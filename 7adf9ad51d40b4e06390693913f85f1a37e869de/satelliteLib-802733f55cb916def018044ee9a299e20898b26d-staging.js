@@ -4451,6 +4451,7 @@
       "f489afdcde1a53ef58aec319401144f7": {
         "engine": "sc",
         "loadOn": "pagebottom",
+        "account": "aaronhardyprod",
         "euCookie": false,
         "sCodeURL": "7adf9ad51d40b4e06390693913f85f1a37e869de/s-code-contents-22c7cbe13317f4c9e99900c0b530d66471196f02-staging.js",
         "initVars": {
@@ -4471,9 +4472,29 @@
         }
       }
     },
-    "pageLoadRules": [
-
-    ],
+    "pageLoadRules": [{
+      name: "KitchenSink",
+      trigger: [{
+        engine: "sc",
+        command: "setVars",
+        arguments: [{
+          eVar10: "MyEvar10",
+          eVar11: "MyEvar11",
+          prop10: "MyProp10",
+          prop11: "MyProp11",
+          pageName: "MyPageName",
+          channel: "MyChannel",
+          pageURL: "MyPageUrl",
+          campaign: "MyCampaign",
+          hier1: "HierLev1|HierLev2|HierLev3|HierLev4"
+        }]
+      }, {engine: "sc", command: "addEvent", arguments: ["prodView:MyProdView"]}, {
+        engine: "tnt",
+        command: "addMbox",
+        arguments: [{mboxGoesAround: "", mboxName: "", arguments: [], timeout: "1500"}]
+      }],
+      event: "pagebottom"
+    }],
     "rules": [
 
     ],

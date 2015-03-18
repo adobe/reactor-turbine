@@ -1,1078 +1,3238 @@
-/*
- ============== DO NOT ALTER ANYTHING BELOW THIS LINE ! ===============
+/*************************************************************************
+ * ADOBE CONFIDENTIAL
+ * ___________________
+ *
+ *  Copyright 2012 Adobe Systems Incorporated
+ *  All Rights Reserved.
+ *
+ * NOTICE:  All information contained herein is, and remains
+ * the property of Adobe Systems Incorporated and its suppliers,
+ * if any.  The intellectual and technical concepts contained
+ * herein are proprietary to Adobe Systems Incorporated and its
+ * suppliers and are protected by all applicable intellectual property
+ * laws, including trade secret and copyright laws.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from Adobe Systems Incorporated.
+ **************************************************************************/
+
+/** @license ============== DO NOT ALTER ANYTHING BELOW THIS LINE ! ===============
 
  AppMeasurement for JavaScript version: 1.4.3
  Copyright 1996-2013 Adobe, Inc. All Rights Reserved
  More info available at http://www.omniture.com
  */
+
+/*********************************************************************
+ * Class AppMeasurement(): Track for tracking
+ *
+ * @constructor
+ * @noalias
+ *********************************************************************/
 function AppMeasurement() {
-  var a = this;
-  a.version = "1.4.3";
-  var k = window;
-  k.s_c_in || (k.s_c_il = [], k.s_c_in = 0);
-  a._il = k.s_c_il;
-  a._in = k.s_c_in;
-  a._il[a._in] = a;
-  k.s_c_in++;
-  a._c = "s_c";
-  var q = k.yb;
-  q || (q = null);
-  var r = k, n, t;
-  try {
-    for (n = r.parent, t = r.location; n && n.location && t && "" + n.location != "" + t && r.location && "" + n.location != "" + r.location && n.location.host == t.host; )
-      r = n, n = r.parent
-  } catch (u) {
+  /**
+   * @type {AppMeasurement}
+   * @noalias
+   */
+  var s = this;
+
+  s.version = "1.4.3";
+
+  /**
+   * @type {!Window}
+   * @noalias
+   */
+  var w = window;
+  if (!w.s_c_in) {
+    w.s_c_il = [];
+    w.s_c_in = 0;
   }
-  a.nb = function(a) {
+  s._il = w.s_c_il;
+  s._in = w.s_c_in;
+  s._il[s._in] = s;
+  w.s_c_in++;
+  s._c="s_c";
+
+  // This and the use of Null below is a hack to keep Google Closure Compiler from creating a global variable for null
+  var Null = w.Null;
+  if (!Null) {
+    Null = null;
+  }
+
+  // Get the top frame set
+  var
+      topFrameSet = w,
+      parent,
+      location,
+      e;
+  try {
+    parent = topFrameSet.parent;
+    location = topFrameSet.location;
+    while ((parent) &&
+    (parent.location) &&
+    (location) &&
+    ('' + parent.location != '' + location) &&
+    (topFrameSet.location) &&
+    ('' + parent.location != '' + topFrameSet.location) &&
+    (parent.location.host == location.host)) {
+      topFrameSet = parent;
+      parent = topFrameSet.parent;
+    }
+  } catch (e) {}
+
+  /*********************************************************************
+   * Function logDebug(message): Log debug message
+   *     message = Debug message
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.logDebug = function(message) {
+    var e;
     try {
-      console.log(a)
-    } catch (b) {
+      console.log(message);
+    } catch(e) {}
+  };
+
+  /*********************************************************************
+   * Function isNumber(x): Is string a number?
+   *     x = String/number to check
+   * Returns:
+   *     True if number, false if not
+   *********************************************************************/
+  s.isNumber = function(x) {
+    return ('' + parseInt(x) == '' + x);
+  };
+
+  /*********************************************************************
+   * Function replace(x,o,n): String replace
+   *     x = Source string
+   *     o = String to match
+   *     n = String to replaces all matches with
+   * Returns:
+   *     x with all o's replaced with n's
+   *********************************************************************/
+  s.replace = function(x,o,n) {
+    if ((!x) || (x.indexOf(o) < 0)) {
+      return x;
     }
+    return x.split(o).join(n);
   };
-  a.za = function(a) {
-    return "" + parseInt(a) == "" + a
-  };
-  a.replace = function(a, b, d) {
-    return !a || 0 > a.indexOf(b) ?
-        a : a.split(b).join(d)
-  };
-  a.escape = function(c) {
-    var b, d;
-    if (!c)
-      return c;
-    c = encodeURIComponent(c);
-    for (b = 0; 7 > b; b++)
-      d = "+~!*()'".substring(b, b + 1), 0 <= c.indexOf(d) && (c = a.replace(c, d, "%" + d.charCodeAt(0).toString(16).toUpperCase()));
-    return c
-  };
-  a.unescape = function(c) {
-    if (!c)
-      return c;
-    c = 0 <= c.indexOf("+") ? a.replace(c, "+", " ") : c;
-    try {
-      return decodeURIComponent(c)
-    } catch (b) {
+
+  /*********************************************************************
+   * Function escape(x): String URL-encode (sometimes '+' is not URL
+   *                     encoded)
+   *     x = String to URL-encode
+   * Returns:
+   *     URL-encoded [x]
+   *********************************************************************/
+  s.escape = function(x) {
+    var
+        y,
+        fix = "+~!*()'",
+        fixPos,
+        fixChar;
+    if (!x) {
+      return x;
     }
-    return unescape(c)
-  };
-  a.eb = function() {
-    var c = k.location.hostname, b = a.fpCookieDomainPeriods, d;
-    b || (b = a.cookieDomainPeriods);
-    if (c && !a.cookieDomain && !/^[0-9.]+$/.test(c) &&
-        (b = b ? parseInt(b) : 2, b = 2 < b ? b : 2, d = c.lastIndexOf("."), 0 <= d)) {
-      for (; 0 <= d && 1 < b; )
-        d = c.lastIndexOf(".", d - 1), b--;
-      a.cookieDomain = 0 < d ? c.substring(d) : c
-    }
-    return a.cookieDomain
-  };
-  a.c_r = a.cookieRead = function(c) {
-    c = a.escape(c);
-    var b = " " + a.d.cookie, d = b.indexOf(" " + c + "="), f = 0 > d ? d : b.indexOf(";", d);
-    c = 0 > d ? "" : a.unescape(b.substring(d + 2 + c.length, 0 > f ? b.length : f));
-    return "[[B]]" != c ? c : ""
-  };
-  a.c_w = a.cookieWrite = function(c, b, d) {
-    var f = a.eb(), e = a.cookieLifetime, g;
-    b = "" + b;
-    e = e ? ("" + e).toUpperCase() : "";
-    d && "SESSION" != e && "NONE" != e && ((g = "" !=
-    b ? parseInt(e ? e : 0) : -60) ? (d = new Date, d.setTime(d.getTime() + 1E3 * g)) : 1 == d && (d = new Date, g = d.getYear(), d.setYear(g + 5 + (1900 > g ? 1900 : 0))));
-    return c && "NONE" != e ? (a.d.cookie = c + "=" + a.escape("" != b ? b : "[[B]]") + "; path=/;" + (d && "SESSION" != e ? " expires=" + d.toGMTString() + ";" : "") + (f ? " domain=" + f + ";" : ""), a.cookieRead(c) == b) : 0
-  };
-  a.F = [];
-  a.ba = function(c, b, d) {
-    if (a.ta)
-      return 0;
-    a.maxDelay || (a.maxDelay = 250);
-    var f = 0, e = (new Date).getTime() + a.maxDelay, g = a.d.visibilityState, m = ["webkitvisibilitychange", "visibilitychange"];
-    g || (g = a.d.webkitVisibilityState);
-    if (g && "prerender" == g) {
-      if (!a.ca)
-        for (a.ca = 1, d = 0; d < m.length; d++)
-          a.d.addEventListener(m[d], function() {
-            var b = a.d.visibilityState;
-            b || (b = a.d.webkitVisibilityState);
-            "visible" == b && (a.ca = 0, a.delayReady())
-          });
-      f = 1;
-      e = 0
-    } else
-      d || a.l("_d") && (f = 1);
-    f && (a.F.push({m: c,a: b,t: e}), a.ca || setTimeout(a.delayReady, a.maxDelay));
-    return f
-  };
-  a.delayReady = function() {
-    var c = (new Date).getTime(), b = 0, d;
-    for (a.l("_d") ? b = 1 : a.na(); 0 < a.F.length; ) {
-      d = a.F.shift();
-      if (b && !d.t && d.t > c) {
-        a.F.unshift(d);
-        setTimeout(a.delayReady, parseInt(a.maxDelay / 2));
-        break
+    y = encodeURIComponent(x);
+    for (fixPos = 0;fixPos < fix.length;fixPos++) {
+      fixChar = fix.substring(fixPos,(fixPos + 1));
+      if (y.indexOf(fixChar) >= 0) {
+        y = s.replace(y,fixChar,"%" + fixChar.charCodeAt(0).toString(16).toUpperCase());
       }
-      a.ta = 1;
-      a[d.m].apply(a, d.a);
-      a.ta = 0
     }
+    return y;
   };
-  a.setAccount = a.sa = function(c) {
-    var b, d;
-    if (!a.ba("setAccount", arguments))
-      if (a.account = c, a.allAccounts)
-        for (b = a.allAccounts.concat(c.split(",")), a.allAccounts = [], b.sort(), d = 0; d < b.length; d++)
-          0 != d && b[d - 1] == b[d] || a.allAccounts.push(b[d]);
-      else
-        a.allAccounts = c.split(",")
-  };
-  a.foreachVar = function(c, b) {
-    var d, f, e, g, m = "";
-    e = f = "";
-    if (a.lightProfileID)
-      d = a.J, (m = a.lightTrackVars) && (m = "," + m + "," + a.ga.join(",") + ",");
-    else {
-      d = a.c;
-      if (a.pe || a.linkType)
-        m = a.linkTrackVars, f = a.linkTrackEvents,
-        a.pe && (e = a.pe.substring(0, 1).toUpperCase() + a.pe.substring(1), a[e] && (m = a[e].xb, f = a[e].wb));
-      m && (m = "," + m + "," + a.A.join(",") + ",");
-      f && m && (m += ",events,")
+
+  /*********************************************************************
+   * Function unescape(x): String URL-decode (sometimes '+' is not URL
+   *                       decoded)
+   *     x = String to URL-decode
+   * Returns:
+   *     URL-decoded [x]
+   *********************************************************************/
+  s.unescape = function(x) {
+    var
+        y,
+        e;
+    if (!x) {
+      return x;
     }
-    b && (b = "," + b + ",");
-    for (f = 0; f < d.length; f++)
-      e = d[f], (g = a[e]) && (!m || 0 <= m.indexOf("," + e + ",")) && (!b || 0 <= b.indexOf("," + e + ",")) && c(e, g)
+    y = (x.indexOf('+') >= 0 ? s.replace(x,'+',' ') : x);
+    try {
+      return decodeURIComponent(y);
+    } catch (e) {}
+    return unescape(y);
   };
-  a.L = function(c, b, d, f, e) {
-    var g = "", m, p, k, w, n = 0;
-    "contextData" == c && (c = "c");
-    if (b) {
-      for (m in b)
-        if (!(Object.prototype[m] || e && m.substring(0, e.length) != e) && b[m] && (!d || 0 <= d.indexOf("," + (f ? f + "." : "") + m + ","))) {
-          k = !1;
-          if (n)
-            for (p = 0; p < n.length; p++)
-              m.substring(0,
-                  n[p].length) == n[p] && (k = !0);
-          if (!k && ("" == g && (g += "&" + c + "."), p = b[m], e && (m = m.substring(e.length)), 0 < m.length))
-            if (k = m.indexOf("."), 0 < k)
-              p = m.substring(0, k), k = (e ? e : "") + p + ".", n || (n = []), n.push(k), g += a.L(p, b, d, f, k);
-            else if ("boolean" == typeof p && (p = p ? "true" : "false"), p) {
-              if ("retrieveLightData" == f && 0 > e.indexOf(".contextData."))
-                switch (k = m.substring(0, 4), w = m.substring(4), m) {
-                  case "transactionID":
-                    m = "xact";
-                    break;
-                  case "channel":
-                    m = "ch";
-                    break;
-                  case "campaign":
-                    m = "v0";
-                    break;
-                  default:
-                    a.za(w) && ("prop" == k ? m = "c" + w : "eVar" == k ? m = "v" +
-                    w : "list" == k ? m = "l" + w : "hier" == k && (m = "h" + w, p = p.substring(0, 255)))
-                }
-              g += "&" + a.escape(m) + "=" + a.escape(p)
+
+  /*********************************************************************
+   * Function getCookieDomain(): Generate and return domain to use for setting cookies
+   *     Nothing
+   * Returns:
+   *     Domain to use for setting cookies
+   *********************************************************************/
+  s.getCookieDomain = function() {
+    var
+        d = w.location.hostname,
+        n = s.fpCookieDomainPeriods,
+        p;
+    if (!n) {
+      n = s.cookieDomainPeriods;
+    }
+    if ((d) && (!s.cookieDomain) && (!(/^[0-9.]+$/).test(d))) {
+      n = (n ? parseInt(n) : 2);
+      n = (n > 2? n : 2);
+      p = d.lastIndexOf('.');
+      if (p >= 0) {
+        while ((p >= 0) && (n > 1)) {
+          p = d.lastIndexOf('.',p - 1);
+          n--;
+        }
+        s.cookieDomain = (p > 0 ? d.substring(p) : d);
+      }
+    }
+    return s.cookieDomain;
+  };
+
+  /*********************************************************************
+   * Function cookieRead(k): Read, URL-decode, and return value of k in cookies
+   *     k = key to read value for out of cookies
+   * Returns:
+   *     Value of k in cookies if found, blank if not
+   *********************************************************************/
+  s.c_r = s.cookieRead = function(k) {
+    k = s.escape(k);
+    var
+        c = ' ' + s.d.cookie,
+        i = c.indexOf(' ' + k + '='),
+        e = (i < 0 ? i : c.indexOf(';',i)),
+        v = (i < 0 ? '' : s.unescape(c.substring((i + 2 + k.length),(e < 0 ? c.length : e))));
+    return (v != '[[B]]' ? v : '');
+  };
+
+  /*********************************************************************
+   * Function cookieWrite(k,v,e): Write value v as key k in cookies with
+   *                              optional expiration e and domain automaticly
+   *                              generated by getCookieDomain()
+   *     k = key to write value for in cookies
+   *     v = value to write to cookies
+   *     e = optional expiration Date object or 1 to use default expiration
+   * Returns:
+   *     True if value was successfuly written and false if it was not
+   *********************************************************************/
+  s.c_w = s.cookieWrite = function(k,v,e) {
+    var
+        d = s.getCookieDomain(),
+        l = s.cookieLifetime,
+        t;
+    v = '' + v;
+    l = (l ? ('' + l).toUpperCase() : '');
+    if ((e) && (l != 'SESSION') && (l != 'NONE')) {
+      t = (v != '' ? parseInt(l ? l : 0) : -60);
+      if (t) {
+        e = new Date;
+        e.setTime(e.getTime() + (t * 1000));
+      } else if (e == 1) {
+        e = new Date;
+        var y = e.getYear();
+        e.setYear( y + 5 + (y < 1900 ? 1900 : 0));
+      }
+    }
+    if ((k) && (l != 'NONE')) {
+      s.d.cookie = k + '=' + s.escape(v != ''? v : '[[B]]' ) + '; path=/;'
+      + ((e) && (l != 'SESSION') ? ' expires=' + e.toGMTString() + ';' : '')
+      + (d ? ' domain=' + d + ';' : '');
+      return (s.cookieRead(k) == v);
+    }
+    return 0;
+  };
+
+  /*********************************************************************
+   * Function delayCall(methodName,args,onlyPrerender): Delay a call to a method if needed
+   *     methodName    = Name of method called
+   *     args          = Arguments to method call
+   *     onlyPrerender = Optionally only delay due to prerender
+   * Returns:
+   *     1 if a delay is needed or 0 if not
+   *********************************************************************/
+  s.delayCallQueue = [];
+  s.delayCall = function(methodName,args,onlyPrerender) {
+    if (s.delayCallDisabled)
+      return 0;
+
+    if (!s.maxDelay) {
+      s.maxDelay = 250;
+    }
+
+    var
+        delayNeeded = 0,
+        tm = new Date,
+        timeout = tm.getTime() + s.maxDelay,
+        visibilityState = s.d.visibilityState,
+        visibilityStateEventList = ["webkitvisibilitychange","visibilitychange"],
+        visibilityStateEventNum;
+
+    if (!visibilityState) {
+      visibilityState = s.d.webkitVisibilityState;
+    }
+    if ((visibilityState) && (visibilityState == 'prerender')) {
+      if (!s.delayCallPrerender) {
+        s.delayCallPrerender = 1;
+        for (visibilityStateEventNum = 0;visibilityStateEventNum < visibilityStateEventList.length;visibilityStateEventNum++) {
+          s.d.addEventListener(visibilityStateEventList[visibilityStateEventNum],function() {
+            var
+                visibilityState = s.d.visibilityState;
+            if (!visibilityState) {
+              visibilityState = s.d.webkitVisibilityState;
             }
-        }
-      "" != g && (g += "&." + c)
-    }
-    return g
-  };
-  a.gb = function() {
-    var c = "", b, d, f, e, g, m, p, k, n = "", q = "", r = d = "";
-    if (a.lightProfileID)
-      b = a.J, (n = a.lightTrackVars) && (n = "," + n + "," + a.ga.join(",") + ",");
-    else {
-      b = a.c;
-      if (a.pe || a.linkType)
-        n = a.linkTrackVars, q = a.linkTrackEvents, a.pe && (d = a.pe.substring(0, 1).toUpperCase() + a.pe.substring(1), a[d] && (n = a[d].xb, q = a[d].wb));
-      n && (n = "," + n + "," + a.A.join(",") + ",");
-      q && (q = "," + q + ",", n && (n += ",events,"));
-      a.events2 &&
-      (r += ("" != r ? "," : "") + a.events2)
-    }
-    a.AudienceManagement && a.AudienceManagement.isReady() && (c += a.L("d", a.AudienceManagement.getEventCallConfigParams()));
-    for (d = 0; d < b.length; d++) {
-      e = b[d];
-      g = a[e];
-      f = e.substring(0, 4);
-      m = e.substring(4);
-      !g && "events" == e && r && (g = r, r = "");
-      if (g && (!n || 0 <= n.indexOf("," + e + ","))) {
-        switch (e) {
-          case "supplementalDataID":
-            e = "sdid";
-            break;
-          case "timestamp":
-            e = "ts";
-            break;
-          case "dynamicVariablePrefix":
-            e = "D";
-            break;
-          case "visitorID":
-            e = "vid";
-            break;
-          case "marketingCloudVisitorID":
-            e = "mid";
-            break;
-          case "analyticsVisitorID":
-            e =
-                "aid";
-            break;
-          case "audienceManagerLocationHint":
-            e = "aamlh";
-            break;
-          case "audienceManagerBlob":
-            e = "aamb";
-            break;
-          case "authState":
-            e = "as";
-            break;
-          case "pageURL":
-            e = "g";
-            255 < g.length && (a.pageURLRest = g.substring(255), g = g.substring(0, 255));
-            break;
-          case "pageURLRest":
-            e = "-g";
-            break;
-          case "referrer":
-            e = "r";
-            break;
-          case "vmk":
-          case "visitorMigrationKey":
-            e = "vmt";
-            break;
-          case "visitorMigrationServer":
-            e = "vmf";
-            a.ssl && a.visitorMigrationServerSecure && (g = "");
-            break;
-          case "visitorMigrationServerSecure":
-            e = "vmf";
-            !a.ssl && a.visitorMigrationServer &&
-            (g = "");
-            break;
-          case "charSet":
-            e = "ce";
-            break;
-          case "visitorNamespace":
-            e = "ns";
-            break;
-          case "cookieDomainPeriods":
-            e = "cdp";
-            break;
-          case "cookieLifetime":
-            e = "cl";
-            break;
-          case "variableProvider":
-            e = "vvp";
-            break;
-          case "currencyCode":
-            e = "cc";
-            break;
-          case "channel":
-            e = "ch";
-            break;
-          case "transactionID":
-            e = "xact";
-            break;
-          case "campaign":
-            e = "v0";
-            break;
-          case "latitude":
-            e = "lat";
-            break;
-          case "longitude":
-            e = "lon";
-            break;
-          case "resolution":
-            e = "s";
-            break;
-          case "colorDepth":
-            e = "c";
-            break;
-          case "javascriptVersion":
-            e = "j";
-            break;
-          case "javaEnabled":
-            e = "v";
-            break;
-          case "cookiesEnabled":
-            e = "k";
-            break;
-          case "browserWidth":
-            e = "bw";
-            break;
-          case "browserHeight":
-            e = "bh";
-            break;
-          case "connectionType":
-            e = "ct";
-            break;
-          case "homepage":
-            e = "hp";
-            break;
-          case "events":
-            r && (g += ("" != g ? "," : "") + r);
-            if (q)
-              for (m = g.split(","), g = "", f = 0; f < m.length; f++)
-                p = m[f], k = p.indexOf("="), 0 <= k && (p = p.substring(0, k)), k = p.indexOf(":"), 0 <= k && (p = p.substring(0, k)), 0 <= q.indexOf("," + p + ",") && (g += (g ? "," : "") + m[f]);
-            break;
-          case "events2":
-            g = "";
-            break;
-          case "contextData":
-            c += a.L("c", a[e], n, e);
-            g = "";
-            break;
-          case "lightProfileID":
-            e =
-                "mtp";
-            break;
-          case "lightStoreForSeconds":
-            e = "mtss";
-            a.lightProfileID || (g = "");
-            break;
-          case "lightIncrementBy":
-            e = "mti";
-            a.lightProfileID || (g = "");
-            break;
-          case "retrieveLightProfiles":
-            e = "mtsr";
-            break;
-          case "deleteLightProfiles":
-            e = "mtsd";
-            break;
-          case "retrieveLightData":
-            a.retrieveLightProfiles && (c += a.L("mts", a[e], n, e));
-            g = "";
-            break;
-          default:
-            a.za(m) && ("prop" == f ? e = "c" + m : "eVar" == f ? e = "v" + m : "list" == f ? e = "l" + m : "hier" == f && (e = "h" + m, g = g.substring(0, 255)))
-        }
-        g && (c += "&" + e + "=" + ("pev" != e.substring(0, 3) ? a.escape(g) : g))
-      }
-      "pev3" == e && a.e &&
-      (c += a.e)
-    }
-    return c
-  };
-  a.u = function(a) {
-    var b = a.tagName;
-    if ("undefined" != "" + a.Bb || "undefined" != "" + a.rb && "HTML" != ("" + a.rb).toUpperCase())
-      return "";
-    b = b && b.toUpperCase ? b.toUpperCase() : "";
-    "SHAPE" == b && (b = "");
-    b && (("INPUT" == b || "BUTTON" == b) && a.type && a.type.toUpperCase ? b = a.type.toUpperCase() : !b && a.href && (b = "A"));
-    return b
-  };
-  a.va = function(a) {
-    var b = a.href ? a.href : "", d, f, e;
-    d = b.indexOf(":");
-    f = b.indexOf("?");
-    e = b.indexOf("/");
-    b && (0 > d || 0 <= f && d > f || 0 <= e && d > e) && (f = a.protocol && 1 < a.protocol.length ? a.protocol : l.protocol ? l.protocol :
-        "", d = l.pathname.lastIndexOf("/"), b = (f ? f + "//" : "") + (a.host ? a.host : l.host ? l.host : "") + ("/" != h.substring(0, 1) ? l.pathname.substring(0, 0 > d ? 0 : d) + "/" : "") + b);
-    return b
-  };
-  a.G = function(c) {
-    var b = a.u(c), d, f, e = "", g = 0;
-    return b && (d = c.protocol, f = c.onclick, !c.href || "A" != b && "AREA" != b || f && d && !(0 > d.toLowerCase().indexOf("javascript")) ? f ? (e = a.replace(a.replace(a.replace(a.replace("" + f, "\r", ""), "\n", ""), "\t", ""), " ", ""), g = 2) : "INPUT" == b || "SUBMIT" == b ? (c.value ? e = c.value : c.innerText ? e = c.innerText : c.textContent && (e = c.textContent),
-        g = 3) : c.src && "IMAGE" == b && (e = c.src) : e = a.va(c), e) ? {id: e.substring(0, 100),type: g} : 0
-  };
-  a.zb = function(c) {
-    for (var b = a.u(c), d = a.G(c); c && !d && "BODY" != b; )
-      if (c = c.parentElement ? c.parentElement : c.parentNode)
-        b = a.u(c), d = a.G(c);
-    d && "BODY" != b || (c = 0);
-    c && (b = c.onclick ? "" + c.onclick : "", 0 <= b.indexOf(".tl(") || 0 <= b.indexOf(".trackLink(")) && (c = 0);
-    return c
-  };
-  a.qb = function() {
-    var c, b, d = a.linkObject, f = a.linkType, e = a.linkURL, g, m;
-    a.ha = 1;
-    d || (a.ha = 0, d = a.clickObject);
-    if (d) {
-      c = a.u(d);
-      for (b = a.G(d); d && !b && "BODY" != c; )
-        if (d = d.parentElement ? d.parentElement :
-                d.parentNode)
-          c = a.u(d), b = a.G(d);
-      b && "BODY" != c || (d = 0);
-      if (d) {
-        var p = d.onclick ? "" + d.onclick : "";
-        if (0 <= p.indexOf(".tl(") || 0 <= p.indexOf(".trackLink("))
-          d = 0
-      }
-    } else
-      a.ha = 1;
-    !e && d && (e = a.va(d));
-    e && !a.linkLeaveQueryString && (g = e.indexOf("?"), 0 <= g && (e = e.substring(0, g)));
-    if (!f && e) {
-      var n = 0, q = 0, r;
-      if (a.trackDownloadLinks && a.linkDownloadFileTypes)
-        for (p = e.toLowerCase(), g = p.indexOf("?"), m = p.indexOf("#"), 0 <= g ? 0 <= m && m < g && (g = m) : g = m, 0 <= g && (p = p.substring(0, g)), g = a.linkDownloadFileTypes.toLowerCase().split(","), m = 0; m < g.length; m++)
-          (r =
-              g[m]) && p.substring(p.length - (r.length + 1)) == "." + r && (f = "d");
-      if (a.trackExternalLinks && !f && (p = e.toLowerCase(), a.ya(p) && (a.linkInternalFilters || (a.linkInternalFilters = k.location.hostname), g = 0, a.linkExternalFilters ? (g = a.linkExternalFilters.toLowerCase().split(","), n = 1) : a.linkInternalFilters && (g = a.linkInternalFilters.toLowerCase().split(",")), g))) {
-        for (m = 0; m < g.length; m++)
-          r = g[m], 0 <= p.indexOf(r) && (q = 1);
-        q ? n && (f = "e") : n || (f = "e")
-      }
-    }
-    a.linkObject = d;
-    a.linkURL = e;
-    a.linkType = f;
-    if (a.trackClickMap || a.trackInlineStats)
-      a.e =
-          "", d && (f = a.pageName, e = 1, d = d.sourceIndex, f || (f = a.pageURL, e = 0), k.s_objectID && (b.id = k.s_objectID, d = b.type = 1), f && b && b.id && c && (a.e = "&pid=" + a.escape(f.substring(0, 255)) + (e ? "&pidt=" + e : "") + "&oid=" + a.escape(b.id.substring(0, 100)) + (b.type ? "&oidt=" + b.type : "") + "&ot=" + c + (d ? "&oi=" + d : "")))
-  };
-  a.hb = function() {
-    var c = a.ha, b = a.linkType, d = a.linkURL, f = a.linkName;
-    b && (d || f) && (b = b.toLowerCase(), "d" != b && "e" != b && (b = "o"), a.pe = "lnk_" + b, a.pev1 = d ? a.escape(d) : "", a.pev2 = f ? a.escape(f) : "", c = 1);
-    a.abort && (c = 0);
-    if (a.trackClickMap || a.trackInlineStats) {
-      var b =
-      {}, d = 0, e = a.cookieRead("s_sq"), g = e ? e.split("&") : 0, m, p, k, e = 0;
-      if (g)
-        for (m = 0; m < g.length; m++)
-          p = g[m].split("="), f = a.unescape(p[0]).split(","), p = a.unescape(p[1]), b[p] = f;
-      f = a.account.split(",");
-      if (c || a.e) {
-        c && !a.e && (e = 1);
-        for (p in b)
-          if (!Object.prototype[p])
-            for (m = 0; m < f.length; m++)
-              for (e && (k = b[p].join(","), k == a.account && (a.e += ("&" != p.charAt(0) ? "&" : "") + p, b[p] = [], d = 1)), g = 0; g < b[p].length; g++)
-                k = b[p][g], k == f[m] && (e && (a.e += "&u=" + a.escape(k) + ("&" != p.charAt(0) ? "&" : "") + p + "&u=0"), b[p].splice(g, 1), d = 1);
-        c || (d = 1);
-        if (d) {
-          e = "";
-          m = 2;
-          !c && a.e && (e = a.escape(f.join(",")) + "=" + a.escape(a.e), m = 1);
-          for (p in b)
-            !Object.prototype[p] && 0 < m && 0 < b[p].length && (e += (e ? "&" : "") + a.escape(b[p].join(",")) + "=" + a.escape(p), m--);
-          a.cookieWrite("s_sq", e)
-        }
-      }
-    }
-    return c
-  };
-  a.ib = function() {
-    if (!a.vb) {
-      var c = new Date, b = r.location, d, f, e = f = d = "", g = "", m = "", k = "1.2", n = a.cookieWrite("s_cc", "true", 0) ? "Y" : "N", q = "", s = "";
-      if (c.setUTCDate && (k = "1.3", (0).toPrecision && (k = "1.5", c = [], c.forEach))) {
-        k = "1.6";
-        f = 0;
-        d = {};
-        try {
-          f = new Iterator(d), f.next && (k = "1.7", c.reduce && (k = "1.8", k.trim && (k =
-              "1.8.1", Date.parse && (k = "1.8.2", Object.create && (k = "1.8.5")))))
-        } catch (t) {
-        }
-      }
-      d = screen.width + "x" + screen.height;
-      e = navigator.javaEnabled() ? "Y" : "N";
-      f = screen.pixelDepth ? screen.pixelDepth : screen.colorDepth;
-      g = a.w.innerWidth ? a.w.innerWidth : a.d.documentElement.offsetWidth;
-      m = a.w.innerHeight ? a.w.innerHeight : a.d.documentElement.offsetHeight;
-      try {
-        a.b.addBehavior("#default#homePage"), q = a.b.Ab(b) ? "Y" : "N"
-      } catch (u) {
-      }
-      try {
-        a.b.addBehavior("#default#clientCaps"), s = a.b.connectionType
-      } catch (x) {
-      }
-      a.resolution = d;
-      a.colorDepth = f;
-      a.javascriptVersion = k;
-      a.javaEnabled = e;
-      a.cookiesEnabled = n;
-      a.browserWidth = g;
-      a.browserHeight = m;
-      a.connectionType = s;
-      a.homepage = q;
-      a.vb = 1
-    }
-  };
-  a.K = {};
-  a.loadModule = function(c, b) {
-    var d = a.K[c];
-    if (!d) {
-      d = k["AppMeasurement_Module_" + c] ? new k["AppMeasurement_Module_" + c](a) : {};
-      a.K[c] = a[c] = d;
-      d.Na = function() {
-        return d.Ra
-      };
-      d.Sa = function(b) {
-        if (d.Ra = b)
-          a[c + "_onLoad"] = b, a.ba(c + "_onLoad", [a, d], 1) || b(a, d)
-      };
-      try {
-        Object.defineProperty ? Object.defineProperty(d, "onLoad", {get: d.Na,set: d.Sa}) : d._olc = 1
-      } catch (f) {
-        d._olc = 1
-      }
-    }
-    b && (a[c + "_onLoad"] =
-        b, a.ba(c + "_onLoad", [a, d], 1) || b(a, d))
-  };
-  a.l = function(c) {
-    var b, d;
-    for (b in a.K)
-      if (!Object.prototype[b] && (d = a.K[b]) && (d._olc && d.onLoad && (d._olc = 0, d.onLoad(a, d)), d[c] && d[c]()))
-        return 1;
-    return 0
-  };
-  a.lb = function() {
-    var c = Math.floor(1E13 * Math.random()), b = a.visitorSampling, d = a.visitorSamplingGroup, d = "s_vsn_" + (a.visitorNamespace ? a.visitorNamespace : a.account) + (d ? "_" + d : ""), f = a.cookieRead(d);
-    if (b) {
-      f && (f = parseInt(f));
-      if (!f) {
-        if (!a.cookieWrite(d, c))
-          return 0;
-        f = c
-      }
-      if (f % 1E4 > v)
-        return 0
-    }
-    return 1
-  };
-  a.M = function(c, b) {
-    var d,
-        f, e, g, m, k;
-    for (d = 0; 2 > d; d++)
-      for (f = 0 < d ? a.oa : a.c, e = 0; e < f.length; e++)
-        if (g = f[e], (m = c[g]) || c["!" + g]) {
-          if (!b && ("contextData" == g || "retrieveLightData" == g) && a[g])
-            for (k in a[g])
-              m[k] || (m[k] = a[g][k]);
-          a[g] = m
-        }
-  };
-  a.Ga = function(c, b) {
-    var d, f, e, g;
-    for (d = 0; 2 > d; d++)
-      for (f = 0 < d ? a.oa : a.c, e = 0; e < f.length; e++)
-        g = f[e], c[g] = a[g], b || c[g] || (c["!" + g] = 1)
-  };
-  a.cb = function(a) {
-    var b, d, f, e, g, m = 0, k, n = "", q = "";
-    if (a && 255 < a.length && (b = "" + a, d = b.indexOf("?"), 0 < d && (k = b.substring(d + 1), b = b.substring(0, d), e = b.toLowerCase(), f = 0, "http://" == e.substring(0,
-            7) ? f += 7 : "https://" == e.substring(0, 8) && (f += 8), d = e.indexOf("/", f), 0 < d && (e = e.substring(f, d), g = b.substring(d), b = b.substring(0, d), 0 <= e.indexOf("google") ? m = ",q,ie,start,search_key,word,kw,cd," : 0 <= e.indexOf("yahoo.co") && (m = ",p,ei,"), m && k)))) {
-      if ((a = k.split("&")) && 1 < a.length) {
-        for (f = 0; f < a.length; f++)
-          e = a[f], d = e.indexOf("="), 0 < d && 0 <= m.indexOf("," + e.substring(0, d) + ",") ? n += (n ? "&" : "") + e : q += (q ? "&" : "") + e;
-        n && q ? k = n + "&" + q : q = ""
-      }
-      d = 253 - (k.length - q.length) - b.length;
-      a = b + (0 < d ? g.substring(0, d) : "") + "?" + k
-    }
-    return a
-  };
-  a.Ma = function(c) {
-    var b =
-        a.d.visibilityState, d = ["webkitvisibilitychange", "visibilitychange"];
-    b || (b = a.d.webkitVisibilityState);
-    if (b && "prerender" == b) {
-      if (c)
-        for (b = 0; b < d.length; b++)
-          a.d.addEventListener(d[b], function() {
-            var b = a.d.visibilityState;
-            b || (b = a.d.webkitVisibilityState);
-            "visible" == b && c()
+            if (visibilityState == 'visible') {
+              s.delayCallPrerender = 0;
+              s['delayReady']();
+            }
           });
-      return !1
-    }
-    return !0
-  };
-  a.Y = !1;
-  a.C = !1;
-  a.Ta = function() {
-    a.C = !0;
-    a.i()
-  };
-  a.W = !1;
-  a.Q = !1;
-  a.Qa = function(c) {
-    a.marketingCloudVisitorID = c;
-    a.Q = !0;
-    a.i()
-  };
-  a.T = !1;
-  a.N = !1;
-  a.Ia = function(c) {
-    a.analyticsVisitorID = c;
-    a.N = !0;
-    a.i()
-  };
-  a.V = !1;
-  a.P = !1;
-  a.Ka = function(c) {
-    a.audienceManagerLocationHint =
-        c;
-    a.P = !0;
-    a.i()
-  };
-  a.U = !1;
-  a.O = !1;
-  a.Ja = function(c) {
-    a.audienceManagerBlob = c;
-    a.O = !0;
-    a.i()
-  };
-  a.La = function(c) {
-    a.maxDelay || (a.maxDelay = 250);
-    return a.l("_d") ? (c && setTimeout(function() {
-      c()
-    }, a.maxDelay), !1) : !0
-  };
-  a.X = !1;
-  a.B = !1;
-  a.na = function() {
-    a.B = !0;
-    a.i()
-  };
-  a.isReadyToTrack = function() {
-    var c = !0, b = a.visitor;
-    a.Y || a.C || (a.Ma(a.Ta) ? a.C = !0 : a.Y = !0);
-    if (a.Y && !a.C)
-      return !1;
-    b && b.isAllowed() && (a.W || a.marketingCloudVisitorID || !b.getMarketingCloudVisitorID || (a.W = !0, a.marketingCloudVisitorID = b.getMarketingCloudVisitorID([a, a.Qa]),
-    a.marketingCloudVisitorID && (a.Q = !0)), a.T || a.analyticsVisitorID || !b.getAnalyticsVisitorID || (a.T = !0, a.analyticsVisitorID = b.getAnalyticsVisitorID([a, a.Ia]), a.analyticsVisitorID && (a.N = !0)), a.V || a.audienceManagerLocationHint || !b.getAudienceManagerLocationHint || (a.V = !0, a.audienceManagerLocationHint = b.getAudienceManagerLocationHint([a, a.Ka]), a.audienceManagerLocationHint && (a.P = !0)), a.U || a.audienceManagerBlob || !b.getAudienceManagerBlob || (a.U = !0, a.audienceManagerBlob = b.getAudienceManagerBlob([a, a.Ja]), a.audienceManagerBlob &&
-    (a.O = !0)), a.W && !a.Q && !a.marketingCloudVisitorID || a.T && !a.N && !a.analyticsVisitorID || a.V && !a.P && !a.audienceManagerLocationHint || a.U && !a.O && !a.audienceManagerBlob) && (c = !1);
-    a.X || a.B || (a.La(a.na) ? a.B = !0 : a.X = !0);
-    a.X && !a.B && (c = !1);
-    return c
-  };
-  a.k = q;
-  a.o = 0;
-  a.callbackWhenReadyToTrack = function(c, b, d) {
-    var f;
-    f = {};
-    f.Xa = c;
-    f.Wa = b;
-    f.Ua = d;
-    a.k == q && (a.k = []);
-    a.k.push(f);
-    0 == a.o && (a.o = setInterval(a.i, 100))
-  };
-  a.i = function() {
-    var c;
-    if (a.isReadyToTrack() && (a.o && (clearInterval(a.o), a.o = 0), a.k != q))
-      for (; 0 < a.k.length; )
-        c = a.k.shift(),
-            c.Wa.apply(c.Xa, c.Ua)
-  };
-  a.Oa = function(c) {
-    var b, d, f = q, e = q;
-    if (!a.isReadyToTrack()) {
-      b = [];
-      if (c != q)
-        for (d in f = {}, c)
-          f[d] = c[d];
-      e = {};
-      a.Ga(e, !0);
-      b.push(f);
-      b.push(e);
-      a.callbackWhenReadyToTrack(a, a.track, b);
-      return !0
-    }
-    return !1
-  };
-  a.fb = function() {
-    var c = a.cookieRead("s_fid"), b = "", d = "", f;
-    f = 8;
-    var e = 4;
-    if (!c || 0 > c.indexOf("-")) {
-      for (c = 0; 16 > c; c++)
-        f = Math.floor(Math.random() * f), b += "0123456789ABCDEF".substring(f, f + 1), f = Math.floor(Math.random() * e), d += "0123456789ABCDEF".substring(f, f + 1), f = e = 16;
-      c = b + "-" + d
-    }
-    a.cookieWrite("s_fid",
-        c, 1) || (c = 0);
-    return c
-  };
-  a.t = a.track = function(c, b) {
-    var d, f = new Date, e = "s" + Math.floor(f.getTime() / 108E5) % 10 + Math.floor(1E13 * Math.random()), g = f.getYear(), g = "t=" + a.escape(f.getDate() + "/" + f.getMonth() + "/" + (1900 > g ? g + 1900 : g) + " " + f.getHours() + ":" + f.getMinutes() + ":" + f.getSeconds() + " " + f.getDay() + " " + f.getTimezoneOffset());
-    a.visitor && (a.visitor.getAuthState && (a.authState = a.visitor.getAuthState()), !a.supplementalDataID && a.visitor.getSupplementalDataID && (a.supplementalDataID = a.visitor.getSupplementalDataID("AppMeasurement:" +
-    a._in, a.expectSupplementalData ? !1 : !0)));
-    a.l("_s");
-    a.Oa(c) || (b && a.M(b), c && (d = {}, a.Ga(d, 0), a.M(c)), a.lb() && (a.analyticsVisitorID || a.marketingCloudVisitorID || (a.fid = a.fb()), a.qb(), a.usePlugins && a.doPlugins && a.doPlugins(a), a.account && (a.abort || (a.trackOffline && !a.timestamp && (a.timestamp = Math.floor(f.getTime() / 1E3)), f = k.location, a.pageURL || (a.pageURL = f.href ? f.href : f), a.referrer || a.Ha || (a.referrer = r.document.referrer), a.Ha = 1, a.referrer = a.cb(a.referrer), a.l("_g")), a.hb() && !a.abort && (a.ib(), g += a.gb(), a.pb(e,
-        g), a.l("_t"), a.referrer = ""))), c && a.M(d, 1));
-    a.abort = a.supplementalDataID = a.timestamp = a.pageURLRest = a.linkObject = a.clickObject = a.linkURL = a.linkName = a.linkType = k.s_objectID = a.pe = a.pev1 = a.pev2 = a.pev3 = a.e = 0
-  };
-  a.tl = a.trackLink = function(c, b, d, f, e) {
-    a.linkObject = c;
-    a.linkType = b;
-    a.linkName = d;
-    e && (a.j = c, a.q = e);
-    return a.track(f)
-  };
-  a.trackLight = function(c, b, d, f) {
-    a.lightProfileID = c;
-    a.lightStoreForSeconds = b;
-    a.lightIncrementBy = d;
-    return a.track(f)
-  };
-  a.clearVars = function() {
-    var c, b;
-    for (c = 0; c < a.c.length; c++)
-      if (b = a.c[c], "prop" ==
-          b.substring(0, 4) || "eVar" == b.substring(0, 4) || "hier" == b.substring(0, 4) || "list" == b.substring(0, 4) || "channel" == b || "events" == b || "eventList" == b || "products" == b || "productList" == b || "purchaseID" == b || "transactionID" == b || "state" == b || "zip" == b || "campaign" == b)
-        a[b] = void 0
-  };
-  a.tagContainerMarker = "";
-  a.pb = function(c, b) {
-    var d, f = a.trackingServer;
-    d = "";
-    var e = a.dc, g = "sc.", k = a.visitorNamespace;
-    f ? a.trackingServerSecure && a.ssl && (f = a.trackingServerSecure) : (k || (k = a.account, f = k.indexOf(","), 0 <= f && (k = k.substring(0, f)), k = k.replace(/[^A-Za-z0-9]/g,
-        "")), d || (d = "2o7.net"), e = e ? ("" + e).toLowerCase() : "d1", "2o7.net" == d && ("d1" == e ? e = "112" : "d2" == e && (e = "122"), g = ""), f = k + "." + e + "." + g + d);
-    d = a.ssl ? "https://" : "http://";
-    e = a.AudienceManagement && a.AudienceManagement.isReady();
-    d += f + "/b/ss/" + a.account + "/" + (a.mobile ? "5." : "") + (e ? "10" : "1") + "/JS-" + a.version + (a.ub ? "T" : "") + (a.tagContainerMarker ? "-" + a.tagContainerMarker : "") + "/" + c + "?AQB=1&ndh=1&pf=1&" + (e ? "callback=s_c_il[" + a._in + "].AudienceManagement.passData&" : "") + b + "&AQE=1";
-    a.ab(d);
-    a.da()
-  };
-  a.ab = function(c) {
-    a.g || a.jb();
-    a.g.push(c);
-    a.fa = a.r();
-    a.Fa()
-  };
-  a.jb = function() {
-    a.g = a.mb();
-    a.g || (a.g = [])
-  };
-  a.mb = function() {
-    var c, b;
-    if (a.ka()) {
-      try {
-        (b = k.localStorage.getItem(a.ia())) && (c = k.JSON.parse(b))
-      } catch (d) {
-      }
-      return c
-    }
-  };
-  a.ka = function() {
-    var c = !0;
-    a.trackOffline && a.offlineFilename && k.localStorage && k.JSON || (c = !1);
-    return c
-  };
-  a.wa = function() {
-    var c = 0;
-    a.g && (c = a.g.length);
-    a.v && c++;
-    return c
-  };
-  a.da = function() {
-    if (!a.v)
-      if (a.xa = q, a.ja)
-        a.fa > a.I && a.Da(a.g), a.ma(500);
-      else {
-        var c = a.Va();
-        if (0 < c)
-          a.ma(c);
-        else if (c = a.ua())
-          a.v = 1, a.ob(c), a.sb(c)
-      }
-  };
-  a.ma =
-      function(c) {
-        a.xa || (c || (c = 0), a.xa = setTimeout(a.da, c))
-      };
-  a.Va = function() {
-    var c;
-    if (!a.trackOffline || 0 >= a.offlineThrottleDelay)
-      return 0;
-    c = a.r() - a.Ca;
-    return a.offlineThrottleDelay < c ? 0 : a.offlineThrottleDelay - c
-  };
-  a.ua = function() {
-    if (0 < a.g.length)
-      return a.g.shift()
-  };
-  a.ob = function(c) {
-    if (a.debugTracking) {
-      var b = "AppMeasurement Debug: " + c;
-      c = c.split("&");
-      var d;
-      for (d = 0; d < c.length; d++)
-        b += "\n\t" + a.unescape(c[d]);
-      a.nb(b)
-    }
-  };
-  a.Pa = function() {
-    return a.marketingCloudVisitorID || a.analyticsVisitorID
-  };
-  a.S = !1;
-  var s;
-  try {
-    s = JSON.parse('{"x":"y"}')
-  } catch (x) {
-    s =
-        null
-  }
-  s && "y" == s.x ? (a.S = !0, a.R = function(a) {
-    return JSON.parse(a)
-  }) : k.$ && k.$.parseJSON ? (a.R = function(a) {
-    return k.$.parseJSON(a)
-  }, a.S = !0) : a.R = function() {
-    return null
-  };
-  a.sb = function(c) {
-    var b, d, f;
-    a.Pa() && 2047 < c.length && ("undefined" != typeof XMLHttpRequest && (b = new XMLHttpRequest, "withCredentials" in b ? d = 1 : b = 0), b || "undefined" == typeof XDomainRequest || (b = new XDomainRequest, d = 2), b && a.AudienceManagement && a.AudienceManagement.isReady() && (a.S ? b.pa = !0 : b = 0));
-    !b && a.kb && (c = c.substring(0, 2047));
-    !b && a.d.createElement && a.AudienceManagement &&
-    a.AudienceManagement.isReady() && (b = a.d.createElement("SCRIPT")) && "async" in b && ((f = (f = a.d.getElementsByTagName("HEAD")) && f[0] ? f[0] : a.d.body) ? (b.type = "text/javascript", b.setAttribute("async", "async"), d = 3) : b = 0);
-    b || (b = new Image, b.alt = "");
-    b.ra = function() {
-      try {
-        a.la && (clearTimeout(a.la), a.la = 0), b.timeout && (clearTimeout(b.timeout), b.timeout = 0)
-      } catch (c) {
-      }
-    };
-    b.onload = b.tb = function() {
-      b.ra();
-      a.$a();
-      a.Z();
-      a.v = 0;
-      a.da();
-      if (b.pa) {
-        b.pa = !1;
-        try {
-          var c = a.R(b.responseText);
-          AudienceManagement.passData(c)
-        } catch (d) {
         }
       }
-    };
-    b.onabort =
-        b.onerror = b.bb = function() {
-          b.ra();
-          (a.trackOffline || a.ja) && a.v && a.g.unshift(a.Za);
-          a.v = 0;
-          a.fa > a.I && a.Da(a.g);
-          a.Z();
-          a.ma(500)
-        };
-    b.onreadystatechange = function() {
-      4 == b.readyState && (200 == b.status ? b.tb() : b.bb())
-    };
-    a.Ca = a.r();
-    if (1 == d || 2 == d) {
-      var e = c.indexOf("?");
-      f = c.substring(0, e);
-      e = c.substring(e + 1);
-      e = e.replace(/&callback=[a-zA-Z0-9_.\[\]]+/, "");
-      1 == d ? (b.open("POST", f, !0), b.send(e)) : 2 == d && (b.open("POST", f), b.send(e))
-    } else if (b.src = c, 3 == d) {
-      if (a.Aa)
-        try {
-          f.removeChild(a.Aa)
-        } catch (g) {
-        }
-      f.firstChild ? f.insertBefore(b,
-          f.firstChild) : f.appendChild(b);
-      a.Aa = a.Ya
-    }
-    b.abort && (a.la = setTimeout(b.abort, 5E3));
-    a.Za = c;
-    a.Ya = k["s_i_" + a.replace(a.account, ",", "_")] = b;
-    if (a.useForcedLinkTracking && a.D || a.q)
-      a.forcedLinkTrackingTimeout || (a.forcedLinkTrackingTimeout = 250), a.aa = setTimeout(a.Z, a.forcedLinkTrackingTimeout)
-  };
-  a.$a = function() {
-    if (a.ka() && !(a.Ba > a.I))
-      try {
-        k.localStorage.removeItem(a.ia()), a.Ba = a.r()
-      } catch (c) {
-      }
-  };
-  a.Da = function(c) {
-    if (a.ka()) {
-      a.Fa();
-      try {
-        k.localStorage.setItem(a.ia(), k.JSON.stringify(c)), a.I = a.r()
-      } catch (b) {
+      delayNeeded = 1;
+      timeout = 0;
+    } else if (!onlyPrerender) {
+      if (s.callModuleMethod("_d")) {
+        delayNeeded = 1;
       }
     }
-  };
-  a.Fa =
-      function() {
-        if (a.trackOffline) {
-          if (!a.offlineLimit || 0 >= a.offlineLimit)
-            a.offlineLimit = 10;
-          for (; a.g.length > a.offlineLimit; )
-            a.ua()
-        }
-      };
-  a.forceOffline = function() {
-    a.ja = !0
-  };
-  a.forceOnline = function() {
-    a.ja = !1
-  };
-  a.ia = function() {
-    return a.offlineFilename + "-" + a.visitorNamespace + a.account
-  };
-  a.r = function() {
-    return (new Date).getTime()
-  };
-  a.ya = function(a) {
-    a = a.toLowerCase();
-    return 0 != a.indexOf("#") && 0 != a.indexOf("about:") && 0 != a.indexOf("opera:") && 0 != a.indexOf("javascript:") ? !0 : !1
-  };
-  a.setTagContainer = function(c) {
-    var b, d, f;
-    a.ub =
-        c;
-    for (b = 0; b < a._il.length; b++)
-      if ((d = a._il[b]) && "s_l" == d._c && d.tagContainerName == c) {
-        a.M(d);
-        if (d.lmq)
-          for (b = 0; b < d.lmq.length; b++)
-            f = d.lmq[b], a.loadModule(f.n);
-        if (d.ml)
-          for (f in d.ml)
-            if (a[f])
-              for (b in c = a[f], f = d.ml[f], f)
-                !Object.prototype[b] && ("function" != typeof f[b] || 0 > ("" + f[b]).indexOf("s_c_il")) && (c[b] = f[b]);
-        if (d.mmq)
-          for (b = 0; b < d.mmq.length; b++)
-            f = d.mmq[b], a[f.m] && (c = a[f.m], c[f.f] && "function" == typeof c[f.f] && (f.a ? c[f.f].apply(c, f.a) : c[f.f].apply(c)));
-        if (d.tq)
-          for (b = 0; b < d.tq.length; b++)
-            a.track(d.tq[b]);
-        d.s =
-            a;
-        break
+
+    if (delayNeeded) {
+      s.delayCallQueue.push({
+        'm':methodName,
+        'a':args,
+        't':timeout
+      });
+      if (!s.delayCallPrerender) {
+        setTimeout(s['delayReady'],s.maxDelay);
       }
+    }
+
+    return delayNeeded;
   };
-  a.Util = {urlEncode: a.escape,urlDecode: a.unescape,cookieRead: a.cookieRead,cookieWrite: a.cookieWrite,getQueryParam: function(c, b, d) {
-    var f;
-    b || (b = a.pageURL ? a.pageURL : k.location);
-    d || (d = "&");
-    return c && b && (b = "" + b, f = b.indexOf("?"), 0 <= f && (b = d + b.substring(f + 1) + d, f = b.indexOf(d + c + "="), 0 <= f && (b = b.substring(f + d.length + c.length + 1), f = b.indexOf(d), 0 <= f && (b = b.substring(0, f)), 0 < b.length))) ? a.unescape(b) : ""
-  }};
-  a.A = "supplementalDataID timestamp dynamicVariablePrefix visitorID marketingCloudVisitorID analyticsVisitorID audienceManagerLocationHint authState fid vmk visitorMigrationKey visitorMigrationServer visitorMigrationServerSecure charSet visitorNamespace cookieDomainPeriods fpCookieDomainPeriods cookieLifetime pageName pageURL referrer contextData currencyCode lightProfileID lightStoreForSeconds lightIncrementBy retrieveLightProfiles deleteLightProfiles retrieveLightData pe pev1 pev2 pev3 pageURLRest".split(" ");
-  a.c = a.A.concat("purchaseID variableProvider channel server pageType transactionID campaign state zip events events2 products audienceManagerBlob tnt".split(" "));
-  a.ga = "timestamp charSet visitorNamespace cookieDomainPeriods cookieLifetime contextData lightProfileID lightStoreForSeconds lightIncrementBy".split(" ");
-  a.J = a.ga.slice(0);
-  a.oa = "account allAccounts debugTracking visitor trackOffline offlineLimit offlineThrottleDelay offlineFilename usePlugins doPlugins configURL visitorSampling visitorSamplingGroup linkObject clickObject linkURL linkName linkType trackDownloadLinks trackExternalLinks trackClickMap trackInlineStats linkLeaveQueryString linkTrackVars linkTrackEvents linkDownloadFileTypes linkExternalFilters linkInternalFilters useForcedLinkTracking forcedLinkTrackingTimeout trackingServer trackingServerSecure ssl abort mobile dc lightTrackVars maxDelay expectSupplementalData AudienceManagement".split(" ");
-  for (n = 0; 250 >= n; n++)
-    76 > n && (a.c.push("prop" + n), a.J.push("prop" + n)), a.c.push("eVar" + n), a.J.push("eVar" + n), 6 > n && a.c.push("hier" + n), 4 > n && a.c.push("list" + n);
-  n = "latitude longitude resolution colorDepth javascriptVersion javaEnabled cookiesEnabled browserWidth browserHeight connectionType homepage".split(" ");
-  a.c = a.c.concat(n);
-  a.A = a.A.concat(n);
-  a.ssl = 0 <= k.location.protocol.toLowerCase().indexOf("https");
-  a.charSet = "UTF-8";
-  a.contextData = {};
-  a.offlineThrottleDelay = 0;
-  a.offlineFilename = "AppMeasurement.offline";
-  a.Ca = 0;
-  a.fa = 0;
-  a.I = 0;
-  a.Ba = 0;
-  a.linkDownloadFileTypes = "exe,zip,wav,mp3,mov,mpg,avi,wmv,pdf,doc,docx,xls,xlsx,ppt,pptx";
-  a.w = k;
-  a.d = k.document;
-  try {
-    a.kb = "Microsoft Internet Explorer" == navigator.appName
-  } catch (y) {
-  }
-  a.Z = function() {
-    a.aa && (k.clearTimeout(a.aa), a.aa = q);
-    a.j && a.D && a.j.dispatchEvent(a.D);
-    a.q && ("function" == typeof a.q ? a.q() : a.j && a.j.href && (a.d.location = a.j.href));
-    a.j = a.D = a.q = 0
+
+  /*********************************************************************
+   * Function delayReady(): Handle the possible end of the delay
+   *     Nothing
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s['delayReady'] = function() {
+    var
+        tm = new Date,
+        now = tm.getTime(),
+        delayNeeded = 0,
+        entry;
+    if (s.callModuleMethod("_d")) {
+      delayNeeded = 1;
+    } else {
+      // s.delayReady is already called by the Integrate module when a module is ready so we're pigybacking on that to update the modules ready state
+      s._modulesReadyCallback();
+    }
+    while (s.delayCallQueue.length > 0) {
+      entry = s.delayCallQueue.shift();
+      if ((delayNeeded) && (!entry['t']) && (entry['t'] > now)) {
+        s.delayCallQueue.unshift(entry);
+        setTimeout(s['delayReady'],parseInt(s.maxDelay / 2));
+        return;
+      }
+      s.delayCallDisabled = 1;
+      s[entry['m']].apply(s,entry['a']);
+      s.delayCallDisabled = 0;
+    }
   };
-  a.Ea = function() {
-    a.b = a.d.body;
-    a.b ? (a.p = function(c) {
-      var b, d, f, e, g;
-      if (!(a.d && a.d.getElementById("cppXYctnr") || c && c["s_fe_" + a._in])) {
-        if (a.qa)
-          if (a.useForcedLinkTracking)
-            a.b.removeEventListener("click",
-                a.p, !1);
-          else {
-            a.b.removeEventListener("click", a.p, !0);
-            a.qa = a.useForcedLinkTracking = 0;
-            return
+
+  /*********************************************************************
+   * Function setAccount(account): Change the account for this instance but still keep track of the account history for this instance
+   *     account = New account
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.setAccount = s.sa = function(account) {
+    var
+        accountList,
+        accountNum;
+
+    // Handle any delay that's needed
+    if (s.delayCall('setAccount',arguments)) {
+      return;
+    }
+
+    s.account = account;
+    if (!s.allAccounts) {
+      s.allAccounts = account.split(",");
+    } else {
+      accountList = s.allAccounts.concat(account.split(","));
+      s.allAccounts = [];
+      accountList.sort();
+      for (accountNum = 0;accountNum < accountList.length;accountNum++) {
+        if ((accountNum == 0) || (accountList[(accountNum - 1)] != accountList[accountNum])) {
+          s.allAccounts.push(accountList[accountNum]);
+        }
+      }
+    }
+  };
+
+  /*********************************************************************
+   * Function foreachVar(varHandler,trackVars): Interate over all variables filtered based on the current state and hand them to the passd in handler function
+   *     varHandler = Variable handler function:
+   *                  function(varKey,varValue) {
+	*                       ...
+	*                  }
+   *     trackVars  = Option string containing an additional filter for variables
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.foreachVar = function(varHandler,trackVars) {
+    var
+        varList,
+        varNum,
+        varKey,
+        varValue,
+        varFilter = "",
+        eventFilter = "",
+        moduleName = "";
+
+    // Setup list
+    if (s.lightProfileID) {
+      varList = s.lightVarList;
+      varFilter = s.lightTrackVars;
+      if (varFilter) {
+        varFilter = "," + varFilter + "," + s.lightRequiredVarList.join(",") + ",";
+      }
+    } else {
+      varList = s.accountVarList;
+
+      // Setup filters
+      if ((s.pe) || (s.linkType)) {
+        varFilter   = s.linkTrackVars;
+        eventFilter = s.linkTrackEvents;
+        if (s.pe) {
+          moduleName = s.pe.substring(0,1).toUpperCase() + s.pe.substring(1);
+          if (s[moduleName]) {
+            varFilter   = s[moduleName].trackVars;
+            eventFilter = s[moduleName].trackEvents;
           }
-        else
-          a.useForcedLinkTracking = 0;
-        a.clickObject = c.srcElement ? c.srcElement : c.target;
-        try {
-          if (!a.clickObject || a.H && a.H == a.clickObject || !(a.clickObject.tagName || a.clickObject.parentElement || a.clickObject.parentNode))
-            a.clickObject = 0;
-          else {
-            var m = a.H = a.clickObject;
-            a.ea && (clearTimeout(a.ea), a.ea = 0);
-            a.ea = setTimeout(function() {
-              a.H == m && (a.H = 0)
-            }, 1E4);
-            f = a.wa();
-            a.track();
-            if (f < a.wa() && a.useForcedLinkTracking && c.target) {
-              for (e = c.target; e &&
-              e != a.b && "A" != e.tagName.toUpperCase() && "AREA" != e.tagName.toUpperCase(); )
-                e = e.parentNode;
-              if (e && (g = e.href, a.ya(g) || (g = 0), d = e.target, c.target.dispatchEvent && g && (!d || "_self" == d || "_top" == d || "_parent" == d || k.name && d == k.name))) {
-                try {
-                  b = a.d.createEvent("MouseEvents")
-                } catch (n) {
-                  b = new k.MouseEvent
+        }
+      }
+      if (varFilter) {
+        varFilter = "," + varFilter + "," + s.requiredVarList.join(",") + ",";
+      }
+      if (eventFilter) {
+        eventFilter = "," + eventFilter + ",";
+        if (varFilter) {
+          varFilter += ",events,";
+        }
+      }
+    }
+
+    if (trackVars) {
+      trackVars = "," + trackVars + ",";
+    }
+
+    for (varNum = 0;varNum < varList.length;varNum++) {
+      varKey   = varList[varNum];
+      varValue = s[varKey];
+
+      // If we have a value and this variable is not filtered out
+      if ((varValue) &&
+          ((!varFilter) || (varFilter.indexOf("," + varKey + ",") >= 0)) &&
+          ((!trackVars) || (trackVars.indexOf("," + varKey + ",") >= 0))) {
+        varHandler(varKey,varValue);
+      }
+    }
+  };
+
+  /*********************************************************************
+   * Function serializeToQueryString(varKey,varValue,varFilter,varFilterPrefix,filter): Serialize an object to a query-string structure
+   *     varKey          = Name of the object
+   *     varValue        = The object
+   *     varFilter       = Filter for variables
+   *     varFilterPrefix = Filter prefix for variables
+   *     filter          = Used internaly for recursive calls to group structure members
+   * Returns:
+   *     Serialized object or empty string if nothing to serialize
+   *********************************************************************/
+  s.serializeToQueryString = function(varKey,varValue,varFilter,varFilterPrefix,filter) {
+    var
+        queryString = "",
+        subVarKey,
+        subVarValue,
+        subVarPrefix,
+        subVarSuffix,
+        nestedKeyEnd,
+        nestedKey,
+        nestedFilter,
+        nestedFilterList = 0,
+        nestedFilterNum,
+        nestedFilterMatch;
+
+    if (varKey == "contextData") {
+      varKey = "c";
+    }
+
+    if (varValue) {
+      for (subVarKey in varValue) {
+        if ((!Object.prototype[subVarKey]) &&
+            ((!filter) || (subVarKey.substring(0,filter.length) == filter)) &&
+            (varValue[subVarKey]) &&
+            ((!varFilter) || (varFilter.indexOf("," + (varFilterPrefix ? varFilterPrefix + "." : "") + subVarKey + ",") >= 0))) {
+          nestedFilterMatch = false;
+          if (nestedFilterList) {
+            for (nestedFilterNum = 0;nestedFilterNum < nestedFilterList.length;nestedFilterNum++) {
+              if (subVarKey.substring(0,nestedFilterList[nestedFilterNum].length) == nestedFilterList[nestedFilterNum]) {
+                nestedFilterMatch = true;
+              }
+            }
+          }
+          if (!nestedFilterMatch) {
+            if (queryString == "") {
+              queryString += "&" + varKey + ".";
+            }
+            subVarValue = varValue[subVarKey];
+            if (filter) {
+              subVarKey = subVarKey.substring(filter.length);
+            }
+            if (subVarKey.length > 0) {
+              nestedKeyEnd = subVarKey.indexOf(".");
+              if (nestedKeyEnd > 0) {
+                nestedKey = subVarKey.substring(0,nestedKeyEnd);
+                nestedFilter = (filter ? filter : "") + nestedKey + ".";
+                if (!nestedFilterList) {
+                  nestedFilterList = [];
                 }
-                if (b) {
-                  try {
-                    b.initMouseEvent("click", c.bubbles, c.cancelable, c.view, c.detail, c.screenX, c.screenY, c.clientX, c.clientY, c.ctrlKey, c.altKey, c.shiftKey, c.metaKey, c.button, c.relatedTarget)
-                  } catch (q) {
-                    b = 0
+                nestedFilterList.push(nestedFilter);
+                queryString += s.serializeToQueryString(nestedKey,varValue,varFilter,varFilterPrefix,nestedFilter);
+              } else {
+                if (typeof(subVarValue) == "boolean") {
+                  // Change to string "true" or "false"
+                  if (subVarValue) {
+                    subVarValue = "true";
+                  } else {
+                    subVarValue = "false";
                   }
-                  b && (b["s_fe_" + a._in] = b.s_fe =
-                      1, c.stopPropagation(), c.stopImmediatePropagation && c.stopImmediatePropagation(), c.preventDefault(), a.j = c.target, a.D = b)
+                }
+                if (subVarValue) {
+                  if ((varFilterPrefix == "retrieveLightData") && (filter.indexOf(".contextData.") < 0)) {
+                    subVarPrefix = subVarKey.substring(0,4);
+                    subVarSuffix = subVarKey.substring(4);
+                    switch (subVarKey) {
+                      case "transactionID" : {
+                        subVarKey = "xact";
+                      } break;
+                      case "channel" : {
+                        subVarKey = "ch";
+                      } break;
+                      case "campaign" : {
+                        subVarKey = "v0";
+                      } break;
+                      default : {
+                        if (s.isNumber(subVarSuffix)) {
+                          if (subVarPrefix == "prop") {
+                            subVarKey = "c" + subVarSuffix;
+                          } else if (subVarPrefix == "eVar") {
+                            subVarKey = "v" + subVarSuffix;
+                          } else if (subVarPrefix == "list") {
+                            subVarKey = "l" + subVarSuffix;
+                          } else if (subVarPrefix == "hier") {
+                            subVarKey   = "h" + subVarSuffix;
+                            subVarValue = subVarValue.substring(0,255);
+                          }
+                        }
+                      } break;
+                    }
+                  }
+                  queryString += "&" + s.escape(subVarKey) + "=" + s.escape(subVarValue);
                 }
               }
             }
           }
-        } catch (r) {
-          a.clickObject = 0
         }
       }
-    }, a.b && a.b.attachEvent ? a.b.attachEvent("onclick", a.p) : a.b && a.b.addEventListener && (navigator && (0 <= navigator.userAgent.indexOf("WebKit") && a.d.createEvent || 0 <= navigator.userAgent.indexOf("Firefox/2") && k.MouseEvent) && (a.qa = 1, a.useForcedLinkTracking = 1, a.b.addEventListener("click", a.p, !0)), a.b.addEventListener("click", a.p, !1))) : setTimeout(a.Ea, 30)
-  };
-  a.Ea()
-}
-function s_gi(a) {
-  var k, q = window.s_c_il, r, n, t = a.split(","), u, s, x = 0;
-  if (q)
-    for (r = 0; !x && r < q.length; ) {
-      k = q[r];
-      if ("s_c" == k._c && (k.account || k.oun))
-        if (k.account && k.account == a)
-          x = 1;
-        else
-          for (n = k.account ? k.account : k.oun, n = k.allAccounts ? k.allAccounts : n.split(","), u = 0; u < t.length; u++)
-            for (s = 0; s < n.length; s++)
-              t[u] == n[s] && (x = 1);
-      r++
+      if (queryString != "") {
+        queryString += "&." + varKey;
+      }
     }
-  x || (k = new AppMeasurement);
-  k.setAccount ? k.setAccount(a) : k.sa && k.sa(a);
-  return k
+
+    return queryString;
+  };
+
+  /*********************************************************************
+   * Function getQueryString(): Build the query-string
+   *     Nothing
+   * Returns:
+   *     Query-String
+   *********************************************************************/
+  s.getQueryString = function() {
+    var
+        queryString = "",
+        varList,
+        varNum,
+        varSubNum,
+        varKey,
+        varValue,
+        varValueParts,
+        varValuePart,
+        varValuePartPos,
+        varPrefix,
+        varSuffix,
+        varFilter = "",
+        eventFilter = "",
+        moduleName = "",
+        events = "",
+        products = "";
+
+    // Setup list
+    if (s.lightProfileID) {
+      varList = s.lightVarList;
+      varFilter = s.lightTrackVars;
+      if (varFilter) {
+        varFilter = "," + varFilter + "," + s.lightRequiredVarList.join(",") + ",";
+      }
+    } else {
+      varList = s.accountVarList;
+
+      // Setup filters
+      if ((s.pe) || (s.linkType)) {
+        varFilter   = s.linkTrackVars;
+        eventFilter = s.linkTrackEvents;
+        if (s.pe) {
+          moduleName = s.pe.substring(0,1).toUpperCase() + s.pe.substring(1);
+          if (s[moduleName]) {
+            varFilter   = s[moduleName].trackVars;
+            eventFilter = s[moduleName].trackEvents;
+          }
+        }
+      }
+      if (varFilter) {
+        varFilter = "," + varFilter + "," + s.requiredVarList.join(",") + ",";
+      }
+      if (eventFilter) {
+        eventFilter = "," + eventFilter + ",";
+        if (varFilter) {
+          varFilter += ",events,";
+        }
+      }
+
+      // Build product event list to be added to event list
+      if (s.events2) {
+        events += (events != "" ? "," : "") + s.events2;
+      }
+    }
+
+    // Add AudienceManagement config params
+    if ((s.AudienceManagement) && (s.AudienceManagement.isReady())) {
+      queryString += s.serializeToQueryString("d",s.AudienceManagement.getEventCallConfigParams());
+    }
+
+    for (varNum = 0;varNum < varList.length;varNum++) {
+      varKey    = varList[varNum];
+      varValue  = s[varKey];
+      varPrefix = varKey.substring(0,4);
+      varSuffix = varKey.substring(4);
+
+      if (!varValue) {
+        if ((varKey == "events") && (events)) {
+          varValue = events;
+          events = "";
+        }
+      }
+
+      // If we have a value and this variable is not filtered out
+      if ((varValue) &&
+          ((!varFilter) || (varFilter.indexOf("," + varKey + ",") >= 0))) {
+        switch (varKey) {
+          case "supplementalDataID" : {
+            varKey = "sdid";
+          } break;
+          case "timestamp" : {
+            varKey = "ts";
+          } break;
+          case "dynamicVariablePrefix" : {
+            varKey = "D";
+          } break;
+          case "visitorID" : {
+            varKey = "vid";
+          } break;
+          case "marketingCloudVisitorID" : {
+            varKey = "mid";
+          } break;
+          case "analyticsVisitorID" : {
+            varKey = "aid";
+          } break;
+          case "audienceManagerLocationHint" : {
+            varKey = "aamlh";
+          } break;
+          case "audienceManagerBlob" : {
+            varKey = "aamb";
+          } break;
+          case "authState" : {
+            varKey = "as";
+          } break;
+          case "pageURL" : {
+            varKey = "g";
+            if (varValue.length > 255) {
+              s.pageURLRest = varValue.substring(255);
+              varValue = varValue.substring(0,255);
+            }
+          } break;
+          case "pageURLRest" : {
+            varKey = "-g";
+          } break;
+          case "referrer" : {
+            varKey = "r";
+          } break;
+          case "vmk" :
+          case "visitorMigrationKey" : {
+            varKey = "vmt";
+          } break;
+          case "visitorMigrationServer" : {
+            varKey = "vmf";
+            if ((s.ssl) && (s.visitorMigrationServerSecure)) {
+              varValue = "";
+            }
+          } break;
+          case "visitorMigrationServerSecure" : {
+            varKey = "vmf";
+            if ((!s.ssl) && (s.visitorMigrationServer)) {
+              varValue = "";
+            }
+          } break;
+          case "charSet" : {
+            varKey = "ce";
+          } break;
+          case "visitorNamespace" : {
+            varKey = "ns";
+          } break;
+          case "cookieDomainPeriods" : {
+            varKey = "cdp";
+          } break;
+          case "cookieLifetime" : {
+            varKey = "cl";
+          } break;
+          case "variableProvider" : {
+            varKey = "vvp";
+          } break;
+          case "currencyCode" : {
+            varKey = "cc";
+          } break;
+          case "channel" : {
+            varKey = "ch";
+          } break;
+          case "transactionID" : {
+            varKey = "xact";
+          } break;
+          case "campaign" : {
+            varKey = "v0";
+          } break;
+          case "latitude" : {
+            varKey = "lat";
+          } break;
+          case "longitude" : {
+            varKey = "lon";
+          } break;
+          case "resolution" : {
+            varKey = "s";
+          } break;
+          case "colorDepth" : {
+            varKey = "c";
+          } break;
+          case "javascriptVersion" : {
+            varKey = "j";
+          } break;
+          case "javaEnabled" : {
+            varKey = "v";
+          } break;
+          case "cookiesEnabled" : {
+            varKey = "k";
+          } break;
+          case "browserWidth" : {
+            varKey = "bw";
+          } break;
+          case "browserHeight" : {
+            varKey = "bh";
+          } break;
+          case "connectionType" : {
+            varKey = "ct";
+          } break;
+          case "homepage" : {
+            varKey = "hp";
+          } break;
+          case "events" : {
+            // Add events from eventList
+            if (events) {
+              varValue += (varValue != "" ? "," : "") + events;
+            }
+
+            // Filter events if needed
+            if (eventFilter) {
+              varValueParts = varValue.split(",");
+              varValue = "";
+              for (varSubNum = 0;varSubNum < varValueParts.length;varSubNum++) {
+                varValuePart = varValueParts[varSubNum];
+                varValuePartPos = varValuePart.indexOf("=");
+                if (varValuePartPos >= 0) {
+                  varValuePart = varValuePart.substring(0,varValuePartPos);
+                }
+                varValuePartPos = varValuePart.indexOf(":");
+                if (varValuePartPos >= 0) {
+                  varValuePart = varValuePart.substring(0,varValuePartPos);
+                }
+                if (eventFilter.indexOf("," + varValuePart + ",") >= 0) {
+                  varValue += (varValue ? "," : "") + varValueParts[varSubNum];
+                }
+              }
+            }
+          } break;
+          case "events2" : {
+            varValue = "";
+          } break;
+          case "contextData" : {
+            queryString += s.serializeToQueryString("c",s[varKey],varFilter,varKey);
+            varValue = "";
+          } break;
+          case "lightProfileID" : {
+            varKey = "mtp";
+          } break;
+          case "lightStoreForSeconds" : {
+            varKey = "mtss";
+            if (!s.lightProfileID) {
+              varValue = "";
+            }
+          } break;
+          case "lightIncrementBy" : {
+            varKey = "mti";
+            if (!s.lightProfileID) {
+              varValue = "";
+            }
+          } break;
+          case "retrieveLightProfiles" : {
+            varKey = "mtsr";
+          } break;
+          case "deleteLightProfiles" : {
+            varKey = "mtsd";
+          } break;
+          case "retrieveLightData" : {
+            if (s.retrieveLightProfiles) {
+              queryString += s.serializeToQueryString("mts",s[varKey],varFilter,varKey);
+            }
+            varValue = "";
+          } break;
+          default : {
+            if (s.isNumber(varSuffix)) {
+              if (varPrefix == "prop") {
+                varKey = "c" + varSuffix;
+              } else if (varPrefix == "eVar") {
+                varKey = "v" + varSuffix;
+              } else if (varPrefix == "list") {
+                varKey = "l" + varSuffix;
+              } else if (varPrefix == "hier") {
+                varKey   = "h" + varSuffix;
+                varValue = varValue.substring(0,255);
+              }
+            }
+          } break;
+        }
+        if (varValue) {
+          queryString += "&" + varKey + "=" + (varKey.substring(0,3) != "pev" ? s.escape(varValue) : varValue);
+        }
+      }
+
+      // Add ClickMap query-string after pev# variables (pev3 is the last one) if it's set
+      if ((varKey == 'pev3') && (s.clickMapQueryString)) {
+        queryString += s.clickMapQueryString;
+      }
+    }
+
+    return queryString;
+  };
+
+  /*********************************************************************
+   * Function getObjectType(o): Return object type or tag-name in upper-case
+   *     o = object to get type or tage-name for
+   * Returns:
+   *     type or tag-name in upper-case
+   *********************************************************************/
+  s.getObjectType = function(o) {
+    var
+        t = o.tagName;
+    if ((('' + o.tagUrn) != 'undefined') || ((('' + o.scopeName) != 'undefined') && (('' + o.scopeName).toUpperCase() != 'HTML'))) {
+      return '';
+    }
+    t = ((t) && (t.toUpperCase) ? t.toUpperCase() : '');
+    if (t == 'SHAPE') {
+      t = '';
+    }
+    if (t) {
+      if (((t == 'INPUT') || (t == 'BUTTON')) && (o.type) && (o.type.toUpperCase)) {
+        t = o.type.toUpperCase();
+      } else if ((!t) && (o.href)) {
+        t = 'A';
+      }
+    }
+    return t;
+  };
+
+  /*********************************************************************
+   * Function getObjectHREF(o): Return object href if possible
+   *     o = object to get href from
+   * Returns:
+   *     href
+   *********************************************************************/
+  s.getObjectHREF = function(o) {
+    var
+        location = w.location,
+        href = (o.href ? o.href : ''),
+        i,
+        j,
+        k,
+        protocol;
+    i = href.indexOf(':');
+    j = href.indexOf('?');
+    k = href.indexOf('/');
+    if ((href) && ((i < 0) || ((j >= 0) && (i > j)) || ((k >= 0) && (i > k)))) {
+      protocol = ((o.protocol) && (o.protocol.length > 1) ? o.protocol : (l.protocol ? l.protocol : ''));
+      i = l.pathname.lastIndexOf('/');
+      href = (protocol ? protocol + '//' : '') + (o.host ? o.host : (l.host ? l.host:'')) + (h.substring(0,1) != '/' ? l.pathname.substring(0,(i < 0 ? 0 : i)) + '/' : '') + href;
+    }
+    return href;
+  };
+
+  /*********************************************************************
+   * Function getObjectID(o): Generate object ID and type and add to passed in object as s_oid and s_oidt
+   *     o = object to generate ID for
+   * Returns:
+   *     Array with generated ID 'id' and ID type 'type'
+   *********************************************************************/
+  s.getObjectID = function(o) {
+    var
+        t = s.getObjectType(o),
+        p,
+        c,
+        n = '',
+        x = 0;
+    if (t) {
+      p = o.protocol;
+      c = o.onclick;
+      if ((o.href) && ((t == 'A') || (t == 'AREA')) && ((!c) || (!p) || (p.toLowerCase().indexOf('javascript') < 0))) {
+        n = s.getObjectHREF(o);
+      } else if (c) {
+        n = s.replace(s.replace(s.replace(s.replace('' + c,"\r",''),"\n",''),"\t",''),' ','');
+        x = 2;
+      } else if ((t == 'INPUT') || (t=='SUBMIT')) {
+        if (o.value) {
+          n = o.value;
+        } else if (o.innerText) {
+          n = o.innerText;
+        } else if (o.textContent) {
+          n = o.textContent;
+        }
+        x = 3;
+      } else if ((o.src) && (t == 'IMAGE')) {
+        n = o.src;
+      }
+      if (n) {
+        return {
+          id:n.substring(0,100),
+          type:x
+        };
+      }
+    }
+
+    return 0
+  };
+
+  /*********************************************************************
+   * Function getObjectUsable(o): Get usable object if any out of passed in object
+   *     o = object to get usable object from
+   * Returns:
+   *     Usable object or 0 if none
+   *********************************************************************/
+  s.getObjectUsable = function(o) {
+    var
+        objectType = s.getObjectType(o),
+        objectID = s.getObjectID(o),
+        onClick;
+    while ((o) && (!objectID) && (objectType != 'BODY')) {
+      o = (o.parentElement ? o.parentElement : o.parentNode);
+      if (o) {
+        objectType = s.getObjectType(o);
+        objectID = s.getObjectID(o);
+      }
+    }
+    if ((!objectID) || (objectType == 'BODY')) {
+      o = 0;
+    }
+    if (o) {
+      onClick = (o.onclick ? '' + o.onclick : '');
+      if ((onClick.indexOf('.tl(') >= 0) || (onClick.indexOf('.trackLink(') >= 0)) {
+        o = 0;
+      }
+    }
+    return o;
+  };
+
+  /*********************************************************************
+   * Function prepareLinkTracking(): Populate the link-tracking variables including ClickMap
+   *     Nothing
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.prepareLinkTracking = function() {
+    var
+        objectType,
+        objectID,
+        linkObject = s.linkObject,
+        linkType   = s.linkType,
+        linkURL    = s.linkURL,
+        queryStringPos,
+        hashPos;
+
+    s.linkTrack = 1; // Start off tracking because this could be a manual call to
+    if (!linkObject) {
+      s.linkTrack = 0; // If linkObject isn't set at this point we know that it's an automatic call so don't track until we decode that we are good to go later based on linkURL/Name and linkType
+      linkObject = s.clickObject;
+    }
+    if (linkObject) {
+      // Make sure we have a clickable object
+      objectType = s.getObjectType(linkObject);
+      objectID   = s.getObjectID(linkObject);
+      while ((linkObject) && (!objectID) && (objectType != 'BODY')) {
+        linkObject = (linkObject.parentElement ? linkObject.parentElement : linkObject.parentNode);
+        if (linkObject) {
+          objectType = s.getObjectType(linkObject);
+          objectID = s.getObjectID(linkObject);
+        }
+      }
+      if ((!objectID) || (objectType == 'BODY')) {
+        linkObject = 0;
+      }
+      if (linkObject) {
+        var onClick = (linkObject.onclick ? '' + linkObject.onclick : '');
+        if ((onClick.indexOf('.tl(') >= 0) || (onClick.indexOf('.trackLink(') >= 0)) {
+          linkObject = 0;
+        }
+      }
+    } else {
+      s.linkTrack = 1; // If we don't have a passed in link object or one from the body onclick this isn't a link tracking call so we should track
+    }
+
+    // Get the link URL
+    if ((!linkURL) && (linkObject)) {
+      linkURL = s.getObjectHREF(linkObject);
+    }
+    if ((linkURL) && (!s.linkLeaveQueryString)) {
+      queryStringPos = linkURL.indexOf('?');
+      if (queryStringPos >= 0) {
+        linkURL = linkURL.substring(0,queryStringPos);
+      }
+    }
+
+    // If we have a link URL but no manually specified type do automatic type determination
+    if ((!linkType) && (linkURL)) {
+      var
+          href,
+          filterList,
+          filterNum,
+          filterMethod = 0,
+          matchedFilter = 0,
+          match;
+
+      // Check for a download link type
+      if ((s.trackDownloadLinks) && (s.linkDownloadFileTypes)) {
+        href = linkURL.toLowerCase();
+        queryStringPos = href.indexOf('?');
+        hashPos = href.indexOf('#');
+        /* Truncate at the hash or the start of the query-string */
+        if (queryStringPos >= 0) {
+          if ((hashPos >= 0) && (hashPos < queryStringPos)) {
+            queryStringPos = hashPos;
+          }
+        } else {
+          queryStringPos = hashPos;
+        }
+        if (queryStringPos >= 0) {
+          href = href.substring(0,queryStringPos);
+        }
+        filterList = s.linkDownloadFileTypes.toLowerCase().split(",");
+        for (filterNum = 0;filterNum < filterList.length;filterNum++) {
+          match = filterList[filterNum];
+          if ((match) && (href.substring((href.length - (match.length + 1))) == '.' + match)) {
+            linkType = 'd';
+          }
+        }
+      }
+
+      // Check for an exit link type (if linkType hasn't already been qualified)
+      if ((s.trackExternalLinks) && (!linkType)) {
+        href = linkURL.toLowerCase();
+        if (s.hrefSupportsLinkTracking(href)) {
+          // Default linkInternalFilters to the document hostname
+          if (!s.linkInternalFilters) {
+            s.linkInternalFilters = w.location.hostname;
+          }
+          filterList = 0;
+          if (s.linkExternalFilters) {
+            filterList = s.linkExternalFilters.toLowerCase().split(",");
+            filterMethod = 1;
+          } else if (s.linkInternalFilters) {
+            filterList = s.linkInternalFilters.toLowerCase().split(",");
+          }
+          if (filterList) {
+            for (filterNum = 0;filterNum < filterList.length;filterNum++) {
+              match = filterList[filterNum];
+              if (href.indexOf(match) >= 0) {
+                matchedFilter = 1;
+              }
+            }
+            if (matchedFilter) {
+              if (filterMethod) {
+                linkType = 'e';
+              }
+            } else if (!filterMethod) {
+              linkType = 'e';
+            }
+          }
+        }
+      }
+    }
+
+    s.linkObject = linkObject;
+    s.linkURL    = linkURL;
+    s.linkType   = linkType;
+
+    // Handle ClickMap
+    if ((s.trackClickMap) || (s.trackInlineStats)) {
+      // Clear the ClickMap query-string fragment
+      s.clickMapQueryString = '';
+
+      // If we are dealing with the click of an object...
+      if (linkObject) {
+        var
+            pageID = s.pageName,
+            pageIDType = 1,
+            objectIndex = linkObject.sourceIndex;;
+        if (!pageID) {
+          pageID     = s.pageURL;
+          pageIDType = 0;
+        }
+        if (w['s_objectID']) {
+          objectID.id   = w['s_objectID'];
+          objectID.type = 1;
+          objectIndex   = 1;
+        }
+        if ((pageID) && (objectID) && (objectID.id) && (objectType)) {
+          s.clickMapQueryString =
+              '&pid=' + s.escape(pageID.substring(0,255)) +
+              (pageIDType ? '&pidt=' + pageIDType : '') +
+              '&oid=' + s.escape(objectID.id.substring(0,100)) +
+              (objectID.type ? '&oidt=' + objectID.type : '') +
+              '&ot='   + objectType +
+              (objectIndex ? '&oi=' + objectIndex : '')
+          ;
+        }
+      }
+    }
+  };
+
+  /*********************************************************************
+   * Function handleLinkTracking(): Handle link-tracking variables including ClickMap
+   *     Nothing
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.handleLinkTracking = function() {
+    var
+        track = s.linkTrack,
+        objectType,
+        objectID,
+        linkObject = s.linkObject,
+        linkType   = s.linkType,
+        linkURL    = s.linkURL,
+        linkName   = s.linkName,
+        queryStringPos;
+
+    if ((linkType) && ((linkURL) || (linkName))) {
+      linkType = linkType.toLowerCase();
+      if ((linkType != "d") && (linkType != "e")) {
+        linkType = "o";
+      }
+
+      s.pe   = "lnk_" + linkType;
+      s.pev1 = (linkURL ? s.escape(linkURL) : "");
+      s.pev2 = (linkName ? s.escape(linkName) : "");
+
+      track = 1; // We know we need to track this link
+    }
+
+    if (s.abort) {
+      track = 0;
+    }
+
+    // Handle ClickMap
+    if ((s.trackClickMap) || (s.trackInlineStats)) {
+      var
+          clickMapData = {},
+          clickMapDataChanged = 0,
+          cookie = s.cookieRead("s_sq"),
+          entryList = (cookie ? cookie.split("&") : 0),
+          entryNum,
+          partList,
+          accountList,
+          accountNum,subAccountNum,
+          account,queryString,
+          useCookie = 0;
+
+      // If we have a cookie value parse it out
+      if (entryList) {
+        for (entryNum = 0;entryNum < entryList.length;entryNum++) {
+          partList = entryList[entryNum].split("=");
+          accountList = s.unescape(partList[0]).split(",");
+          queryString = s.unescape(partList[1]);
+          clickMapData[queryString] = accountList;
+        }
+      }
+      accountList = s.account.split(",");
+
+      // If we are about to track or if we have a new ClickMap query-string fragment update the ClickMap data
+      if ((track) || (s.clickMapQueryString)) {
+        // Remove ClickMap data for current account(s)
+        // If we are tracking and don't have a new ClickMap query-string look for one in the data from the ClickMap cookie
+        if ((track) && (!s.clickMapQueryString)) {
+          useCookie = 1;
+        }
+        for (queryString in clickMapData) {
+          if (!Object.prototype[queryString]) {
+            for (accountNum = 0;accountNum < accountList.length;accountNum++) {
+              // If we need to use ClickMap query-string fragments from the cookie and we have an exact match for the account(s) add the fragement and nuke the entry
+              if (useCookie) {
+                account = clickMapData[queryString].join(',');
+                if (account == s.account) {
+                  s.clickMapQueryString += (queryString.charAt(0) != '&' ? '&' : '') + queryString;
+                  clickMapData[queryString] = [];
+                  clickMapDataChanged = 1;
+                }
+              }
+              for (subAccountNum = 0;subAccountNum < clickMapData[queryString].length;subAccountNum++) {
+                account = clickMapData[queryString][subAccountNum];
+                if (account == accountList[accountNum]) {
+                  // If we need to use ClickMap query-string fragments from the cookie and we have a single account match add the fragment wrapped as account specific variables
+                  if (useCookie) {
+                    s.clickMapQueryString += "&u=" + s.escape(account) + (queryString.charAt(0) != '&' ? '&' : '') + queryString + "&u=0";
+                  }
+                  clickMapData[queryString].splice(subAccountNum,1);
+                  clickMapDataChanged = 1;
+                }
+              }
+            }
+          }
+        }
+
+        // If we are not about to track and just have a new ClickMap query-string we need to update the cookie
+        if (!track) {
+          clickMapDataChanged = 1;
+        }
+
+        // If the ClickMap data changed write the new cookie out or delete it
+        if (clickMapDataChanged) {
+          cookie = '';
+          entryNum = 2; // Default to writing out 2 cookie entries
+          // If we need to store the new ClickMap query-string fragment for later
+          if ((!track) && (s.clickMapQueryString)) {
+            cookie = s.escape(accountList.join(",")) + "=" + s.escape(s.clickMapQueryString);
+            entryNum = 1; // We have already added our first entry so just add one more
+          }
+          // Add 1 or 2 more entries to the cookie
+          for (queryString in clickMapData) {
+            if (!Object.prototype[queryString]) {
+              if ((entryNum > 0) && (clickMapData[queryString].length > 0)) {
+                cookie += (cookie ? "&" : "") + s.escape(clickMapData[queryString].join(",")) + "=" + s.escape(queryString);
+                entryNum--;
+              }
+            }
+          }
+          // Write out the new cookie
+          s.cookieWrite("s_sq",cookie);
+        }
+      }
+    }
+
+    return track;
+  };
+
+  /*********************************************************************
+   * Function handleTechnology(): Populate the technology variables
+   *     Nothing
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.handleTechnology = function() {
+    if (!s.technologyHandled) {
+      var
+          tm = new Date,
+          tl = topFrameSet.location,
+          a,o,i,
+          x = '',
+          c = '',
+          v = '',
+          p = '',
+          bw = '',
+          bh = '',
+          j = '1.2',
+          k = (s.cookieWrite('s_cc','true',0) ? 'Y' : 'N'),
+          hp = '',
+          ct = '',
+          pn = 0,
+          e;
+
+      if (tm.setUTCDate) {
+        j = '1.3';
+        if (pn.toPrecision) {
+          j = '1.5';
+          a = [];
+          if (a.forEach) {
+            j = '1.6';
+            i = 0;
+            o = {};
+            try {
+              i=new Iterator(o);
+              if (i.next) {
+                j = '1.7';
+                if (a.reduce) {
+                  j = '1.8';
+                  if (j.trim) {
+                    j = '1.8.1';
+                    if (Date.parse) {
+                      j = '1.8.2';
+                      if (Object.create) {
+                        j = '1.8.5';
+                      }
+                    }
+                  }
+                }
+              }
+            } catch (e) {}
+          }
+        }
+      }
+      x = screen.width + 'x' + screen.height;
+      v = (navigator.javaEnabled() ? 'Y' : 'N');
+      c = (screen.pixelDepth ? screen.pixelDepth : screen.colorDepth);
+      bw = (s.w.innerWidth ? s.w.innerWidth : s.d.documentElement.offsetWidth);
+      bh = (s.w.innerHeight ? s.w.innerHeight : s.d.documentElement.offsetHeight);
+      try {
+        s.b.addBehavior("#default#homePage");
+        hp = (s.b.isHomePage(tl) ? "Y" : "N");
+      } catch (e) {}
+      try {
+        s.b.addBehavior("#default#clientCaps");
+        ct = s.b.connectionType;
+      } catch (e) {}
+
+      s.resolution        = x;
+      s.colorDepth        = c;
+      s.javascriptVersion = j;
+      s.javaEnabled       = v;
+      s.cookiesEnabled    = k;
+      s.browserWidth      = bw;
+      s.browserHeight     = bh;
+      s.connectionType    = ct;
+      s.homepage          = hp;
+
+      s.technologyHandled = 1;
+    }
+  };
+
+  /*********************************************************************
+   * Function loadModule(): Load a module into this instance
+   *     moduleName = Module name
+   *     onLoad     = Optional onLoad function to execute after the module
+   *                  is loaded
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.modules = {};
+  s.loadModule = function(moduleName,onLoad) {
+    var
+        module = s.modules[moduleName],
+        e;
+    if (!module) {
+      // Create the module instance
+      if (w["AppMeasurement_Module_" + moduleName]) {
+        module = new w["AppMeasurement_Module_" + moduleName](s);
+      } else {
+        module = {};
+      }
+      s.modules[moduleName] = s[moduleName] = module;
+
+      // Handle module onLoad
+      module._getOnLoad = function() {
+        return module._onLoad;
+      };
+      module._setOnLoad = function(v) {
+        module._onLoad = v;
+        if (v) {
+          s[moduleName + '_onLoad'] = v;
+          if (!s.delayCall(moduleName + '_onLoad',[s,module],1)) {
+            v(s,module);
+          }
+        }
+      };
+      try {
+        // Try to use Object.defineProperty
+        if (Object['defineProperty']) {
+          Object['defineProperty'](module,"onLoad",{
+            'get':module._getOnLoad,
+            'set':module._setOnLoad
+          });
+        } else {
+          // We don't have Object.defineProperty so set a flag telling callModuleMethod to look for the onLoad later
+          module['_olc'] = 1;
+        }
+      } catch(e) {
+        // Object.defineProperty threw an exception so set a flag telling callModuleMethod to look for the onLoad later
+        module['_olc'] = 1;
+      }
+    }
+
+    if (onLoad) {
+      s[moduleName + '_onLoad'] = onLoad;
+      if (!s.delayCall(moduleName + '_onLoad',[s,module],1)) {
+        onLoad(s,module);
+      }
+    }
+  };
+
+  /*********************************************************************
+   * Function callModuleMethod(methodName): Call method on all modules if defined
+   *     methodName = Method name to call
+   * Returns:
+   *     1 if any module returns something that tests as true for the method.  0 otherwise
+   *********************************************************************/
+  s.callModuleMethod = function(methodName) {
+    var
+        moduleName,
+        module;
+    for (moduleName in s.modules) {
+      if (!Object.prototype[moduleName]) {
+        module = s.modules[moduleName];
+        if (module) {
+          if ((module['_olc']) && (module['onLoad'])) {
+            module['_olc'] = 0;
+            module['onLoad'](s,module);
+          }
+          if (module[methodName]) {
+            if (module[methodName]()) {
+              return 1;
+            }
+          }
+        }
+      }
+    }
+    return 0;
+  };
+
+  /********************************************************************
+   * Function vs(x): Check to see if visitor should be sampled or
+   *                 not if visitor-sampling is turned on
+   *     x  = Random sampling number
+   * Returns:
+   *     1 if visitor falls into sampling group or 0 if not
+   *********************************************************************/
+  s.isVisitorInSample = function() {
+    var
+        visitorSamplingNumber      = Math.floor(Math.random() * 10000000000000),
+        visitorSampling            = s.visitorSampling,
+        visitorSamplingGroup       = s.visitorSamplingGroup,
+        visitorSamplingCookieKey   ='s_vsn_' + (s.visitorNamespace ? s.visitorNamespace : s.account) + (visitorSamplingGroup ? '_' + visitorSamplingGroup : ''),
+        visitorSamplingCookieValue = s.cookieRead(visitorSamplingCookieKey);
+    if (visitorSampling) {
+      visitorSampling *= 100;
+      if (visitorSamplingCookieValue) {
+        visitorSamplingCookieValue = parseInt(visitorSamplingCookieValue);
+      }
+      if (!visitorSamplingCookieValue) {
+        if (!s.cookieWrite(visitorSamplingCookieKey,visitorSamplingNumber)) {
+          return 0;
+        }
+        visitorSamplingCookieValue = visitorSamplingNumber;
+      }
+      if (visitorSamplingCookieValue % 10000 > v) {
+        return 0;
+      }
+    }
+
+    return 1;
+  };
+
+  /*********************************************************************
+   * Function variableOverridesApply(variableOverrides,restoring): Apply variable overrides
+   *     variableOverrides = Object containing one time variable overrides
+   *     restoring         = Optional restore flag
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.variableOverridesApply = function(variableOverrides,restoring) {
+    var
+        listNum,
+        list,
+        varNum,
+        varKey,
+        varValue,
+        subVarKey;
+
+    for (listNum = 0;listNum < 2;listNum++) {
+      list = (listNum > 0 ? s.accountConfigList : s.accountVarList);
+      for (varNum = 0;varNum < list.length;varNum++) {
+        varKey   = list[varNum];
+        varValue = variableOverrides[varKey];
+        if ((varValue) || (variableOverrides['!' + varKey])) {
+          if ((!restoring) && ((varKey == 'contextData') || (varKey == 'retrieveLightData')) && (s[varKey])) {
+            for (subVarKey in s[varKey]) {
+              if (!varValue[subVarKey]) {
+                varValue[subVarKey] = s[varKey][subVarKey];
+              }
+            }
+          }
+          s[varKey] = varValue;
+        }
+      }
+    }
+  };
+
+  /*********************************************************************
+   * Function variableOverridesBuild(variableOverrides): Build variable overrides
+   *     variableOverrides = Object to fill in with variable overrides
+   *     onlySet           = Optional flag to not build unsets (!varKey)
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.variableOverridesBuild = function(variableOverrides,onlySet) {
+    var
+        listNum,
+        list,
+        varNum,
+        varKey;
+
+    for (listNum = 0;listNum < 2;listNum++) {
+      list = (listNum > 0 ? s.accountConfigList : s.accountVarList);
+      for (varNum = 0;varNum < list.length;varNum++) {
+        varKey = list[varNum];
+        variableOverrides[varKey] = s[varKey];
+        if ((!onlySet) && (!variableOverrides[varKey])) {
+          variableOverrides['!' + varKey] = 1;
+        }
+      }
+    }
+  };
+
+  /*********************************************************************
+   * Function fixReferrer(x): Fix referrers we know about
+   *                 Reorder query-string variables to put
+   *
+   *                 Google:
+   *                         q
+   *                         ie
+   *                         start
+   *                         search_key
+   *                         word
+   *                         kw
+   *                         cd
+   *                 Yahoo:
+   *                         p
+   *
+   *                         first in the query-string.  To match google
+   *                         the hostname must contain "google" and the
+   *                         query-string must contain at least one of
+   *                         the above query-string variables.  To match
+   *                         Yahoo the hostname must contain "yahoo.co"
+   *                         and the query-string must contain at least
+   *                         one of the above query-string variables. We
+   *                         also truncate the path in favor of keeping
+   *                         the query-string
+   *     referrer = referrer URL
+   * Returns:
+   *     Fixed referrer URL or original if no fix was needed
+   *********************************************************************/
+  s.fixReferrer = function(referrer) {
+    var
+        newReferrer,
+        i,j,
+        host,
+        path,
+        queryStringKeySet = 0,
+        queryString,
+        newQueryStringLeft = "",
+        newQueryStringRight = "",
+        pairList,
+        pair;
+    if ((referrer) && (referrer.length > 255)) {
+      newReferrer = "" + referrer;
+      i = newReferrer.indexOf("?");
+      if (i > 0) {
+        queryString = newReferrer.substring(i + 1);
+        newReferrer = newReferrer.substring(0,i);
+        host        = newReferrer.toLowerCase();
+        j = 0;
+        if (host.substring(0,7) == "http://") {
+          j += 7;
+        } else if (host.substring(0,8) == "https://") {
+          j += 8;
+        }
+        i = host.indexOf("/",j);
+        if (i > 0) {
+          host = host.substring(j,i);
+          path = newReferrer.substring(i);
+          newReferrer = newReferrer.substring(0,i);
+          if (host.indexOf("google") >= 0) {
+            queryStringKeySet = ",q,ie,start,search_key,word,kw,cd,";
+          } else if (host.indexOf('yahoo.co') >= 0) {
+            queryStringKeySet = ",p,ei,";
+          }
+          if ((queryStringKeySet) && (queryString)) {
+            /* Do query-string reordering */
+            pairList = queryString.split("&");
+            if ((pairList) && (pairList.length > 1)) {
+              for (j = 0;j < pairList.length;j++) {
+                pair = pairList[j];
+                i = pair.indexOf("=");
+                if ((i > 0) && (queryStringKeySet.indexOf("," + pair.substring(0,i) + ",") >= 0)) {
+                  newQueryStringLeft += (newQueryStringLeft ? "&" : "") + pair;
+                } else {
+                  newQueryStringRight += (newQueryStringRight ? "&" : "") + pair;
+                }
+              }
+              if ((newQueryStringLeft) && (newQueryStringRight)) {
+                queryString = newQueryStringLeft + "&" + newQueryStringRight;
+              } else {
+                newQueryStringRight = "";
+              }
+            }
+            /* Truncate path if needed */
+            i = 253 - (queryString.length - newQueryStringRight.length) - newReferrer.length;
+            /* Put it back together */
+            referrer = newReferrer + (i > 0 ? path.substring(0,i) : '') + '?' + queryString;
+          }
+        }
+      }
+    }
+
+    return referrer;
+  };
+
+  /*********************************************************************
+   * Function _checkVisibility(callback): Check the browser visibility state
+   *     callback = Callback to call once the browser is visible
+   * Returns:
+   *     true if the browser window is visible or false if not
+   *********************************************************************/
+  s._checkVisibility = function(callback) {
+    var
+        delayNeeded = 0,
+        tm = new Date,
+        timeout = tm.getTime() + s.maxDelay,
+        visibilityState = s.d.visibilityState,
+        visibilityStateEventList = ["webkitvisibilitychange","visibilitychange"],
+        visibilityStateEventNum;
+
+    if (!visibilityState) {
+      visibilityState = s.d.webkitVisibilityState;
+    }
+    if ((visibilityState) && (visibilityState == 'prerender')) {
+      if (callback) {
+        for (visibilityStateEventNum = 0;visibilityStateEventNum < visibilityStateEventList.length;visibilityStateEventNum++) {
+          s.d.addEventListener(visibilityStateEventList[visibilityStateEventNum],function(){
+            var
+                visibilityState = s.d.visibilityState;
+            if (!visibilityState) {
+              visibilityState = s.d.webkitVisibilityState;
+            }
+            if (visibilityState == 'visible') {
+              callback();
+            }
+          });
+        }
+      }
+      return false;
+    }
+    return true;
+  };
+
+  /*********************************************************************
+   * Function _visibilityCallback(): Callback for when browser is visible
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s._waitingForVisibility = false;
+  s._doneWaitingForVisibility = false;
+  s._visibilityCallback = function() {
+    s._doneWaitingForVisibility = true;
+    s._callbackWhenReadyToTrackCheck();
+  };
+
+  /*********************************************************************
+   * Function _marketingCloudVisitorIDCallback(marketingCloudVisitorID): Visitor API callback for Marketing Cloud Visitor ID
+   *     marketingCloudVisitorID = Marketing Cloud Visitor ID
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s._waitingForMarketingCloudVisitorID = false;
+  s._doneWaitingForMarketingCloudVisitorID = false;
+  s._marketingCloudVisitorIDCallback = function(marketingCloudVisitorID) {
+    s.marketingCloudVisitorID = marketingCloudVisitorID;
+    s._doneWaitingForMarketingCloudVisitorID = true;
+    s._callbackWhenReadyToTrackCheck();
+  };
+
+  /*********************************************************************
+   * Function _analyticsVisitorIDCallback(analyticsVisitorID): Visitor API callback for Analytics Visitor ID
+   *     analyticsVisitorID = Analytics Visitor ID
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s._waitingForAnalyticsVisitorID = false;
+  s._doneWaitingForAnalyticsVisitorID = false;
+  s._analyticsVisitorIDCallback = function(analyticsVisitorID) {
+    s.analyticsVisitorID = analyticsVisitorID;
+    s._doneWaitingForAnalyticsVisitorID = true;
+    s._callbackWhenReadyToTrackCheck();
+  };
+
+  /*********************************************************************
+   * Function _audienceManagerLocationHintCallback(audienceManagerLocationHint): Visitor API callback for Audience Manager Location Hint
+   *     audienceManagerLocationHint = Audience Manager Location Hint
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s._waitingForAudienceManagerLocationHint = false;
+  s._doneWaitingForAudienceManagerLocationHint = false;
+  s._audienceManagerLocationHintCallback = function(audienceManagerLocationHint) {
+    s.audienceManagerLocationHint = audienceManagerLocationHint;
+    s._doneWaitingForAudienceManagerLocationHint = true;
+    s._callbackWhenReadyToTrackCheck();
+  };
+
+  /*********************************************************************
+   * Function _audienceManagerBlobCallback(audienceManagerBlob): Visitor API callback for Audience Manager Blob
+   *     audienceManagerBlob = Audience Manager Blob
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s._waitingForAudienceManagerBlob = false;
+  s._doneWaitingForAudienceManagerBlob = false;
+  s._audienceManagerBlobCallback = function(audienceManagerBlob) {
+    s.audienceManagerBlob = audienceManagerBlob;
+    s._doneWaitingForAudienceManagerBlob = true;
+    s._callbackWhenReadyToTrackCheck();
+  };
+
+  /*********************************************************************
+   * Function _checkModulesReady(callback): Check for mobule readyness
+   *     callback = Callback to call once modules are ready or on timeout
+   * Returns:
+   *     true if mobules are ready or false if not
+   *********************************************************************/
+  s._checkModulesReady = function(callback) {
+    if (!s.maxDelay) {
+      s.maxDelay = 250;
+    }
+
+    if (s.callModuleMethod("_d")) {
+      if (callback) {
+        setTimeout(function() {
+          callback();
+        },s.maxDelay);
+      }
+      return false;
+    }
+    return true;
+  };
+
+  /*********************************************************************
+   * Function _modulesReadyCallback(): Callback for when modules are ready or time out
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s._waitingForModulesReady = false;
+  s._doneWaitingForModulesReady = false;
+  s._modulesReadyCallback = function() {
+    s._doneWaitingForModulesReady = true;
+    s._callbackWhenReadyToTrackCheck();
+  };
+
+  /*********************************************************************
+   * Function isReadyToTrack(): Check to see if the instance is ready to track
+   * Returns:
+   *     true if ready to track or false if not
+   *********************************************************************/
+  s.isReadyToTrack = function() {
+    var
+        readyToTrack = true,
+        visitor = s.visitor;
+
+    // Client/browser state
+    if ((!s._waitingForVisibility) && (!s._doneWaitingForVisibility)) {
+      if (!s._checkVisibility(s._visibilityCallback)) {
+        s._waitingForVisibility = true;
+      } else {
+        s._doneWaitingForVisibility = true;
+      }
+    }
+    // IMPORTANT: If we're waiting for visibility don't do any of the other ready checks because that will fire off actions that we don't want to happen when the browser window isn't visible
+    if ((s._waitingForVisibility) && (!s._doneWaitingForVisibility)) {
+      return false;
+    }
+
+    // Visitor
+    if ((visitor) && (visitor.isAllowed())) {
+      // Marketing Cloud Visitor ID
+      if ((!s._waitingForMarketingCloudVisitorID) && (!s.marketingCloudVisitorID) && (visitor.getMarketingCloudVisitorID)) {
+        s._waitingForMarketingCloudVisitorID = true;
+        s.marketingCloudVisitorID = visitor.getMarketingCloudVisitorID([s,s._marketingCloudVisitorIDCallback]);
+        if (s.marketingCloudVisitorID) {
+          s._doneWaitingForMarketingCloudVisitorID = true;
+        }
+      }
+
+      // Analytics Visitor ID
+      if ((!s._waitingForAnalyticsVisitorID) && (!s.analyticsVisitorID) && (visitor.getAnalyticsVisitorID)) {
+        s._waitingForAnalyticsVisitorID = true;
+        s.analyticsVisitorID = visitor.getAnalyticsVisitorID([s,s._analyticsVisitorIDCallback]);
+        if (s.analyticsVisitorID) {
+          s._doneWaitingForAnalyticsVisitorID = true;
+        }
+      }
+
+      // Audience Manager Location Hint & Blob
+      if ((!s._waitingForAudienceManagerLocationHint) && (!s.audienceManagerLocationHint) && (visitor.getAudienceManagerLocationHint)) {
+        s._waitingForAudienceManagerLocationHint = true;
+        s.audienceManagerLocationHint = visitor.getAudienceManagerLocationHint([s,s._audienceManagerLocationHintCallback]);
+        if (s.audienceManagerLocationHint) {
+          s._doneWaitingForAudienceManagerLocationHint = true;
+        }
+      }
+      if ((!s._waitingForAudienceManagerBlob) && (!s.audienceManagerBlob) && (visitor.getAudienceManagerBlob)) {
+        s._waitingForAudienceManagerBlob = true;
+        s.audienceManagerBlob = visitor.getAudienceManagerBlob([s,s._audienceManagerBlobCallback]);
+        if (s.audienceManagerBlob) {
+          s._doneWaitingForAudienceManagerBlob = true;
+        }
+      }
+
+      // Make sure we have everything we need
+      if (((s._waitingForMarketingCloudVisitorID)     && (!s._doneWaitingForMarketingCloudVisitorID)     && (!s.marketingCloudVisitorID)) ||
+          ((s._waitingForAnalyticsVisitorID)          && (!s._doneWaitingForAnalyticsVisitorID)          && (!s.analyticsVisitorID)) ||
+          ((s._waitingForAudienceManagerLocationHint) && (!s._doneWaitingForAudienceManagerLocationHint) && (!s.audienceManagerLocationHint)) ||
+          ((s._waitingForAudienceManagerBlob)         && (!s._doneWaitingForAudienceManagerBlob)         && (!s.audienceManagerBlob))) {
+        readyToTrack = false;
+      }
+    }
+
+    // Modules
+    if ((!s._waitingForModulesReady) && (!s._doneWaitingForModulesReady)) {
+      if (!s._checkModulesReady(s._modulesReadyCallback)) {
+        s._waitingForModulesReady = true;
+      } else {
+        s._doneWaitingForModulesReady = true;
+      }
+    }
+    if ((s._waitingForModulesReady) && (!s._doneWaitingForModulesReady)) {
+      readyToTrack = false;
+    }
+
+    return readyToTrack;
+  };
+
+  /*********************************************************************
+   * Function callbackWhenReadyToTrack(): Callback when instance is ready to track
+   *     callbackThis = Object for callback
+   *     callback     = Callback function object
+   *     args         = Arguments for callback
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s._callbackWhenReadyToTrackQueue = Null;
+  s._callbackWhenReadyToTrackInterval = 0;
+  s.callbackWhenReadyToTrack = function(callbackThis,callback,args) {
+    var
+        callbackInfo;
+
+    callbackInfo = {};
+    callbackInfo.callbackThis = callbackThis;
+    callbackInfo.callback     = callback;
+    callbackInfo.args         = args;
+    if (s._callbackWhenReadyToTrackQueue == Null) {
+      s._callbackWhenReadyToTrackQueue = [];
+    }
+    s._callbackWhenReadyToTrackQueue.push(callbackInfo);
+
+    if (s._callbackWhenReadyToTrackInterval == 0) {
+      s._callbackWhenReadyToTrackInterval = setInterval(s._callbackWhenReadyToTrackCheck,100);
+    }
+  };
+
+  /*********************************************************************
+   * Function _callbackWhenReadyToTrackCheck(): Interval check to see if the instance is ready to track
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s._callbackWhenReadyToTrackCheck = function() {
+    var
+        callbackNum,
+        callbackInfo;
+
+    if (s.isReadyToTrack()) {
+      if (s._callbackWhenReadyToTrackInterval) {
+        clearInterval(s._callbackWhenReadyToTrackInterval);
+        s._callbackWhenReadyToTrackInterval = 0;
+      }
+      if (s._callbackWhenReadyToTrackQueue != Null) {
+        while (s._callbackWhenReadyToTrackQueue.length > 0) {
+          callbackInfo = s._callbackWhenReadyToTrackQueue.shift();
+          callbackInfo.callback.apply(callbackInfo.callbackThis,callbackInfo.args);
+        }
+      }
+    }
+  };
+
+  /*********************************************************************
+   * Function _handleNotReadyToTrack(variableOverrides): Handle not ready to track.  If not ready register callback
+   *     variableOverrides = Object containing one time variable overrides
+   * Returns:
+   *     true if not ready to track and false if ready
+   *********************************************************************/
+  s._handleNotReadyToTrack = function(variableOverrides) {
+    var
+        args,
+        varKey,
+        variableOverridesCopy = Null,
+        setVariables = Null;
+
+    if (!s.isReadyToTrack()) {
+      args = [];
+      if (variableOverrides != Null) {
+        variableOverridesCopy = {};
+        for (varKey in variableOverrides) {
+          variableOverridesCopy[varKey] = variableOverrides[varKey];
+        }
+      }
+      setVariables = {};
+      s.variableOverridesBuild(setVariables,true);
+      args.push(variableOverridesCopy);
+      args.push(setVariables);
+      s.callbackWhenReadyToTrack(s,s.track,args);
+
+      return true;
+    }
+
+    return false;
+  };
+
+  /*********************************************************************
+   * Function getFallbackVisitorID(): Get the fallback visitor ID
+   *     Nothing
+   * Returns:
+   *     The fallback visitor ID if supported or 0 if not
+   *********************************************************************/
+  s.getFallbackVisitorID = function() {
+    var
+        digits = "0123456789ABCDEF",
+        key = "s_fid",
+        fallbackVisitorID = s.cookieRead(key),
+        high = "",low = "",
+        digitNum,digitValue,highDigitValueMax = 8,lowDigitValueMax = 4; /* The first nibble can't have the left-most bit set because we are deailing with signed 64bit numbers.  The low part can only use the 2 right-most bits to avoid collisions */
+    if ((!fallbackVisitorID) || (fallbackVisitorID.indexOf("-") < 0)) {
+      for (digitNum = 0;digitNum < 16;digitNum++) {
+        digitValue = Math.floor(Math.random() * highDigitValueMax);
+        high += digits.substring(digitValue,(digitValue + 1));
+        digitValue = Math.floor(Math.random() * lowDigitValueMax);
+        low += digits.substring(digitValue,(digitValue + 1));
+        highDigitValueMax = lowDigitValueMax = 16;
+      }
+      fallbackVisitorID = high + "-" + low;
+    }
+    if (!s.cookieWrite(key,fallbackVisitorID,1)) {
+      fallbackVisitorID = 0;
+    }
+    return fallbackVisitorID;
+  };
+
+
+  /*********************************************************************
+   * Function track(vo): Gather and send stats.  This is where the stats
+   *                     are gathered and sent to mod-stats
+   *     variableOverrides = Optional object containing one time variable overrides
+   *     setVariables      = Optional object containing perminent variable overrides
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.t = s.track = function(variableOverrides,setVariables) {
+    var
+        notReadyToTrack,
+        variableOverridesBackup,
+        tm = new Date,
+        sed = Math.floor(Math.random() * 10000000000000),
+        cacheBusting = "s" + Math.floor(tm.getTime() / 10800000) % 10 + sed,
+        year = tm.getYear(),
+        time =
+            tm.getDate() + '/'
+            + tm.getMonth() + '/'
+            + (year < 1900 ? year + 1900 : year) + ' '
+            + tm.getHours() + ':'
+            + tm.getMinutes() + ':'
+            + tm.getSeconds() + ' '
+            + tm.getDay() + ' '
+            + tm.getTimezoneOffset(),
+        queryString = "t=" + s.escape(time);
+
+    // Simple Visitor API Usage
+    if (s.visitor) {
+      // Handle authenticated state
+      if (s.visitor.getAuthState) {
+        s.authState = s.visitor.getAuthState();
+      }
+      // Handle supplemental-data ID
+      if ((!s.supplementalDataID) && (s.visitor.getSupplementalDataID)) {
+        s.supplementalDataID = s.visitor.getSupplementalDataID("AppMeasurement:" + s._in,(s.expectSupplementalData ? false : true));
+      }
+    }
+
+    // Call module setup methods and consiquently any module onLoad that hasn't been handled yet
+    s.callModuleMethod("_s");
+
+    // Handle not ready to track
+    notReadyToTrack = s._handleNotReadyToTrack(variableOverrides);
+    if (!notReadyToTrack) {
+      if (setVariables) {
+        s.variableOverridesApply(setVariables);
+      }
+
+      // Apply variable overrides
+      if (variableOverrides) {
+        variableOverridesBackup = {};
+        s.variableOverridesBuild(variableOverridesBackup,0);
+        s.variableOverridesApply(variableOverrides);
+      }
+
+      // Do visitor-sampling
+      if (s.isVisitorInSample()) {
+        // Make sure we have a fallback visitor ID if we don't already have an alternative
+        if ((!s.analyticsVisitorID) && (!s.marketingCloudVisitorID)) {
+          s.fid = s.getFallbackVisitorID();
+        }
+
+        // Prepare link tracking information before doPlugins so it can be reviewed and optionaly altered
+        s.prepareLinkTracking();
+
+        // Fire off manual plugins/modules
+        if ((s.usePlugins) && (s.doPlugins)) {
+          s.doPlugins(s);
+        }
+
+        // If we have an account build query-string and track
+        if (s.account) {
+          if (!s.abort) {
+            // If timestamp hasn't been set yet and offline tracking is on set the timestamp
+            if ((s.trackOffline) && (!s.timestamp)) {
+              s.timestamp = Math.floor(tm.getTime() / 1000);
+            }
+
+            // Polulate basic account variables
+            var l = w.location;
+            if (!s.pageURL) {
+              s.pageURL = (l.href ? l.href : l);
+            }
+            if ((!s.referrer) && (!s._1_referrer)) {
+              s.referrer = topFrameSet.document.referrer;
+            }
+            s._1_referrer = 1;
+            s.referrer = s.fixReferrer(s.referrer);
+
+            // Give modules a chance to give us variables
+            s.callModuleMethod("_g");
+          }
+
+          // Handle link tracking - If it doesn't tell us to skip tracking and we havn't already been told to not track...
+          // IMPORTANT-NOTE: Even if doPlugins told us to abort we still need to handle the link tracking
+          if ((s.handleLinkTracking()) && (!s.abort)) {
+            // Fill in technology
+            s.handleTechnology();
+
+            // Get query-string part for account variables
+            queryString += s.getQueryString();
+
+            // Fire off request
+            s.makeRequest(cacheBusting,queryString);
+
+            // Give modules a chance to take variables and use them
+            s.callModuleMethod("_t");
+
+            // Clear out referrer because we only want to use it once
+            s.referrer = "";
+          }
+        }
+      }
+
+      // Restore variables
+      if (variableOverrides) {
+        s.variableOverridesApply(variableOverridesBackup,1);
+      }
+    }
+
+    // Reset variables
+    s.abort               =
+        s.supplementalDataID  =
+            s.timestamp           =
+                s.pageURLRest         =
+                    s.linkObject          =
+                        s.clickObject         =
+                            s.linkURL             =
+                                s.linkName            =
+                                    s.linkType            =
+                                        w.s_objectID          =
+                                            s.pe                  =
+                                                s.pev1                =
+                                                    s.pev2                =
+                                                        s.pev3                =
+                                                            s.clickMapQueryString =
+                                                                0;
+  };
+
+  /*********************************************************************
+   * Function trackLink(linkObject,linkType,linkName,variableOverrides,doneAction): Track link click
+   *     linkObject        = link object
+   *     linkType          = link type
+   *     linkName          = link name
+   *     variableOverrides = Optional object containing one time variable overrides
+   *     doneAction        = Optional function to call when tracking is finished or times out
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.tl = s.trackLink = function(linkObject,linkType,linkName,variableOverrides,doneAction) {
+    s.linkObject = linkObject;
+    s.linkType = linkType;
+    s.linkName = linkName;
+    if (doneAction) {
+      s.bodyClickTarget   = linkObject;
+      s.bodyClickFunction = doneAction;
+    }
+    return s.track(variableOverrides);
+  };
+
+  /*********************************************************************
+   * Function trackLight(profileID,storeForSeconds,incrementBy,variableOverrides): Track light server call
+   *     profileID         = Light server call profile ID
+   *     storeForSeconds   = Light server call store for seconds
+   *     incrementBy       = Light server call increment by
+   *     variableOverrides = Optional object containing one time variable overrides
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.trackLight = function(profileID,storeForSeconds,incrementBy,variableOverrides) {
+    s.lightProfileID       = profileID;
+    s.lightStoreForSeconds = storeForSeconds;
+    s.lightIncrementBy     = incrementBy;
+    return s.track(variableOverrides);
+  };
+
+  /*********************************************************************
+   * Function clearVars(): Clear a standard set of variables
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.clearVars = function() {
+    var
+        varNum,
+        varKey;
+
+    for (varNum = 0;varNum < s.accountVarList.length;varNum++) {
+      varKey = s.accountVarList[varNum];
+      // We don't want to clear everything
+      if ((varKey.substring(0,4) == "prop") ||
+          (varKey.substring(0,4) == "eVar") ||
+          (varKey.substring(0,4) == "hier") ||
+          (varKey.substring(0,4) == "list") ||
+          (varKey                == "channel") ||
+          (varKey                == "events") ||
+          (varKey                == "eventList") ||
+          (varKey                == "products") ||
+          (varKey                == "productList") ||
+          (varKey                == "purchaseID") ||
+          (varKey                == "transactionID") ||
+          (varKey                == "state") ||
+          (varKey                == "zip") ||
+          (varKey                == "campaign")) {
+        s[varKey] = undefined;
+      }
+    }
+  }
+
+  /*********************************************************************
+   * Function makeRequest(cacheBusting,queryString): Make Request
+   *     cacheBusting = Cache-Busting
+   *     queryString  = Stats query string
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.tagContainerMarker = "";
+  s.makeRequest = function(cacheBusting,queryString) {
+    var
+        request,
+        trackingServer = s.trackingServer,
+        trackingServerBase = "",
+        dc = s.dc,
+        product = "sc.",
+        prefix = s.visitorNamespace,
+        ci;
+
+    if (trackingServer) {
+      if ((s.trackingServerSecure) && (s.ssl)) {
+        trackingServer = s.trackingServerSecure;
+      }
+    } else {
+      if (!prefix) {
+        prefix = s.account;
+        ci = prefix.indexOf(",");
+        if (ci >= 0) {
+          prefix = prefix.substring(0,ci);
+        }
+        prefix = prefix.replace(/[^A-Za-z0-9]/g,'');
+      }
+
+      if (!trackingServerBase) {
+        trackingServerBase = "2o7.net";
+      }
+
+      if (dc) {
+        dc = (""+dc).toLowerCase();
+      } else {
+        dc = "d1";
+      }
+      if (trackingServerBase == "2o7.net") {
+        if (dc == "d1") {
+          dc = "112";
+        } else if (dc == "d2") {
+          dc = "122";
+        }
+        product = "";
+      }
+
+      trackingServer = prefix + "." + dc + "." + product + trackingServerBase;
+    }
+
+    if (s.ssl) {
+      request = "https://";
+    } else {
+      request = "http://";
+    }
+
+    var
+        useAudienceManagement = ((s.AudienceManagement) && (s.AudienceManagement.isReady()));
+    request += trackingServer + "/b/ss/" + s.account + "/" + (s.mobile? "5." : "" ) + (useAudienceManagement ? "10" : "1") + "/JS-" + s.version + (s.tagContainerName ? "T" : "") + (s.tagContainerMarker ? "-" + s.tagContainerMarker : "") + "/" + cacheBusting + "?AQB=1&ndh=1&pf=1&" + (useAudienceManagement ? "callback=s_c_il[" + s._in + "].AudienceManagement.passData&" : "") + queryString + "&AQE=1";
+
+    s.enqueueRequest(request);
+    s.handleRequestList();
+
+    return "";
+  };
+
+  /*********************************************************************
+   * Function enqueueRequest(request): Makes sure everything is prepped for request handling and add request to s.requestList
+   *     request = Request to send off
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.enqueueRequest = function(request) {
+    if (!s.requestList) {
+      s.initRequestList();
+    }
+    s.requestList.push(request);
+    s.lastEnqueuedPacketTimestamp = s.getCurrentTimeInMilliseconds();
+    s.trimRequestListToOfflineLimit();
+  };
+
+  s.initRequestList = function() {
+    s.requestList = s.loadOfflineRequestList();
+    if (!s.requestList) {
+      s.requestList = new Array;
+    }
+  };
+
+  /*********************************************************************
+   * Function loadOfflineRequestList(): Load s.requestList from permanent storage
+   *     Nothing
+   * Returns:
+   *     Array containing offline requests, or nothing if none has been stored.
+   *********************************************************************/
+  s.loadOfflineRequestList = function() {
+    var e, requestList;
+    var storedString;
+
+    if (!s.offlineStorageSupported()) {
+      return;
+    }
+
+    try {
+      storedString = w.localStorage.getItem(s.makeUniqueOfflineFilename());
+      if (storedString) {
+        requestList = w.JSON.parse(storedString);
+      }
+    } catch (e) {}
+
+    return requestList;
+  };
+
+  s.offlineStorageSupported = function() {
+    var offlineStorageSupport = true;
+    if (!s.trackOffline || !s.offlineFilename || !w.localStorage || !w.JSON) {
+      offlineStorageSupport = false;
+    }
+    return offlineStorageSupport;
+  };
+
+  s.getPendingRequestCount = function() {
+    var pendingRequestCount = 0;
+    if (s.requestList) {
+      pendingRequestCount = s.requestList.length;
+    }
+    if (s.handlingRequest) {
+      pendingRequestCount ++;
+    }
+
+    return pendingRequestCount;
+  }
+
+
+  /*********************************************************************
+   * Function handleRequestList(): Handle pulling from s.requestList and sending off the requests
+   *     Nothing
+   * Returns:
+   *     Nothing
+   * NOTE:
+   *     Called by setTimeout and directly
+   *********************************************************************/
+  s.handleRequestList = function() {
+    if (s.handlingRequest) {
+      return;
+    }
+    s.handleRequestListTimer = Null;
+
+    if (s.offline) {
+      if (s.lastEnqueuedPacketTimestamp > s.lastOfflineWriteTimestamp) {
+        s.saveOfflineRequestList(s.requestList);
+      }
+      s.scheduleCallToHandleRequestList(500);
+      return;
+    }
+
+    var requestThrottleDelay = s.calculateRequestThrottleDelay();
+    if (requestThrottleDelay > 0) {
+      s.scheduleCallToHandleRequestList(requestThrottleDelay);
+      return;
+    }
+
+    var request = s.dequeueRequest();
+    if (!request) {
+      return;
+    }
+    s.handlingRequest = 1;
+    s.logRequest(request);
+    s.sendRequest(request);
+  };
+
+  s.scheduleCallToHandleRequestList = function(timeoutInMilliseconds) {
+    if (s.handleRequestListTimer) {
+      return;
+    }
+    if (!timeoutInMilliseconds) {
+      timeoutInMilliseconds = 0;
+    }
+    s.handleRequestListTimer = setTimeout(s.handleRequestList, timeoutInMilliseconds);
+  };
+
+  s.calculateRequestThrottleDelay = function() {
+    var currentTimestamp;
+    var timeSinceLastRequest;
+    if (!s.trackOffline || s.offlineThrottleDelay <= 0) {
+      return 0;
+    }
+    currentTimestamp = s.getCurrentTimeInMilliseconds();
+    timeSinceLastRequest = currentTimestamp - s.lastRequestTimestamp;
+    if (s.offlineThrottleDelay < timeSinceLastRequest) {
+      return 0;
+    }
+    return (s.offlineThrottleDelay - timeSinceLastRequest);
+  };
+
+  s.dequeueRequest = function() {
+    if (s.requestList.length > 0) {
+      return s.requestList.shift();
+    }
+  };
+
+  s.logRequest = function(request) {
+    if (s.debugTracking) {
+      var
+          debug = 'AppMeasurement Debug: ' + request,
+          debugLines = request.split('&'),
+          debugLineNum;
+      for (debugLineNum = 0;debugLineNum < debugLines.length;debugLineNum++) {
+        debug += "\n\t" + s.unescape(debugLines[debugLineNum]);
+      }
+      s.logDebug(debug);
+    }
+  };
+
+  s._hasVisitorID = function() {
+    return ((s.marketingCloudVisitorID) || (s.analyticsVisitorID));
+  };
+
+  s._jsonSupported = false;
+  {
+    var
+        jsonTest,
+        e;
+    // Try native JSON support first
+    try {
+      jsonTest = JSON.parse("{\"x\":\"y\"}");
+    } catch (e) {
+      jsonTest = null;
+    }
+    if ((jsonTest) && (jsonTest.x == "y")) {
+      s._jsonSupported = true;
+      s._jsonParse = function(j){return JSON.parse(j);};
+      // Fallback to jQuery JSON support
+    } else if ((w['$']) && (w['$']['parseJSON'])) {
+      s._jsonParse = function(j){return w['$']['parseJSON'](j);};
+      s._jsonSupported = true;
+    } else {
+      s._jsonParse = function(){return null;};
+    }
+  }
+
+  s.sendRequest = function(request) {
+    var
+        connection,
+        method,
+        parent;
+
+    // POST - Only if a Visitor ID is present and the URL is too long
+    if ((s._hasVisitorID()) && (request.length > 2047)) {
+      if (typeof(XMLHttpRequest) != "undefined") {
+        connection = new XMLHttpRequest;
+        if ("withCredentials" in connection) {
+          method = 1;
+        } else {
+          connection = 0;
+        }
+      }
+      if ((!connection) && (typeof(XDomainRequest) != "undefined")) {
+        connection = new XDomainRequest;
+        method = 2;
+      }
+      if ((connection) && (s.AudienceManagement) && (s.AudienceManagement.isReady())) {
+        if (s._jsonSupported) {
+          connection.audienceManagementCallbackNeeded = true;
+        } else {
+          connection = 0;
+        }
+      }
+    }
+
+    // If not using POST and in IE we have to trim the request down
+    if ((!connection) && (s.isIE)) {
+      request = request.substring(0,2047);
+    }
+
+    // JSONP
+    if ((!connection) && (s.d.createElement) &&
+        (s.AudienceManagement) && (s.AudienceManagement.isReady())) {
+      connection = s.d.createElement("SCRIPT");
+      if ((connection) && ("async" in connection)) {
+        parent = s.d.getElementsByTagName("HEAD");
+        if ((parent) && (parent[0])) {
+          parent = parent[0];
+        } else {
+          parent = s.d.body;
+        }
+        if (parent) {
+          connection.type = "text/javascript";
+          connection.setAttribute("async","async");
+          method = 3;
+        } else {
+          connection = 0;
+        }
+      }
+    }
+
+    // Image
+    if (!connection) {
+      connection = new Image;
+      connection.alt = "";
+    }
+
+    connection.cleanup = function() {
+      var e;
+      try {
+        if (s.requestTimeout) {
+          clearTimeout(s.requestTimeout);
+          s.requestTimeout = 0;
+        }
+        if (connection.timeout) {
+          clearTimeout(connection.timeout);
+          connection.timeout = 0;
+        }
+      } catch (e) {}
+    };
+
+    connection.onload = connection.success = function() {
+      connection.cleanup();
+      s.deleteOfflineRequestList();
+      s.bodyClickRepropagate();
+      s.handlingRequest = 0;
+      s.handleRequestList();
+
+      if (connection.audienceManagementCallbackNeeded) {
+        connection.audienceManagementCallbackNeeded = false;
+
+        var e;
+        try {
+          var
+              audienceManagementData = s._jsonParse(connection.responseText);
+          AudienceManagement.passData(audienceManagementData);
+        } catch (e) {}
+      }
+    };
+
+    connection.onabort = connection.onerror = connection.failure = function() {
+      connection.cleanup();
+      // Condition to avoid having multiple of the same request put back onto the queue.
+      if (((s.trackOffline) || (s.offline)) && (s.handlingRequest)) {
+        s.requestList.unshift(s.currentRequest);
+      }
+      s.handlingRequest = 0;
+      if (s.lastEnqueuedPacketTimestamp > s.lastOfflineWriteTimestamp) {
+        s.saveOfflineRequestList(s.requestList);
+      }
+      s.bodyClickRepropagate();
+      s.scheduleCallToHandleRequestList(500);
+    };
+    connection.onreadystatechange = function() {
+      if (connection.readyState == 4) {
+        if (connection.status == 200) {
+          connection.success();
+        } else {
+          connection.failure();
+        }
+      }
+    };
+
+    s.lastRequestTimestamp = s.getCurrentTimeInMilliseconds();
+
+    if ((method == 1) || (method == 2)) {
+      var
+          dataPos = request.indexOf("?"),
+          uri = request.substring(0,dataPos),
+          data = request.substring((dataPos + 1));
+      data = data.replace(/&callback=[a-zA-Z0-9_.\[\]]+/,"");
+      if (method == 1) {
+        connection.open("POST",uri,true);
+        connection.send(data);
+      } else if (method == 2) {
+        connection.open("POST",uri);
+        connection.send(data);
+      }
+    } else {
+      connection.src = request;
+      if (method == 3) {
+        // If we previously injected a script tag remove the old one
+        if (s.lastConnection) {
+          try {
+            parent.removeChild(s.lastConnection);
+          } catch (e) {}
+        }
+        if (parent.firstChild) {
+          parent.insertBefore(connection,parent.firstChild);
+        } else {
+          parent.appendChild(connection);
+        }
+        s.lastConnection = s.currentConnection;
+      }
+    }
+
+    // Only schedule forced request timeouts if the connection supports abort
+    if (connection.abort) {
+      s.requestTimeout = setTimeout(connection.abort, 5000);
+    }
+
+    s.currentRequest = request;
+    s.currentConnection = w['s_i_' + s.replace(s.account,',','_')] = connection;
+
+    // Setup timeout for forced link tracking
+    if (((s.useForcedLinkTracking) && (s.bodyClickEvent)) || (s.bodyClickFunction)) {
+      if (!s.forcedLinkTrackingTimeout) {
+        s.forcedLinkTrackingTimeout = 250;
+      }
+      s.bodyClickRepropagateTimer = setTimeout(s.bodyClickRepropagate, s.forcedLinkTrackingTimeout);
+    }
+  };
+
+  s.deleteOfflineRequestList = function() {
+    if (!s.offlineStorageSupported()) {
+      return;
+    }
+    if (s.lastOfflineDeletionTimestamp > s.lastOfflineWriteTimestamp) {
+      return;
+    }
+
+    var e;
+    try {
+      w.localStorage.removeItem(s.makeUniqueOfflineFilename());
+      s.lastOfflineDeletionTimestamp = s.getCurrentTimeInMilliseconds();
+
+    } catch (e) {}
+  };
+
+  s.saveOfflineRequestList = function(requestList) {
+    if (!s.offlineStorageSupported()) {
+      return;
+    }
+
+    s.trimRequestListToOfflineLimit();
+
+    var e;
+    try {
+      w.localStorage.setItem(s.makeUniqueOfflineFilename(), w.JSON.stringify(requestList));
+      s.lastOfflineWriteTimestamp = s.getCurrentTimeInMilliseconds();
+    } catch (e) {}
+  };
+
+  s.trimRequestListToOfflineLimit = function() {
+    if (!s.trackOffline) {
+      return;
+    }
+    if (!s.offlineLimit || s.offlineLimit <= 0) {
+      s.offlineLimit = 10;
+    }
+
+    while (s.requestList.length > s.offlineLimit) {
+      s.dequeueRequest();
+    }
+  };
+
+  s.forceOffline = function() {
+    s.offline = true;
+  };
+
+  s.forceOnline = function() {
+    s.offline = false;
+  };
+
+  s.makeUniqueOfflineFilename = function() {
+    return s.offlineFilename + "-"  + s.visitorNamespace + s.account;
+  };
+
+  s.getCurrentTimeInMilliseconds = function() {
+    return (new Date).getTime();
+  };
+
+  s.hrefSupportsLinkTracking = function(href) {
+    href = href.toLowerCase();
+    if ((href.indexOf("#") != 0) &&
+        (href.indexOf("about:") != 0) &&
+        (href.indexOf("opera:") != 0) &&
+        (href.indexOf("javascript:") != 0)) {
+      return true;
+    }
+    return false;
+  };
+
+  /*********************************************************************
+   * Function setTagContainer(tagContainerName): Set the tag container
+   *             and use the tag container loader if it exists to get the
+   *             queues for calls to execute that happened before the
+   *             container was loaded
+   *     tagContainerName = Name of tag container (same as s.tagContainerName)
+   * Returns:
+   *     Nothing
+   *********************************************************************/
+  s.setTagContainer = function(tagContainerName) {
+    var i,
+        containerLoader,
+        container,
+        module;
+    s.tagContainerName = tagContainerName;
+    for (i=0; i<s._il.length; i++) {
+      containerLoader = s._il[i];
+      if (containerLoader && containerLoader['_c'] == 's_l'
+          && containerLoader['tagContainerName'] == tagContainerName) {
+
+        s.variableOverridesApply(containerLoader);
+
+        // Load queued up modules
+        if (containerLoader['lmq']) {
+          for (i=0; i<containerLoader['lmq'].length; i++) {
+            container = containerLoader['lmq'][i];
+            s.loadModule(container['n']);
+          }
+        }
+        // Transfer various module member objects (such as: s.Media.trackMilestones etc.)
+        if (containerLoader['ml']) {
+          for (container in containerLoader['ml']) {
+            if (s[container]) {
+              module = s[container];
+              container = containerLoader['ml'][container];
+              for(i in container) {
+                if (!Object.prototype[i]){
+                  if (typeof(container[i])!='function' || (''+container[i]).indexOf('s_c_il')<0)
+                    module[i] = container[i];
+                }
+              }
+            }
+          }
+        }
+        // Execute queued up module function calls
+        if (containerLoader['mmq']) {
+          for (i=0; i<containerLoader['mmq'].length; i++) {
+            container = containerLoader['mmq'][i];
+            if (s[container['m']]){
+              module = s[container['m']];
+              if (module[container['f']]&&typeof(module[container['f']])=='function'){
+                if (container['a']) {
+                  module[container['f']].apply(module, container['a']);
+                }
+                else {
+                  module[container['f']].apply(module);
+                }
+              }
+            }
+          }
+        }
+        // Execute queued up track calls
+        if (containerLoader['tq']) {
+          for (i=0; i<containerLoader['tq'].length; i++) {
+            s.track(containerLoader['tq'][i]);
+          }
+        }
+        containerLoader['s'] = s;
+        return;
+      }
+    }
+  };
+
+  /* Utilities API */
+  s.Util = {
+    'urlEncode':s.escape,
+    'urlDecode':s.unescape,
+    'cookieRead':s.cookieRead,
+    'cookieWrite':s.cookieWrite,
+    'getQueryParam':function(key,url,delim){
+      var
+          queryStringPos,
+          value;
+      /* If we don't have a custom URL like document.referrer... */
+      if (!url) {
+        /* Look for a custom page URL in s.pageURL */
+        if (s.pageURL) {
+          url = s.pageURL;
+          /* Default to window.location */
+        } else {
+          url = w.location;
+        }
+      }
+      /* If we don't have a custom delimiter (usualy ";") default to "&" */
+      if (!delim) {
+        delim = '&';
+      }
+      /* If we have a good URL and key look for the value */
+      if ((key) && (url)) {
+        url = '' + url;
+        queryStringPos = url.indexOf('?');
+        if (queryStringPos >= 0) {
+          value = delim + url.substring(queryStringPos + 1) + delim;
+          queryStringPos = value.indexOf(delim + key + '=');
+          if (queryStringPos >= 0) {
+            value = value.substring(queryStringPos + delim.length + key.length + 1);
+            queryStringPos = value.indexOf(delim);
+            if (queryStringPos >= 0) {
+              value = value.substring(0,queryStringPos);
+            }
+            if (value.length > 0) {
+              /* We found something so URL decode it before returning */
+              return s.unescape(value);
+            }
+          }
+        }
+      }
+      /* We didn't find anything so return an empty string */
+      return '';
+    }
+  };
+
+  // BEGIN VARIABLE REPLACEMENT
+  // This will be replaced with the variable lists by the Makefile
+  //APPMEASUREMENT_VARAIBLES
+
+  s.requiredVarList = [
+    'supplementalDataID',
+    'timestamp',
+    'dynamicVariablePrefix',
+    'visitorID',
+    'marketingCloudVisitorID',
+    'analyticsVisitorID',
+    'audienceManagerLocationHint',
+    'authState',
+    'fid',
+    'vmk',
+    'visitorMigrationKey',
+    'visitorMigrationServer',
+    'visitorMigrationServerSecure',
+    'charSet',
+    'visitorNamespace',
+    'cookieDomainPeriods',
+    'fpCookieDomainPeriods',
+    'cookieLifetime',
+    'pageName',
+    'pageURL',
+    'referrer',
+    'contextData',
+    'currencyCode',
+    'lightProfileID',
+    'lightStoreForSeconds',
+    'lightIncrementBy',
+    'retrieveLightProfiles',
+    'deleteLightProfiles',
+    'retrieveLightData',
+    'pe',
+    'pev1',
+    'pev2',
+    'pev3',
+    'pageURLRest'
+  ];
+
+  s.accountVarList = s.requiredVarList.concat([
+    'purchaseID',
+    'variableProvider',
+    'channel',
+    'server',
+    'pageType',
+    'transactionID',
+    'campaign',
+    'state',
+    'zip',
+    'events',
+    'events2',
+    'products',
+    'audienceManagerBlob',
+    'tnt'
+  ]);
+
+  s.lightRequiredVarList = [
+    'timestamp',
+    'charSet',
+    'visitorNamespace',
+    'cookieDomainPeriods',
+    'cookieLifetime',
+    'contextData',
+    'lightProfileID',
+    'lightStoreForSeconds',
+    'lightIncrementBy'
+  ];
+
+  s.lightVarList = s.lightRequiredVarList.slice(0);
+  s.accountConfigList = [
+    'account',
+    'allAccounts',
+    'debugTracking',
+    'visitor',
+    'trackOffline',
+    'offlineLimit',
+    'offlineThrottleDelay',
+    'offlineFilename',
+    'usePlugins',
+    'doPlugins',
+    'configURL',
+    'visitorSampling',
+    'visitorSamplingGroup',
+    'linkObject',
+    'clickObject',
+    'linkURL',
+    'linkName',
+    'linkType',
+    'trackDownloadLinks',
+    'trackExternalLinks',
+    'trackClickMap',
+    'trackInlineStats',
+    'linkLeaveQueryString',
+    'linkTrackVars',
+    'linkTrackEvents',
+    'linkDownloadFileTypes',
+    'linkExternalFilters',
+    'linkInternalFilters',
+    'useForcedLinkTracking',
+    'forcedLinkTrackingTimeout',
+    'trackingServer',
+    'trackingServerSecure',
+    'ssl',
+    'abort',
+    'mobile',
+    'dc',
+    'lightTrackVars',
+    'maxDelay',
+    'expectSupplementalData',
+    'AudienceManagement'
+  ];
+
+  for (var varNum = 0;varNum <= 250;varNum++) {
+    if (varNum < 76) {
+      s.accountVarList.push('prop' + varNum);
+      s.lightVarList.push('prop' + varNum);
+    }
+    s.accountVarList.push('eVar' + varNum);
+    s.lightVarList.push('eVar' + varNum);
+    if (varNum < 6) {
+      s.accountVarList.push('hier' + varNum);
+    }
+    if (varNum < 4) {
+      s.accountVarList.push('list' + varNum);
+    }
+  }
+  var technologyVarList = [
+    'latitude',
+    'longitude',
+    'resolution',
+    'colorDepth',
+    'javascriptVersion',
+    'javaEnabled',
+    'cookiesEnabled',
+    'browserWidth',
+    'browserHeight',
+    'connectionType',
+    'homepage'
+  ];
+  s.accountVarList = s.accountVarList.concat(technologyVarList);
+  s.requiredVarList = s.requiredVarList.concat(technologyVarList);
+
+  // END VARIABLE REPLACEMENT
+
+  // Defaults
+  s.ssl = (w.location.protocol.toLowerCase().indexOf('https')>=0);
+  s.charSet = "UTF-8";
+  s.contextData = {};
+
+  s.offlineThrottleDelay = 0;
+  s.offlineFilename = "AppMeasurement.offline";
+
+  // Timestamps that controls request throttling, and offline request storage
+  s.lastRequestTimestamp = 0;
+  s.lastEnqueuedPacketTimestamp = 0;
+  s.lastOfflineWriteTimestamp = 0;
+  s.lastOfflineDeletionTimestamp = 0;
+
+  s.linkDownloadFileTypes = "exe,zip,wav,mp3,mov,mpg,avi,wmv,pdf,doc,docx,xls,xlsx,ppt,pptx";
+
+  // Aliases
+  s.w = w;
+  /**
+   * @type {!Document}
+   * @noalias
+   */
+  s.d = w.document;
+
+  // Basic browser detection
+  var
+      e;
+  try {
+    s.isIE = (navigator.appName == "Microsoft Internet Explorer");
+  } catch (e) {}
+
+  /*********************************************************************
+   * Function bodyClickRepropagate(): Repropagate a cloned click event
+   *                                  from s.bct and s.bce or run a
+   *                                  custom callback in s.bcf
+   *     Nothing
+   * Returns:
+   *     Nothing
+   * NOTE:
+   *     Called by setTimeout and directly
+   *********************************************************************/
+  s.bodyClickRepropagate = function() {
+    if (s.bodyClickRepropagateTimer) {
+      w.clearTimeout(s.bodyClickRepropagateTimer);
+      s.bodyClickRepropagateTimer = Null;
+    }
+
+    /*
+     For future connections supporting abort, this would be a good place to call it.
+     If offline storage is turned on, this would then save the pending request.
+     If offline storage is turend on the forcedLinkTrackingTimeout could also be
+     set shorter because requests would end up being saved.
+     if (s.handlingRequest && s.currentConnection.abort) {
+     s.currentConnection.abort();
+     }
+     */
+    if ((s.bodyClickTarget) && (s.bodyClickEvent)) {
+      s.bodyClickTarget.dispatchEvent(s.bodyClickEvent);
+    }
+    if (s.bodyClickFunction) {
+      if (typeof(s.bodyClickFunction) == 'function') {
+        s.bodyClickFunction();
+      } else if ((s.bodyClickTarget) && (s.bodyClickTarget.href)) {
+        s.d.location = s.bodyClickTarget.href;
+      }
+    }
+    s.bodyClickTarget = s.bodyClickEvent = s.bodyClickFunction = 0;
+  };
+
+  // Setup the body when it exists
+  s.setupBody = function() {
+    s.b = s.d.body;
+
+    if (s.b) {
+      /*********************************************************************
+       * Function bodyClick(e): <body> click handler
+       *     e = Click event object
+       * Returns:
+       *     Nothing
+       *********************************************************************/
+      s.bodyClick = function(e) {
+        var
+            parent,
+            x,
+            newEvent,
+            target,
+            requestCount,
+            anchor,
+            href,
+            e;
+
+        /* If ClickMap plugin is running or this is a fake click event ignore */
+        if (((s.d) && (s.d.getElementById("cppXYctnr"))) ||
+            ((e) && (e['s_fe_' + s._in]))) {
+          return;
+        }
+
+        /* If we don't have forced body click support turn off the flag */
+        if (!s.blockingBodyClick) {
+          s.useForcedLinkTracking=0;
+          /* If we do have forced body click support but it's turned off remove the capture event listener and turn the support flag off */
+        } else if(!s.useForcedLinkTracking){
+          s.b.removeEventListener("click",s.bodyClick,true);
+          s.blockingBodyClick = s.useForcedLinkTracking = 0;
+          return
+          /* If we do have forced body click support and it's turned on remove the bubble event listener */
+        } else {
+          s.b.removeEventListener("click",s.bodyClick,false);
+        }
+
+        s.clickObject = (e.srcElement ? e.srcElement : e.target);
+        try {
+          if ((s.clickObject) && ((!s.lastClickObject) || (s.lastClickObject != s.clickObject)) && ((s.clickObject.tagName) || (s.clickObject.parentElement) || (s.clickObject.parentNode))) {
+            /*
+             * Safeguard tracking a flood of clicks from fake or real events to the same object (s.lastClickObject checked above)
+             * Only track a click to the same object after a 10 second timeout
+             */
+            var lastClickObject = s.lastClickObject = s.clickObject;
+            if (s.lastClickObjectTimeout) {
+              clearTimeout(s.lastClickObjectTimeout);
+              s.lastClickObjectTimeout = 0;
+            }
+            s.lastClickObjectTimeout = setTimeout(function () {
+              // Only clear if we are still dealing with the samek object
+              if (s.lastClickObject == lastClickObject) {
+                s.lastClickObject = 0;
+              }
+            },10000);
+
+            requestCount = s.getPendingRequestCount();
+            s.track();
+
+            /* If we just tracked the click, have forced body click support, it's turned on, and we have a DOM element that can dispatch events... */
+            if ((requestCount < s.getPendingRequestCount()) && (s.useForcedLinkTracking) && (e.target)) {
+              /*
+               We only do the automatic forced link tracking for
+               1. A and AREA tags
+               2. href that is not #*, about:*, opera:*, or javascript:*
+               3. link-target attribute that is the current window
+               */
+              anchor = e.target;
+              while ((anchor) && (anchor != s.b) && (anchor.tagName.toUpperCase() != "A") && (anchor.tagName.toUpperCase() != "AREA")) {
+                anchor = anchor.parentNode;
+              }
+              if (anchor) {
+                href = anchor.href;
+                if (!s.hrefSupportsLinkTracking(href)) {
+                  href = 0;
+                }
+                target = anchor.target;
+                if ((e.target.dispatchEvent) && (href) && ((!target) || (target == '_self') || (target == '_top') || (target == '_parent') || ((w.name) && (target == w.name)))) {
+                  /* Create the click event */
+                  try {
+                    newEvent = s.d.createEvent("MouseEvents");
+                  } catch (e) {
+                    newEvent = new w['MouseEvent'];
+                  }
+                  if (newEvent) {
+                    try {
+                      newEvent.initMouseEvent(
+                          "click",
+                          e.bubbles,
+                          e.cancelable,
+                          e.view,
+                          e.detail,
+                          e.screenX,
+                          e.screenY,
+                          e.clientX,
+                          e.clientY,
+                          e.ctrlKey,
+                          e.altKey,
+                          e.shiftKey,
+                          e.metaKey,
+                          e.button,
+                          e.relatedTarget
+                      );
+                    } catch (e) {
+                      newEvent = 0;
+                    }
+                    if (newEvent) {
+                      /* Flag as a fake event that we should not handle when it's repropagated */
+                      newEvent['s_fe_' + s._in] = newEvent['s_fe'] = 1;
+
+                      /* Kill the event propagation */
+                      e.stopPropagation();
+                      if (e.stopImmediatePropagation) {
+                        e.stopImmediatePropagation();
+                      }
+                      e.preventDefault();
+
+                      /* Store the target and cloned event to use later to repropagate the click */
+                      s.bodyClickTarget = e.target;
+                      s.bodyClickEvent = newEvent;
+                    }
+                  }
+                }
+              }
+            }
+          } else {
+            s.clickObject = 0;
+          }
+        } catch (x) {
+          s.clickObject = 0;
+        }
+      };
+
+      // Add event handlers
+      if ((s.b) && (s.b.attachEvent)) {
+        s.b.attachEvent('onclick',s.bodyClick);
+      } else if ((s.b) && (s.b.addEventListener)) {
+        /* Setup forced link tracking event handler if supported */
+        if ((navigator) && (
+            ((navigator.userAgent.indexOf('WebKit') >= 0) && (s.d.createEvent)) ||
+            ((navigator.userAgent.indexOf('Firefox/2') >= 0) && (w['MouseEvent']))
+            )) {
+          s.blockingBodyClick     = 1;
+          s.useForcedLinkTracking = 1;
+          s.b.addEventListener('click',s.bodyClick,true)
+        }
+        s.b.addEventListener('click',s.bodyClick,false);
+      }
+    } else {
+      setTimeout(s.setupBody,30);
+    }
+  }
+  s.setupBody();
 }
-AppMeasurement.getInstance = s_gi;
-window.s_objectID || (window.s_objectID = 0);
+
+/*********************************************************************
+ * Function getInstance(account): Finds instance for an account
+ *     account = Account for instance
+ * Returns:
+ *     Instance
+ *
+ * @constructor
+ * @noalias
+ *********************************************************************/
+function s_gi(account) {
+  /**
+   * @type {AppMeasurement}
+   * @noalias
+   */
+  var s;
+  var
+      instanceList = window.s_c_il,
+      instanceNum,
+      accountSet,
+      accountList = account.split(","),
+      allAccounts,
+      accountNum,subAccountNum,
+      found = 0;
+  if (instanceList) {
+    instanceNum = 0;
+    while ((!found) && (instanceNum < instanceList.length)) {
+      s = instanceList[instanceNum];
+      if (s._c == "s_c") {
+        if ((s.account) || (s.oun)) {
+          if ((s.account) && (s.account == account)) {
+            found = 1;
+          } else {
+            accountSet = (s.account ? s.account : s.oun);
+            allAccounts = (s.allAccounts ? s.allAccounts : accountSet.split(","));
+            for (accountNum = 0;accountNum < accountList.length;accountNum++) {
+              for (subAccountNum = 0;subAccountNum < allAccounts.length;subAccountNum++) {
+                if (accountList[accountNum] == allAccounts[subAccountNum]) {
+                  found = 1;
+                }
+              }
+            }
+          }
+        }
+      }
+      instanceNum++;
+    }
+  }
+  if (!found) {
+    s = new AppMeasurement();
+  }
+  if (s.setAccount) {
+    s.setAccount(account);
+  } else if (s.sa) {
+    s.sa(account);
+  }
+  return s;
+}
+AppMeasurement['getInstance'] = s_gi;
+
+/*********************************************************************
+ * Globals
+ *********************************************************************/
+if (!window['s_objectID']) {
+  window['s_objectID'] = 0;
+}
+
+/*********************************************************************
+ * Function processGetInstanceCallQueue(): Process the s_gi call queue
+ *     that was recorded by Tag Management prior to library being loaded.
+ * Returns:
+ *     Nothing
+ *********************************************************************/
 function s_pgicq() {
-  var a = window, k = a.s_giq, q, r, n;
-  if (k)
-    for (q = 0; q < k.length; q++)
-      r = k[q], n = s_gi(r.oun), n.setAccount(r.un), n.setTagContainer(r.tagContainerName);
-  a.s_giq = 0
+  var w = window,
+      callQueue = w.s_giq,
+      ia,
+      callInfo,
+      s;
+  if(callQueue) {
+    for(ia=0; ia<callQueue.length; ia++) {
+      callInfo = callQueue[ia];
+      s = s_gi(callInfo['oun']);
+      s.setAccount(callInfo['un']);
+      s.setTagContainer(callInfo['tagContainerName']);
+    }
+  }
+  w.s_giq = 0;
 }
+
 s_pgicq();

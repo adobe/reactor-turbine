@@ -4,6 +4,125 @@
 // Adobe Systems Incorporated
 
 (function(window, document, undefined) {
+
+  var frameworkEnabled = true;
+
+  var getBrowserWidth = function() {
+    return window.innerWidth ? window.innerWidth : document.documentElement.offsetWidth;
+  };
+
+  var getBrowserHeight = function() {
+    return window.innerHeight ? window.innerHeight : document.documentElement.offsetHeight;
+  };
+
+  var getResolution = function() {
+    return window.screen.width + "x" + window.screen.height;
+  };
+
+  var getColorDepth = function() {
+    return window.screen.pixelDepth ? window.screen.pixelDepth : window.screen.colorDepth;
+  };
+
+  var getJSVersion = function() {
+    var
+        tm = new Date,
+        a,o,i,
+        j = '1.2',
+        pn = 0;
+
+    if (tm.setUTCDate) {
+      j = '1.3';
+      if (pn.toPrecision) {
+        j = '1.5';
+        a = [];
+        if (a.forEach) {
+          j = '1.6';
+          i = 0;
+          o = {};
+          try {
+            i=new Iterator(o);
+            if (i.next) {
+              j = '1.7';
+              if (a.reduce) {
+                j = '1.8';
+                if (j.trim) {
+                  j = '1.8.1';
+                  if (Date.parse) {
+                    j = '1.8.2';
+                    if (Object.create) {
+                      j = '1.8.5';
+                    }
+                  }
+                }
+              }
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    return j;
+  };
+
+  var getIsJavaEnabled = function() {
+    return navigator.javaEnabled() ? 'Y' : 'N';
+  };
+
+  var getIsCookiesEnabled = function() {
+    return window.navigator.cookieEnabled ? 'Y' : 'N';
+  };
+
+  // TODO: Can we get rid of this?
+  var getConnectionType = function() {
+    return document.body.connectionType;
+  };
+
+  // TODO: Can we get rid of this?
+  var getIsHomePage = function() {
+    var isHomePage = document.body.isHomePage;
+    return isHomePage ? isHomePage(getTopFrameSet().location) : 'N';
+  };
+
+  // TODO: Can we get rid of this?
+  var getTopFrameSet = function() {
+    // Get the top frame set
+    var
+        topFrameSet = window,
+        parent,
+        location;
+    try {
+      parent = topFrameSet.parent;
+      location = topFrameSet.location;
+      while ((parent) &&
+          (parent.location) &&
+          (location) &&
+          ('' + parent.location != '' + location) &&
+          (topFrameSet.location) &&
+          ('' + parent.location != '' + topFrameSet.location) &&
+          (parent.location.host == location.host)) {
+        topFrameSet = parent;
+        parent = topFrameSet.parent;
+      }
+    } catch (e) {}
+
+    return topFrameSet;
+  };
+
+  var getClientInfo = function() {
+    return {
+      browserHeight: getBrowserHeight(),
+      browserWidth: getBrowserWidth(),
+      resolution: getResolution(),
+      colorDepth: getColorDepth(),
+      javaScriptVersion: getJSVersion(),
+      javaEnabled: getIsJavaEnabled(),
+      cookiesEnabled: getIsCookiesEnabled(),
+      connectionType: getConnectionType(),
+      homePage: getIsHomePage()
+    };
+  };
+
+
 // Satellite
 // =========
 //
@@ -2640,7 +2759,7 @@
 
       var visitorIdInstance = SL.getVisitorId()
       if (visitorIdInstance) {
-        s.visitor = SL.getVisitorId()
+        s.visitor = SL.getVisitorId() // TODO: can we use visitorIdInstance?
       }
 
       return s
@@ -2667,27 +2786,128 @@
     clearCustomSetup: function(){
       this.customSetupFuns = []
     },
-    sendBeacon: function(){
-      var s = this.getS(window[this.settings.renameS || 's'])
-      if (!s){
-        SL.notify('Adobe Analytics: page code not loaded', 1)
-        return
-      }
-      if (this.settings.customInit){
-        if (this.settings.customInit(s) === false){
-          SL.notify("Adobe Analytics: custom init suppressed beacon", 1)
-          return
+    queryStringParamMap: {
+      browserHeight: 'bh',
+      browserWidth: 'bw',
+      campaign: 'v0',
+      channel: 'ch',
+      colorDepth: 'c',
+      connectionType: 'ct',
+      cookiesEnabled: 'k',
+      currencyCode: 'cc',
+      events: 'events',
+      homePage: 'hp',
+      javaEnabled: 'v',
+      javaScriptVersion: 'j',
+      linkName: 'pev2',
+      linkType: 'pe',
+      linkURL: 'pev1',
+      pageName: 'pageName',
+      pageType: 'pageType',
+      pageURL: 'g',
+      plugins: 'p',
+      products: 'products',
+      purchaseID: 'purchaseID',
+      referrer: 'r',
+      resolution: 's',
+      server: 'server',
+      state: 'state',
+      timestamp: 'ts',
+      transactionID: 'xact',
+      visitorID: 'vid',
+      marketingCloudVisitorID: 'mid',
+      zip: 'zip'
+    },
+    remodelDataToQueryString: function(data) {
+      var result = {};
+      var key;
+
+      var clientInfo = data.clientInfo;
+
+      if (clientInfo) {
+        for (key in clientInfo) {
+          if (clientInfo.hasOwnProperty(key)) {
+            result[this.queryStringParamMap[key]] = clientInfo[key];
+          }
         }
       }
 
-      if (this.settings.executeCustomPageCodeFirst) {
-        this.applyVarBindingsOnTracker(s, this.varBindings)
+      var varBindings = data.varBindings;
+
+      if (varBindings) {
+        for (key in varBindings) {
+          if (varBindings.hasOwnProperty(key)) {
+            var value = varBindings[key];
+
+            if (key.indexOf('eVar') === 0) {
+              result['v' + key.substr(4)] = value;
+            } else if (key.indexOf('hier') === 0) {
+              result['h' + key.substr(4)] = value;
+            } else if (key.indexOf('prop') === 0) {
+              result['c' + key.substr(4)] = value;
+            } else {
+              var queryStringParam = this.queryStringParamMap[key];
+              if (queryStringParam) {
+                result[this.queryStringParamMap[key]] = value;
+              }
+            }
+          }
+        }
       }
-      this.executeCustomSetupFuns(s)
-      s.t()
-      this.clearVarBindings()
-      this.clearCustomSetup()
-      SL.notify("Adobe Analytics: tracked page view", 1)
+
+      var events = data.events;
+
+      if (events) {
+        result[this.queryStringParamMap['events']] = events.join(',');
+      }
+
+      var linkInfo = data.linkInfo;
+
+      if (linkInfo) {
+        for (key in linkInfo) {
+          if (linkInfo.hasOwnProperty(key)) {
+            result[this.queryStringParamMap[key]] = linkInfo[key];
+          }
+        }
+      }
+
+      result = SL.encodeObjectToURI(result);
+      return result;
+    },
+    sendBeacon: function(){
+      if (frameworkEnabled) {
+        var queryString = this.remodelDataToQueryString({
+          varBindings: this.varBindings,
+          events: this.events,
+          clientInfo: getClientInfo()
+        });
+
+        console.log(queryString);
+       // send the beacon
+      } else {
+        var s = this.getS(window[this.settings.renameS || 's'])
+        if (!s){
+          SL.notify('Adobe Analytics: page code not loaded', 1)
+          return
+        }
+        if (this.settings.customInit){
+          if (this.settings.customInit(s) === false){
+            SL.notify("Adobe Analytics: custom init suppressed beacon", 1)
+            return
+          }
+        }
+
+        if (this.settings.executeCustomPageCodeFirst) {
+          this.applyVarBindingsOnTracker(s, this.varBindings)
+        }
+        this.executeCustomSetupFuns(s)
+
+        s.t()
+        this.clearVarBindings()
+        this.clearCustomSetup()
+        SL.notify("Adobe Analytics: tracked page view", 1)
+      }
+
     },
     executeCustomSetupFuns: function(s){
       SL.each(this.customSetupFuns, function(fun){
@@ -4455,6 +4675,7 @@
         "euCookie": false,
         "sCodeURL": "7adf9ad51d40b4e06390693913f85f1a37e869de/s-code-contents-22c7cbe13317f4c9e99900c0b530d66471196f02-staging.js",
         "initVars": {
+          "currencyCode":"TND",
           "trackInlineStats": true,
           "trackDownloadLinks": true,
           "linkDownloadFileTypes": "doc,docx,eps,jpg,png,svg,xls,ppt,pptx,pdf,xlsx,tab,csv,zip,txt,vsd,vxd,xml,js,css,rar,exe,wma,mov,avi,wmv,mp3,wav,m4v",
@@ -4488,7 +4709,7 @@
           campaign: "MyCampaign",
           hier1: "HierLev1|HierLev2|HierLev3|HierLev4"
         }]
-      }, {engine: "sc", command: "addEvent", arguments: ["prodView:MyProdView"]}, {
+      }, {engine:"sc",command:"addEvent",arguments:["event10:MyEvent10","event11:MyEvent11","prodView:MyProdView"]}, {
         engine: "tnt",
         command: "addMbox",
         arguments: [{mboxGoesAround: "", mboxName: "", arguments: [], timeout: "1500"}]
@@ -4496,7 +4717,9 @@
       event: "pagebottom"
     }],
     "rules": [
-
+      {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink"}]}],"conditions":[function(event,target){
+        return !_satellite.isLinked(target)
+      }],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}
     ],
     "directCallRules": [
 

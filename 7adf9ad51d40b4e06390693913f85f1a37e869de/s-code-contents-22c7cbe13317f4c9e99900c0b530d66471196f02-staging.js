@@ -847,6 +847,8 @@ function AppMeasurement() {
       }
     }
 
+    recordAMUrl(queryString);
+
     return queryString;
   };
 
@@ -2232,6 +2234,7 @@ function AppMeasurement() {
     var
         useAudienceManagement = ((s.AudienceManagement) && (s.AudienceManagement.isReady()));
     request += trackingServer + "/b/ss/" + s.account + "/" + (s.mobile? "5." : "" ) + (useAudienceManagement ? "10" : "1") + "/JS-" + s.version + (s.tagContainerName ? "T" : "") + (s.tagContainerMarker ? "-" + s.tagContainerMarker : "") + "/" + cacheBusting + "?AQB=1&ndh=1&pf=1&" + (useAudienceManagement ? "callback=s_c_il[" + s._in + "].AudienceManagement.passData&" : "") + queryString + "&AQE=1";
+
 
     s.enqueueRequest(request);
     s.handleRequestList();

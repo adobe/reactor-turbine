@@ -5,7 +5,7 @@
 
 (function(window, document, undefined) {
 
-  var frameworkEnabled = true;
+  window.frameworkEnabled = true;
 
   var getBrowserWidth = function() {
     return window.innerWidth ? window.innerWidth : document.documentElement.offsetWidth;
@@ -74,13 +74,19 @@
 
   // TODO: Can we get rid of this?
   var getConnectionType = function() {
-    return document.body.connectionType;
+    try {
+      document.body.addBehavior('#default#clientCaps');
+      return document.body.connectionType;
+    } catch (e) {}
   };
 
   // TODO: Can we get rid of this?
   var getIsHomePage = function() {
-    var isHomePage = document.body.isHomePage;
-    return isHomePage ? isHomePage(getTopFrameSet().location) : 'N';
+    try {
+      document.body.addBehavior('#default#homePage');
+      var isHomePage = document.body.isHomePage;
+      return isHomePage ? isHomePage(getTopFrameSet().location) : 'N';
+    } catch (e) {}
   };
 
   // TODO: Can we get rid of this?
@@ -2791,11 +2797,21 @@
       browserWidth: 'bw',
       campaign: 'v0',
       channel: 'ch',
+      charSet: 'ce',
       colorDepth: 'c',
       connectionType: 'ct',
       cookiesEnabled: 'k',
       currencyCode: 'cc',
-      events: 'events',
+      dynamicVariablePrefix: 'D',
+      eVar: function(obj, key, value) {
+        obj['v' + key.substr(4)] = value;
+      },
+      events: function(obj, key, value) {
+        obj['events'] = value.join(',');
+      },
+      hier: function(obj, key, value) {
+        obj['h' + key.substr(4)] = value.substr(0, 255);
+      },
       homePage: 'hp',
       javaEnabled: 'v',
       javaScriptVersion: 'j',
@@ -2804,9 +2820,14 @@
       linkURL: 'pev1',
       pageName: 'pageName',
       pageType: 'pageType',
-      pageURL: 'g',
+      pageURL: function(obj, key, value) {
+        obj['g'] = value.substr(0, 255);
+      },
       plugins: 'p',
       products: 'products',
+      prop: function(obj, key, value) {
+        obj['c' + key.substr(4)] = value;
+      },
       purchaseID: 'purchaseID',
       referrer: 'r',
       resolution: 's',
@@ -2822,12 +2843,33 @@
       var result = {};
       var key;
 
+      var queryStringParamMap = this.queryStringParamMap;
+      var translate = function(key, value) {
+        var translator = queryStringParamMap[key];
+
+        if (!translator) {
+          var prefix = key.substr(0, 4);
+          translator = queryStringParamMap[prefix];
+        }
+
+        if (translator) {
+          if (typeof translator === 'string') {
+            result[translator] = value;
+          } else {
+            translator(result, key, value);
+          }
+        }
+      };
+
       var clientInfo = data.clientInfo;
 
       if (clientInfo) {
         for (key in clientInfo) {
           if (clientInfo.hasOwnProperty(key)) {
-            result[this.queryStringParamMap[key]] = clientInfo[key];
+            var clientInfoValue = clientInfo[key];
+            if (clientInfoValue) {
+              translate(key, clientInfoValue);
+            }
           }
         }
       }
@@ -2837,19 +2879,9 @@
       if (varBindings) {
         for (key in varBindings) {
           if (varBindings.hasOwnProperty(key)) {
-            var value = varBindings[key];
-
-            if (key.indexOf('eVar') === 0) {
-              result['v' + key.substr(4)] = value;
-            } else if (key.indexOf('hier') === 0) {
-              result['h' + key.substr(4)] = value;
-            } else if (key.indexOf('prop') === 0) {
-              result['c' + key.substr(4)] = value;
-            } else {
-              var queryStringParam = this.queryStringParamMap[key];
-              if (queryStringParam) {
-                result[this.queryStringParamMap[key]] = value;
-              }
+            var varBindingValue = varBindings[key];
+            if (varBindingValue) {
+              translate(key, varBindingValue);
             }
           }
         }
@@ -2858,7 +2890,7 @@
       var events = data.events;
 
       if (events) {
-        result[this.queryStringParamMap['events']] = events.join(',');
+        translate('events', events);
       }
 
       var linkInfo = data.linkInfo;
@@ -2866,7 +2898,10 @@
       if (linkInfo) {
         for (key in linkInfo) {
           if (linkInfo.hasOwnProperty(key)) {
-            result[this.queryStringParamMap[key]] = linkInfo[key];
+            var linkInfoValue = linkInfo[key];
+            if (linkInfoValue) {
+              translate(key, linkInfoValue);
+            }
           }
         }
       }
@@ -2875,14 +2910,14 @@
       return result;
     },
     sendBeacon: function(){
-      if (frameworkEnabled) {
+      if (window.frameworkEnabled) {
         var queryString = this.remodelDataToQueryString({
           varBindings: this.varBindings,
           events: this.events,
           clientInfo: getClientInfo()
         });
 
-        console.log(queryString);
+        recordDTMUrl(queryString);
        // send the beacon
       } else {
         var s = this.getS(window[this.settings.renameS || 's'])
@@ -4675,14 +4710,17 @@
         "euCookie": false,
         "sCodeURL": "7adf9ad51d40b4e06390693913f85f1a37e869de/s-code-contents-22c7cbe13317f4c9e99900c0b530d66471196f02-staging.js",
         "initVars": {
-          "currencyCode":"TND",
+          "charSet": "UTF-8",
+          "currencyCode": "TND",
+          "referrer": "myreferreroverride",
+          "campaign": "mycamp",
           "trackInlineStats": true,
           "trackDownloadLinks": true,
-          "linkDownloadFileTypes": "doc,docx,eps,jpg,png,svg,xls,ppt,pptx,pdf,xlsx,tab,csv,zip,txt,vsd,vxd,xml,js,css,rar,exe,wma,mov,avi,wmv,mp3,wav,m4v",
+          "linkDownloadFileTypes": "avi,css,csv,doc,docx,eps,exe,jpg,js,m4v,mov,mp3,pdf,png,ppt,pptx,rar,svg,tab,txt,vsd,vxd,wav,wma,wmv,xls,xlsx,xml,zip,fake",
           "trackExternalLinks": true,
-          "linkInternalFilters": "javascript:,tel:,mailto:",
+          "linkInternalFilters": "javascript:,mailto:,tel:",
           "linkLeaveQueryString": false,
-          "dynamicVariablePrefix": "D="
+          "dynamicVariablePrefix": "$$"
         }
       },
       "da8f823508d51bfe232b1a9609a426dcbfce8709": {

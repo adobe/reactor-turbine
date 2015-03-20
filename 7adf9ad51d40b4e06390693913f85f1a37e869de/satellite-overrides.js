@@ -335,19 +335,6 @@ _satellite.availableTools.sc.prototype.remodelDataToQueryString = function(data)
     translate('events', events);
   }
 
-  var linkInfo = data.linkInfo;
-
-  if (linkInfo) {
-    for (key in linkInfo) {
-      if (linkInfo.hasOwnProperty(key)) {
-        var linkInfoValue = linkInfo[key];
-        if (linkInfoValue) {
-          translate(key, linkInfoValue);
-        }
-      }
-    }
-  }
-
   result = SL.encodeObjectToURI(result);
   return result;
 };
@@ -360,12 +347,9 @@ _satellite.availableTools.sc.prototype.sendBeacon = function() {
       clientInfo: getClientInfo()
     });
 
-    var tagContainerMarker = 'D' + SL.appVersion;
-    var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 + Math.floor(Math.random() * 10000000000000);
-    var url = this.getTrackingServer() + '/b/ss/' + this.settings.account + '/1/JS-1.4.3-' +
-        tagContainerMarker + '/' + cacheBuster + '?' + queryString;
+    var uri = this.getTrackingURI(queryString);
 
-    recordDTMUrl(url);
+    recordDTMUrl(uri);
   } else {
     var s = this.getS(window[this.settings.renameS || 's'])
     if (!s){
@@ -410,8 +394,6 @@ _satellite.availableTools.sc.prototype.$trackLink = function(elm, evt, params) {
   if (window.frameworkEnabled) {
     this.trackLinkUsingFramework(vars, events, linkName, type);
   } else {
-
-
     var s = this.getS(null, {
       setVars: vars,
       addEvent: events
@@ -459,38 +441,61 @@ _satellite.availableTools.sc.prototype.$trackLink = function(elm, evt, params) {
 
     s.linkTrackVars = orgLinkTrackVars
     s.linkTrackEvents = orgLinkTrackEvents
-
-
   }
 };
 
 _satellite.availableTools.sc.prototype.trackLinkUsingFramework = function(vars, events, linkName, linkType) {
   var mergedVarBindings = {};
-  SL.extend(mergedVarBindings, this.varBindings);
+
+  // Copy variables from tool except those that should only come from the rule ("defined var names")
+  var varBindingsDefinedVars = this.definedVarNames(this.varBindings);
+
+  for (var key in this.varBindings) {
+    if (varBindingsDefinedVars.indexOf(key) === -1) {
+      mergedVarBindings[key] = this.varBindings[key];
+    }
+  }
+
+  // Copy vars from rule.
   SL.extend(mergedVarBindings, vars);
 
-  delete mergedVarBindings['referrer'];
+  // Add in specific link info.
+  mergedVarBindings.linkName = linkName;
+  mergedVarBindings.linkType = linkType || 'o';
 
-  // Remove defined vars cascading from tool.
-  var varsToFilter = this.definedVarNames(this.varBindings);
-  for (var i = 0; i < varsToFilter.length; i++) {
-    delete mergedVarBindings[varsToFilter[i]];
-  }
+  // Referrer is never sent for link tracking.
+  delete mergedVarBindings['referrer'];
 
   var queryString = this.remodelDataToQueryString({
     varBindings: mergedVarBindings,
     events: events,
-    linkInfo: {
-      linkName: linkName,
-      linkType: linkType || 'o'
-    },
     clientInfo: getClientInfo()
   });
 
-  recordDTMUrl(queryString);
+  var uri = this.getTrackingURI(queryString);
+
+  recordDTMUrl(uri);
   // TODO: Support custom setup code.
 };
 
+_satellite.availableTools.sc.prototype.getTrackingURI = function(queryString) {
+  var tagContainerMarker = 'D' + SL.appVersion;
+  var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
+      Math.floor(Math.random() * 10000000000000);
+  var protocol = SL.isHttps() ? 'https://' : 'http://';
+  var uri = protocol + this.getTrackingServer() + '/b/ss/' + this.settings.account + '/1/JS-1.4.3-' +
+      tagContainerMarker + '/' + cacheBuster;
+
+  if (queryString) {
+    if (queryString.length && queryString[0] !== '?') {
+      uri += '?';
+    }
+
+    uri += queryString;
+  }
+
+  return uri;
+};
 
 
 

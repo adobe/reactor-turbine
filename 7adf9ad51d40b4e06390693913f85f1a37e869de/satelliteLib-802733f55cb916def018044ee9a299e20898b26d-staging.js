@@ -4502,7 +4502,12 @@
       event: "pagebottom"
     }],
     "rules": [
-      {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
+      //{"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
+      //    SL.getQueryParam('dead')
+      //},"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
+      //  return !_satellite.isLinked(target)
+      //}],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}
+      {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackPageView","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
           SL.getQueryParam('dead')
       },"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
         return !_satellite.isLinked(target)

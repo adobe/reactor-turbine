@@ -316,14 +316,14 @@ _satellite.availableTools.sc.prototype.remodelDataToQueryString = function(data)
     }
   }
 
-  var varBindings = data.varBindings;
+  var vars = data.vars;
 
-  if (varBindings) {
-    for (key in varBindings) {
-      if (varBindings.hasOwnProperty(key)) {
-        var varBindingValue = varBindings[key];
-        if (varBindingValue) {
-          translate(key, varBindingValue);
+  if (vars) {
+    for (key in vars) {
+      if (vars.hasOwnProperty(key)) {
+        var varValue = vars[key];
+        if (varValue) {
+          translate(key, varValue);
         }
       }
     }
@@ -342,7 +342,7 @@ _satellite.availableTools.sc.prototype.remodelDataToQueryString = function(data)
 _satellite.availableTools.sc.prototype.sendBeacon = function() {
   if (window.frameworkEnabled) {
     var queryString = this.remodelDataToQueryString({
-      varBindings: this.varBindings,
+      vars: this.varBindings,
       events: this.events,
       clientInfo: getClientInfo()
     });
@@ -445,29 +445,29 @@ _satellite.availableTools.sc.prototype.$trackLink = function(elm, evt, params) {
 };
 
 _satellite.availableTools.sc.prototype.trackLinkUsingFramework = function(vars, events, linkName, linkType) {
-  var mergedVarBindings = {};
+  var mergedVars = {};
 
   // Copy variables from tool except those that should only come from the rule ("defined var names")
   var varBindingsDefinedVars = this.definedVarNames(this.varBindings);
 
   for (var key in this.varBindings) {
     if (varBindingsDefinedVars.indexOf(key) === -1) {
-      mergedVarBindings[key] = this.varBindings[key];
+      mergedVars[key] = this.varBindings[key];
     }
   }
 
   // Copy vars from rule.
-  SL.extend(mergedVarBindings, vars);
+  SL.extend(mergedVars, vars);
 
   // Add in specific link info.
-  mergedVarBindings.linkName = linkName;
-  mergedVarBindings.linkType = linkType || 'o';
+  mergedVars.linkName = linkName;
+  mergedVars.linkType = linkType || 'o';
 
   // Referrer is never sent for link tracking.
-  delete mergedVarBindings['referrer'];
+  delete mergedVars['referrer'];
 
   var queryString = this.remodelDataToQueryString({
-    varBindings: mergedVarBindings,
+    vars: mergedVars,
     events: events,
     clientInfo: getClientInfo()
   });
@@ -478,6 +478,55 @@ _satellite.availableTools.sc.prototype.trackLinkUsingFramework = function(vars, 
   // TODO: Support custom setup code.
 };
 
+_satellite.availableTools.sc.prototype.trackPageViewUsingFramework = function(vars, events) {
+  var mergedVars = {};
+  SL.extend(mergedVars, this.varBindings);
+  SL.extend(mergedVars, vars);
+
+  // Referrer is never sent for page view tracking. Tracking referrer on the initial page load
+  // is handled in sendBeacon().
+  delete mergedVars.referrer;
+
+  var queryString = this.remodelDataToQueryString({
+    vars: mergedVars,
+    events: events,
+    clientInfo: getClientInfo()
+  });
+
+  var uri = this.getTrackingURI(queryString);
+
+  recordDTMUrl(uri);
+};
+
+_satellite.availableTools.sc.prototype.$trackPageView = function(elm, evt, params){
+  var vars = params && params.setVars
+  var events = (params && params.addEvent) || []
+
+  if (window.frameworkEnabled) {
+    this.trackPageViewUsingFramework(vars, events);
+  } else {
+    var s = this.getS(null, {
+      setVars: vars,
+      addEvent: events
+    })
+
+    if (!s){
+      SL.notify('Adobe Analytics: page code not loaded', 1)
+      return
+    }
+    s.linkTrackVars = ''
+    s.linkTrackEvents = ''
+    this.executeCustomSetupFuns(s)
+    if (params && params.customSetup){
+      params.customSetup.call(elm, evt, s)
+    }
+    s.t()
+    this.clearVarBindings()
+    this.clearCustomSetup()
+    SL.notify("Adobe Analytics: tracked page view", 1)
+  }
+},
+
 _satellite.availableTools.sc.prototype.getTrackingURI = function(queryString) {
   var tagContainerMarker = 'D' + SL.appVersion;
   var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
@@ -487,7 +536,7 @@ _satellite.availableTools.sc.prototype.getTrackingURI = function(queryString) {
       tagContainerMarker + '/' + cacheBuster;
 
   if (queryString) {
-    if (queryString.length && queryString[0] !== '?') {
+    if (queryString[0] !== '?') {
       uri += '?';
     }
 

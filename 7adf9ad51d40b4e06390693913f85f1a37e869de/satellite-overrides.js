@@ -1,3 +1,126 @@
+window.frameworkEnabled = true;
+
+var getBrowserWidth = function() {
+  return window.innerWidth ? window.innerWidth : document.documentElement.offsetWidth;
+};
+
+var getBrowserHeight = function() {
+  return window.innerHeight ? window.innerHeight : document.documentElement.offsetHeight;
+};
+
+var getResolution = function() {
+  return window.screen.width + "x" + window.screen.height;
+};
+
+var getColorDepth = function() {
+  return window.screen.pixelDepth ? window.screen.pixelDepth : window.screen.colorDepth;
+};
+
+var getJSVersion = function() {
+  var
+      tm = new Date,
+      a,o,i,
+      j = '1.2',
+      pn = 0;
+
+  if (tm.setUTCDate) {
+    j = '1.3';
+    if (pn.toPrecision) {
+      j = '1.5';
+      a = [];
+      if (a.forEach) {
+        j = '1.6';
+        i = 0;
+        o = {};
+        try {
+          i=new Iterator(o);
+          if (i.next) {
+            j = '1.7';
+            if (a.reduce) {
+              j = '1.8';
+              if (j.trim) {
+                j = '1.8.1';
+                if (Date.parse) {
+                  j = '1.8.2';
+                  if (Object.create) {
+                    j = '1.8.5';
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {}
+      }
+    }
+  }
+
+  return j;
+};
+
+var getIsJavaEnabled = function() {
+  return navigator.javaEnabled() ? 'Y' : 'N';
+};
+
+var getIsCookiesEnabled = function() {
+  return window.navigator.cookieEnabled ? 'Y' : 'N';
+};
+
+// TODO: Can we get rid of this?
+var getConnectionType = function() {
+  try {
+    document.body.addBehavior('#default#clientCaps');
+    return document.body.connectionType;
+  } catch (e) {}
+};
+
+// TODO: Can we get rid of this?
+var getIsHomePage = function() {
+  try {
+    document.body.addBehavior('#default#homePage');
+    var isHomePage = document.body.isHomePage;
+    return isHomePage ? isHomePage(getTopFrameSet().location) : 'N';
+  } catch (e) {}
+};
+
+// TODO: Can we get rid of this?
+var getTopFrameSet = function() {
+  // Get the top frame set
+  var
+      topFrameSet = window,
+      parent,
+      location;
+  try {
+    parent = topFrameSet.parent;
+    location = topFrameSet.location;
+    while ((parent) &&
+    (parent.location) &&
+    (location) &&
+    ('' + parent.location != '' + location) &&
+    (topFrameSet.location) &&
+    ('' + parent.location != '' + topFrameSet.location) &&
+    (parent.location.host == location.host)) {
+      topFrameSet = parent;
+      parent = topFrameSet.parent;
+    }
+  } catch (e) {}
+
+  return topFrameSet;
+};
+
+var getClientInfo = function() {
+  return {
+    browserHeight: getBrowserHeight(),
+    browserWidth: getBrowserWidth(),
+    resolution: getResolution(),
+    colorDepth: getColorDepth(),
+    javaScriptVersion: getJSVersion(),
+    javaEnabled: getIsJavaEnabled(),
+    cookiesEnabled: getIsCookiesEnabled(),
+    connectionType: getConnectionType(),
+    homePage: getIsHomePage()
+  };
+};
+
 var SL = _satellite;
 
 _satellite.stringify = function(obj, seenValues) {
@@ -90,7 +213,283 @@ _satellite.createBeacon =  function (config, successCallback, failCallback) {
 
 };
 
+_satellite.availableTools.sc.prototype.getTimestamp = function() {
+  var now = new Date();
+  var year = now.getYear();
+  return now.getDate() + '/'
+      + now.getMonth() + '/'
+      + (year < 1900 ? year + 1900 : year) + ' '
+      + now.getHours() + ':'
+      + now.getMinutes() + ':'
+      + now.getSeconds() + ' '
+      + now.getDay() + ' '
+      + now.getTimezoneOffset();
+};
 
+_satellite.availableTools.sc.prototype.queryStringParamMap = {
+  browserHeight: 'bh',
+      browserWidth: 'bw',
+      campaign: 'v0',
+      channel: 'ch',
+      charSet: 'ce',
+      colorDepth: 'c',
+      connectionType: 'ct',
+      cookiesEnabled: 'k',
+      currencyCode: 'cc',
+      dynamicVariablePrefix: 'D',
+      eVar: function(obj, key, value) {
+    obj['v' + key.substr(4)] = value;
+  },
+  events: function(obj, key, value) {
+    obj['events'] = value.join(',');
+  },
+  hier: function(obj, key, value) {
+    obj['h' + key.substr(4)] = value.substr(0, 255);
+  },
+  homePage: 'hp',
+      javaEnabled: 'v',
+      javaScriptVersion: 'j',
+      linkName: 'pev2',
+      linkType: function(obj, key, value) {
+    obj['pe'] = 'lnk_' + value;
+  },
+  linkURL: 'pev1',
+      pageName: 'pageName',
+      pageType: 'pageType',
+      pageURL: function(obj, key, value) {
+    obj['g'] = value.substr(0, 255);
+    if (value.length > 255) {
+      obj['-g'] = value.substring(255);
+    }
+  },
+  plugins: 'p',
+      products: 'products',
+      prop: function(obj, key, value) {
+    obj['c' + key.substr(4)] = value;
+  },
+  purchaseID: 'purchaseID',
+      referrer: 'r',
+      resolution: 's',
+      server: 'server',
+      state: 'state',
+      timestamp: 'ts',
+      transactionID: 'xact',
+      visitorID: 'vid',
+      marketingCloudVisitorID: 'mid',
+      zip: 'zip'
+};
+
+_satellite.availableTools.sc.prototype.remodelDataToQueryString = function(data) {
+  var result = {};
+  var key;
+
+  result.t = this.getTimestamp();
+
+  var queryStringParamMap = this.queryStringParamMap;
+  var translate = function(key, value) {
+    var translator = queryStringParamMap[key];
+
+    if (!translator) {
+      var prefix = key.substr(0, 4);
+      translator = queryStringParamMap[prefix];
+    }
+
+    if (translator) {
+      if (typeof translator === 'string') {
+        result[translator] = value;
+      } else {
+        translator(result, key, value);
+      }
+    }
+  };
+
+  var clientInfo = data.clientInfo;
+
+  if (clientInfo) {
+    for (key in clientInfo) {
+      if (clientInfo.hasOwnProperty(key)) {
+        var clientInfoValue = clientInfo[key];
+        if (clientInfoValue) {
+          translate(key, clientInfoValue);
+        }
+      }
+    }
+  }
+
+  var varBindings = data.varBindings;
+
+  if (varBindings) {
+    for (key in varBindings) {
+      if (varBindings.hasOwnProperty(key)) {
+        var varBindingValue = varBindings[key];
+        if (varBindingValue) {
+          translate(key, varBindingValue);
+        }
+      }
+    }
+  }
+
+  var events = data.events;
+
+  if (events) {
+    translate('events', events);
+  }
+
+  var linkInfo = data.linkInfo;
+
+  if (linkInfo) {
+    for (key in linkInfo) {
+      if (linkInfo.hasOwnProperty(key)) {
+        var linkInfoValue = linkInfo[key];
+        if (linkInfoValue) {
+          translate(key, linkInfoValue);
+        }
+      }
+    }
+  }
+
+  result = SL.encodeObjectToURI(result);
+  return result;
+};
+
+_satellite.availableTools.sc.prototype.sendBeacon = function() {
+  if (window.frameworkEnabled) {
+    var queryString = this.remodelDataToQueryString({
+      varBindings: this.varBindings,
+      events: this.events,
+      clientInfo: getClientInfo()
+    });
+
+    var tagContainerMarker = 'D' + SL.appVersion;
+    var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 + Math.floor(Math.random() * 10000000000000);
+    var url = this.getTrackingServer() + '/b/ss/' + this.settings.account + '/1/JS-1.4.3-' +
+        tagContainerMarker + '/' + cacheBuster + '?' + queryString;
+
+    recordDTMUrl(url);
+  } else {
+    var s = this.getS(window[this.settings.renameS || 's'])
+    if (!s){
+      SL.notify('Adobe Analytics: page code not loaded', 1)
+      return
+    }
+    if (this.settings.customInit){
+      if (this.settings.customInit(s) === false){
+        SL.notify("Adobe Analytics: custom init suppressed beacon", 1)
+        return
+      }
+    }
+
+    if (this.settings.executeCustomPageCodeFirst) {
+      this.applyVarBindingsOnTracker(s, this.varBindings)
+    }
+    this.executeCustomSetupFuns(s)
+
+    s.t()
+    this.clearVarBindings()
+    this.clearCustomSetup()
+    SL.notify("Adobe Analytics: tracked page view", 1)
+  }
+};
+
+_satellite.availableTools.sc.prototype.$trackLink = function(elm, evt, params) {
+  params = params || {}
+  var type = params.type
+  var linkName = params.linkName
+  if (!linkName &&
+      elm &&
+      elm.nodeName &&
+      elm.nodeName.toLowerCase() === 'a'){
+    linkName = elm.innerHTML
+  }
+  if (!linkName){
+    linkName = 'link clicked'
+  }
+  var vars = params && params.setVars
+  var events = (params && params.addEvent) || []
+
+  if (window.frameworkEnabled) {
+    this.trackLinkUsingFramework(vars, events, linkName, type);
+  } else {
+
+
+    var s = this.getS(null, {
+      setVars: vars,
+      addEvent: events
+    })
+
+    if (!s){
+      SL.notify('Adobe Analytics: page code not loaded', 1)
+      return
+    }
+
+    var orgLinkTrackVars = s.linkTrackVars
+    var orgLinkTrackEvents = s.linkTrackEvents
+    var definedVarNames = this.definedVarNames(vars)
+
+    if (params && params.customSetup){
+      params.customSetup.call(elm, evt, s)
+    }
+
+    if (events.length > 0)
+      definedVarNames.push('events')
+    if (s.products)
+      definedVarNames.push('products')
+
+    // add back the vars from s
+    definedVarNames = this.mergeTrackLinkVars(s.linkTrackVars, definedVarNames)
+
+    // add back events from s
+    events = this.mergeTrackLinkVars(s.linkTrackEvents, events)
+
+    s.linkTrackVars = this.getCustomLinkVarsList(definedVarNames)
+
+    var eventsKeys = SL.map(events, function(item) {
+      return item.split(':')[0]
+    });
+    s.linkTrackEvents = this.getCustomLinkVarsList(eventsKeys)
+
+    s.tl(true, type || 'o', linkName)
+    SL.notify([
+      'Adobe Analytics: tracked link ',
+      'using: linkTrackVars=',
+      SL.stringify(s.linkTrackVars),
+      '; linkTrackEvents=',
+      SL.stringify(s.linkTrackEvents)
+    ].join(''), 1)
+
+    s.linkTrackVars = orgLinkTrackVars
+    s.linkTrackEvents = orgLinkTrackEvents
+
+
+  }
+};
+
+_satellite.availableTools.sc.prototype.trackLinkUsingFramework = function(vars, events, linkName, linkType) {
+  var mergedVarBindings = {};
+  SL.extend(mergedVarBindings, this.varBindings);
+  SL.extend(mergedVarBindings, vars);
+
+  delete mergedVarBindings['referrer'];
+
+  // Remove defined vars cascading from tool.
+  var varsToFilter = this.definedVarNames(this.varBindings);
+  for (var i = 0; i < varsToFilter.length; i++) {
+    delete mergedVarBindings[varsToFilter[i]];
+  }
+
+  var queryString = this.remodelDataToQueryString({
+    varBindings: mergedVarBindings,
+    events: events,
+    linkInfo: {
+      linkName: linkName,
+      linkType: linkType || 'o'
+    },
+    clientInfo: getClientInfo()
+  });
+
+  recordDTMUrl(queryString);
+  // TODO: Support custom setup code.
+};
 
 
 

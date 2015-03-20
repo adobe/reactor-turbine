@@ -4,131 +4,6 @@
 // Adobe Systems Incorporated
 
 (function(window, document, undefined) {
-
-  window.frameworkEnabled = true;
-
-  var getBrowserWidth = function() {
-    return window.innerWidth ? window.innerWidth : document.documentElement.offsetWidth;
-  };
-
-  var getBrowserHeight = function() {
-    return window.innerHeight ? window.innerHeight : document.documentElement.offsetHeight;
-  };
-
-  var getResolution = function() {
-    return window.screen.width + "x" + window.screen.height;
-  };
-
-  var getColorDepth = function() {
-    return window.screen.pixelDepth ? window.screen.pixelDepth : window.screen.colorDepth;
-  };
-
-  var getJSVersion = function() {
-    var
-        tm = new Date,
-        a,o,i,
-        j = '1.2',
-        pn = 0;
-
-    if (tm.setUTCDate) {
-      j = '1.3';
-      if (pn.toPrecision) {
-        j = '1.5';
-        a = [];
-        if (a.forEach) {
-          j = '1.6';
-          i = 0;
-          o = {};
-          try {
-            i=new Iterator(o);
-            if (i.next) {
-              j = '1.7';
-              if (a.reduce) {
-                j = '1.8';
-                if (j.trim) {
-                  j = '1.8.1';
-                  if (Date.parse) {
-                    j = '1.8.2';
-                    if (Object.create) {
-                      j = '1.8.5';
-                    }
-                  }
-                }
-              }
-            }
-          } catch (e) {}
-        }
-      }
-    }
-
-    return j;
-  };
-
-  var getIsJavaEnabled = function() {
-    return navigator.javaEnabled() ? 'Y' : 'N';
-  };
-
-  var getIsCookiesEnabled = function() {
-    return window.navigator.cookieEnabled ? 'Y' : 'N';
-  };
-
-  // TODO: Can we get rid of this?
-  var getConnectionType = function() {
-    try {
-      document.body.addBehavior('#default#clientCaps');
-      return document.body.connectionType;
-    } catch (e) {}
-  };
-
-  // TODO: Can we get rid of this?
-  var getIsHomePage = function() {
-    try {
-      document.body.addBehavior('#default#homePage');
-      var isHomePage = document.body.isHomePage;
-      return isHomePage ? isHomePage(getTopFrameSet().location) : 'N';
-    } catch (e) {}
-  };
-
-  // TODO: Can we get rid of this?
-  var getTopFrameSet = function() {
-    // Get the top frame set
-    var
-        topFrameSet = window,
-        parent,
-        location;
-    try {
-      parent = topFrameSet.parent;
-      location = topFrameSet.location;
-      while ((parent) &&
-          (parent.location) &&
-          (location) &&
-          ('' + parent.location != '' + location) &&
-          (topFrameSet.location) &&
-          ('' + parent.location != '' + topFrameSet.location) &&
-          (parent.location.host == location.host)) {
-        topFrameSet = parent;
-        parent = topFrameSet.parent;
-      }
-    } catch (e) {}
-
-    return topFrameSet;
-  };
-
-  var getClientInfo = function() {
-    return {
-      browserHeight: getBrowserHeight(),
-      browserWidth: getBrowserWidth(),
-      resolution: getResolution(),
-      colorDepth: getColorDepth(),
-      javaScriptVersion: getJSVersion(),
-      javaEnabled: getIsJavaEnabled(),
-      cookiesEnabled: getIsCookiesEnabled(),
-      connectionType: getConnectionType(),
-      homePage: getIsHomePage()
-    };
-  };
-
-
 // Satellite
 // =========
 //
@@ -2765,7 +2640,7 @@
 
       var visitorIdInstance = SL.getVisitorId()
       if (visitorIdInstance) {
-        s.visitor = SL.getVisitorId() // TODO: can we use visitorIdInstance?
+        s.visitor = SL.getVisitorId()
       }
 
       return s
@@ -2792,157 +2667,27 @@
     clearCustomSetup: function(){
       this.customSetupFuns = []
     },
-    queryStringParamMap: {
-      browserHeight: 'bh',
-      browserWidth: 'bw',
-      campaign: 'v0',
-      channel: 'ch',
-      charSet: 'ce',
-      colorDepth: 'c',
-      connectionType: 'ct',
-      cookiesEnabled: 'k',
-      currencyCode: 'cc',
-      dynamicVariablePrefix: 'D',
-      eVar: function(obj, key, value) {
-        obj['v' + key.substr(4)] = value;
-      },
-      events: function(obj, key, value) {
-        obj['events'] = value.join(',');
-      },
-      hier: function(obj, key, value) {
-        obj['h' + key.substr(4)] = value.substr(0, 255);
-      },
-      homePage: 'hp',
-      javaEnabled: 'v',
-      javaScriptVersion: 'j',
-      linkName: 'pev2',
-      linkType: 'pe',
-      linkURL: 'pev1',
-      pageName: 'pageName',
-      pageType: 'pageType',
-      pageURL: function(obj, key, value) {
-        obj['g'] = value.substr(0, 255);
-      },
-      plugins: 'p',
-      products: 'products',
-      prop: function(obj, key, value) {
-        obj['c' + key.substr(4)] = value;
-      },
-      purchaseID: 'purchaseID',
-      referrer: 'r',
-      resolution: 's',
-      server: 'server',
-      state: 'state',
-      timestamp: 'ts',
-      transactionID: 'xact',
-      visitorID: 'vid',
-      marketingCloudVisitorID: 'mid',
-      zip: 'zip'
-    },
-    remodelDataToQueryString: function(data) {
-      var result = {};
-      var key;
-
-      var queryStringParamMap = this.queryStringParamMap;
-      var translate = function(key, value) {
-        var translator = queryStringParamMap[key];
-
-        if (!translator) {
-          var prefix = key.substr(0, 4);
-          translator = queryStringParamMap[prefix];
-        }
-
-        if (translator) {
-          if (typeof translator === 'string') {
-            result[translator] = value;
-          } else {
-            translator(result, key, value);
-          }
-        }
-      };
-
-      var clientInfo = data.clientInfo;
-
-      if (clientInfo) {
-        for (key in clientInfo) {
-          if (clientInfo.hasOwnProperty(key)) {
-            var clientInfoValue = clientInfo[key];
-            if (clientInfoValue) {
-              translate(key, clientInfoValue);
-            }
-          }
-        }
-      }
-
-      var varBindings = data.varBindings;
-
-      if (varBindings) {
-        for (key in varBindings) {
-          if (varBindings.hasOwnProperty(key)) {
-            var varBindingValue = varBindings[key];
-            if (varBindingValue) {
-              translate(key, varBindingValue);
-            }
-          }
-        }
-      }
-
-      var events = data.events;
-
-      if (events) {
-        translate('events', events);
-      }
-
-      var linkInfo = data.linkInfo;
-
-      if (linkInfo) {
-        for (key in linkInfo) {
-          if (linkInfo.hasOwnProperty(key)) {
-            var linkInfoValue = linkInfo[key];
-            if (linkInfoValue) {
-              translate(key, linkInfoValue);
-            }
-          }
-        }
-      }
-
-      result = SL.encodeObjectToURI(result);
-      return result;
-    },
     sendBeacon: function(){
-      if (window.frameworkEnabled) {
-        var queryString = this.remodelDataToQueryString({
-          varBindings: this.varBindings,
-          events: this.events,
-          clientInfo: getClientInfo()
-        });
-
-        recordDTMUrl(queryString);
-       // send the beacon
-      } else {
-        var s = this.getS(window[this.settings.renameS || 's'])
-        if (!s){
-          SL.notify('Adobe Analytics: page code not loaded', 1)
+      var s = this.getS(window[this.settings.renameS || 's'])
+      if (!s){
+        SL.notify('Adobe Analytics: page code not loaded', 1)
+        return
+      }
+      if (this.settings.customInit){
+        if (this.settings.customInit(s) === false){
+          SL.notify("Adobe Analytics: custom init suppressed beacon", 1)
           return
         }
-        if (this.settings.customInit){
-          if (this.settings.customInit(s) === false){
-            SL.notify("Adobe Analytics: custom init suppressed beacon", 1)
-            return
-          }
-        }
-
-        if (this.settings.executeCustomPageCodeFirst) {
-          this.applyVarBindingsOnTracker(s, this.varBindings)
-        }
-        this.executeCustomSetupFuns(s)
-
-        s.t()
-        this.clearVarBindings()
-        this.clearCustomSetup()
-        SL.notify("Adobe Analytics: tracked page view", 1)
       }
 
+      if (this.settings.executeCustomPageCodeFirst) {
+        this.applyVarBindingsOnTracker(s, this.varBindings)
+      }
+      this.executeCustomSetupFuns(s)
+      s.t()
+      this.clearVarBindings()
+      this.clearCustomSetup()
+      SL.notify("Adobe Analytics: tracked page view", 1)
     },
     executeCustomSetupFuns: function(s){
       SL.each(this.customSetupFuns, function(fun){
@@ -4720,7 +4465,9 @@
           "trackExternalLinks": true,
           "linkInternalFilters": "javascript:,mailto:,tel:",
           "linkLeaveQueryString": false,
-          "dynamicVariablePrefix": "$$"
+          "dynamicVariablePrefix": "$$",
+          "eVar50": "toolevar50",
+          "prop50": "toolprop50"
         }
       },
       "da8f823508d51bfe232b1a9609a426dcbfce8709": {
@@ -4743,7 +4490,7 @@
           prop11: "MyProp11",
           pageName: "MyPageName",
           channel: "MyChannel",
-          pageURL: "MyPageUrl",
+          pageURL: "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
           campaign: "MyCampaign",
           hier1: "HierLev1|HierLev2|HierLev3|HierLev4"
         }]
@@ -4755,7 +4502,9 @@
       event: "pagebottom"
     }],
     "rules": [
-      {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink"}]}],"conditions":[function(event,target){
+      {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
+          SL.getQueryParam('dead')
+      },"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
         return !_satellite.isLinked(target)
       }],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}
     ],

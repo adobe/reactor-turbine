@@ -1,0 +1,19 @@
+{
+  "name": "dtm-framework-sandbox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.corp.adobe.com:aahardy/dtm-framework-sandbox.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gulp-coverage": "^0.3.34",
+    "gulp-mocha": "^2.0.0"
+  }
+}

@@ -238,36 +238,36 @@ _satellite.availableTools.sc.prototype.queryStringParamMap = {
       currencyCode: 'cc',
       dynamicVariablePrefix: 'D',
       eVar: function(obj, key, value) {
-    obj['v' + key.substr(4)] = value;
-  },
-  events: function(obj, key, value) {
-    obj['events'] = value.join(',');
-  },
-  hier: function(obj, key, value) {
-    obj['h' + key.substr(4)] = value.substr(0, 255);
-  },
-  homePage: 'hp',
+        obj['v' + key.substr(4)] = value;
+      },
+      events: function(obj, key, value) {
+        obj['events'] = value.join(',');
+      },
+      hier: function(obj, key, value) {
+        obj['h' + key.substr(4)] = value.substr(0, 255);
+      },
+      homePage: 'hp',
       javaEnabled: 'v',
       javaScriptVersion: 'j',
       linkName: 'pev2',
       linkType: function(obj, key, value) {
-    obj['pe'] = 'lnk_' + value;
-  },
-  linkURL: 'pev1',
+        obj['pe'] = 'lnk_' + value;
+      },
+      linkURL: 'pev1',
       pageName: 'pageName',
       pageType: 'pageType',
       pageURL: function(obj, key, value) {
-    obj['g'] = value.substr(0, 255);
-    if (value.length > 255) {
-      obj['-g'] = value.substring(255);
-    }
-  },
-  plugins: 'p',
+        obj['g'] = value.substr(0, 255);
+        if (value.length > 255) {
+          obj['-g'] = value.substring(255);
+        }
+      },
+      plugins: 'p',
       products: 'products',
       prop: function(obj, key, value) {
-    obj['c' + key.substr(4)] = value;
-  },
-  purchaseID: 'purchaseID',
+        obj['c' + key.substr(4)] = value;
+      },
+      purchaseID: 'purchaseID',
       referrer: 'r',
       resolution: 's',
       server: 'server',
@@ -348,6 +348,10 @@ _satellite.availableTools.sc.prototype.sendBeacon = function() {
     });
 
     var uri = this.getTrackingURI(queryString);
+    SL.createBeacon({
+      beaconURL: uri,
+      type: 'image'
+    });
 
     recordDTMUrl(uri);
   } else {
@@ -474,6 +478,11 @@ _satellite.availableTools.sc.prototype.trackLinkUsingFramework = function(vars, 
 
   var uri = this.getTrackingURI(queryString);
 
+  SL.createBeacon({
+    beaconURL: uri,
+    type: 'image'
+  });
+
   recordDTMUrl(uri);
   // TODO: Support custom setup code.
 };
@@ -494,6 +503,11 @@ _satellite.availableTools.sc.prototype.trackPageViewUsingFramework = function(va
   });
 
   var uri = this.getTrackingURI(queryString);
+
+  SL.createBeacon({
+    beaconURL: uri,
+    type: 'image'
+  });
 
   recordDTMUrl(uri);
 };

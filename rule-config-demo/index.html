@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title></title>
+  <style>
+    #ruleConfigFrame {
+      display: block;
+      border: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="ruleConfigFrame" src="rule-config.html" sandbox="allow-scripts"></iframe>
+  <button id="validateButton">Validate</button>
+  <button id="getArgumentsButton">Get Arguments</button>
+  <script>
+    var ruleConfigFrame = document.getElementById('ruleConfigFrame');
+
+    document.getElementById('validateButton').addEventListener('click', function() {
+      // Note that we're sending the message to "*", rather than some specific
+      // origin. Sandboxed iframes which lack the 'allow-same-origin' header
+      // don't have an origin which you can target.
+      ruleConfigFrame.contentWindow.postMessage({
+        type: 'validate'
+      }, '*');
+    });
+
+    document.getElementById('getArgumentsButton').addEventListener('click', function() {
+      ruleConfigFrame.contentWindow.postMessage({
+        type: 'getArguments'
+      }, '*');
+    });
+
+    function receiveMessage(message) {
+      // Sandboxed iframes which lack the 'allow-same-origin' header have a "null" origin.
+      if (message.origin === 'null' && message.source === ruleConfigFrame.contentWindow) {
+        switch(message.data.type) {
+          case 'validateResponse':
+            alert('Validate Response: ' + message.data.content);
+            break;
+          case 'getArgumentsResponse':
+            alert('Get Arguments Response: ' + JSON.stringify(message.data.content));
+            break;
+        }
+      }
+
+    }
+
+    window.addEventListener('message', receiveMessage);
+
+    window.niner = 'woot';
+  </script>
+</body>
+</html>

@@ -38,10 +38,13 @@ _satellite.stringify = function(obj, seenValues) {
 _satellite.createBeacon =  function (config, successCallback, failCallback) {
     /*
     config = {
-        type: 'image','ajax'
+        type: 'image','ajax','form'
         beaconURL: string
         beaconData: json (framework) || string
     }
+
+    iframe beacons have no way to give a failiure response.
+    so it is always a success
     */
     var connection,
         request = config.beaconURL;
@@ -56,6 +59,10 @@ _satellite.createBeacon =  function (config, successCallback, failCallback) {
         }
         connection = new Image;
         connection.alt = "";
+    }
+
+    if(config.type === 'form'){
+        this.createBeacon.createIframeBeacon(config.url,_satellite.stringify(config.beaconData),successCallback);
     }
 
     // Default POST via ajax
@@ -91,6 +98,39 @@ _satellite.createBeacon =  function (config, successCallback, failCallback) {
     }
 
 };
+
+_satellite.createBeacon.getBeaconIframesContainer = function(){
+    if(this.containerIframe){
+        return this.containerIframe;
+    }
+    this.containerIframe = document.createElement('iframe');
+	this.containerIframe.style.display = 'none';
+	document.body.appendChild(this.containerIframe);
+    return this.containerIframe;
+};
+
+_satellite.createBeacon.createIframeBeacon = function(url,data,callback){
+	var childFrame = document.createElement('iframe');
+	var form = document.createElement('form');
+    var input = document.createElement('input');
+    input.name = 'data';
+    input.value = data;
+	form.action = url;
+	form.method = 'POST';
+
+	form.appendChild(input);
+    this.getBeaconIframesContainer().contentDocument.body.appendChild(childFrame);
+	childFrame.contentDocument.body.appendChild(form);
+
+	childFrame.onload = function(){
+		childFrame.remove();
+        if(callback){
+            callback();
+        }
+	};
+	form.submit();
+};
+
 
 _satellite.availableTools.sc.prototype.getTimestamp = function() {
   var now = new Date();
@@ -652,4 +692,3 @@ SL.detectBrowserInfo = function(){
 }
 
 SL.detectBrowserInfo();
-

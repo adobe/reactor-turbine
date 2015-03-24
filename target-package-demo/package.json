@@ -1,0 +1,13 @@
+{
+  "id":"targetid",
+  "name":"target",
+  "install": {
+    "events": [
+      {
+        "swipe": "swipe"
+      }
+    ]
+  },
+  "fulfillmentConfig": "offer-config",
+  "fulfillment": "load-offers"
+}

@@ -389,7 +389,7 @@ _satellite.availableTools.sc.prototype.trackLinkUsingFramework = function(vars, 
   });
 
   recordDTMUrl(uri);
-  // TODO: Support custom setup code.
+  // TODO: Support custom setup code. Custom setup code will no longer have access to an "s" object though.
 };
 
 _satellite.availableTools.sc.prototype.trackPageViewUsingFramework = function(vars, events) {

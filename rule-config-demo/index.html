@@ -14,7 +14,7 @@
 <body>
   <iframe id="ruleConfigFrame" src="rule-config.html" sandbox="allow-scripts"></iframe>
   <button id="validateButton">Validate</button>
-  <button id="getArgumentsButton">Get Arguments</button>
+  <button id="getSettingsButton">Get Settings</button>
   <script>
     var ruleConfigFrame = document.getElementById('ruleConfigFrame');
 
@@ -27,9 +27,9 @@
       }, '*');
     });
 
-    document.getElementById('getArgumentsButton').addEventListener('click', function() {
+    document.getElementById('getSettingsButton').addEventListener('click', function() {
       ruleConfigFrame.contentWindow.postMessage({
-        type: 'getArguments'
+        type: 'getSettings'
       }, '*');
     });
 
@@ -40,8 +40,8 @@
           case 'validateResponse':
             alert('Validate Response: ' + message.data.content);
             break;
-          case 'getArgumentsResponse':
-            alert('Get Arguments Response: ' + JSON.stringify(message.data.content));
+          case 'getSettingsResponse':
+            alert('Get Settings Response: ' + JSON.stringify(message.data.content));
             break;
         }
       }
@@ -49,8 +49,6 @@
     }
 
     window.addEventListener('message', receiveMessage);
-
-    window.niner = 'woot';
   </script>
 </body>
 </html>

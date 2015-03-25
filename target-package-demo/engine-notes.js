@@ -29,13 +29,11 @@ _satellite.init({
   //      "prop50": "toolprop50"
   //    }
   //  },
+  "tools": {
     "da8f823508d51bfe232b1a9609a426dcbfce8709": {
-      "engine": "tnt",
-      "mboxURL": "7adf9ad51d40b4e06390693913f85f1a37e869de/mbox-contents-da8f823508d51bfe232b1a9609a426dcbfce8709-staging.js",
-      "loadSync": true,
-      "pageParams": {
-      }
-    },
+      "accountId": "1351231"
+    }
+  },
   //},
   //"pageLoadRules": [{
   //  name: "KitchenSink",
@@ -65,11 +63,12 @@ _satellite.init({
       "name":"Dead Header",
       "trigger": [
         {
-          "engine":"tnt",
+          "tool":"da8f823508d51bfe232b1a9609a426dcbfce8709",
           "fulfillment": _satellite.executeModule(function(module) {
-            module.exports = function(args) {
-              _satellite.io.get('http://target.adobe.com/getoffer', {offer:args.offer}, function(response){
-                var el = _satellite.dom.querySelector(params.container);
+            module.exports = function(toolSettings, ruleSettings) {
+              var url = 'http://target.adobe.com/' + toolSettings.accountId + '/getoffer';
+              _satellite.io.get(url, {offer: ruleSettings.offer}, function(response){
+                var el = _satellite.dom.querySelector(ruleSettings.container);
 
                 if (el) {
                   el.innerHTML = response;
@@ -77,7 +76,7 @@ _satellite.init({
               });
             };
           }),
-          "arguments": [
+          "settings": [
             {
               "offer":"myoffer",
               "container":".mycontainer"

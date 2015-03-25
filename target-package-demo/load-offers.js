@@ -1,6 +1,7 @@
-module.exports = function(args) {
-  _satellite.io.get('http://target.adobe.com/getoffer', {offer: args.offer}, function(response){
-    var el = _satellite.dom.querySelector(params.container);
+module.exports = function(toolSettings, ruleSettings) {
+  var url = 'http://target.adobe.com/' + toolSettings.accountId + '/getoffer';
+  _satellite.io.jsonp(url, {offer: ruleSettings.offer}, function(response){
+    var el = _satellite.dom.querySelector(ruleSettings.container);
 
     if (el) {
       el.innerHTML = response;

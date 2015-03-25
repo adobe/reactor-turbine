@@ -4,10 +4,12 @@
   "install": {
     "events": [
       {
-        "swipe": "swipe"
+        "swipe": "swipe.js"
       }
     ]
   },
-  "fulfillmentConfig": "offer-config",
-  "fulfillment": "load-offers"
+  "toolConfig": "target-config.html",
+  "ruleConfig": "offer-config.html",
+  "ruleFulfillment": "load-offers.js",
+  "howDoesPrependPostpendPayloadsWork(seeWiki)": "?"
 }

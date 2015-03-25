@@ -14,11 +14,11 @@
             });
           }
           break;
-        case 'getArguments':
-          if (window.dtm.getArguments) {
+        case 'getSettings':
+          if (window.dtm.getSettings) {
             respond(event, {
-              type: 'getArgumentsResponse',
-              content: window.dtm.getArguments()
+              type: 'getSettingsResponse',
+              content: window.dtm.getSettings()
             });
           }
           break;

@@ -2415,12 +2415,129 @@
     });
 
     var userAgent = navigator.userAgent
+
+    var getBrowserWidth = function() {
+      return window.innerWidth ? window.innerWidth : document.documentElement.offsetWidth;
+    };
+
+    var getBrowserHeight = function() {
+      return window.innerHeight ? window.innerHeight : document.documentElement.offsetHeight;
+    };
+
+    var getResolution = function() {
+      return window.screen.width + "x" + window.screen.height;
+    };
+
+    var getColorDepth = function() {
+      return window.screen.pixelDepth ? window.screen.pixelDepth : window.screen.colorDepth;
+    };
+
+    var getJSVersion = function() {
+      var
+          tm = new Date,
+          a,o,i,
+          j = '1.2',
+          pn = 0;
+
+      if (tm.setUTCDate) {
+        j = '1.3';
+        if (pn.toPrecision) {
+          j = '1.5';
+          a = [];
+          if (a.forEach) {
+            j = '1.6';
+            i = 0;
+            o = {};
+            try {
+              i=new Iterator(o);
+              if (i.next) {
+                j = '1.7';
+                if (a.reduce) {
+                  j = '1.8';
+                  if (j.trim) {
+                    j = '1.8.1';
+                    if (Date.parse) {
+                      j = '1.8.2';
+                      if (Object.create) {
+                        j = '1.8.5';
+                      }
+                    }
+                  }
+                }
+              }
+            } catch (e) {}
+          }
+        }
+      }
+
+      return j;
+    };
+
+    var getIsJavaEnabled = function() {
+      return navigator.javaEnabled();
+    };
+
+    var getIsCookiesEnabled = function() {
+      return window.navigator.cookieEnabled;
+    };
+
+    // TODO: Can we get rid of this?
+    var getConnectionType = function() {
+      try {
+        document.body.addBehavior('#default#clientCaps');
+        return document.body.connectionType;
+      } catch (e) {}
+    };
+
+    // TODO: Can we get rid of this?
+    var getIsHomePage = function() {
+      try {
+        document.body.addBehavior('#default#homePage');
+        var isHomePage = document.body.isHomePage;
+        return isHomePage ? isHomePage(getTopFrameSet().location) : false;
+      } catch (e) {}
+    };
+
+    // TODO: Can we get rid of this?
+    var getTopFrameSet = function() {
+      // Get the top frame set
+      var
+          topFrameSet = window,
+          parent,
+          location;
+      try {
+        parent = topFrameSet.parent;
+        location = topFrameSet.location;
+        while ((parent) &&
+        (parent.location) &&
+        (location) &&
+        ('' + parent.location != '' + location) &&
+        (topFrameSet.location) &&
+        ('' + parent.location != '' + topFrameSet.location) &&
+        (parent.location.host == location.host)) {
+          topFrameSet = parent;
+          parent = topFrameSet.parent;
+        }
+      } catch (e) {}
+
+      return topFrameSet;
+    };
+
     SL.browserInfo = {
       browser: getBrowser(userAgent)
       , os: getOS(userAgent)
       , deviceType: getDeviceType(userAgent)
+      , getBrowserWidth: getBrowserWidth
+      , getBrowserHeight: getBrowserHeight
+      , resolution: getResolution()
+      , colorDepth: getColorDepth()
+      , jsVersion: getJSVersion()
+      , isJavaEnabled: getIsJavaEnabled()
+      , isCookiesEnabled: getIsCookiesEnabled()
+      , connectionType: getConnectionType()
+      , isHomePage: getIsHomePage()
     }
-  }
+  };
 
   SL.isHttps = function(){
     return 'https:' == document.location.protocol
@@ -4475,7 +4592,7 @@
     };
 
     // TODO: Handle canceling tool initialization (suppression?).
-    // TODO: Handle custom setup functions?
+    // TODO: Handle custom setup functions (funs, as it were)?
     var AdobeAnalyticsExtension = function(extensionSettings) {
       this.extensionSettings = extensionSettings;
     };
@@ -4646,16 +4763,14 @@
     //};
 
     AdobeAnalyticsExtension.prototype.getTrackingServer = function() {
-      // TODO Use the real logic once I can figure out where everything's coming from.
-      return 'faketrackingserver';
-
       // TODO: Use getAccount from tool since it deals with accountByHost? What is accountByHost anyway?
+      // TODO: What do we do if account is not default. Returning null is probably not awesome.
       var account = this.extensionSettings.account;
       if (!account) return null
       // based on code in app measurement
       var w
       var c = ''
-      var d = s && s.dc
+      var d = this.extensionSettings.trackVars.dc || 'd1'
       var e
       var f
       w = account
@@ -4663,7 +4778,6 @@
       e >= 0 && (w = w.gb(0, e))
       w = w.replace(/[^A-Za-z0-9]/g, "")
       c || (c = "2o7.net")
-      d = d ? ("" + d).toLowerCase() : "d1"
       c == "2o7.net" && (d == "d1" ? d = "112" : d == "d2" && (d = "122"), f = "")
       e = w + "." + d + "." + f + c
       return e
@@ -4673,8 +4787,8 @@
       // TODO: Merge some logic from SiteCatalystTool.concatWithToolVarBindings?
       // TODO: I think referrer is only supposed to be included on the first trackPageView?
       var trackVars = {};
-      SL.extend(trackVars, actionSettings.trackVars);
       SL.extend(trackVars, this.extensionSettings.trackVars);
+      SL.extend(trackVars, actionSettings.trackVars);
 
       var trackEvents = actionSettings.trackEvents;
 
@@ -4731,7 +4845,7 @@
           "charSet": "UTF-8",
           "currencyCode": "TND",
           "referrer": "myreferreroverride",
-          "campaign": "mycamp",
+          "campaign": "MyToolCampaign",
           "pageURL": "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
           "trackInlineStats": true,
           "trackDownloadLinks": true,
@@ -4758,8 +4872,24 @@
         extensionId: 'adobeanalytics',
         settings: {
           account: 'aaronhardyprod',
+          euCookie: false,
           trackVars: {
-            evar50: 'toolevar50'
+            charSet: 'UTF-8',
+            currencyCode: 'TND',
+            referrer: 'myreferreroverride',
+            campaign: 'MyToolCampaign',
+            pageURL: "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
+            trackInlineStats: true,
+            trackDownloadLinks: true,
+            linkDownloadFileTypes: "avi,css,csv,doc,docx,eps,exe,jpg,js,m4v,mov,mp3,pdf,png,ppt,pptx,rar,svg,tab,txt,vsd,vxd,wav,wma,wmv,xls,xlsx,xml,zip,fake",
+            trackExternalLinks: true,
+            linkInternalFilters: "javascript:,mailto:,tel:",
+            linkLeaveQueryString: false,
+            dynamicVariablePrefix: "$$",
+            eVar50: "toolevar50",
+            prop50: "toolprop50",
+            // TODO: Why is this in the var list and not a direct child of settings? (currently follows Tool structure)
+            dc: '122'
           }
         }
       }
@@ -4774,8 +4904,21 @@
             settings: {
               trackType: 'pageView',
               trackVars: {
-                evar10: 'ruleevar10'
-              }
+                eVar10: 'MyEvar10',
+                eVar11: 'MyEvar11',
+                prop10: 'MyProp10',
+                prop11: 'MyProp11',
+                pageName: 'MyPageName',
+                channel: 'MyChannel',
+                pageURL: "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
+                campaign: 'MyRuleCampaign',
+                hier1: "HierLev1|HierLev2|HierLev3|HierLev4"
+              },
+              trackEvents: [
+                "event10:MyEvent10",
+                "event11:MyEvent11",
+                "prodView:MyProdView"
+              ]
             }
           }
         ]
@@ -4795,7 +4938,7 @@
           pageName: "MyPageName",
           channel: "MyChannel",
           pageURL: "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
-          campaign: "MyCampaign",
+          campaign: "MyRuleCampaign",
           hier1: "HierLev1|HierLev2|HierLev3|HierLev4"
         }]
       }, {engine:"sc",command:"addEvent",arguments:["event10:MyEvent10","event11:MyEvent11","prodView:MyProdView"]}, {

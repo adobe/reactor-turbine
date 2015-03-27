@@ -2304,6 +2304,27 @@
 
     SL.firePageLoadEvent('pagetop')
     SL.initialized = true
+
+    // TODO: This is temporary.
+    // Oh look an event occurred!
+    setTimeout(function() {
+      for (var i = 0; i < settings.newRules.length; i++) {
+        var rule = settings.newRules[i];
+        for (var k = 0; k < rule.actions.length; k++) {
+          var action = rule.actions[k];
+          for (var m = 0; m < action.extensionInstanceIds.length; m++) {
+            var extensionInstanceId = action.extensionInstanceIds[m];
+            var extensionInstance = settings.extensions[extensionInstanceId];
+            // TODO: Pass an options object instead?
+            action.script(
+                settings.settings,
+                extensionInstance.settings,
+                action.settings,
+                extensionInstanceId);
+          }
+        }
+      }
+    }, 2000);
   }
 
   SL.pageLoadPhases = ['aftertoolinit', 'pagetop', 'pagebottom', 'domready', 'windowload']
@@ -4585,7 +4606,7 @@
       var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
           Math.floor(Math.random() * 10000000000000);
       var protocol = SL.isHttps() ? 'https://' : 'http://';
-      var uri = protocol + this.getTrackingServer() + '/b/ss/' + this.settings.account +
+      var uri = protocol + this.getTrackingServer() + '/b/ss/' + this.extensionSettings.account +
           '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
 
       if (queryString) {
@@ -4597,6 +4618,55 @@
       }
 
       return uri;
+    };
+
+    AdobeAnalyticsExtension.prototype.getTimestamp = function() {
+      var now = new Date();
+      var year = now.getYear();
+      return now.getDate() + '/'
+          + now.getMonth() + '/'
+          + (year < 1900 ? year + 1900 : year) + ' '
+          + now.getHours() + ':'
+          + now.getMinutes() + ':'
+          + now.getSeconds() + ' '
+          + now.getDay() + ' '
+          + now.getTimezoneOffset();
+    };
+
+    //AdobeAnalyticsExtension.prototype.getAccount = function(hostname){
+      // TODO: What is accountByHost all about?
+      //if (window.s_account){
+      //  return window.s_account
+      //}
+      //if (hostname && this.settings.accountByHost){
+      //  return this.settings.accountByHost[hostname] || this.settings.account
+      //}else{
+      //  return this.settings.account
+      //}
+    //};
+
+    AdobeAnalyticsExtension.prototype.getTrackingServer = function() {
+      // TODO Use the real logic once I can figure out where everything's coming from.
+      return 'faketrackingserver';
+
+      // TODO: Use getAccount from tool since it deals with accountByHost? What is accountByHost anyway?
+      var account = this.extensionSettings.account;
+      if (!account) return null
+      // based on code in app measurement
+      var w
+      var c = ''
+      var d = s && s.dc
+      var e
+      var f
+      w = account
+      e = w.indexOf(",")
+      e >= 0 && (w = w.gb(0, e))
+      w = w.replace(/[^A-Za-z0-9]/g, "")
+      c || (c = "2o7.net")
+      d = d ? ("" + d).toLowerCase() : "d1"
+      c == "2o7.net" && (d == "d1" ? d = "112" : d == "d2" && (d = "122"), f = "")
+      e = w + "." + d + "." + f + c
+      return e
     };
 
     AdobeAnalyticsExtension.prototype.trackPageView = function(actionSettings) {
@@ -4637,15 +4707,15 @@
       // TODO
     };
 
-    return function(propertySettings, extensionSettings, actionSettings) {
-      var instance = instanceById[extensionSettings.instanceId];
+    return function(propertySettings, extensionSettings, actionSettings, extensionInstanceId) {
+      var instance = instanceById[extensionInstanceId];
 
       if (!instance) {
-        instance = instanceById[extensionSettings.instanceId] = new AdobeAnalyticsExtension();
+        instance = instanceById[extensionInstanceId] = new AdobeAnalyticsExtension(extensionSettings);
       }
 
       var methodName = trackTypeMethodMap[actionSettings.trackType];
-      instance[methodName]();
+      instance[methodName](actionSettings);
     };
   })();
 
@@ -4682,6 +4752,36 @@
         }
       }
     },
+    extensions: {
+      'abcdef': {
+        instanceId: 'abcdef',
+        extensionId: 'adobeanalytics',
+        settings: {
+          account: 'aaronhardyprod',
+          trackVars: {
+            evar50: 'toolevar50'
+          }
+        }
+      }
+    },
+    newRules: [
+      {
+        name: 'Test Rule',
+        actions: [
+          {
+            extensionInstanceIds: ['abcdef'],
+            script: adobeAnalyticsAction,
+            settings: {
+              trackType: 'pageView',
+              trackVars: {
+                evar10: 'ruleevar10'
+              }
+            }
+          }
+        ]
+      }
+    ],
+
     "pageLoadRules": [{
       name: "KitchenSink",
       trigger: [{

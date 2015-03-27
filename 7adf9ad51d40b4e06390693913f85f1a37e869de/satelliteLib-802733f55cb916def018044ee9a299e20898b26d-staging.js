@@ -4445,6 +4445,209 @@
   }
   SL.availableEventEmitters.push(FacebookEventEmitter);
 
+  var adobeAnalyticsAction = (function() {
+    var instanceById = {};
+
+    var trackTypeMethodMap = {
+      pageView: 'trackPageView',
+      link: 'trackLink'
+    };
+
+    // TODO: Handle canceling tool initialization (suppression?).
+    // TODO: Handle custom setup functions?
+    var AdobeAnalyticsExtension = function(extensionSettings) {
+      this.extensionSettings = extensionSettings;
+    };
+
+    AdobeAnalyticsExtension.prototype.queryStringParamMap = {
+      browserHeight: 'bh',
+      browserWidth: 'bw',
+      campaign: 'v0',
+      channel: 'ch',
+      charSet: 'ce',
+      colorDepth: 'c',
+      connectionType: 'ct',
+      cookiesEnabled: function(obj, key, value) {
+        obj['k'] = value ? 'Y' : 'N';
+      },
+      currencyCode: 'cc',
+      dynamicVariablePrefix: 'D',
+      eVar: function(obj, key, value) {
+        obj['v' + key.substr(4)] = value;
+      },
+      events: function(obj, key, value) {
+        obj['events'] = value.join(',');
+      },
+      hier: function(obj, key, value) {
+        obj['h' + key.substr(4)] = value.substr(0, 255);
+      },
+      homePage: function(obj, key, value) {
+        obj['hp'] = value ? 'Y' : 'N';
+      },
+      javaEnabled: function(obj, key, value) {
+        obj['v'] = value ? 'Y' : 'N';
+      },
+      javaScriptVersion: 'j',
+      linkName: 'pev2',
+      linkType: function(obj, key, value) {
+        obj['pe'] = 'lnk_' + value;
+      },
+      linkURL: 'pev1',
+      pageName: 'pageName',
+      pageType: 'pageType',
+      pageURL: function(obj, key, value) {
+        obj['g'] = value.substr(0, 255);
+        if (value.length > 255) {
+          obj['-g'] = value.substring(255);
+        }
+      },
+      plugins: 'p',
+      products: 'products',
+      prop: function(obj, key, value) {
+        obj['c' + key.substr(4)] = value;
+      },
+      purchaseID: 'purchaseID',
+      referrer: 'r',
+      resolution: 's',
+      server: 'server',
+      state: 'state',
+      timestamp: 'ts',
+      transactionID: 'xact',
+      visitorID: 'vid',
+      marketingCloudVisitorID: 'mid',
+      zip: 'zip'
+    };
+
+    AdobeAnalyticsExtension.prototype.remodelDataToQueryString = function(data) {
+      var result = {};
+      var key;
+
+      result.t = this.getTimestamp();
+
+      var queryStringParamMap = this.queryStringParamMap;
+
+      // TODO: Maybe put this on the prototype?
+      var translate = function(key, value) {
+        var translator = queryStringParamMap[key];
+
+        if (!translator) {
+          var prefix = key.substr(0, 4);
+          translator = queryStringParamMap[prefix];
+        }
+
+        if (translator) {
+          if (typeof translator === 'string') {
+            result[translator] = value;
+          } else {
+            translator(result, key, value);
+          }
+        }
+      };
+
+      var browserInfo = data.browserInfo;
+
+      if (browserInfo) {
+        for (key in browserInfo) {
+          if (browserInfo.hasOwnProperty(key)) {
+            var browserInfoValue = browserInfo[key];
+            if (browserInfoValue) {
+              translate(key, browserInfoValue);
+            }
+          }
+        }
+      }
+
+      var vars = data.vars;
+
+      if (vars) {
+        for (key in vars) {
+          if (vars.hasOwnProperty(key)) {
+            var varValue = vars[key];
+            if (varValue) {
+              translate(key, varValue);
+            }
+          }
+        }
+      }
+
+      var events = data.events;
+
+      if (events) {
+        translate('events', events);
+      }
+
+      result = SL.encodeObjectToURI(result);
+      return result;
+    };
+
+    AdobeAnalyticsExtension.prototype.getTrackingURI = function(queryString) {
+      var tagContainerMarker = 'D' + SL.appVersion;
+      var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
+          Math.floor(Math.random() * 10000000000000);
+      var protocol = SL.isHttps() ? 'https://' : 'http://';
+      var uri = protocol + this.getTrackingServer() + '/b/ss/' + this.settings.account +
+          '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
+
+      if (queryString) {
+        if (queryString[0] !== '?') {
+          uri += '?';
+        }
+
+        uri += queryString;
+      }
+
+      return uri;
+    };
+
+    AdobeAnalyticsExtension.prototype.trackPageView = function(actionSettings) {
+      // TODO: Merge some logic from SiteCatalystTool.concatWithToolVarBindings?
+      // TODO: I think referrer is only supposed to be included on the first trackPageView?
+      var trackVars = {};
+      SL.extend(trackVars, actionSettings.trackVars);
+      SL.extend(trackVars, this.extensionSettings.trackVars);
+
+      var trackEvents = actionSettings.trackEvents;
+
+      var queryString = this.remodelDataToQueryString({
+        vars: trackVars,
+        events: trackEvents,
+        browserInfo: {
+          browserHeight: SL.browserInfo.getBrowserHeight(),
+          browserWidth: SL.browserInfo.getBrowserWidth(),
+          resolution: SL.browserInfo.resolution,
+          colorDepth: SL.browserInfo.colorDepth,
+          javaScriptVersion: SL.browserInfo.jsVersion,
+          javaEnabled: SL.browserInfo.isJavaEnabled,
+          cookiesEnabled: SL.browserInfo.isCookiesEnabled,
+          connectionType: SL.connectionType,
+          homePage: SL.isHomePage
+        }
+      });
+
+      var uri = this.getTrackingURI(queryString);
+      SL.createBeacon({
+        beaconURL: uri,
+        type: 'image'
+      });
+
+      recordDTMUrl(uri);
+    };
+
+    AdobeAnalyticsExtension.prototype.trackLink = function(actionSettings) {
+      // TODO
+    };
+
+    return function(propertySettings, extensionSettings, actionSettings) {
+      var instance = instanceById[extensionSettings.instanceId];
+
+      if (!instance) {
+        instance = instanceById[extensionSettings.instanceId] = new AdobeAnalyticsExtension();
+      }
+
+      var methodName = trackTypeMethodMap[actionSettings.trackType];
+      instance[methodName]();
+    };
+  })();
 
   _satellite.init({
     "tools": {
@@ -4503,16 +4706,16 @@
       event: "pagebottom"
     }],
     "rules": [
-      {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
-          SL.getQueryParam('dead')
-      },"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
-        return !_satellite.isLinked(target)
-      }],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}
-      //{"name":"Dead Header","trigger":[{"engine":"sc","command":"trackPageView","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
+      //{"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
       //    SL.getQueryParam('dead')
       //},"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
       //  return !_satellite.isLinked(target)
-      //}],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false},
+      //}],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}
+      {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackPageView","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
+          SL.getQueryParam('dead')
+      },"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
+        return !_satellite.isLinked(target)
+      }],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false},
       //{"name":"Download Link","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"d","linkName":"%this.href%"}]},{"command":"delayActivateLink"}],"selector":"a","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false,"property":{"href":/\.(?:doc|docx|eps|xls|ppt|pptx|pdf|xlsx|tab|csv|zip|txt|vsd|vxd|xml|js|css|rar|exe|wma|mov|avi|wmv|mp3|wav|m4v)($|\&|\?)/i}}
     ],
     "directCallRules": [

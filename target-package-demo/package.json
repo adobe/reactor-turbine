@@ -1,15 +1,57 @@
 {
-  "id":"targetid",
-  "name":"target",
-  "install": {
-    "events": [
-      {
-        "swipe": "swipe.js"
-      }
-    ]
-  },
-  "toolConfig": "target-config.html",
-  "ruleConfig": "offer-config.html",
-  "ruleFulfillment": "load-offers.js",
-  "howDoesPrependPostpendPayloadsWork(seeWiki)": "?"
+	"id": "adobetarget",	
+	"name": "Adobe Target",
+	"dependencies": [
+		"adobeanalytics" // Not sure what identifiers will look like.
+	],
+	"install": {
+		"events": [
+			{
+				"swipe": "swipe.js"
+			}
+		],
+		"rules": [{
+			"name": "Custom Rule",
+			"event": {
+				"type": "click",
+				"settings": {
+					"selector": ".mytriggerdiv"
+				}
+			},
+			"conditions": [
+				{
+					"type": "param",
+					"settings": {
+						"name": "myParam",
+						"value": "myValue"
+					}
+				},
+				{
+					"type": "custom",
+					"settings": {
+						"script": "custom-rule-condition.js"
+					}
+				}
+			],
+			"actions": [
+				{
+					"extensionId": "adobeanalytics",
+					"settings": {
+						"track": "pageview",
+						"evar20": "MyEvar10"
+					}
+				},
+				{
+					"extensionId": "adobetarget",
+					"settings": {
+						"offerName": "myOffer",
+						"selector": ".myOfferContainer"
+					}
+				}
+			]
+		}]
+	},
+	"toolConfig": "target-config.html",
+	"ruleActionConfig": "offer-config.html",
+	"ruleAction": "load-offers.js"
 }

@@ -1,8 +1,8 @@
-_satellite.executeModule = function(moduleFactory) {
+function importModule(moduleFactory) {
   var module = {};
   moduleFactory(module);
   return module.exports;
-};
+}
 
 _satellite.init({
   //"tools": {

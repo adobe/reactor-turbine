@@ -4661,7 +4661,7 @@
       var translator = this.queryStringParamMap[key];
 
       if (!translator) {
-        // Things like prop1 and prop1 use the same translator. Also, eVar1 and eVar2.
+        // Things like prop1 and prop2 use the same translator. Also, eVar1 and eVar2.
         var prefix = key.substr(0, 4);
         translator = this.queryStringParamMap[prefix];
       }
@@ -4748,42 +4748,34 @@
           + now.getTimezoneOffset();
     };
 
-    //AdobeAnalyticsExtension.prototype.getAccount = function(hostname){
-      // TODO: What is accountByHost all about?
-      //if (window.s_account){
-      //  return window.s_account
-      //}
-      //if (hostname && this.settings.accountByHost){
-      //  return this.settings.accountByHost[hostname] || this.settings.account
-      //}else{
-      //  return this.settings.account
-      //}
-    //};
-
     AdobeAnalyticsExtension.prototype.getTrackingServer = function() {
       // TODO: Use getAccount from tool since it deals with accountByHost? What is accountByHost anyway?
       // TODO: What do we do if account is not default. Returning null is probably not awesome.
+      if (this.extensionSettings.trackingServer) {
+        return this.extensionSettings.trackingServer;
+      }
+
       var account = this.extensionSettings.account;
-      if (!account) return null
-      // based on code in app measurement
-      var w
+
+      if (!account) {
+        return null
+      }
+
+      // based on code in AppMeasurement.
       var c = ''
-      var d = this.extensionSettings.trackVars.dc || 'd1'
+      var dataCenter = this.extensionSettings.trackVars.dc || 'd1'
       var e
       var f
-      w = account
-      e = w.indexOf(",")
-      e >= 0 && (w = w.gb(0, e))
-      w = w.replace(/[^A-Za-z0-9]/g, "")
+      e = account.indexOf(",")
+      e >= 0 && (account = account.gb(0, e))
+      account = account.replace(/[^A-Za-z0-9]/g, "")
       c || (c = "2o7.net")
-      c == "2o7.net" && (d == "d1" ? d = "112" : d == "d2" && (d = "122"), f = "")
-      e = w + "." + d + "." + f + c
+      c == "2o7.net" && (dataCenter == "d1" ? dataCenter = "112" : dataCenter == "d2" && (dataCenter = "122"), f = "")
+      e = account + "." + dataCenter + "." + f + c
       return e
     };
 
     AdobeAnalyticsExtension.prototype.trackPageView = function(actionSettings) {
-      // TODO: Merge some logic from SiteCatalystTool.concatWithToolVarBindings?
-      // TODO: I think referrer is only supposed to be included on the first trackPageView?
       var trackVars = {};
       SL.extend(trackVars, this.extensionSettings.trackVars);
       SL.extend(trackVars, actionSettings.trackVars);
@@ -4795,7 +4787,12 @@
 
       this.initialPageViewTracked = true;
 
-      this.sendData(trackVars, actionSettings.trackEvents);
+      if (actionSettings.customSetup) {
+        // TODO: Do we need to send the originating event into the custom setup function?
+        actionSettings.customSetup();
+      }
+
+      this.track(trackVars, actionSettings.trackEvents);
     };
 
     AdobeAnalyticsExtension.prototype.doesExtensionVarApplyToLinkTracking = function(varName){
@@ -4816,10 +4813,15 @@
       // Referrer is never sent for link tracking.
       delete trackVars.referrer;
 
-      this.sendData(trackVars, actionSettings.trackEvents);
+      if (actionSettings.customSetup) {
+        // TODO: Do we need to send the originating event into the custom setup function?
+        actionSettings.customSetup();
+      }
+
+      this.track(trackVars, actionSettings.trackEvents);
     };
 
-    AdobeAnalyticsExtension.prototype.sendData = function(trackVars, trackEvents) {
+    AdobeAnalyticsExtension.prototype.track = function(trackVars, trackEvents) {
       var queryString = this.remodelDataToQueryString({
         vars: trackVars,
         events: trackEvents,
@@ -4869,6 +4871,8 @@
         "initVars": {
           "charSet": "UTF-8",
           "currencyCode": "TND",
+          //trackingServer: 'myTrackingServer.com',
+          //trackingServerSecure: 'mySSLTrackingServer.com',
           "referrer": "myreferreroverride",
           "campaign": "MyToolCampaign",
           "pageURL": "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
@@ -4898,6 +4902,8 @@
         settings: {
           account: 'aaronhardyprod',
           euCookie: false,
+          //trackingServer: 'myTrackingServer.com',
+          //trackingServerSecure: 'mySSLTrackingServer.com',
           trackVars: {
             charSet: 'UTF-8',
             currencyCode: 'TND',
@@ -4971,7 +4977,10 @@
               },
               trackEvents: [
                   'event20:deadevent'
-              ]
+              ],
+              customSetup: function(){
+                console.log('I am a custom setup function from an extension.');
+              }
             }
           }
         ]
@@ -5004,6 +5013,8 @@
     "rules": [
       {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
           SL.getQueryParam('dead')
+      },"customSetup":function(event,s){
+        console.log('I am a custom setup function from a tool.');
       },"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
         return !_satellite.isLinked(target)
       }],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}

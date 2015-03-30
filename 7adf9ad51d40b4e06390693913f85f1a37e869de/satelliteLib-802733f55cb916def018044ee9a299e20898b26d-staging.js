@@ -2308,24 +2308,25 @@
     // TODO: This is temporary.
     // Oh look an event occurred!
     setTimeout(function() {
-      for (var i = 0; i < settings.newRules.length; i++) {
-        var rule = settings.newRules[i];
-        for (var k = 0; k < rule.actions.length; k++) {
-          var action = rule.actions[k];
-          for (var m = 0; m < action.extensionInstanceIds.length; m++) {
-            var extensionInstanceId = action.extensionInstanceIds[m];
-            var extensionInstance = settings.extensions[extensionInstanceId];
-            // TODO: Pass an options object instead?
-            action.script(
-                settings.settings,
-                extensionInstance.settings,
-                action.settings,
-                extensionInstanceId);
-          }
-        }
-      }
+      SL.executeRule(settings.extensions, settings.newRules[1]);
     }, 2000);
   }
+
+  SL.executeRule = function(extensions, rule) {
+    for (var k = 0; k < rule.actions.length; k++) {
+      var action = rule.actions[k];
+      for (var m = 0; m < action.extensionInstanceIds.length; m++) {
+        var extensionInstanceId = action.extensionInstanceIds[m];
+        var extensionInstance = extensions[extensionInstanceId];
+        // TODO: Pass an options object instead?
+        action.script(
+            this.settings.settings,
+            extensionInstance.settings,
+            action.settings,
+            extensionInstanceId);
+      }
+    }
+  };
 
   SL.pageLoadPhases = ['aftertoolinit', 'pagetop', 'pagebottom', 'domready', 'windowload']
 
@@ -4656,31 +4657,29 @@
       zip: 'zip'
     };
 
+    AdobeAnalyticsExtension.prototype.translateToQueryStringParam = function(queryStringObj, key, value) {
+      var translator = this.queryStringParamMap[key];
+
+      if (!translator) {
+        // Things like prop1 and prop1 use the same translator. Also, eVar1 and eVar2.
+        var prefix = key.substr(0, 4);
+        translator = this.queryStringParamMap[prefix];
+      }
+
+      if (translator) {
+        if (typeof translator === 'string') {
+          queryStringObj[translator] = value;
+        } else {
+          translator(queryStringObj, key, value);
+        }
+      }
+    };
+
     AdobeAnalyticsExtension.prototype.remodelDataToQueryString = function(data) {
-      var result = {};
+      var queryStringParams = {};
       var key;
 
-      result.t = this.getTimestamp();
-
-      var queryStringParamMap = this.queryStringParamMap;
-
-      // TODO: Maybe put this on the prototype?
-      var translate = function(key, value) {
-        var translator = queryStringParamMap[key];
-
-        if (!translator) {
-          var prefix = key.substr(0, 4);
-          translator = queryStringParamMap[prefix];
-        }
-
-        if (translator) {
-          if (typeof translator === 'string') {
-            result[translator] = value;
-          } else {
-            translator(result, key, value);
-          }
-        }
-      };
+      queryStringParams.t = this.getTimestamp();
 
       var browserInfo = data.browserInfo;
 
@@ -4689,7 +4688,7 @@
           if (browserInfo.hasOwnProperty(key)) {
             var browserInfoValue = browserInfo[key];
             if (browserInfoValue) {
-              translate(key, browserInfoValue);
+              this.translateToQueryStringParam(queryStringParams, key, browserInfoValue);
             }
           }
         }
@@ -4702,7 +4701,7 @@
           if (vars.hasOwnProperty(key)) {
             var varValue = vars[key];
             if (varValue) {
-              translate(key, varValue);
+              this.translateToQueryStringParam(queryStringParams, key, varValue);
             }
           }
         }
@@ -4711,11 +4710,10 @@
       var events = data.events;
 
       if (events) {
-        translate('events', events);
+        this.translateToQueryStringParam(queryStringParams, 'events', events);
       }
 
-      result = SL.encodeObjectToURI(result);
-      return result;
+      return SL.encodeObjectToURI(queryStringParams);
     };
 
     AdobeAnalyticsExtension.prototype.getTrackingURI = function(queryString) {
@@ -4790,8 +4788,38 @@
       SL.extend(trackVars, this.extensionSettings.trackVars);
       SL.extend(trackVars, actionSettings.trackVars);
 
-      var trackEvents = actionSettings.trackEvents;
+      // Referrer is intentionally only tracked on the first page view beacon.
+      if (this.initialPageViewTracked) {
+        delete this.referrer;
+      }
 
+      this.initialPageViewTracked = true;
+
+      this.sendData(trackVars, actionSettings.trackEvents);
+    };
+
+    AdobeAnalyticsExtension.prototype.doesExtensionVarApplyToLinkTracking = function(varName){
+      return !/^(eVar[0-9]+)|(prop[0-9]+)|(hier[0-9]+)|campaign|purchaseID|channel|server|state|zip|pageType$/.test(varName);
+    };
+
+    AdobeAnalyticsExtension.prototype.trackLink = function(actionSettings) {
+      var trackVars = {};
+
+      for (var varName in this.extensionSettings.trackVars) {
+        if (this.doesExtensionVarApplyToLinkTracking(varName)) {
+          trackVars[varName] = this.extensionSettings.trackVars[varName];
+        }
+      }
+
+      SL.extend(trackVars, actionSettings.trackVars);
+
+      // Referrer is never sent for link tracking.
+      delete trackVars.referrer;
+
+      this.sendData(trackVars, actionSettings.trackEvents);
+    };
+
+    AdobeAnalyticsExtension.prototype.sendData = function(trackVars, trackEvents) {
       var queryString = this.remodelDataToQueryString({
         vars: trackVars,
         events: trackEvents,
@@ -4809,16 +4837,13 @@
       });
 
       var uri = this.getTrackingURI(queryString);
+
       SL.createBeacon({
         beaconURL: uri,
         type: 'image'
       });
 
       recordDTMUrl(uri);
-    };
-
-    AdobeAnalyticsExtension.prototype.trackLink = function(actionSettings) {
-      // TODO
     };
 
     return function(propertySettings, extensionSettings, actionSettings, extensionInstanceId) {
@@ -4896,6 +4921,7 @@
     },
     newRules: [
       {
+        // TODO Needs event stuff.
         name: 'Test Rule',
         actions: [
           {
@@ -4918,6 +4944,33 @@
                 "event10:MyEvent10",
                 "event11:MyEvent11",
                 "prodView:MyProdView"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        // TODO Needs event stuff.
+        name: 'Dead Header Rule',
+        conditions: [
+          function(event,target) { return !_satellite.isLinked(target) }
+        ],
+        actions: [
+          {
+            extensionInstanceIds: ['abcdef'],
+            script: adobeAnalyticsAction,
+            settings: {
+              trackType: 'link',
+              trackVars: {
+                linkType: 'o',
+                linkName: 'MyLink',
+                pageName: 'MyPageName',
+                eVar20: 'MyDeadHeaderEvar',
+                prop20: 'D=v20',
+                campaign: SL.getQueryParam('dead')
+              },
+              trackEvents: [
+                  'event20:deadevent'
               ]
             }
           }
@@ -4949,16 +5002,16 @@
       event: "pagebottom"
     }],
     "rules": [
-      //{"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
-      //    SL.getQueryParam('dead')
-      //},"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
-      //  return !_satellite.isLinked(target)
-      //}],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}
-      {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackPageView","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
+      {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
           SL.getQueryParam('dead')
       },"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
         return !_satellite.isLinked(target)
-      }],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false},
+      }],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}
+      //{"name":"Dead Header","trigger":[{"engine":"sc","command":"trackPageView","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
+      //    SL.getQueryParam('dead')
+      //},"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
+      //  return !_satellite.isLinked(target)
+      //}],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false},
       //{"name":"Download Link","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"d","linkName":"%this.href%"}]},{"command":"delayActivateLink"}],"selector":"a","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false,"property":{"href":/\.(?:doc|docx|eps|xls|ppt|pptx|pdf|xlsx|tab|csv|zip|txt|vsd|vxd|xml|js|css|rar|exe|wma|mov|avi|wmv|mp3|wav|m4v)($|\&|\?)/i}}
     ],
     "directCallRules": [

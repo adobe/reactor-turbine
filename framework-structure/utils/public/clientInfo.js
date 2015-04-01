@@ -9,6 +9,31 @@ var matcher = function(regexs){
   };
 };
 
+// TODO: Can we get rid of this?
+var getTopFrameSet = function() {
+  // Get the top frame set
+  var
+      topFrameSet = window,
+      parent,
+      location;
+  try {
+    parent = topFrameSet.parent;
+    location = topFrameSet.location;
+    while ((parent) &&
+    (parent.location) &&
+    (location) &&
+    ('' + parent.location != '' + location) &&
+    (topFrameSet.location) &&
+    ('' + parent.location != '' + topFrameSet.location) &&
+    (parent.location.host == location.host)) {
+      topFrameSet = parent;
+      parent = topFrameSet.parent;
+    }
+  } catch (e) {}
+
+  return topFrameSet;
+};
+
 var exports = {};
 
 exports.getBrowser = matcher({
@@ -131,31 +156,6 @@ exports.getIsHomePage = function() {
     var isHomePage = document.body.isHomePage;
     return isHomePage ? isHomePage(getTopFrameSet().location) : false;
   } catch (e) {}
-};
-
-// TODO: Can we get rid of this?
-var getTopFrameSet = function() {
-  // Get the top frame set
-  var
-      topFrameSet = window,
-      parent,
-      location;
-  try {
-    parent = topFrameSet.parent;
-    location = topFrameSet.location;
-    while ((parent) &&
-    (parent.location) &&
-    (location) &&
-    ('' + parent.location != '' + location) &&
-    (topFrameSet.location) &&
-    ('' + parent.location != '' + topFrameSet.location) &&
-    (parent.location.host == location.host)) {
-      topFrameSet = parent;
-      parent = topFrameSet.parent;
-    }
-  } catch (e) {}
-
-  return topFrameSet;
 };
 
 module.exports = exports;

@@ -1,5 +1,6 @@
 var stringify = require('./stringify');
 var encodeObjectToURI = require('./encodeObjectToURI');
+var clientInfo = require('./clientInfo');
 
 var getBeaconIframesContainer = function() {
   if (this.containerIframe) {
@@ -52,7 +53,7 @@ var createBeacon = function(config, successCallback, failCallback) {
     if (config.beaconData) {
       request += '?' + encodeObjectToURI(config.beaconData);
     }
-    if (SL.browserInfo.browser === 'IE') {
+    if (clientInfo.getBrowser() === 'IE') {
       request = request.substring(0, 2047);
     }
     connection = new Image;
@@ -60,7 +61,7 @@ var createBeacon = function(config, successCallback, failCallback) {
   }
 
   if (config.type === 'form') {
-    createIframeBeacon(config.url, _satellite.stringify(config.beaconData), successCallback);
+    createIframeBeacon(config.url, stringify(config.beaconData), successCallback);
   }
 
   // Default POST via ajax

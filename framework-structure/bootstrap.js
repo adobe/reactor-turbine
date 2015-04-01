@@ -9,18 +9,34 @@ _satellite.availableExtensions = {
   adobeAnalytics: require('./extensions/adobeAnalytics')
 };
 
-_satellite.init = function(settings) {
-  console.log(settings);
+var createExtensionInstances = function(propertyMeta) {
+  var instances = {};
 
-  _satellite.extensionInstances = _satellite.extensionInstances || {};
-
-  for (var extensionInstanceId in settings.extensions) {
-    var extensionInstanceMeta = settings.extensions[extensionInstanceId];
+  for (var extensionInstanceId in propertyMeta.extensions) {
+    var extensionInstanceMeta = propertyMeta.extensions[extensionInstanceId];
     var extensionId = extensionInstanceMeta.extensionId;
     var Extension = _satellite.availableExtensions[extensionId];
-    var extensionInstance = new Extension(settings, extensionInstanceMeta.settings);
-    _satellite.extensionInstances[extensionInstanceId] = extensionInstance;
+    var extensionInstance = new Extension(propertyMeta, extensionInstanceMeta.settings);
+    instances[extensionInstanceId] = extensionInstance;
   }
+
+  return instances;
+}
+
+_satellite.init = function(propertyMeta) {
+  _satellite.appVersion = propertyMeta.appVersion;
+  _satellite.extensionInstances = createExtensionInstances(propertyMeta);
+
+  // TODO: Temporary for testing.
+  setTimeout(function() {
+    var rule = propertyMeta.newRules[0];
+    rule.actions.forEach(function(action) {
+      action.extensionInstanceIds.forEach(function(instanceId) {
+        var instance = _satellite.extensionInstances[instanceId];
+        instance[action.method](action.settings);
+      });
+    });
+  }, 2000);
 };
 
 _satellite.init({

@@ -1,9 +1,10 @@
 // TODO: Handle canceling tool initialization. Not sure why this is supported.
-var AdobeAnalyticsExtension = function(extensionSettings) {
+var AdobeAnalyticsExtension = function(propertySettings, extensionSettings) {
+  this.propertySettings = propertySettings;
   this.extensionSettings = extensionSettings;
 };
 
-_satellite.utils.extend(AdobeAnalyticsExtension, {
+_satellite.utils.extend(AdobeAnalyticsExtension.prototype, {
   queryStringParamMap: {
     browserHeight: 'bh',
     browserWidth: 'bw',
@@ -117,13 +118,13 @@ _satellite.utils.extend(AdobeAnalyticsExtension, {
       this.translateToQueryStringParam(queryStringParams, 'events', events);
     }
 
-    return SL.encodeObjectToURI(queryStringParams);
+    return _satellite.utils.encodeObjectToURI(queryStringParams);
   },
   getTrackingURI: function(queryString) {
-    var tagContainerMarker = 'D' + SL.appVersion;
+    var tagContainerMarker = 'D' + _satellite.appVersion;
     var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
         Math.floor(Math.random() * 10000000000000);
-    var protocol = SL.isHttps() ? 'https://' : 'http://';
+    var protocol = _satellite.utils.isHttps() ? 'https://' : 'http://';
     var uri = protocol + this.getTrackingServer() + '/b/ss/' + this.extensionSettings.account +
         '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
 
@@ -227,7 +228,7 @@ _satellite.utils.extend(AdobeAnalyticsExtension, {
 
     var uri = this.getTrackingURI(queryString);
 
-    SL.createBeacon({
+    _satellite.utils.createBeacon({
       beaconURL: uri,
       type: 'image'
     });

@@ -2230,7 +2230,10 @@
 // Initialize Satellite.
 //
 // - `settings` - all the settings that comprising a library.
-  SL.init = function(settings) {
+  SL.init = function(
+
+
+  ) {
     if (SL.stagingLibraryOverride())
       return
 

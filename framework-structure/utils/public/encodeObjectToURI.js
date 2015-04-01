@@ -1,5 +1,7 @@
+var isObject = require('./isObject');
+
 module.exports = function(obj) {
-  if (SL.isObject(obj) === false) {
+  if (isObject(obj) === false) {
     return ''
   }
 

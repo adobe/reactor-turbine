@@ -3,14 +3,19 @@
 <head lang="en">
   <meta charset="UTF-8">
   <title></title>
-  <script src="//dtm.aaronhardy.com/7adf9ad51d40b4e06390693913f85f1a37e869de/satelliteLib-802733f55cb916def018044ee9a299e20898b26d-staging.js"></script>
-  <script src="//dtm.aaronhardy.com/7adf9ad51d40b4e06390693913f85f1a37e869de/satellite-overrides.js"></script>
+  <!--<script src="//dtm.aaronhardy.com/7adf9ad51d40b4e06390693913f85f1a37e869de/satelliteLib-802733f55cb916def018044ee9a299e20898b26d-staging.js"></script>-->
+  <!--<script src="//dtm.aaronhardy.com/7adf9ad51d40b4e06390693913f85f1a37e869de/satellite-overrides.js"></script>-->
+  <script src="//dtm.aaronhardy.com/framework-structure/dist/bundle.js"></script>
 </head>
 <body>
-  <h1>Hello.</h1>
+  <h1>Super-duper DTM Tester</h1>
   <p><a href="file.zip">Download link</a></p>
   <button id="clearBeaconAnalysisButton" onclick="clearBeaconAnalysis()">Clear Beacon Analysis</button>
-  <label><input id="frameworkEnabledCheckbox" type="checkbox" checked>Framework Enabled</label>
+  <!--<label><input id="frameworkEnabledCheckbox" type="checkbox" checked>Framework Enabled</label>-->
+  <div id="hero" class="hero"></div>
+  <!--<script>-->
+    <!--mboxDefine('hero', 'mbox_hero');-->
+  <!--</script>-->
   <script type="text/javascript">_satellite.pageBottom();</script>
   <script>
     var deserializeQuery = function(url) {
@@ -154,18 +159,18 @@
 
 
     clearBeaconAnalysisButton.addEventListener('click', clearBeaconAnalysis);
-    frameworkEnabledCheckbox.addEventListener('change', function(event) {
-          window.frameworkEnabled = event.target.checked;
-          sessionStorage.setItem('frameworkEnabled', window.frameworkEnabled);
-        });
+//    frameworkEnabledCheckbox.addEventListener('change', function(event) {
+//          window.frameworkEnabled = event.target.checked;
+//          sessionStorage.setItem('frameworkEnabled', window.frameworkEnabled);
+//        });
 
     window.frameworkEnabled = sessionStorage.getItem('frameworkEnabled') === 'true';
 
-    if (window.frameworkEnabled) {
-      frameworkEnabledCheckbox.setAttribute('checked', '');
-    } else {
-      frameworkEnabledCheckbox.removeAttribute('checked');
-    }
+//    if (window.frameworkEnabled) {
+//      frameworkEnabledCheckbox.setAttribute('checked', '');
+//    } else {
+//      frameworkEnabledCheckbox.removeAttribute('checked');
+//    }
   </script>
 </body>
 </html>

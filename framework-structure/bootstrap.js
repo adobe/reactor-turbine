@@ -1,16 +1,27 @@
-window._satellite = require('./public/publicMap.js');
+window._satellite = {};
+
+_satellite.utils = require('./utils/public/index');
+_satellite.data = require('./data/public/index');
+
+// TODO: This will need to be more flexible to handle inclusion of only the extensions
+// configured for the property.
+_satellite.availableExtensions = {
+  adobeAnalytics: require('./extensions/adobeAnalytics')
+};
 
 _satellite.init = function(settings) {
   console.log(settings);
-}
 
-var adobeAnalyticsAction = function (){};
+  _satellite.extensionInstances = _satellite.extensionInstances || {};
 
-
-
-
-
-
+  for (var extensionInstanceId in settings.extensions) {
+    var extensionInstanceMeta = settings.extensions[extensionInstanceId];
+    var extensionId = extensionInstanceMeta.extensionId;
+    var Extension = _satellite.availableExtensions[extensionId];
+    var extensionInstance = new Extension(settings, extensionInstanceMeta.settings);
+    _satellite.extensionInstances[extensionInstanceId] = extensionInstance;
+  }
+};
 
 _satellite.init({
 "events": {
@@ -59,7 +70,7 @@ _satellite.init({
 extensions: {
   'abcdef': {
     instanceId: 'abcdef',
-    extensionId: 'adobeanalytics',
+    extensionId: 'adobeAnalytics',
     settings: {
       account: 'aaronhardyprod',
       euCookie: false,
@@ -89,9 +100,8 @@ newRules: [{
   name: 'Test Rule',
   actions: [{
     extensionInstanceIds: ['abcdef'],
-    script: adobeAnalyticsAction,
+    method: 'trackPageView',
     settings: {
-      trackType: 'pageView',
       trackVars: {
         eVar10: 'MyEvar10',
         eVar11: 'MyEvar11',
@@ -121,21 +131,20 @@ newRules: [{
   },
   conditions: [
     function(event, target) {
-      return !_satellite.util.isLinked(target)
+      return !_satellite.utils.isLinked(target)
     }
   ],
   actions: [{
     extensionInstanceIds: ['abcdef'],
-    script: adobeAnalyticsAction,
+    method: 'trackLink',
     settings: {
-      trackType: 'link',
       trackVars: {
         linkType: 'o',
         linkName: 'MyLink',
         pageName: 'MyPageName',
         eVar20: 'MyDeadHeaderEvar',
         prop20: 'D=v20',
-        campaign: _satellite.util.queryParams.getQueryParam('dead')
+        campaign: _satellite.utils.queryParams.getQueryParam('dead')
       },
       trackEvents: [
         'event20:deadevent'
@@ -187,13 +196,13 @@ newRules: [{
         "setVars": {
           "eVar20": "MyDeadHeaderEvar",
           "prop20": "D=v20",
-          "campaign": _satellite.util.queryParams.getQueryParam('dead')
+          "campaign": _satellite.utils.queryParams.getQueryParam('dead')
         },
         "addEvent": ["event20:deadevent"]
       }]
     }],
     "conditions": [function(event, target) {
-      return !_satellite.util.isLinked(target)
+      return !_satellite.utils.isLinked(target)
     }],
     "selector": "h1, h2, h3, h4, h5",
     "event": "click",
@@ -204,7 +213,7 @@ newRules: [{
   //{"name":"Dead Header","trigger":[{"engine":"sc","command":"trackPageView","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
   //    SL.getQueryParam('dead')
   //},"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
-  //  return !_satellite.util.isLinked(target)
+  //  return !_satellite.utils.isLinked(target)
   //}],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false},
   //{"name":"Download Link","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"d","linkName":"%this.href%"}]},{"command":"delayActivateLink"}],"selector":"a","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false,"property":{"href":/\.(?:doc|docx|eps|xls|ppt|pptx|pdf|xlsx|tab|csv|zip|txt|vsd|vxd|xml|js|css|rar|exe|wma|mov|avi|wmv|mp3|wav|m4v)($|\&|\?)/i}}
 ],

@@ -1,5 +1,5 @@
 var methods = {};
-var escapeForHtml = require('./escapeForHTML.js');
+var escapeForHtml = require('./escapeForHTML');
 
 methods.parseQueryParams = function(str){
   var URIDecode = function (str) {

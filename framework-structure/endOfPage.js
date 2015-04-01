@@ -1,5 +1,5 @@
-var state = require('../data/state.js');
-var events = require('../events/events.js');
+var state = require('./data/state');
+var events = require('./events/events');
 
 module.exports = function(){
   if (!state.initialized) return;

@@ -24,17 +24,17 @@ var $ = require('gulp-load-plugins')();
 
 gulp.task("webpack", function() {
   return gulp.src('./framework-structure/bootstrap.js')
-  .pipe($.webpack({
+    .pipe($.webpack({
       output: {
         filename: "bundle.js"
       },
       devtool: "#inline-source-map",
       resolve: {
-        extensions: ['','.js']
+        extensions: ['', '.js']
       }
     })).pipe(gulp.dest('./framework-structure/dist/'));
 });
 
-gulp.task('watch', function () {
+gulp.task('watch', function() {
   gulp.watch(['./framework-structure/**/*.js', '!./framework-structure/dist/**/*'], ['webpack']);
 });

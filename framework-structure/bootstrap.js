@@ -121,7 +121,7 @@ newRules: [{
   },
   conditions: [
     function(event, target) {
-      return !_satellite.isLinked(target)
+      return !_satellite.util.isLinked(target)
     }
   ],
   actions: [{
@@ -135,7 +135,7 @@ newRules: [{
         pageName: 'MyPageName',
         eVar20: 'MyDeadHeaderEvar',
         prop20: 'D=v20',
-        campaign: _satellite.queryParams.getQueryParam('dead')
+        campaign: _satellite.util.queryParams.getQueryParam('dead')
       },
       trackEvents: [
         'event20:deadevent'
@@ -187,13 +187,13 @@ newRules: [{
         "setVars": {
           "eVar20": "MyDeadHeaderEvar",
           "prop20": "D=v20",
-          "campaign": _satellite.queryParams.getQueryParam('dead')
+          "campaign": _satellite.util.queryParams.getQueryParam('dead')
         },
         "addEvent": ["event20:deadevent"]
       }]
     }],
     "conditions": [function(event, target) {
-      return !_satellite.isLinked(target)
+      return !_satellite.util.isLinked(target)
     }],
     "selector": "h1, h2, h3, h4, h5",
     "event": "click",
@@ -204,7 +204,7 @@ newRules: [{
   //{"name":"Dead Header","trigger":[{"engine":"sc","command":"trackPageView","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
   //    SL.getQueryParam('dead')
   //},"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
-  //  return !_satellite.isLinked(target)
+  //  return !_satellite.util.isLinked(target)
   //}],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false},
   //{"name":"Download Link","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"d","linkName":"%this.href%"}]},{"command":"delayActivateLink"}],"selector":"a","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false,"property":{"href":/\.(?:doc|docx|eps|xls|ppt|pptx|pdf|xlsx|tab|csv|zip|txt|vsd|vxd|xml|js|css|rar|exe|wma|mov|avi|wmv|mp3|wav|m4v)($|\&|\?)/i}}
 ],

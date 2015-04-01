@@ -1,6 +1,6 @@
 var state = require('../data/state.js');
 
-var ensureCSSSelector = function(){
+_satellite.polyfill.ensureCSSSelector = function(){
   if (document.querySelectorAll){
     state.hasSelector = true
     return
@@ -13,13 +13,13 @@ var ensureCSSSelector = function(){
       return
     }
     var pending = SL.onEvent.pendingEvents
-    _satellite.util.each(pending, function(evt){
+    _satellite.each(pending, function(evt){
       SL.handleEvent(evt)
     }, this)
     SL.onEvent = SL.handleEvent
     state.hasSelector = true
     ;delete state.loadingSizzle
-    _satellite.util.each(state.sizzleQueue, function(item){
+    _satellite.each(state.sizzleQueue, function(item){
       SL.cssQuery(item[0], item[1])
     })
     ;delete SL.sizzleQueue

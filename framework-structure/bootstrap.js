@@ -2,6 +2,7 @@ window._satellite = {};
 
 _satellite.utils = require('./utils/public/index');
 _satellite.data = require('./data/public/index');
+_satellite.pageBottom = require('./endOfPage');
 
 // TODO: This will need to be more flexible to handle inclusion of only the extensions
 // configured for the property.
@@ -21,36 +22,47 @@ var createExtensionInstances = function(propertyMeta) {
   }
 
   return instances;
-}
+};
 
 _satellite.init = function(propertyMeta) {
   _satellite.appVersion = propertyMeta.appVersion;
   _satellite.extensionInstances = createExtensionInstances(propertyMeta);
-
-  // TODO: Temporary for testing.
-  setTimeout(function() {
-    var rule = propertyMeta.newRules[0];
-    rule.actions.forEach(function(action) {
-      action.extensionInstanceIds.forEach(function(instanceId) {
-        var instance = _satellite.extensionInstances[instanceId];
-        instance[action.method](action.settings);
-      });
-    });
-  }, 2000);
+  require('./rules/initRules')(propertyMeta);
 };
+
+
+
+var click = function(eventSettingsCollection, callback) {
+  // setup direct bindings time bindings
+  for( var i = eventSettingsCollection.length-1; i >= 0; i--){
+    eventSettings = eventSettingsCollection[i];
+    if(eventSettings.eventHandlerOnElement){
+      // TODO: setup polling here
+      // TODO: wait for dom before attching listener
+      _satellite.utils.addEventListener(
+        _satellite.utils.querySelectorAll(eventSettings.selector)[0],
+        'click',
+        callback.bind(this,eventSettings)
+      );
+
+      eventSettingsCollection.splice(i,1);
+    }
+  }
+  // setup global event listener
+  _satellite.utils.addEventListener(document, 'click', function(event) {
+    _satellite.utils.each(eventSettingsCollection, function (eventSettings) {
+      if (eventSettings.selector && _satellite.utils.matchesCss(eventSettings.selector, event.target)) {
+        callback(eventSettings);
+      }
+    });
+  });
+};
+
+
 
 _satellite.init({
 "events": {
-  'click': function(eventSettingsCollection, callback) {
-    document.addEventListener('click', function(event) {
-      for (var i = 0; i < eventSettingsCollection.length; i++) {
-        var eventSettings = eventSettingsCollection[i];
-        if (eventSettings.selector && _satellite.matchsCSS(eventSettings.selector, event.target)) {
-          callback(eventSettings);
-        }
-      }
-    });
-  }
+  'click': click
 },
 "tools": {
   "f489afdcde1a53ef58aec319401144f7": {
@@ -136,8 +148,7 @@ newRules: [{
       ]
     }
   }]
-}, {
-  // TODO Needs event stuff.
+},{
   name: 'Dead Header Rule',
   event: {
     type: 'click',
@@ -147,7 +158,44 @@ newRules: [{
   },
   conditions: [
     function(event, target) {
-      return !_satellite.utils.isLinked(target)
+      return !_satellite.utils.isLinked(target);
+    }
+  ],
+  actions: [{
+    extensionInstanceIds: ['abcdef'],
+    method: 'trackLink',
+    settings: {
+      trackVars: {
+        linkType: 'o',
+        linkName: 'MyLink',
+        pageName: 'MyPageName',
+        eVar20: 'MyDeadHeaderEvar',
+        prop20: 'D=v20',
+        campaign: _satellite.utils.queryParams.getQueryParam('dead')
+      },
+      trackEvents: [
+        'event20:deadevent'
+      ]
+    }
+  }]
+},{
+  name: 'Crazy Test Rule',
+  event: {
+    type: 'click',
+    settings: {
+      selector: 'h1, h2, h3, h4, h5',
+      'bubbleFireIfParent': true,
+      'bubbleFireIfChildFired': false,
+      'bubbleStop': true,
+      'property': {
+        'className': 'test'
+      },
+//      'eventHandlerOnElement': true
+    },
+  },
+  conditions: [
+    function(event, target) {
+      return !_satellite.utils.isLinked(target);
     }
   ],
   actions: [{

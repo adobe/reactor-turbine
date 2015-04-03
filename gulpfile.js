@@ -38,3 +38,5 @@ gulp.task("webpack", function() {
 gulp.task('watch', function() {
   gulp.watch(['./framework-structure/**/*.js', '!./framework-structure/dist/**/*'], ['webpack']);
 });
+
+gulp.task('default', ['webpack','watch']);

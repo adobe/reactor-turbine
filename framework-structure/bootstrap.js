@@ -7,7 +7,7 @@ _satellite.pageBottom = require('./endOfPage');
 // TODO: This will need to be more flexible to handle inclusion of only the extensions
 // configured for the property.
 _satellite.availableExtensions = {
-  adobeAnalytics: require('./extensions/adobeAnalytics')
+  adobeAnalytics: require('./extensions/_adobeAnalytics')
 };
 
 var createExtensionInstances = function(propertyMeta) {

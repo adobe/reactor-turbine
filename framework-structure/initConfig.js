@@ -137,7 +137,7 @@ newRules: [{
       'property': {
         'className': 'test'
       },
-//      'eventHandlerOnElement': true
+     'eventHandlerOnElement': true
     },
   },
   conditions: [

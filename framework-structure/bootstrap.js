@@ -2,12 +2,12 @@ window._satellite = {};
 
 _satellite.utils = require('./utils/public/index');
 _satellite.data = require('./data/public/index');
-_satellite.pageBottom = require('./endOfPage');
+_satellite.pageBottom = require('./pageBottom');
 
 // TODO: This will need to be more flexible to handle inclusion of only the extensions
 // configured for the property.
 _satellite.availableExtensions = {
-  adobeAnalytics: require('./extensions/_adobeAnalytics')
+  adobeAnalytics: require('./extensions/AdobeAnalytics')
 };
 
 var createExtensionInstances = function(propertyMeta) {

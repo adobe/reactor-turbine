@@ -2230,10 +2230,7 @@
 // Initialize Satellite.
 //
 // - `settings` - all the settings that comprising a library.
-  SL.init = function(
-
-
-  ) {
+  SL.init = function(settings) {
     if (SL.stagingLibraryOverride())
       return
 
@@ -2307,29 +2304,7 @@
 
     SL.firePageLoadEvent('pagetop')
     SL.initialized = true
-
-    // TODO: This is temporary.
-    // Oh look an event occurred!
-    setTimeout(function() {
-      SL.executeRule(settings.extensions, settings.newRules[1]);
-    }, 2000);
   }
-
-  SL.executeRule = function(extensions, rule) {
-    for (var k = 0; k < rule.actions.length; k++) {
-      var action = rule.actions[k];
-      for (var m = 0; m < action.extensionInstanceIds.length; m++) {
-        var extensionInstanceId = action.extensionInstanceIds[m];
-        var extensionInstance = extensions[extensionInstanceId];
-        // TODO: Pass an options object instead?
-        action.script(
-            this.settings.settings,
-            extensionInstance.settings,
-            action.settings,
-            extensionInstanceId);
-      }
-    }
-  };
 
   SL.pageLoadPhases = ['aftertoolinit', 'pagetop', 'pagebottom', 'domready', 'windowload']
 
@@ -2419,129 +2394,12 @@
     });
 
     var userAgent = navigator.userAgent
-
-    var getBrowserWidth = function() {
-      return window.innerWidth ? window.innerWidth : document.documentElement.offsetWidth;
-    };
-
-    var getBrowserHeight = function() {
-      return window.innerHeight ? window.innerHeight : document.documentElement.offsetHeight;
-    };
-
-    var getResolution = function() {
-      return window.screen.width + "x" + window.screen.height;
-    };
-
-    var getColorDepth = function() {
-      return window.screen.pixelDepth ? window.screen.pixelDepth : window.screen.colorDepth;
-    };
-
-    var getJSVersion = function() {
-      var
-          tm = new Date,
-          a,o,i,
-          j = '1.2',
-          pn = 0;
-
-      if (tm.setUTCDate) {
-        j = '1.3';
-        if (pn.toPrecision) {
-          j = '1.5';
-          a = [];
-          if (a.forEach) {
-            j = '1.6';
-            i = 0;
-            o = {};
-            try {
-              i=new Iterator(o);
-              if (i.next) {
-                j = '1.7';
-                if (a.reduce) {
-                  j = '1.8';
-                  if (j.trim) {
-                    j = '1.8.1';
-                    if (Date.parse) {
-                      j = '1.8.2';
-                      if (Object.create) {
-                        j = '1.8.5';
-                      }
-                    }
-                  }
-                }
-              }
-            } catch (e) {}
-          }
-        }
-      }
-
-      return j;
-    };
-
-    var getIsJavaEnabled = function() {
-      return navigator.javaEnabled();
-    };
-
-    var getIsCookiesEnabled = function() {
-      return window.navigator.cookieEnabled;
-    };
-
-    // TODO: Can we get rid of this?
-    var getConnectionType = function() {
-      try {
-        document.body.addBehavior('#default#clientCaps');
-        return document.body.connectionType;
-      } catch (e) {}
-    };
-
-    // TODO: Can we get rid of this?
-    var getIsHomePage = function() {
-      try {
-        document.body.addBehavior('#default#homePage');
-        var isHomePage = document.body.isHomePage;
-        return isHomePage ? isHomePage(getTopFrameSet().location) : false;
-      } catch (e) {}
-    };
-
-    // TODO: Can we get rid of this?
-    var getTopFrameSet = function() {
-      // Get the top frame set
-      var
-          topFrameSet = window,
-          parent,
-          location;
-      try {
-        parent = topFrameSet.parent;
-        location = topFrameSet.location;
-        while ((parent) &&
-        (parent.location) &&
-        (location) &&
-        ('' + parent.location != '' + location) &&
-        (topFrameSet.location) &&
-        ('' + parent.location != '' + topFrameSet.location) &&
-        (parent.location.host == location.host)) {
-          topFrameSet = parent;
-          parent = topFrameSet.parent;
-        }
-      } catch (e) {}
-
-      return topFrameSet;
-    };
-
     SL.browserInfo = {
       browser: getBrowser(userAgent)
       , os: getOS(userAgent)
       , deviceType: getDeviceType(userAgent)
-      , getBrowserWidth: getBrowserWidth
-      , getBrowserHeight: getBrowserHeight
-      , resolution: getResolution()
-      , colorDepth: getColorDepth()
-      , jsVersion: getJSVersion()
-      , isJavaEnabled: getIsJavaEnabled()
-      , isCookiesEnabled: getIsCookiesEnabled()
-      , connectionType: getConnectionType()
-      , isHomePage: getIsHomePage()
     }
-  };
+  }
 
   SL.isHttps = function(){
     return 'https:' == document.location.protocol
@@ -2609,6 +2467,646 @@
 
 // Set Satellite to the global variable `_satellite`.
   window._satellite = SL
+
+// Orientation Change Event Emitter
+// ================================
+//
+// The `orientationchange` event on mobile devices fire when the devices switchs between
+// portrait and landscape modes. You can use `%event.orientation%` in your command arguments
+// to evaluate to either `portrait` or `landscape`.
+  function OrientationChangeEventEmitter(){
+    SL.addEventHandler(window, "orientationchange", OrientationChangeEventEmitter.orientationChange)
+  }
+  OrientationChangeEventEmitter.orientationChange = function (e) {
+    var orientation = window.orientation === 0 ?
+        'portrait' :
+        'landscape'
+    e.orientation = orientation
+    SL.onEvent(e)
+  }
+  SL.availableEventEmitters.push(OrientationChangeEventEmitter)
+
+// VideoPlayedEventEmitter
+// =======================
+//
+// Emits the `videoplayed` event, given a specified percentage or duration, i.e. `videoplayed`
+// is a parameterized event. A rule looks like this
+//
+//      {
+//          name: "Video 10% complete",
+//          event: "videoplayed(10%)",
+//          selector: "#video",
+//          trigger: [
+//              {
+//                  tool: "ga",
+//                  command: "trackEvent",
+//                  arguments: [
+//                      "video",
+//                      "video 10% complete",
+//                      "from: %URI%"
+//                  ]
+//              }
+//          ]
+//      }
+//
+// `10%` is in the paranthesis which indicates this rule will only fire when the 10%
+// of the total length of the video has been played.
+// You can also specifiy a duration in seconds, which looks like `videoplayed(8s)` - which
+// stands for 8 seconds.
+
+  function VideoPlayedEventEmitter(){
+    this.rules = SL.filter(SL.rules, function(rule){
+      return rule.event.substring(0, 11) === 'videoplayed'
+    })
+    this.eventHandler = SL.bind(this.onUpdateTime, this)
+  }
+  VideoPlayedEventEmitter.prototype = {
+    backgroundTasks: function(){
+      var eventHandler = this.eventHandler
+      SL.each(this.rules, function(rule){
+        SL.cssQuery(rule.selector || 'video', function(elms){
+          SL.each(elms, function(elm){
+            if (SL.$data(elm, 'videoplayed.tracked')) return
+            SL.addEventHandler(elm, 'timeupdate', SL.throttle(eventHandler, 100))
+            SL.$data(elm, 'videoplayed.tracked', true)
+          })
+        })
+      })
+    },
+    evalRule: function(elm, rule){
+      var eventType = rule.event
+          , seekable = elm.seekable
+          , startTime = seekable.start(0)
+          , endTime = seekable.end(0)
+          , currentTime = elm.currentTime
+          , m = rule.event.match(/^videoplayed\(([0-9]+)([s%])\)$/)
+      if (!m) return
+      var unit = m[2]
+          , amount = Number(m[1])
+      var func = unit === '%' ?
+          function(){
+            return amount <=
+                100 * (currentTime - startTime) / (endTime - startTime)
+          } :
+          function(){
+            return amount <= currentTime - startTime
+          }
+      if (!SL.$data(elm, eventType) && func()){
+        SL.$data(elm, eventType, true)
+        SL.onEvent({type: eventType, target: elm})
+      }
+    },
+    onUpdateTime: function(e){
+      var rules = this.rules
+          , elm = e.target
+      if (!elm.seekable || elm.seekable.length === 0) return
+      for (var i = 0, len = rules.length; i < len; i++)
+        this.evalRule(elm, rules[i])
+    }
+  }
+  SL.availableEventEmitters.push(VideoPlayedEventEmitter)
+
+// InviewEventEmitter
+// ==================
+//
+// Emits the `inview` event. The `inview` event fires on an element when the element
+// first comes into the view of the user. If the element is in view immediately upon page
+// load, it will be fired right away, if it only comes in view after some scrolling, it
+// will fire then. An optional delay interval `inviewDelay` can be specified in the rule
+// which determine how long the element has to be in view for before the event fires,
+// of which the default value is 1 second.
+
+  function InViewEventEmitter(rules){
+    rules = rules || SL.rules
+    this.rules = SL.filter(rules, function(rule){
+      return rule.event === 'inview'
+    })
+    this.elements = []
+    this.eventHandler = SL.bind(this.track, this)
+    SL.addEventHandler(window, 'scroll', this.eventHandler)
+    SL.addEventHandler(window, 'load', this.eventHandler)
+  }
+
+// Util functions needed by `InViewEventEmitter`
+  InViewEventEmitter.offset = function(elem) {
+    var box
+
+    try {
+      box = elem.getBoundingClientRect()
+    } catch(e) {}
+
+    var doc = document,
+        docElem = doc.documentElement
+
+    var body = doc.body,
+        win = window,
+        clientTop  = docElem.clientTop  || body.clientTop  || 0,
+        clientLeft = docElem.clientLeft || body.clientLeft || 0,
+        scrollTop  = win.pageYOffset || docElem.scrollTop  || body.scrollTop,
+        scrollLeft = win.pageXOffset || docElem.scrollLeft || body.scrollLeft,
+        top  = box.top  + scrollTop  - clientTop,
+        left = box.left + scrollLeft - clientLeft
+
+    return { top: top, left: left }
+  }
+  InViewEventEmitter.getViewportHeight = function() {
+    var height = window.innerHeight // Safari, Opera
+    var mode = document.compatMode
+
+    if (mode) { // IE, Gecko
+      height = (mode == 'CSS1Compat') ?
+          document.documentElement.clientHeight : // Standards
+          document.body.clientHeight // Quirks
+    }
+
+    return height
+  }
+  InViewEventEmitter.getScrollTop = function(){
+    return (document.documentElement.scrollTop ?
+        document.documentElement.scrollTop :
+        document.body.scrollTop)
+  }
+
+  InViewEventEmitter.prototype = {
+    backgroundTasks: function(){
+      var elements = this.elements
+          , self = this
+      SL.each(this.rules, function(rule){
+        SL.cssQuery(rule.selector, function(elms){
+          var addCount = 0
+          SL.each(elms, function(elm){
+            if (!SL.contains(elements, elm)){
+              elements.push(elm)
+              addCount++
+            }
+          })
+          if (addCount){
+            SL.notify(rule.selector + ' added ' + addCount + ' elements.', 1)
+          }
+        })
+      })
+      this.track()
+    },
+    elementIsInView: function(el){
+      var vpH = InViewEventEmitter.getViewportHeight()
+          , scrolltop = InViewEventEmitter.getScrollTop()
+          , top = InViewEventEmitter.offset(el).top
+          , height = el.offsetHeight
+      return !(scrolltop > (top + height) || scrolltop + vpH < top)
+    },
+    checkInView: function(el, recheck){
+      var inview = SL.$data(el, 'inview')
+      if (this.elementIsInView(el)) {
+        // it is in view now
+        if (!inview)
+          SL.$data(el, 'inview', true)
+        var self = this
+        this.processRules(el, function(rule, viewedProp, timeoutIdProp){
+          if (recheck || !rule.inviewDelay){
+            SL.$data(el, viewedProp, true)
+            SL.onEvent({type: 'inview', target: el, inviewDelay: rule.inviewDelay})
+          }else if(rule.inviewDelay){
+            var timeout = SL.$data(el, timeoutIdProp)
+            if (timeout)
+              clearTimeout(timeout)
+            timeout = setTimeout(function(){
+              self.checkInView(el, true)
+            }, rule.inviewDelay)
+            SL.$data(el, timeoutIdProp, timeout)
+          }
+        })
+      } else {
+        // it is not in view now
+        if (inview)
+          SL.$data(el, 'inview', false)
+        this.processRules(el, function(rule, viewedProp, timeoutIdProp){
+          var timeout = SL.$data(el, timeoutIdProp)
+          if (timeout){
+            clearTimeout(timeout)
+          }
+        })
+      }
+    },
+    track: function(){
+      SL.each(this.elements, function(elm){
+        this.checkInView(elm)
+      }, this)
+    },
+    processRules: function(elm, callback){
+      SL.each(this.rules, function(rule, i){
+        // viewedProp: for rules that has a timeout, the definition for
+        // "viewed" is rule dependent. But for all rules that do not have
+        // a timeout, it is independent.
+        var viewedProp = rule.inviewDelay ? 'viewed_' + rule.inviewDelay : 'viewed'
+        var timeoutIdProp = 'inview_timeout_id_' + i
+        if (SL.$data(elm, viewedProp)) return
+        if (SL.matchesCss(rule.selector, elm)){
+          callback(rule, viewedProp, timeoutIdProp)
+        }
+      })
+    }
+  }
+
+  SL.availableEventEmitters.push(InViewEventEmitter)
+
+// Facebook Event Emitter
+// ======================
+//
+// Will track `edge.create`, `edge.remove` and `message.send` events from the Facebook
+// Javascript API and emit `facebook.like`, `facebook.unlike` and `facebook.send` events
+// respectively.
+
+  function FacebookEventEmitter(FB){
+    this.delay = 250;
+    this.FB = FB;
+
+    SL.domReady(SL.bind(function () {
+      SL.poll(SL.bind(this.initialize, this), this.delay, 8);
+    }, this));
+  }
+
+  FacebookEventEmitter.prototype = {
+    initialize: function() {
+      this.FB = this.FB || window.FB;
+
+      if (this.FB && this.FB.Event && this.FB.Event.subscribe) {
+        this.bind();
+        return true;
+      }
+    },
+
+    bind: function(){
+      this.FB.Event.subscribe('edge.create', function() {
+        SL.notify("tracking a facebook like", 1)
+        SL.onEvent({type: 'facebook.like', target: document})
+      });
+
+      this.FB.Event.subscribe('edge.remove', function() {
+        SL.notify("tracking a facebook unlike", 1)
+        SL.onEvent({type: 'facebook.unlike', target: document})
+      });
+
+      this.FB.Event.subscribe('message.send', function() {
+        SL.notify("tracking a facebook share", 1)
+        SL.onEvent({type: 'facebook.send', target: document})
+      });
+    }
+  }
+  SL.availableEventEmitters.push(FacebookEventEmitter);
+
+// Hover Event Emitter
+// =====================
+//
+// Emits the `hover` event in the event. This is better than `mouseover` because you can introduce a certain delay.
+// 
+//  {
+//        name: "Hover for 1 second"
+//        event: "hover(1000)",
+//        ...
+//  }
+  function HoverEventEmitter(){
+    var eventRegex = this.eventRegex = /^hover\(([0-9]+)\)$/
+    var rules = this.rules = []
+    SL.each(SL.rules, function(rule){
+      var m = rule.event.match(eventRegex)
+      if (m){
+        rules.push([
+          Number(rule.event.match(eventRegex)[1]),
+          rule.selector
+        ])
+      }
+    })
+  }
+  HoverEventEmitter.prototype = {
+    backgroundTasks: function(){
+      var self = this
+      SL.each(this.rules, function(rule){
+        var selector = rule[1]
+            , delay = rule[0]
+        SL.cssQuery(selector, function(newElms){
+          SL.each(newElms, function(elm){
+            self.trackElement(elm, delay)
+          })
+        })
+      }, this)
+    },
+    trackElement: function(elm, delay){
+      var self = this
+          , trackDelays = SL.$data(elm, 'hover.delays')
+      if (!trackDelays){
+        SL.addEventHandler(elm, 'mouseover', function(e){
+          self.onMouseOver(e, elm)
+        })
+        SL.addEventHandler(elm, 'mouseout', function(e){
+          self.onMouseOut(e, elm)
+        })
+        SL.$data(elm, 'hover.delays', [delay])
+      }
+      else if (!SL.contains(trackDelays, delay)){
+        trackDelays.push(delay)
+      }
+    },
+    onMouseOver: function(e, elem){
+      var target = e.target || e.srcElement
+          , related = e.relatedTarget || e.fromElement
+          , hit = (elem === target || SL.containsElement(elem, target)) &&
+              !SL.containsElement(elem, related)
+      if (hit)
+        this.onMouseEnter(elem)
+    },
+    onMouseEnter: function(elm){
+      var delays = SL.$data(elm, 'hover.delays')
+      var delayTimers = SL.map(delays, function(delay){
+        return setTimeout(function(){
+          SL.onEvent({type: 'hover(' + delay + ')', target: elm})
+        }, delay)
+      })
+      SL.$data(elm, 'hover.delayTimers', delayTimers)
+    },
+    onMouseOut: function(e, elem){
+      var target = e.target || e.srcElement
+          , related = e.relatedTarget || e.toElement
+          , hit = (elem === target || SL.containsElement(elem, target)) &&
+              !SL.containsElement(elem, related)
+      if (hit)
+        this.onMouseLeave(elem)
+    },
+    onMouseLeave: function(elm){
+      var delayTimers = SL.$data(elm, 'hover.delayTimers')
+      if (delayTimers)
+        SL.each(delayTimers, function(timer){
+          clearTimeout(timer)
+        })
+    }
+  }
+  SL.availableEventEmitters.push(HoverEventEmitter)
+
+// ElementExistsEventEmitter
+// ==================
+//
+// Emits the `elementexists` event. The `elementexists` event fires when an element
+// of a specified selector becomes into existance - either because it's in the page
+// markup or dynamically injected later on. *Each rule only fires once.*
+
+  function ElementExistsEventEmitter(){
+    this.rules = SL.filter(SL.rules, function(rule){
+      return rule.event === 'elementexists'
+    })
+  }
+  ElementExistsEventEmitter.prototype.backgroundTasks = function(){
+    SL.each(this.rules, function(rule){
+      SL.cssQuery(rule.selector, function(elms){
+        if (elms.length > 0){
+          var elm = elms[0]
+          if (SL.$data(elm, 'elementexists.seen')) return
+          SL.$data(elm, 'elementexists.seen', true)
+          SL.onEvent({type: 'elementexists', target: elm})
+        }
+      })
+    })
+  }
+
+  SL.availableEventEmitters.push(ElementExistsEventEmitter)
+
+// Twitter Event Emitter
+// =====================
+//
+// Emits the `twitter.tweet` event in the event a user tweets from the site.
+  function TwitterEventEmitter(twttr){
+    SL.domReady(SL.bind(function () {
+      this.twttr = twttr || window.twttr;
+      this.initialize();
+    }, this));
+  }
+
+  TwitterEventEmitter.prototype = {
+    initialize: function(){
+      var twttr = this.twttr;
+      if (twttr && typeof twttr.ready === 'function') {
+        twttr.ready(SL.bind(this.bind, this));
+      }
+    },
+
+    bind: function(){
+      this.twttr.events.bind('tweet', function(event) {
+        if (event) {
+          SL.notify("tracking a tweet button", 1);
+          SL.onEvent({type: 'twitter.tweet', target: document});
+        }
+      });
+
+    }
+  }
+  SL.availableEventEmitters.push(TwitterEventEmitter)
+
+// Test & Target Tool
+// ==================
+//
+// This tool lets you use Test & Target with Satellite.
+//
+//
+
+  function Tnt(settings){
+    SL.BaseTool.call(this, settings)
+
+    this.styleElements = {}
+    this.targetPageParamsStore = {}
+  }
+  SL.inherit(Tnt, SL.BaseTool)
+  SL.extend(Tnt.prototype, {
+    name: 'tnt',
+
+    endPLPhase: function(pageLoadEvent) {
+      if (pageLoadEvent === 'aftertoolinit') {
+        this.initialize();
+      }
+    },
+
+    initialize: function() {
+      SL.notify('Test & Target: Initializing', 1)
+      this.initializeTargetPageParams()
+      this.load()
+    },
+
+    initializeTargetPageParams: function() {
+      if (window.targetPageParams) {
+        this.updateTargetPageParams(
+            this.parseTargetPageParamsResult(
+                window.targetPageParams()
+            )
+        )
+      }
+
+      this.updateTargetPageParams(this.settings.pageParams)
+
+      this.setTargetPageParamsFunction()
+    },
+
+    load: function(){
+      var url = this.getMboxURL(this.settings.mboxURL)
+      if (this.settings.initTool !== false){
+        if (this.settings.loadSync) {
+          SL.loadScriptSync(url)
+          this.onScriptLoaded()
+        } else {
+          SL.loadScript(url, SL.bind(this.onScriptLoaded, this))
+          this.initializing = true
+        }
+      } else {
+        this.initialized = true
+      }
+    },
+
+    getMboxURL: function(urlData) {
+      var url = urlData
+      if (SL.isObject(urlData)) {
+        if (window.location.protocol === 'https:')
+          url = urlData.https
+        else
+          url = urlData.http
+      }
+      if (!url.match(/^https?:/))
+        return SL.basePath() + url
+      else
+        return url
+    },
+
+    onScriptLoaded: function(){
+      SL.notify('Test & Target: loaded.', 1)
+
+      this.flushQueue()
+
+      this.initialized = true
+      this.initializing = false
+    },
+
+    $addMbox: function(elm, evt, settings){
+      var mboxGoesAround = settings.mboxGoesAround
+      var styleText = mboxGoesAround + '{visibility: hidden;}'
+      var styleElm = this.appendStyle(styleText)
+      if (!(mboxGoesAround in this.styleElements)){
+        this.styleElements[mboxGoesAround] = styleElm
+      }
+
+      if (this.initialized){
+        this.$addMBoxStep2(null, null, settings)
+      }else if (this.initializing){
+        this.queueCommand({
+          command: 'addMBoxStep2'
+          , "arguments": [settings]
+        }, elm, evt)
+      }
+    },
+    $addMBoxStep2: function(elm, evt, settings){
+      var mboxID = this.generateID()
+      var self = this
+      SL.addEventHandler(window, 'load', SL.bind(function(){
+        SL.cssQuery(settings.mboxGoesAround, function(elms){
+          var elem = elms[0]
+          if (!elem) return
+          var newDiv = document.createElement("div")
+          newDiv.id = mboxID
+          elem.parentNode.replaceChild(newDiv, elem)
+          newDiv.appendChild(elem)
+          window.mboxDefine(mboxID, settings.mboxName)
+          var args = [settings.mboxName]
+          if (settings.arguments){
+            args = args.concat(settings.arguments)
+          }
+          window.mboxUpdate.apply(null, args)
+          self.reappearWhenCallComesBack(elem, mboxID, settings.timeout, settings)
+        });
+      }, this))
+      this.lastMboxID = mboxID // leave this here for easier testing
+    },
+
+    $addTargetPageParams: function(elm, evt, pageParams) {
+      this.updateTargetPageParams(pageParams)
+    },
+
+    generateID: function(){
+      var id = '_sdsat_mbox_' + String(Math.random()).substring(2) + '_'
+      return id
+    },
+    appendStyle: function(css){
+      // <http://stackoverflow.com/a/524721/5304>
+      var head = document.getElementsByTagName('head')[0]
+          , style = document.createElement('style')
+      style.type = 'text/css'
+      if(style.styleSheet){
+        style.styleSheet.cssText = css
+      }else{
+        style.appendChild(document.createTextNode(css))
+      }
+      head.appendChild(style)
+      return style
+    },
+    reappearWhenCallComesBack: function(elmGoesAround, mboxID, timeout, settings){
+      var self = this
+
+      function reappear(){
+        var styleElm = self.styleElements[settings.mboxGoesAround]
+        if (styleElm){
+          styleElm.parentNode.removeChild(styleElm)
+          ;delete self.styleElements[settings.mboxGoesAround]
+        }
+      }
+
+      SL.cssQuery('script[src*="omtrdc.net"]', function(results){
+        var script = results[0]
+        if (script){
+          SL.scriptOnLoad(script.src, script, function(){
+            SL.notify('Test & Target: request complete', 1)
+            reappear()
+            clearTimeout(timeoutID)
+          })
+          var timeoutID = setTimeout(function(){
+            SL.notify('Test & Target: bailing after ' + timeout + 'ms', 1)
+            reappear()
+          }, timeout)
+        }else{
+          SL.notify('Test & Target: failed to find T&T ajax call, bailing', 1)
+          reappear()
+        }
+      })
+    },
+
+    updateTargetPageParams: function(obj) {
+      var o = {}
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          o[SL.replace(key)] = SL.replace(obj[key])
+        }
+      }
+      SL.extend(
+          this.targetPageParamsStore,
+          o
+      )
+    },
+
+    getTargetPageParams: function() {
+      return this.targetPageParamsStore
+    },
+
+    setTargetPageParamsFunction: function() {
+      window.targetPageParams = SL.bind(this.getTargetPageParams, this)
+    },
+
+    parseTargetPageParamsResult: function(data) {
+      var result = data
+
+      if(SL.isArray(data)) {
+        data = data.join('&')
+      }
+
+      if (SL.isString(data)) {
+        result = SL.parseQueryParams(data)
+      }
+
+      return result
+    }
+  })
+  SL.availableTools.tnt = Tnt
 
 // Site Catalyst Tool
 // ---------------------
@@ -3024,430 +3522,70 @@
   })
   SL.availableTools.sc = SiteCatalystTool
 
-// Test & Target Tool
-// ==================
+// Basic Tool
+// ------------
 //
-// This tool lets you use Test & Target with Satellite.
-//
+// This is a generic tool that allows integrating with
+// various simple tools.
 //
 
-  function Tnt(settings){
+  function BasicTool(settings){
     SL.BaseTool.call(this, settings)
 
-    this.styleElements = {}
-    this.targetPageParamsStore = {}
+    this.name = settings.name || 'Basic'
   }
-  SL.inherit(Tnt, SL.BaseTool)
-  SL.extend(Tnt.prototype, {
-    name: 'tnt',
 
-    endPLPhase: function(pageLoadEvent) {
-      if (pageLoadEvent === 'aftertoolinit') {
-        this.initialize();
-      }
-    },
+  SL.inherit(BasicTool, SL.BaseTool)
 
-    initialize: function() {
-      SL.notify('Test & Target: Initializing', 1)
-      this.initializeTargetPageParams()
-      this.load()
-    },
-
-    initializeTargetPageParams: function() {
-      if (window.targetPageParams) {
-        this.updateTargetPageParams(
-            this.parseTargetPageParamsResult(
-                window.targetPageParams()
-            )
-        )
-      }
-
-      this.updateTargetPageParams(this.settings.pageParams)
-
-      this.setTargetPageParamsFunction()
-    },
-
-    load: function(){
-      var url = this.getMboxURL(this.settings.mboxURL)
+  SL.extend(BasicTool.prototype, {
+    initialize: function(){
+      var settings = this.settings
       if (this.settings.initTool !== false){
-        if (this.settings.loadSync) {
-          SL.loadScriptSync(url)
-          this.onScriptLoaded()
-        } else {
-          SL.loadScript(url, SL.bind(this.onScriptLoaded, this))
-          this.initializing = true
+        var url = settings.url
+        if (typeof url === 'string'){
+          url = SL.basePath() + url
+        }else{
+          url = SL.isHttps() ? url.https : url.http
         }
-      } else {
+        SL.loadScript(url, SL.bind(this.onLoad, this))
+        this.initializing = true
+      }else{
         this.initialized = true
       }
     },
-
-    getMboxURL: function(urlData) {
-      var url = urlData
-      if (SL.isObject(urlData)) {
-        if (window.location.protocol === 'https:')
-          url = urlData.https
-        else
-          url = urlData.http
-      }
-      if (!url.match(/^https?:/))
-        return SL.basePath() + url
-      else
-        return url
+    isQueueAvailable: function(){
+      return !this.initialized
     },
-
-    onScriptLoaded: function(){
-      SL.notify('Test & Target: loaded.', 1)
-
-      this.flushQueue()
-
+    onLoad: function(){
       this.initialized = true
       this.initializing = false
-    },
-
-    $addMbox: function(elm, evt, settings){
-      var mboxGoesAround = settings.mboxGoesAround
-      var styleText = mboxGoesAround + '{visibility: hidden;}'
-      var styleElm = this.appendStyle(styleText)
-      if (!(mboxGoesAround in this.styleElements)){
-        this.styleElements[mboxGoesAround] = styleElm
+      if (this.settings.initialBeacon){
+        this.settings.initialBeacon()
       }
-
-      if (this.initialized){
-        this.$addMBoxStep2(null, null, settings)
-      }else if (this.initializing){
+      this.flushQueue()
+    },
+    endPLPhase: function(pageLoadEvent){
+      var loadOn = this.settings.loadOn
+      if (pageLoadEvent === loadOn){
+        SL.notify(this.name + ': Initializing at ' + pageLoadEvent, 1)
+        this.initialize()
+      }
+    },
+    $fire: function(elm, evt, fun){
+      if (this.initializing){
         this.queueCommand({
-          command: 'addMBoxStep2'
-          , "arguments": [settings]
+          command: 'fire',
+          arguments: [fun]
         }, elm, evt)
-      }
-    },
-    $addMBoxStep2: function(elm, evt, settings){
-      var mboxID = this.generateID()
-      var self = this
-      SL.addEventHandler(window, 'load', SL.bind(function(){
-        SL.cssQuery(settings.mboxGoesAround, function(elms){
-          var elem = elms[0]
-          if (!elem) return
-          var newDiv = document.createElement("div")
-          newDiv.id = mboxID
-          elem.parentNode.replaceChild(newDiv, elem)
-          newDiv.appendChild(elem)
-          window.mboxDefine(mboxID, settings.mboxName)
-          var args = [settings.mboxName]
-          if (settings.arguments){
-            args = args.concat(settings.arguments)
-          }
-          window.mboxUpdate.apply(null, args)
-          self.reappearWhenCallComesBack(elem, mboxID, settings.timeout, settings)
-        });
-      }, this))
-      this.lastMboxID = mboxID // leave this here for easier testing
-    },
-
-    $addTargetPageParams: function(elm, evt, pageParams) {
-      this.updateTargetPageParams(pageParams)
-    },
-
-    generateID: function(){
-      var id = '_sdsat_mbox_' + String(Math.random()).substring(2) + '_'
-      return id
-    },
-    appendStyle: function(css){
-      // <http://stackoverflow.com/a/524721/5304>
-      var head = document.getElementsByTagName('head')[0]
-          , style = document.createElement('style')
-      style.type = 'text/css'
-      if(style.styleSheet){
-        style.styleSheet.cssText = css
-      }else{
-        style.appendChild(document.createTextNode(css))
-      }
-      head.appendChild(style)
-      return style
-    },
-    reappearWhenCallComesBack: function(elmGoesAround, mboxID, timeout, settings){
-      var self = this
-
-      function reappear(){
-        var styleElm = self.styleElements[settings.mboxGoesAround]
-        if (styleElm){
-          styleElm.parentNode.removeChild(styleElm)
-          ;delete self.styleElements[settings.mboxGoesAround]
-        }
-      }
-
-      SL.cssQuery('script[src*="omtrdc.net"]', function(results){
-        var script = results[0]
-        if (script){
-          SL.scriptOnLoad(script.src, script, function(){
-            SL.notify('Test & Target: request complete', 1)
-            reappear()
-            clearTimeout(timeoutID)
-          })
-          var timeoutID = setTimeout(function(){
-            SL.notify('Test & Target: bailing after ' + timeout + 'ms', 1)
-            reappear()
-          }, timeout)
-        }else{
-          SL.notify('Test & Target: failed to find T&T ajax call, bailing', 1)
-          reappear()
-        }
-      })
-    },
-
-    updateTargetPageParams: function(obj) {
-      var o = {}
-      for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          o[SL.replace(key)] = SL.replace(obj[key])
-        }
-      }
-      SL.extend(
-          this.targetPageParamsStore,
-          o
-      )
-    },
-
-    getTargetPageParams: function() {
-      return this.targetPageParamsStore
-    },
-
-    setTargetPageParamsFunction: function() {
-      window.targetPageParams = SL.bind(this.getTargetPageParams, this)
-    },
-
-    parseTargetPageParamsResult: function(data) {
-      var result = data
-
-      if(SL.isArray(data)) {
-        data = data.join('&')
-      }
-
-      if (SL.isString(data)) {
-        result = SL.parseQueryParams(data)
-      }
-
-      return result
-    }
-  })
-  SL.availableTools.tnt = Tnt
-
-// The Default Tool
-// ================
-//
-// The default tool comes with several handy utilities.
-
-  function DefaultTool(){
-    SL.BaseTool.call(this)
-
-    this.asyncScriptCallbackQueue = []
-    this.argsForBlockingScripts = []
-  }
-  SL.inherit(DefaultTool, SL.BaseTool)
-  SL.extend(DefaultTool.prototype, {
-    name: 'Default',
-
-    // `loadIframe(src, variables)`
-    // ----------------------------
-    //
-    // Dynamically create an iframe to load a URL.
-    //
-    // - src - the URL to load
-    // - variables - an object literal of which the key/value pairs will be used
-    //      to create the query string to use in the src URL
-    $loadIframe: function(elm, evt, options){
-      var pages = options.pages
-          , loadOn = options.loadOn
-      var doit = SL.bind(function(){
-        SL.each(pages, function(page){
-          this.loadIframe(elm, evt, page)
-        }, this)
-      }, this)
-      if (!loadOn) doit()
-      if (loadOn === 'domready') SL.domReady(doit)
-      if (loadOn === 'load') SL.addEventHandler(window, 'load', doit)
-    },
-
-    loadIframe: function(elm, evt, page){
-      var iframe = document.createElement('iframe')
-      iframe.style.display = 'none'
-      var host = SL.data.host
-          , data = page.data
-          , src = this.scriptURL(page.src)
-          , search = SL.searchVariables(data, elm, evt)
-      if (host)
-        src = SL.basePath() + src
-      src += search
-      iframe.src = src
-      var body = document.getElementsByTagName('body')[0]
-      if (body)
-        body.appendChild(iframe)
-      else
-        SL.domReady(function(){
-          document.getElementsByTagName('body')[0].appendChild(iframe)
-        })
-    },
-
-    scriptURL: function(url){
-      var scriptDir = SL.settings.scriptDir || ''
-      return scriptDir + url
-    },
-
-    // `loadScript(options)
-    // ------------------------------
-    //
-    // Load any number of Javascript files using dynamically generated script tags.
-    // If you provide multiple file URLs, they will be loaded sequentially.
-    $loadScript: function(elm, evt, options){
-      var scripts = options.scripts
-          , sequential = options.sequential
-          , loadOn = options.loadOn
-      var doit = SL.bind(function(){
-        if (sequential){
-          this.loadScripts(elm, evt, scripts)
-        }else{
-          SL.each(scripts, function(script){
-            this.loadScripts(elm, evt, [script])
-          }, this)
-        }
-      }, this)
-
-      if (!loadOn) doit()
-      else if (loadOn === 'domready') SL.domReady(doit)
-      else if (loadOn === 'load') SL.addEventHandler(window, 'load', doit)
-    },
-
-    loadScripts: function(elm, evt, scripts) {
-      try{
-        var scripts = scripts.slice(0)
-            , q = this.asyncScriptCallbackQueue
-            , lastScript
-            , target = evt.target || evt.srcElement
-            , self = this
-      }catch(e){
-        console.error('scripts is', SL.stringify(scripts))
-      }
-      function loadNext(){
-        if (q.length > 0 && lastScript){
-          var callback = q.shift()
-          callback.call(elm, evt, target)
-        }
-        var script = scripts.shift()
-        if (script){
-          var host = SL.data.host
-              , src = self.scriptURL(script.src)
-          if (host)
-            src = SL.basePath() + src
-          lastScript = script
-          SL.loadScript(src, loadNext)
-        }
-      }
-      loadNext()
-    },
-
-    $loadBlockingScript: function(elm, evt, options){
-      var scripts = options.scripts
-          , loadOn = options.loadOn
-      var doit = SL.bind(function(){
-        SL.each(scripts, function(script){
-          this.loadBlockingScript(elm, evt, script)
-        }, this)
-      }, this)
-      //if (!loadOn || loadOn === evt.type) doit()
-      doit()
-    },
-
-    loadBlockingScript: function(elm, evt, script){
-      /*jshint evil:true */
-      var src = this.scriptURL(script.src)
-          , host = SL.data.host
-          , target = evt.target || evt.srcElement
-      if (host)
-        src = SL.basePath() + src
-      this.argsForBlockingScripts.push([elm, evt, target])
-      SL.loadScriptSync(src)
-    },
-
-    pushAsyncScript: function(callback){
-      this.asyncScriptCallbackQueue.push(callback)
-    },
-
-    pushBlockingScript: function(callback){
-      var args = this.argsForBlockingScripts.shift()
-      var element = args[0]
-      callback.apply(element, args.slice(1))
-    },
-
-    // `writeHTML(html)`
-    // -----------------
-    //
-    // Write an HTML fragment onto the page using `document.write()`.
-    //
-    // - `html` - the HTML fragment
-    $writeHTML: function(elm, evt){
-      /*jshint evil:true */
-      if (SL.domReadyFired || !document.write){
-        SL.notify('Command writeHTML failed. You should try appending HTML using the async option.', 1)
         return
       }
-      if (evt.type !== 'pagebottom' && evt.type !== 'pagetop'){
-        SL.notify('You can only use writeHTML on the `pagetop` and `pagebottom` events.', 1)
-        return
-      }
-      for (var i = 2, len = arguments.length; i < len; i++){
-        var html = arguments[i].html
-        html = SL.replace(html, elm, evt)
-        document.write(html)
-      }
-    },
-
-    linkNeedsDelayActivate: function(a, win){
-      win = win || window
-      var tagName = a.tagName
-          , target = a.getAttribute('target')
-          , location = a.getAttribute('href')
-      if (tagName && tagName.toLowerCase() !== 'a')
-        return false
-      if (!location)
-        return false
-      else if (!target)
-        return true
-      else if (target === '_blank')
-        return false
-      else if (target === '_top')
-        return win.top === win
-      else if (target === '_parent')
-        return false
-      else if (target === '_self')
-        return true
-      else if (win.name)
-        return target === win.name
-      else
-        return true
-    },
-
-    // `delayActivateLink()`
-    // ---------------------
-    //
-    // Delay the activation of an anchor link by first using `evt.preventDefault()` on
-    // the click event, and then setting the window location to the destination after
-    // a small delay. The default delay is 100 milliseconds, which can be configured in
-    // `_satellite.settings.linkDelay`
-    $delayActivateLink: function(elm, evt){
-      if (!this.linkNeedsDelayActivate(elm)) return
-      SL.preventDefault(evt)
-      var linkDelay = SL.settings.linkDelay || 100
-      setTimeout(function(){
-        SL.setLocation(elm.href)
-      }, linkDelay)
-    },
-
-    isQueueable: function(trig){
-      return trig.command !== 'writeHTML'
+      fun.call(this.settings, elm, evt)
     }
   })
-  SL.availableTools['default'] = DefaultTool
+
+  SL.availableTools.am = BasicTool
+  SL.availableTools.adlens = BasicTool
+  SL.availableTools.__basic = BasicTool
 
 // The Google Analytics Universal Tool
 // ================
@@ -3915,70 +4053,221 @@
     }
   };
 
-// Basic Tool
-// ------------
+// The Default Tool
+// ================
 //
-// This is a generic tool that allows integrating with
-// various simple tools.
-//
+// The default tool comes with several handy utilities.
 
-  function BasicTool(settings){
-    SL.BaseTool.call(this, settings)
+  function DefaultTool(){
+    SL.BaseTool.call(this)
 
-    this.name = settings.name || 'Basic'
+    this.asyncScriptCallbackQueue = []
+    this.argsForBlockingScripts = []
   }
+  SL.inherit(DefaultTool, SL.BaseTool)
+  SL.extend(DefaultTool.prototype, {
+    name: 'Default',
 
-  SL.inherit(BasicTool, SL.BaseTool)
+    // `loadIframe(src, variables)`
+    // ----------------------------
+    //
+    // Dynamically create an iframe to load a URL.
+    //
+    // - src - the URL to load
+    // - variables - an object literal of which the key/value pairs will be used
+    //      to create the query string to use in the src URL
+    $loadIframe: function(elm, evt, options){
+      var pages = options.pages
+          , loadOn = options.loadOn
+      var doit = SL.bind(function(){
+        SL.each(pages, function(page){
+          this.loadIframe(elm, evt, page)
+        }, this)
+      }, this)
+      if (!loadOn) doit()
+      if (loadOn === 'domready') SL.domReady(doit)
+      if (loadOn === 'load') SL.addEventHandler(window, 'load', doit)
+    },
 
-  SL.extend(BasicTool.prototype, {
-    initialize: function(){
-      var settings = this.settings
-      if (this.settings.initTool !== false){
-        var url = settings.url
-        if (typeof url === 'string'){
-          url = SL.basePath() + url
+    loadIframe: function(elm, evt, page){
+      var iframe = document.createElement('iframe')
+      iframe.style.display = 'none'
+      var host = SL.data.host
+          , data = page.data
+          , src = this.scriptURL(page.src)
+          , search = SL.searchVariables(data, elm, evt)
+      if (host)
+        src = SL.basePath() + src
+      src += search
+      iframe.src = src
+      var body = document.getElementsByTagName('body')[0]
+      if (body)
+        body.appendChild(iframe)
+      else
+        SL.domReady(function(){
+          document.getElementsByTagName('body')[0].appendChild(iframe)
+        })
+    },
+
+    scriptURL: function(url){
+      var scriptDir = SL.settings.scriptDir || ''
+      return scriptDir + url
+    },
+
+    // `loadScript(options)
+    // ------------------------------
+    //
+    // Load any number of Javascript files using dynamically generated script tags.
+    // If you provide multiple file URLs, they will be loaded sequentially.
+    $loadScript: function(elm, evt, options){
+      var scripts = options.scripts
+          , sequential = options.sequential
+          , loadOn = options.loadOn
+      var doit = SL.bind(function(){
+        if (sequential){
+          this.loadScripts(elm, evt, scripts)
         }else{
-          url = SL.isHttps() ? url.https : url.http
+          SL.each(scripts, function(script){
+            this.loadScripts(elm, evt, [script])
+          }, this)
         }
-        SL.loadScript(url, SL.bind(this.onLoad, this))
-        this.initializing = true
-      }else{
-        this.initialized = true
+      }, this)
+
+      if (!loadOn) doit()
+      else if (loadOn === 'domready') SL.domReady(doit)
+      else if (loadOn === 'load') SL.addEventHandler(window, 'load', doit)
+    },
+
+    loadScripts: function(elm, evt, scripts) {
+      try{
+        var scripts = scripts.slice(0)
+            , q = this.asyncScriptCallbackQueue
+            , lastScript
+            , target = evt.target || evt.srcElement
+            , self = this
+      }catch(e){
+        console.error('scripts is', SL.stringify(scripts))
       }
-    },
-    isQueueAvailable: function(){
-      return !this.initialized
-    },
-    onLoad: function(){
-      this.initialized = true
-      this.initializing = false
-      if (this.settings.initialBeacon){
-        this.settings.initialBeacon()
+      function loadNext(){
+        if (q.length > 0 && lastScript){
+          var callback = q.shift()
+          callback.call(elm, evt, target)
+        }
+        var script = scripts.shift()
+        if (script){
+          var host = SL.data.host
+              , src = self.scriptURL(script.src)
+          if (host)
+            src = SL.basePath() + src
+          lastScript = script
+          SL.loadScript(src, loadNext)
+        }
       }
-      this.flushQueue()
+      loadNext()
     },
-    endPLPhase: function(pageLoadEvent){
-      var loadOn = this.settings.loadOn
-      if (pageLoadEvent === loadOn){
-        SL.notify(this.name + ': Initializing at ' + pageLoadEvent, 1)
-        this.initialize()
-      }
+
+    $loadBlockingScript: function(elm, evt, options){
+      var scripts = options.scripts
+          , loadOn = options.loadOn
+      var doit = SL.bind(function(){
+        SL.each(scripts, function(script){
+          this.loadBlockingScript(elm, evt, script)
+        }, this)
+      }, this)
+      //if (!loadOn || loadOn === evt.type) doit()
+      doit()
     },
-    $fire: function(elm, evt, fun){
-      if (this.initializing){
-        this.queueCommand({
-          command: 'fire',
-          arguments: [fun]
-        }, elm, evt)
+
+    loadBlockingScript: function(elm, evt, script){
+      /*jshint evil:true */
+      var src = this.scriptURL(script.src)
+          , host = SL.data.host
+          , target = evt.target || evt.srcElement
+      if (host)
+        src = SL.basePath() + src
+      this.argsForBlockingScripts.push([elm, evt, target])
+      SL.loadScriptSync(src)
+    },
+
+    pushAsyncScript: function(callback){
+      this.asyncScriptCallbackQueue.push(callback)
+    },
+
+    pushBlockingScript: function(callback){
+      var args = this.argsForBlockingScripts.shift()
+      var element = args[0]
+      callback.apply(element, args.slice(1))
+    },
+
+    // `writeHTML(html)`
+    // -----------------
+    //
+    // Write an HTML fragment onto the page using `document.write()`.
+    //
+    // - `html` - the HTML fragment
+    $writeHTML: function(elm, evt){
+      /*jshint evil:true */
+      if (SL.domReadyFired || !document.write){
+        SL.notify('Command writeHTML failed. You should try appending HTML using the async option.', 1)
         return
       }
-      fun.call(this.settings, elm, evt)
+      if (evt.type !== 'pagebottom' && evt.type !== 'pagetop'){
+        SL.notify('You can only use writeHTML on the `pagetop` and `pagebottom` events.', 1)
+        return
+      }
+      for (var i = 2, len = arguments.length; i < len; i++){
+        var html = arguments[i].html
+        html = SL.replace(html, elm, evt)
+        document.write(html)
+      }
+    },
+
+    linkNeedsDelayActivate: function(a, win){
+      win = win || window
+      var tagName = a.tagName
+          , target = a.getAttribute('target')
+          , location = a.getAttribute('href')
+      if (tagName && tagName.toLowerCase() !== 'a')
+        return false
+      if (!location)
+        return false
+      else if (!target)
+        return true
+      else if (target === '_blank')
+        return false
+      else if (target === '_top')
+        return win.top === win
+      else if (target === '_parent')
+        return false
+      else if (target === '_self')
+        return true
+      else if (win.name)
+        return target === win.name
+      else
+        return true
+    },
+
+    // `delayActivateLink()`
+    // ---------------------
+    //
+    // Delay the activation of an anchor link by first using `evt.preventDefault()` on
+    // the click event, and then setting the window location to the destination after
+    // a small delay. The default delay is 100 milliseconds, which can be configured in
+    // `_satellite.settings.linkDelay`
+    $delayActivateLink: function(elm, evt){
+      if (!this.linkNeedsDelayActivate(elm)) return
+      SL.preventDefault(evt)
+      var linkDelay = SL.settings.linkDelay || 100
+      setTimeout(function(){
+        SL.setLocation(elm.href)
+      }, linkDelay)
+    },
+
+    isQueueable: function(trig){
+      return trig.command !== 'writeHTML'
     }
   })
-
-  SL.availableTools.am = BasicTool
-  SL.availableTools.adlens = BasicTool
-  SL.availableTools.__basic = BasicTool
+  SL.availableTools['default'] = DefaultTool
 
 // The Marketing Cloud Visitor ID Service Tool
 // ================
@@ -4156,712 +4445,6 @@
     }
   }
 
-// ElementExistsEventEmitter
-// ==================
-//
-// Emits the `elementexists` event. The `elementexists` event fires when an element
-// of a specified selector becomes into existance - either because it's in the page
-// markup or dynamically injected later on. *Each rule only fires once.*
-
-  function ElementExistsEventEmitter(){
-    this.rules = SL.filter(SL.rules, function(rule){
-      return rule.event === 'elementexists'
-    })
-  }
-  ElementExistsEventEmitter.prototype.backgroundTasks = function(){
-    SL.each(this.rules, function(rule){
-      SL.cssQuery(rule.selector, function(elms){
-        if (elms.length > 0){
-          var elm = elms[0]
-          if (SL.$data(elm, 'elementexists.seen')) return
-          SL.$data(elm, 'elementexists.seen', true)
-          SL.onEvent({type: 'elementexists', target: elm})
-        }
-      })
-    })
-  }
-
-  SL.availableEventEmitters.push(ElementExistsEventEmitter)
-
-// VideoPlayedEventEmitter
-// =======================
-//
-// Emits the `videoplayed` event, given a specified percentage or duration, i.e. `videoplayed`
-// is a parameterized event. A rule looks like this
-//
-//      {
-//          name: "Video 10% complete",
-//          event: "videoplayed(10%)",
-//          selector: "#video",
-//          trigger: [
-//              {
-//                  tool: "ga",
-//                  command: "trackEvent",
-//                  arguments: [
-//                      "video",
-//                      "video 10% complete",
-//                      "from: %URI%"
-//                  ]
-//              }
-//          ]
-//      }
-//
-// `10%` is in the paranthesis which indicates this rule will only fire when the 10%
-// of the total length of the video has been played.
-// You can also specifiy a duration in seconds, which looks like `videoplayed(8s)` - which
-// stands for 8 seconds.
-
-  function VideoPlayedEventEmitter(){
-    this.rules = SL.filter(SL.rules, function(rule){
-      return rule.event.substring(0, 11) === 'videoplayed'
-    })
-    this.eventHandler = SL.bind(this.onUpdateTime, this)
-  }
-  VideoPlayedEventEmitter.prototype = {
-    backgroundTasks: function(){
-      var eventHandler = this.eventHandler
-      SL.each(this.rules, function(rule){
-        SL.cssQuery(rule.selector || 'video', function(elms){
-          SL.each(elms, function(elm){
-            if (SL.$data(elm, 'videoplayed.tracked')) return
-            SL.addEventHandler(elm, 'timeupdate', SL.throttle(eventHandler, 100))
-            SL.$data(elm, 'videoplayed.tracked', true)
-          })
-        })
-      })
-    },
-    evalRule: function(elm, rule){
-      var eventType = rule.event
-          , seekable = elm.seekable
-          , startTime = seekable.start(0)
-          , endTime = seekable.end(0)
-          , currentTime = elm.currentTime
-          , m = rule.event.match(/^videoplayed\(([0-9]+)([s%])\)$/)
-      if (!m) return
-      var unit = m[2]
-          , amount = Number(m[1])
-      var func = unit === '%' ?
-          function(){
-            return amount <=
-                100 * (currentTime - startTime) / (endTime - startTime)
-          } :
-          function(){
-            return amount <= currentTime - startTime
-          }
-      if (!SL.$data(elm, eventType) && func()){
-        SL.$data(elm, eventType, true)
-        SL.onEvent({type: eventType, target: elm})
-      }
-    },
-    onUpdateTime: function(e){
-      var rules = this.rules
-          , elm = e.target
-      if (!elm.seekable || elm.seekable.length === 0) return
-      for (var i = 0, len = rules.length; i < len; i++)
-        this.evalRule(elm, rules[i])
-    }
-  }
-  SL.availableEventEmitters.push(VideoPlayedEventEmitter)
-
-// InviewEventEmitter
-// ==================
-//
-// Emits the `inview` event. The `inview` event fires on an element when the element
-// first comes into the view of the user. If the element is in view immediately upon page
-// load, it will be fired right away, if it only comes in view after some scrolling, it
-// will fire then. An optional delay interval `inviewDelay` can be specified in the rule
-// which determine how long the element has to be in view for before the event fires,
-// of which the default value is 1 second.
-
-  function InViewEventEmitter(rules){
-    rules = rules || SL.rules
-    this.rules = SL.filter(rules, function(rule){
-      return rule.event === 'inview'
-    })
-    this.elements = []
-    this.eventHandler = SL.bind(this.track, this)
-    SL.addEventHandler(window, 'scroll', this.eventHandler)
-    SL.addEventHandler(window, 'load', this.eventHandler)
-  }
-
-// Util functions needed by `InViewEventEmitter`
-  InViewEventEmitter.offset = function(elem) {
-    var box
-
-    try {
-      box = elem.getBoundingClientRect()
-    } catch(e) {}
-
-    var doc = document,
-        docElem = doc.documentElement
-
-    var body = doc.body,
-        win = window,
-        clientTop  = docElem.clientTop  || body.clientTop  || 0,
-        clientLeft = docElem.clientLeft || body.clientLeft || 0,
-        scrollTop  = win.pageYOffset || docElem.scrollTop  || body.scrollTop,
-        scrollLeft = win.pageXOffset || docElem.scrollLeft || body.scrollLeft,
-        top  = box.top  + scrollTop  - clientTop,
-        left = box.left + scrollLeft - clientLeft
-
-    return { top: top, left: left }
-  }
-  InViewEventEmitter.getViewportHeight = function() {
-    var height = window.innerHeight // Safari, Opera
-    var mode = document.compatMode
-
-    if (mode) { // IE, Gecko
-      height = (mode == 'CSS1Compat') ?
-          document.documentElement.clientHeight : // Standards
-          document.body.clientHeight // Quirks
-    }
-
-    return height
-  }
-  InViewEventEmitter.getScrollTop = function(){
-    return (document.documentElement.scrollTop ?
-        document.documentElement.scrollTop :
-        document.body.scrollTop)
-  }
-
-  InViewEventEmitter.prototype = {
-    backgroundTasks: function(){
-      var elements = this.elements
-          , self = this
-      SL.each(this.rules, function(rule){
-        SL.cssQuery(rule.selector, function(elms){
-          var addCount = 0
-          SL.each(elms, function(elm){
-            if (!SL.contains(elements, elm)){
-              elements.push(elm)
-              addCount++
-            }
-          })
-          if (addCount){
-            SL.notify(rule.selector + ' added ' + addCount + ' elements.', 1)
-          }
-        })
-      })
-      this.track()
-    },
-    elementIsInView: function(el){
-      var vpH = InViewEventEmitter.getViewportHeight()
-          , scrolltop = InViewEventEmitter.getScrollTop()
-          , top = InViewEventEmitter.offset(el).top
-          , height = el.offsetHeight
-      return !(scrolltop > (top + height) || scrolltop + vpH < top)
-    },
-    checkInView: function(el, recheck){
-      var inview = SL.$data(el, 'inview')
-      if (this.elementIsInView(el)) {
-        // it is in view now
-        if (!inview)
-          SL.$data(el, 'inview', true)
-        var self = this
-        this.processRules(el, function(rule, viewedProp, timeoutIdProp){
-          if (recheck || !rule.inviewDelay){
-            SL.$data(el, viewedProp, true)
-            SL.onEvent({type: 'inview', target: el, inviewDelay: rule.inviewDelay})
-          }else if(rule.inviewDelay){
-            var timeout = SL.$data(el, timeoutIdProp)
-            if (timeout)
-              clearTimeout(timeout)
-            timeout = setTimeout(function(){
-              self.checkInView(el, true)
-            }, rule.inviewDelay)
-            SL.$data(el, timeoutIdProp, timeout)
-          }
-        })
-      } else {
-        // it is not in view now
-        if (inview)
-          SL.$data(el, 'inview', false)
-        this.processRules(el, function(rule, viewedProp, timeoutIdProp){
-          var timeout = SL.$data(el, timeoutIdProp)
-          if (timeout){
-            clearTimeout(timeout)
-          }
-        })
-      }
-    },
-    track: function(){
-      SL.each(this.elements, function(elm){
-        this.checkInView(elm)
-      }, this)
-    },
-    processRules: function(elm, callback){
-      SL.each(this.rules, function(rule, i){
-        // viewedProp: for rules that has a timeout, the definition for
-        // "viewed" is rule dependent. But for all rules that do not have
-        // a timeout, it is independent.
-        var viewedProp = rule.inviewDelay ? 'viewed_' + rule.inviewDelay : 'viewed'
-        var timeoutIdProp = 'inview_timeout_id_' + i
-        if (SL.$data(elm, viewedProp)) return
-        if (SL.matchesCss(rule.selector, elm)){
-          callback(rule, viewedProp, timeoutIdProp)
-        }
-      })
-    }
-  }
-
-  SL.availableEventEmitters.push(InViewEventEmitter)
-
-// Twitter Event Emitter
-// =====================
-//
-// Emits the `twitter.tweet` event in the event a user tweets from the site.
-  function TwitterEventEmitter(twttr){
-    SL.domReady(SL.bind(function () {
-      this.twttr = twttr || window.twttr;
-      this.initialize();
-    }, this));
-  }
-
-  TwitterEventEmitter.prototype = {
-    initialize: function(){
-      var twttr = this.twttr;
-      if (twttr && typeof twttr.ready === 'function') {
-        twttr.ready(SL.bind(this.bind, this));
-      }
-    },
-
-    bind: function(){
-      this.twttr.events.bind('tweet', function(event) {
-        if (event) {
-          SL.notify("tracking a tweet button", 1);
-          SL.onEvent({type: 'twitter.tweet', target: document});
-        }
-      });
-
-    }
-  }
-  SL.availableEventEmitters.push(TwitterEventEmitter)
-
-// Hover Event Emitter
-// =====================
-//
-// Emits the `hover` event in the event. This is better than `mouseover` because you can introduce a certain delay.
-//
-//  {
-//        name: "Hover for 1 second"
-//        event: "hover(1000)",
-//        ...
-//  }
-  function HoverEventEmitter(){
-    var eventRegex = this.eventRegex = /^hover\(([0-9]+)\)$/
-    var rules = this.rules = []
-    SL.each(SL.rules, function(rule){
-      var m = rule.event.match(eventRegex)
-      if (m){
-        rules.push([
-          Number(rule.event.match(eventRegex)[1]),
-          rule.selector
-        ])
-      }
-    })
-  }
-  HoverEventEmitter.prototype = {
-    backgroundTasks: function(){
-      var self = this
-      SL.each(this.rules, function(rule){
-        var selector = rule[1]
-            , delay = rule[0]
-        SL.cssQuery(selector, function(newElms){
-          SL.each(newElms, function(elm){
-            self.trackElement(elm, delay)
-          })
-        })
-      }, this)
-    },
-    trackElement: function(elm, delay){
-      var self = this
-          , trackDelays = SL.$data(elm, 'hover.delays')
-      if (!trackDelays){
-        SL.addEventHandler(elm, 'mouseover', function(e){
-          self.onMouseOver(e, elm)
-        })
-        SL.addEventHandler(elm, 'mouseout', function(e){
-          self.onMouseOut(e, elm)
-        })
-        SL.$data(elm, 'hover.delays', [delay])
-      }
-      else if (!SL.contains(trackDelays, delay)){
-        trackDelays.push(delay)
-      }
-    },
-    onMouseOver: function(e, elem){
-      var target = e.target || e.srcElement
-          , related = e.relatedTarget || e.fromElement
-          , hit = (elem === target || SL.containsElement(elem, target)) &&
-              !SL.containsElement(elem, related)
-      if (hit)
-        this.onMouseEnter(elem)
-    },
-    onMouseEnter: function(elm){
-      var delays = SL.$data(elm, 'hover.delays')
-      var delayTimers = SL.map(delays, function(delay){
-        return setTimeout(function(){
-          SL.onEvent({type: 'hover(' + delay + ')', target: elm})
-        }, delay)
-      })
-      SL.$data(elm, 'hover.delayTimers', delayTimers)
-    },
-    onMouseOut: function(e, elem){
-      var target = e.target || e.srcElement
-          , related = e.relatedTarget || e.toElement
-          , hit = (elem === target || SL.containsElement(elem, target)) &&
-              !SL.containsElement(elem, related)
-      if (hit)
-        this.onMouseLeave(elem)
-    },
-    onMouseLeave: function(elm){
-      var delayTimers = SL.$data(elm, 'hover.delayTimers')
-      if (delayTimers)
-        SL.each(delayTimers, function(timer){
-          clearTimeout(timer)
-        })
-    }
-  }
-  SL.availableEventEmitters.push(HoverEventEmitter)
-
-// Orientation Change Event Emitter
-// ================================
-//
-// The `orientationchange` event on mobile devices fire when the devices switchs between
-// portrait and landscape modes. You can use `%event.orientation%` in your command arguments
-// to evaluate to either `portrait` or `landscape`.
-  function OrientationChangeEventEmitter(){
-    SL.addEventHandler(window, "orientationchange", OrientationChangeEventEmitter.orientationChange)
-  }
-  OrientationChangeEventEmitter.orientationChange = function (e) {
-    var orientation = window.orientation === 0 ?
-        'portrait' :
-        'landscape'
-    e.orientation = orientation
-    SL.onEvent(e)
-  }
-  SL.availableEventEmitters.push(OrientationChangeEventEmitter)
-
-// Facebook Event Emitter
-// ======================
-//
-// Will track `edge.create`, `edge.remove` and `message.send` events from the Facebook
-// Javascript API and emit `facebook.like`, `facebook.unlike` and `facebook.send` events
-// respectively.
-
-  function FacebookEventEmitter(FB){
-    this.delay = 250;
-    this.FB = FB;
-
-    SL.domReady(SL.bind(function () {
-      SL.poll(SL.bind(this.initialize, this), this.delay, 8);
-    }, this));
-  }
-
-  FacebookEventEmitter.prototype = {
-    initialize: function() {
-      this.FB = this.FB || window.FB;
-
-      if (this.FB && this.FB.Event && this.FB.Event.subscribe) {
-        this.bind();
-        return true;
-      }
-    },
-
-    bind: function(){
-      this.FB.Event.subscribe('edge.create', function() {
-        SL.notify("tracking a facebook like", 1)
-        SL.onEvent({type: 'facebook.like', target: document})
-      });
-
-      this.FB.Event.subscribe('edge.remove', function() {
-        SL.notify("tracking a facebook unlike", 1)
-        SL.onEvent({type: 'facebook.unlike', target: document})
-      });
-
-      this.FB.Event.subscribe('message.send', function() {
-        SL.notify("tracking a facebook share", 1)
-        SL.onEvent({type: 'facebook.send', target: document})
-      });
-    }
-  }
-  SL.availableEventEmitters.push(FacebookEventEmitter);
-
-  var adobeAnalyticsAction = (function() {
-    var instanceById = {};
-
-    var trackTypeMethodMap = {
-      pageView: 'trackPageView',
-      link: 'trackLink'
-    };
-
-    // TODO: Handle canceling tool initialization (suppression?).
-    // TODO: Handle custom setup functions (funs, as it were)?
-    var AdobeAnalyticsExtension = function(extensionSettings) {
-      this.extensionSettings = extensionSettings;
-    };
-
-    AdobeAnalyticsExtension.prototype.queryStringParamMap = {
-      browserHeight: 'bh',
-      browserWidth: 'bw',
-      campaign: 'v0',
-      channel: 'ch',
-      charSet: 'ce',
-      colorDepth: 'c',
-      connectionType: 'ct',
-      cookiesEnabled: function(obj, key, value) {
-        obj['k'] = value ? 'Y' : 'N';
-      },
-      currencyCode: 'cc',
-      dynamicVariablePrefix: 'D',
-      eVar: function(obj, key, value) {
-        obj['v' + key.substr(4)] = value;
-      },
-      events: function(obj, key, value) {
-        obj['events'] = value.join(',');
-      },
-      hier: function(obj, key, value) {
-        obj['h' + key.substr(4)] = value.substr(0, 255);
-      },
-      homePage: function(obj, key, value) {
-        obj['hp'] = value ? 'Y' : 'N';
-      },
-      javaEnabled: function(obj, key, value) {
-        obj['v'] = value ? 'Y' : 'N';
-      },
-      javaScriptVersion: 'j',
-      linkName: 'pev2',
-      linkType: function(obj, key, value) {
-        obj['pe'] = 'lnk_' + value;
-      },
-      linkURL: 'pev1',
-      pageName: 'pageName',
-      pageType: 'pageType',
-      pageURL: function(obj, key, value) {
-        obj['g'] = value.substr(0, 255);
-        if (value.length > 255) {
-          obj['-g'] = value.substring(255);
-        }
-      },
-      plugins: 'p',
-      products: 'products',
-      prop: function(obj, key, value) {
-        obj['c' + key.substr(4)] = value;
-      },
-      purchaseID: 'purchaseID',
-      referrer: 'r',
-      resolution: 's',
-      server: 'server',
-      state: 'state',
-      timestamp: 'ts',
-      transactionID: 'xact',
-      visitorID: 'vid',
-      marketingCloudVisitorID: 'mid',
-      zip: 'zip'
-    };
-
-    AdobeAnalyticsExtension.prototype.translateToQueryStringParam = function(queryStringObj, key, value) {
-      var translator = this.queryStringParamMap[key];
-
-      if (!translator) {
-        // Things like prop1 and prop2 use the same translator. Also, eVar1 and eVar2.
-        var prefix = key.substr(0, 4);
-        translator = this.queryStringParamMap[prefix];
-      }
-
-      if (translator) {
-        if (typeof translator === 'string') {
-          queryStringObj[translator] = value;
-        } else {
-          translator(queryStringObj, key, value);
-        }
-      }
-    };
-
-    AdobeAnalyticsExtension.prototype.remodelDataToQueryString = function(data) {
-      var queryStringParams = {};
-      var key;
-
-      queryStringParams.t = this.getTimestamp();
-
-      var browserInfo = data.browserInfo;
-
-      if (browserInfo) {
-        for (key in browserInfo) {
-          if (browserInfo.hasOwnProperty(key)) {
-            var browserInfoValue = browserInfo[key];
-            if (browserInfoValue) {
-              this.translateToQueryStringParam(queryStringParams, key, browserInfoValue);
-            }
-          }
-        }
-      }
-
-      var vars = data.vars;
-
-      if (vars) {
-        for (key in vars) {
-          if (vars.hasOwnProperty(key)) {
-            var varValue = vars[key];
-            if (varValue) {
-              this.translateToQueryStringParam(queryStringParams, key, varValue);
-            }
-          }
-        }
-      }
-
-      var events = data.events;
-
-      if (events) {
-        this.translateToQueryStringParam(queryStringParams, 'events', events);
-      }
-
-      return SL.encodeObjectToURI(queryStringParams);
-    };
-
-    AdobeAnalyticsExtension.prototype.getTrackingURI = function(queryString) {
-      var tagContainerMarker = 'D' + SL.appVersion;
-      var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
-          Math.floor(Math.random() * 10000000000000);
-      var protocol = SL.isHttps() ? 'https://' : 'http://';
-      var uri = protocol + this.getTrackingServer() + '/b/ss/' + this.extensionSettings.account +
-          '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
-
-      if (queryString) {
-        if (queryString[0] !== '?') {
-          uri += '?';
-        }
-
-        uri += queryString;
-      }
-
-      return uri;
-    };
-
-    AdobeAnalyticsExtension.prototype.getTimestamp = function() {
-      var now = new Date();
-      var year = now.getYear();
-      return now.getDate() + '/'
-          + now.getMonth() + '/'
-          + (year < 1900 ? year + 1900 : year) + ' '
-          + now.getHours() + ':'
-          + now.getMinutes() + ':'
-          + now.getSeconds() + ' '
-          + now.getDay() + ' '
-          + now.getTimezoneOffset();
-    };
-
-    AdobeAnalyticsExtension.prototype.getTrackingServer = function() {
-      // TODO: Use getAccount from tool since it deals with accountByHost? What is accountByHost anyway?
-      // TODO: What do we do if account is not default. Returning null is probably not awesome.
-      if (this.extensionSettings.trackingServer) {
-        return this.extensionSettings.trackingServer;
-      }
-
-      var account = this.extensionSettings.account;
-
-      if (!account) {
-        return null
-      }
-
-      // based on code in AppMeasurement.
-      var c = ''
-      var dataCenter = this.extensionSettings.trackVars.dc || 'd1'
-      var e
-      var f
-      e = account.indexOf(",")
-      e >= 0 && (account = account.gb(0, e))
-      account = account.replace(/[^A-Za-z0-9]/g, "")
-      c || (c = "2o7.net")
-      c == "2o7.net" && (dataCenter == "d1" ? dataCenter = "112" : dataCenter == "d2" && (dataCenter = "122"), f = "")
-      e = account + "." + dataCenter + "." + f + c
-      return e
-    };
-
-    AdobeAnalyticsExtension.prototype.trackPageView = function(actionSettings) {
-      var trackVars = {};
-      SL.extend(trackVars, this.extensionSettings.trackVars);
-      SL.extend(trackVars, actionSettings.trackVars);
-
-      // Referrer is intentionally only tracked on the first page view beacon.
-      if (this.initialPageViewTracked) {
-        delete this.referrer;
-      }
-
-      this.initialPageViewTracked = true;
-
-      if (actionSettings.customSetup) {
-        // TODO: Do we need to send the originating event into the custom setup function?
-        actionSettings.customSetup();
-      }
-
-      this.track(trackVars, actionSettings.trackEvents);
-    };
-
-    AdobeAnalyticsExtension.prototype.doesExtensionVarApplyToLinkTracking = function(varName){
-      return !/^(eVar[0-9]+)|(prop[0-9]+)|(hier[0-9]+)|campaign|purchaseID|channel|server|state|zip|pageType$/.test(varName);
-    };
-
-    AdobeAnalyticsExtension.prototype.trackLink = function(actionSettings) {
-      var trackVars = {};
-
-      for (var varName in this.extensionSettings.trackVars) {
-        if (this.doesExtensionVarApplyToLinkTracking(varName)) {
-          trackVars[varName] = this.extensionSettings.trackVars[varName];
-        }
-      }
-
-      SL.extend(trackVars, actionSettings.trackVars);
-
-      // Referrer is never sent for link tracking.
-      delete trackVars.referrer;
-
-      if (actionSettings.customSetup) {
-        // TODO: Do we need to send the originating event into the custom setup function?
-        actionSettings.customSetup();
-      }
-
-      this.track(trackVars, actionSettings.trackEvents);
-    };
-
-    AdobeAnalyticsExtension.prototype.track = function(trackVars, trackEvents) {
-      var queryString = this.remodelDataToQueryString({
-        vars: trackVars,
-        events: trackEvents,
-        browserInfo: {
-          browserHeight: SL.browserInfo.getBrowserHeight(),
-          browserWidth: SL.browserInfo.getBrowserWidth(),
-          resolution: SL.browserInfo.resolution,
-          colorDepth: SL.browserInfo.colorDepth,
-          javaScriptVersion: SL.browserInfo.jsVersion,
-          javaEnabled: SL.browserInfo.isJavaEnabled,
-          cookiesEnabled: SL.browserInfo.isCookiesEnabled,
-          connectionType: SL.connectionType,
-          homePage: SL.isHomePage
-        }
-      });
-
-      var uri = this.getTrackingURI(queryString);
-
-      SL.createBeacon({
-        beaconURL: uri,
-        type: 'image'
-      });
-
-      recordDTMUrl(uri);
-    };
-
-    return function(propertySettings, extensionSettings, actionSettings, extensionInstanceId) {
-      var instance = instanceById[extensionInstanceId];
-
-      if (!instance) {
-        instance = instanceById[extensionInstanceId] = new AdobeAnalyticsExtension(extensionSettings);
-      }
-
-      var methodName = trackTypeMethodMap[actionSettings.trackType];
-      instance[methodName](actionSettings);
-    };
-  })();
 
   _satellite.init({
     "tools": {
@@ -4874,14 +4457,12 @@
         "initVars": {
           "charSet": "UTF-8",
           "currencyCode": "TND",
-          //trackingServer: 'myTrackingServer.com',
-          //trackingServerSecure: 'mySSLTrackingServer.com',
+          "dc": "122",
           "referrer": "myreferreroverride",
-          "campaign": "MyToolCampaign",
+          "campaign": "mycamp",
           "pageURL": "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
           "trackInlineStats": true,
-          "trackDownloadLinks": true,
-          "linkDownloadFileTypes": "avi,css,csv,doc,docx,eps,exe,jpg,js,m4v,mov,mp3,pdf,png,ppt,pptx,rar,svg,tab,txt,vsd,vxd,wav,wma,wmv,xls,xlsx,xml,zip,fake",
+          "trackDownloadLinks": false,
           "trackExternalLinks": true,
           "linkInternalFilters": "javascript:,mailto:,tel:",
           "linkLeaveQueryString": false,
@@ -4898,135 +4479,25 @@
         }
       }
     },
-    extensions: {
-      'abcdef': {
-        instanceId: 'abcdef',
-        extensionId: 'adobeanalytics',
-        settings: {
-          account: 'aaronhardyprod',
-          euCookie: false,
-          //trackingServer: 'myTrackingServer.com',
-          //trackingServerSecure: 'mySSLTrackingServer.com',
-          trackVars: {
-            charSet: 'UTF-8',
-            currencyCode: 'TND',
-            referrer: 'myreferreroverride',
-            campaign: 'MyToolCampaign',
-            pageURL: "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
-            trackInlineStats: true,
-            trackDownloadLinks: true,
-            linkDownloadFileTypes: "avi,css,csv,doc,docx,eps,exe,jpg,js,m4v,mov,mp3,pdf,png,ppt,pptx,rar,svg,tab,txt,vsd,vxd,wav,wma,wmv,xls,xlsx,xml,zip,fake",
-            trackExternalLinks: true,
-            linkInternalFilters: "javascript:,mailto:,tel:",
-            linkLeaveQueryString: false,
-            dynamicVariablePrefix: "$$",
-            eVar50: "toolevar50",
-            prop50: "toolprop50",
-            // TODO: Why is this in the var list and not a direct child of settings? (currently follows Tool structure)
-            dc: '122'
-          }
-        }
-      }
-    },
-    newRules: [
-      {
-        // TODO Needs event stuff.
-        name: 'Test Rule',
-        actions: [
-          {
-            extensionInstanceIds: ['abcdef'],
-            script: adobeAnalyticsAction,
-            settings: {
-              trackType: 'pageView',
-              trackVars: {
-                eVar10: 'MyEvar10',
-                eVar11: 'MyEvar11',
-                prop10: 'MyProp10',
-                prop11: 'MyProp11',
-                pageName: 'MyPageName',
-                channel: 'MyChannel',
-                pageURL: "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
-                campaign: 'MyRuleCampaign',
-                hier1: "HierLev1|HierLev2|HierLev3|HierLev4"
-              },
-              trackEvents: [
-                "event10:MyEvent10",
-                "event11:MyEvent11",
-                "prodView:MyProdView"
-              ]
-            }
-          }
-        ]
-      },
-      {
-        // TODO Needs event stuff.
-        name: 'Dead Header Rule',
-        conditions: [
-          function(event,target) { return !_satellite.isLinked(target) }
-        ],
-        actions: [
-          {
-            extensionInstanceIds: ['abcdef'],
-            script: adobeAnalyticsAction,
-            settings: {
-              trackType: 'link',
-              trackVars: {
-                linkType: 'o',
-                linkName: 'MyLink',
-                pageName: 'MyPageName',
-                eVar20: 'MyDeadHeaderEvar',
-                prop20: 'D=v20',
-                campaign: SL.getQueryParam('dead')
-              },
-              trackEvents: [
-                  'event20:deadevent'
-              ],
-              customSetup: function(){
-                console.log('I am a custom setup function from an extension.');
-              }
-            }
-          }
-        ]
-      }
+    "pageLoadRules": [
+      {"name":"Hero Banner","trigger":[{"engine":"tnt","command":"addMbox","arguments":[{"mboxGoesAround":".hero","mboxName":"tdtm-01","arguments":["localmboxparam1=localmboxvalue1"],"timeout":"1500"}]}],"event":"windowload"},
+      {"name":"KitchenSink","trigger":[{"engine":"sc","command":"setVars","arguments":[{"eVar10":"MyEvar10","eVar11":"MyEvar11","prop10":"MyProp10","prop11":"MyProp11","pageName":"MyPageName","channel":"MyChannel","pageURL":"MyPageUrl","campaign":"MyCampaign","hier1":"HierLev1|HierLev2|HierLev3|HierLev4"}]},{"engine":"sc","command":"addEvent","arguments":["event10:MyEvent10","event11:MyEvent11","prodView:MyProdView"]},{"engine":"tnt","command":"addMbox","arguments":[{"mboxGoesAround":"","mboxName":"","arguments":[],"timeout":"1500"}]}],"event":"pagebottom"},
+      {"name":"Hero Banner - (Global Mbox Parameters)","event":"aftertoolinit","trigger":[{"engine":"tnt","command":"addTargetPageParams","arguments":[{"globalmboxparam1":"globalmboxvalue1"}]}]}
     ],
-
-    "pageLoadRules": [{
-      name: "KitchenSink",
-      trigger: [{
-        engine: "sc",
-        command: "setVars",
-        arguments: [{
-          eVar10: "MyEvar10",
-          eVar11: "MyEvar11",
-          prop10: "MyProp10",
-          prop11: "MyProp11",
-          pageName: "MyPageName",
-          channel: "MyChannel",
-          pageURL: "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
-          campaign: "MyRuleCampaign",
-          hier1: "HierLev1|HierLev2|HierLev3|HierLev4"
-        }]
-      }, {engine:"sc",command:"addEvent",arguments:["event10:MyEvent10","event11:MyEvent11","prodView:MyProdView"]}, {
-        engine: "tnt",
-        command: "addMbox",
-        arguments: [{mboxGoesAround: "", mboxName: "", arguments: [], timeout: "1500"}]
-      }],
-      event: "pagebottom"
-    }],
     "rules": [
       {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
           SL.getQueryParam('dead')
       },"customSetup":function(event,s){
-        console.log('I am a custom setup function from a tool.');
+        console.log('Am I a custom setup function?');
       },"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
         return !_satellite.isLinked(target)
-      }],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}
-      //{"name":"Dead Header","trigger":[{"engine":"sc","command":"trackPageView","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
-      //    SL.getQueryParam('dead')
-      //},"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
-      //  return !_satellite.isLinked(target)
-      //}],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false},
-      //{"name":"Download Link","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"d","linkName":"%this.href%"}]},{"command":"delayActivateLink"}],"selector":"a","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false,"property":{"href":/\.(?:doc|docx|eps|xls|ppt|pptx|pdf|xlsx|tab|csv|zip|txt|vsd|vxd|xml|js|css|rar|exe|wma|mov|avi|wmv|mp3|wav|m4v)($|\&|\?)/i}}
+      },function(){
+        return _satellite.textMatch(_satellite.getQueryParam('woot'), "niner")
+      }],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false},
+      {"name":"Download Link","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"d","linkName":"%this.href%"}]},{"command":"delayActivateLink"}],"selector":"a","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false,"property":{"href":/\.(?:doc|docx|eps|xls|ppt|pptx|pdf|xlsx|tab|csv|zip|txt|vsd|vxd|xml|js|css|rar|exe|wma|mov|avi|wmv|mp3|wav|m4v)($|\&|\?)/i}},
+      {"name":"Transaction","conditions":[function(){
+        return _satellite.getVar("browserWidth") > 3;
+      }],"selector":"a","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}
     ],
     "directCallRules": [
 
@@ -5056,14 +4527,17 @@
       ],
       "revenue": "",
       "host": {
-        "http": "dtm.aaronhardy.com",
-        "https": "dtm.aaronhardy.com"
+        "http": "assets.adobedtm.com",
+        "https": "assets.adobedtm.com"
       }
     },
     "dataElements": {
+      "browserWidth": {"customJS":function(){
+        return _satellite.getBrowserWidth();
+      },"storeLength":"session"}
     },
-    "appVersion": "52A",
-    "buildDate": "2015-03-16 20:55:42 UTC",
+    "appVersion": "53O",
+    "buildDate": "2015-04-03 21:21:27 UTC",
     "publishDate": "2015-03-16 14:43:44 -0600"
   });
 })(window, document);

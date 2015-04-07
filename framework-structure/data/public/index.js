@@ -8,6 +8,8 @@ module.exports = {
     browserWidth: clientInfoUtil.getBrowserWidth(),
     browserHeight: clientInfoUtil.getBrowserHeight(),
     resolution: clientInfoUtil.getResolution(),
+    screenWidth: clientInfoUtil.getScreenWidth(),
+    screenHeight: clientInfoUtil.getScreenHeight(),
     colorDepth: clientInfoUtil.getColorDepth(),
     jsVersion: clientInfoUtil.getJSVersion(),
     isJavaEnabled: clientInfoUtil.getIsJavaEnabled(),

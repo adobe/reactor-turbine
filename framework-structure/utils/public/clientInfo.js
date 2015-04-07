@@ -88,6 +88,14 @@ exports.getResolution = function() {
   return window.screen.width + "x" + window.screen.height;
 };
 
+exports.getScreenWidth = function() {
+  return window.screen.width;
+};
+
+exports.getScreenHeight = function() {
+  return window.screen.height;
+}
+
 exports.getColorDepth = function() {
   return window.screen.pixelDepth ? window.screen.pixelDepth : window.screen.colorDepth;
 };

@@ -1,4543 +1,2151 @@
-// Dynamic Tag Management Library
-// Property: dtm.aaronhardy.com
-// All code and conventions are protected by copyright
-// Adobe Systems Incorporated
 
-(function(window, document, undefined) {
-// Satellite
-// =========
-//
-// Satellite *core*. Yeah, you want it.
-//
-// In this first section, we have a some useful utility functions.
-  var ToString = Object.prototype.toString
+// compression: 1
 
-  var Overrides = window._satellite && window._satellite.override
+var mboxCopyright = "Copyright 1996-2014. Adobe Systems Incorporated. All rights reserved.";
+var TNT = TNT || {};
+TNT._internal = TNT._internal || {};
+TNT._internal.nestedMboxes = [];
+TNT._internal.isDomLoaded = false;
 
-  function assert(cond, msg){
-    if (!cond){
-      throw new Error(msg || "Assertion Failure")
+TNT._internal._settings = {
+  "companyName": "Test&amp;Target",
+  "isProduction": true,
+  "adminUrl": "//admin3.testandtarget.omniture.com/admin",
+  "clientCode": "adobeinternaldtmdemo",
+  "serverHost": "adobeinternaldtmdemo.tt.omtrdc.net",
+  "mboxTimeout": 15000,
+  "mboxLoadedTimeout": 16,
+  "mboxFactoryDisabledTimeout": 60 * 60,
+  "bodyPollingTimeout": 16,
+  "sessionExpirationTimeout": 31 * 60,
+  "experienceManagerDisabledTimeout": 30 * 60,
+  "experienceManagerTimeout": 5000,
+  "tntIdLifetime": 1209600,
+  "crossDomain": "disabled",
+  "trafficDuration": 10368000,
+  "trafficLevelPercentage": 100,
+  "clientSessionIdSupport": false,
+  "clientTntIdSupport": false,
+  "passPageParameters": true,
+  "usePersistentCookies": true,
+  "crossDomainEnabled": false,
+  "crossDomainXOnly": false,
+  "imsOrgId": "824A1C8B532710590A490D4D@AdobeOrg",
+  "includeExperienceManagerPlugin": true,
+  "globalMboxName": "existingGlobalMbox",
+  "globalMboxLocationDomId": "",
+  "globalMboxAutoCreate": false,
+  "experienceManagerPluginUrl": "//cdn.tt.omtrdc.net/cdn/target.js",
+  "siteCatalystPluginName": "tt",
+  "includeSiteCatalystPlugin": false,
+  "mboxVersion": 56,
+  "mboxIsSupportedFunction": function () {
+    return true;
+  },
+  "clientJavascriptFunction": function () {
+  },
+  "parametersFunction": function () {
+    return "";
+  },
+  "cookieDomainFunction": function () {
+    return mboxCookiePageDomain();
+  }
+};
+
+TNT._internal._params = {
+  "page": "mboxPage",
+  "mcgvid": "mboxMCGVID",
+  "mcglh": "mboxMCGLH",
+  "aamb": "mboxAAMB",
+  "mcavid": "mboxMCAVID",
+  "mcsdid": "mboxMCSDID",
+  "count": "mboxCount",
+  "host": "mboxHost",
+  "factoryId": "mboxFactoryId",
+  "tntId": "mboxPC",
+  "screeHeight": "screenHeight",
+  "screenWidth": "screenWidth",
+  "browserWidth": "browserWidth",
+  "browserHeight": "browserHeight",
+  "browserTimeOffset": "browserTimeOffset",
+  "colorDepth": "colorDepth",
+  "crossDomain": "mboxXDomain",
+  "url": "mboxURL",
+  "referrer": "mboxReferrer",
+  "version": "mboxVersion",
+  "name": "mbox",
+  "id": "mboxId",
+  "domLoaded": "mboxDOMLoaded",
+  "time": "mboxTime",
+  "scPluginVersion": "scPluginVersion"
+};
+
+TNT._internal._pageParams = {
+  "disable": "mboxDisable",
+  "session": "mboxSession",
+  "environment": "mboxEnv",
+  "debug": "mboxDebug"
+};
+
+TNT._internal._cookies = {
+  "disable": "disable",
+  "session": "session",
+  "tntId": "PC",
+  "level": "level",
+  "signalPrefix": "signal-",
+  "check": "check",
+  "debug": "debug"
+};
+
+TNT._internal._constants = {
+  "defaultFactoryId": "default",
+  "cookiePrefix": "mbox",
+  "divImportPrefix": "mboxImported-",
+  "millisInMinute": 60000,
+  "divDefaultClass": "mboxDefault",
+  "divMarkerPrefix": "mboxMarker-",
+  "nameLength": 250,
+  "scPluginVersion": 1,
+  "version": 54
+};
+
+TNT.getGlobalMboxName = function () {
+  return TNT._internal._settings.globalMboxName;
+};
+
+TNT.getGlobalMboxLocation = function () {
+  return TNT._internal._settings.globalMboxLocationDomId;
+};
+
+TNT.isAutoCreateGlobalMbox = function () {
+  return TNT._internal._settings.globalMboxAutoCreate;
+};
+
+TNT.getClientMboxExtraParameters = function () {
+  return TNT._internal._settings.parametersFunction();
+};
+
+TNT.getMboxSettings = function () {
+  return TNT._internal._settings;
+};
+
+TNT.setMboxSettings = function (_settings) {
+  TNT._internal._settings = _settings;
+};
+
+TNT._internal._getGlobalMboxParameters = function () {
+  var _getClass = {}.toString;
+  var _possibleFunction = window.targetPageParams;
+  var _functionResult = null;
+
+  if (typeof(_possibleFunction) === 'undefined' || _getClass.call(_possibleFunction) !== '[object Function]') {
+    return [];
+  }
+
+  try {
+    _functionResult = _possibleFunction();
+  } catch (_ignore) { }
+
+  if (_functionResult === null) {
+    return [];
+  }
+
+  if (_getClass.call(_functionResult) === '[object Array]') {
+    return _functionResult;
+  }
+
+  if (_getClass.call(_functionResult) === '[object String]' && _functionResult.length > 0) {
+    var _params = _functionResult.trim().split("&");
+    for (var _index = 0; _index < _params.length; _index++) {
+      if (_params[_index].indexOf('=') <= 0) {
+        _params.splice(_index, 1);
+        continue;
+      }
+      _params[_index] = decodeURIComponent(_params[_index]);
+    }
+    return _params;
+  }
+
+  if (_getClass.call(_functionResult) === '[object Object]') {
+    return TNT._internal._extractParamsFromObject([], _functionResult);
+  }
+
+  return [];
+};
+
+TNT._internal._extractParamsFromObject = function (_nestedParams, _objectWithParams) {
+  var _result = [];
+  var _paramNamePrefix = _nestedParams.join('.');
+  var _paramValue;
+
+  for (var _paramName in _objectWithParams) {
+    if (!_objectWithParams.hasOwnProperty(_paramName)) {
+      continue;
+    }
+
+    _paramValue = _objectWithParams[_paramName];
+
+    if (typeof _paramValue === "object") {
+      _nestedParams.push(_paramName);
+      var _nestedResult = TNT._internal._extractParamsFromObject(_nestedParams, _paramValue);
+      _nestedParams.pop();
+
+      for (var _index = 0; _index < _nestedResult.length; _index++) {
+        _result.push(_nestedResult[_index]);
+      }
+      continue;
+    }
+
+    _result.push((_paramNamePrefix.length > 0 ? _paramNamePrefix + '.' : '') + _paramName + '=' + _paramValue);
+  }
+
+  return _result;
+};
+
+TNT._internal._globalMboxFetcher = function() { };
+
+TNT._internal._globalMboxFetcher.prototype.getType = function() {
+  return 'ajax';
+};
+
+TNT._internal._globalMboxFetcher.prototype.fetch = function(_urlBuilder) {
+  _urlBuilder.setServerType(this.getType());
+  document.write('<' + 'scr' + 'ipt src="' + _urlBuilder.buildUrl() +'" language="JavaScript"><' + '\/scr' + 'ipt>');
+};
+
+TNT._internal._globalMboxFetcher.prototype.cancel = function() { };
+
+
+
+/**
+ * Builds the url of a request given the mbox server host, client code
+ * and server type.
+ * @PrivateClass
+ *
+ * @param _mboxServer host of the mbox server e.g.
+ *   mbox-test.dev.tt.omtrdc.net
+ */
+mboxUrlBuilder = function(_mboxServer, _clientCode) {
+  this._mboxServer = _mboxServer;
+  this._clientCode = _clientCode;
+  this._parameters = [];
+  this._urlProcess = function(_url) { return _url; };
+  this._basePath = null;
+};
+
+/**
+ * Adds a new parameter regardless of whether or not it's present already, use with caution
+ *
+ * @param _name - parameter name, should not contain single or double quotes
+ * @param _value - parameter value, should not be html escaped
+ */
+mboxUrlBuilder.prototype.addNewParameter = function (_name, _value) {
+  this._parameters.push({name: _name, value: _value});
+  return this;
+};
+
+/**
+ * Adds a parameter if it's not already present
+ *
+ * @param _name - parameter name, should not contain single or double quotes
+ * @param _value - parameter value, should not be html escaped
+ */
+mboxUrlBuilder.prototype.addParameterIfAbsent = function (_name, _value) {
+  if (_value) {
+    for (var _i = 0; _i < this._parameters.length; _i++) {
+      var _parameter = this._parameters[_i];
+      if (_parameter.name === _name) {
+        return this;
+      }
+    }
+
+    this.checkInvalidCharacters(_name);
+    return this.addNewParameter(_name, _value);
+  }
+};
+
+/**
+ * Adds a parameter
+ *
+ * @param _name - parameter name, should not contain single or double quotes
+ * @param _value - parameter value, should not be html escaped
+ */
+mboxUrlBuilder.prototype.addParameter = function(_name, _value) {
+  this.checkInvalidCharacters(_name);
+
+  for (var _i = 0; _i < this._parameters.length; _i++) {
+    var _parameter = this._parameters[_i];
+    if (_parameter.name === _name) {
+      _parameter.value = _value;
+      return this;
     }
   }
 
-  var SL = {
-    initialized: false,
+  return this.addNewParameter(_name, _value);
+};
 
-    // `$data(elm, prop, [val])`
-    // ----------------------------
-    //
-    // Our own `$data()` method, [a la jQuery](http://api.jquery.com/jQuery.data/)
-    // , used to get or set
-    // properties on DOM elements without going insane.
-    // `uuid` and `dataCache` are used by `$data()`
-    //
-    // Parameters:
-    //
-    // - `elm` - the element to get or set a property to
-    // - `prop` - the property name
-    // - `val` - the value of the property, if omitted, the method will
-    //      return the existing value of the property, if any
-    $data: function(elm, prop, val){
-      var __satellite__ = '__satellite__'
-      var cache = SL.dataCache
-      var uuid = elm[__satellite__]
-      if (!uuid) uuid = elm[__satellite__] = SL.uuid++
-      var datas = cache[uuid]
-      if (!datas) datas = cache[uuid] = {}
-      if (val === undefined)
-        return datas[prop]
-      else
-        datas[prop] = val
-    },
-    uuid: 1,
-    dataCache: {},
+/**
+ * @param _parameters An array with items of the form "name=value".
+ */
+mboxUrlBuilder.prototype.addParameters = function(_parameters) {
+  if (!_parameters) {
+    return this;
+  }
+  for (var _i = 0; _i < _parameters.length; _i++) {
+    var _splitIndex = _parameters[_i].indexOf('=');
+    if (_splitIndex === -1 || _splitIndex === 0) {
+      continue;
+    }
+    this.addParameter(_parameters[_i].substring(0, _splitIndex),
+        _parameters[_i].substring(_splitIndex + 1, _parameters[_i].length));
+  }
+  return this;
+};
 
-    // `keys(object)`
-    // --------------
-    //
-    // Return all keys of an object in an array.
-    keys: function(obj){
-      var ret = []
-      for (var key in obj) ret.push(key)
-      return ret
-    },
+mboxUrlBuilder.prototype.setServerType = function(_type) {
+  this._serverType = _type;
+};
 
-    // `values(object)`
-    // ----------------
-    //
-    // Return all values of an object in an array.
-    values: function(obj){
-      var ret = []
-      for (var key in obj) ret.push(obj[key])
-      return ret
-    },
+mboxUrlBuilder.prototype.setBasePath = function(_basePath) {
+  this._basePath = _basePath;
+};
 
-    // `isArray(thing)`
-    // --------------
-    //
-    // Returns whether the given thing is an array.
-    isArray: Array.isArray || function(thing){
-      return ToString.apply(thing) === "[object Array]"
-    },
+/**
+ * @param _action is a function that accepts a string parameter (url)
+ * @return The new url string
+ */
+mboxUrlBuilder.prototype.setUrlProcessAction = function(_action) {
+  this._urlProcess = _action;
+};
 
-    // `isObject(thing)`
-    // -----------------
-    //
-    // Returns whether the given thing is a plain object.
-    isObject: function(thing){
-      return thing != null && !SL.isArray(thing) &&
-          typeof thing === 'object'
-    },
+mboxUrlBuilder.prototype.buildUrl = function() {
+  var _path = this._basePath ? this._basePath :
+  '/m2/' + this._clientCode + '/mbox/' + this._serverType;
 
-    // `isString(thing)`
-    // -----------------
-    //
-    // Returns whether thing is a string
-    isString: function(thing){
-      return typeof thing === 'string'
-    },
+  var _protocol = document.location.protocol == 'file:' ? 'http:' :
+      document.location.protocol;
 
-    // `isNumber(thing)`
-    // -----------------
-    //
-    // Returns whether thing is a number
-    isNumber: function(thing){
-      return ToString.apply(thing) === '[object Number]' && !SL.isNaN(thing)
-    },
+  var _url = _protocol + "//" + this._mboxServer + _path;
 
-    // `isNaN(thing)`
-    // --------------
-    //
-    // Return whether thing is NaN
-    isNaN: function(thing){
-      return thing !== thing
-    },
+  var _separator = _url.indexOf('?') != -1 ? '&' : '?';
+  for (var _i = 0; _i < this._parameters.length; _i++) {
+    var _parameter = this._parameters[_i];
+    _url += _separator + encodeURIComponent(_parameter.name) + '=' +
+    encodeURIComponent(_parameter.value);
+    _separator = '&';
+  }
+  return this._escapeQuote(this._urlProcess(_url));
+};
 
-    // `isRegex(thing)`
-    // ----------------
-    //
-    // Returns whether thing is a RegExp object
-    isRegex: function(thing){
-      return thing instanceof RegExp
-    },
+/**
+ * @return An array of objects with two properties "name" and "value"
+ */
+mboxUrlBuilder.prototype.getParameters = function() {
+  return this._parameters;
+};
 
-    // `isLinkTag(thing)`
-    // ----------------
-    //
-    // Returns whether thing is a DOM link element
-    isLinkTag: function(thing){
-      return !!(thing && thing.nodeName &&
-      thing.nodeName.toLowerCase() === 'a')
-    },
+mboxUrlBuilder.prototype.setParameters = function(_parameters) {
+  this._parameters = _parameters;
+};
 
-    // `each(arr, func, [context])`
-    // ------------------
-    //
-    // A handy method for array iteration wo having to write a for-loop.
-    //
-    // Parameters:
-    //
-    // - `arr` - an array
-    // - `func(item, index, arr)` - a function which accepts each item in the array
-    //      once. I takes these arguments
-    //      * `item` - an item
-    //      * `index` - the array index of said item
-    //      * `arr` - the array
-    // - `context` - the context to be bound to `func` when it is invoked
-    each: function(arr, func, context){
-      for (var i = 0, len = arr.length; i < len; i++)
-        func.call(context, arr[i], i, arr)
-    },
+mboxUrlBuilder.prototype.clone = function() {
+  var _newUrlBuilder = new mboxUrlBuilder(this._mboxServer, this._clientCode);
+  _newUrlBuilder.setServerType(this._serverType);
+  _newUrlBuilder.setBasePath(this._basePath);
+  _newUrlBuilder.setUrlProcessAction(this._urlProcess);
+  for (var _i = 0; _i < this._parameters.length; _i++) {
+    _newUrlBuilder.addParameter(this._parameters[_i].name,
+        this._parameters[_i].value);
+  }
+  return _newUrlBuilder;
+};
 
-    // `map(arr, func)`
-    // ----------------
-    //
-    // A handy method for mapping an array to another array using a 1-to-1 mapping
-    // for each element
-    //
-    // Parameters:
-    //
-    // Parameters are the same as `SL.each`, except that `func` is expected to return
-    // a the value you want in the corresponding index of the returned array.
-    map: function(arr, func, context){
-      var ret = []
-      for (var i = 0, len = arr.length; i < len; i++)
-        ret.push(func.call(context, arr[i], i, arr))
-      return ret
-    },
+mboxUrlBuilder.prototype._escapeQuote = function(_text) {
+  return _text.replace(/\"/g, '&quot;').replace(/>/g, '&gt;');
+};
 
-    // `filter(arr, cond)`
-    // -------------------
-    //
-    // Handy method for take an array and filtering down to a subset of the elements.
-    //
-    // Parameters:
-    //
-    // Parameters are the same as `SL.each` except the second argument is `cond`
-    // instead of `func` and it is expected to return a truthy value respresenting
-    // whether to include this item in the return array or not.
-    filter: function(arr, cond, context){
-      var ret = []
-      for (var i = 0, len = arr.length; i < len; i++){
-        var item = arr[i]
-        if (cond.call(context, item, i, arr))
-          ret.push(item)
+/**
+ * Checks a parameter's name for prohibited chars
+ */
+mboxUrlBuilder.prototype.checkInvalidCharacters = function (_name) {
+  var _invalidCharacters = new RegExp('(\'|")');
+  if (_invalidCharacters.exec(_name)) {
+    throw "Parameter '" + _name + "' contains invalid characters";
+  }
+};
+
+/**
+ * Fetches the content given the url builder by including the script using
+ * document.write(..)
+ * @PrivateClass
+ */
+mboxStandardFetcher = function() { };
+
+mboxStandardFetcher.prototype.getType = function() {
+  return 'standard';
+};
+
+mboxStandardFetcher.prototype.fetch = function(_urlBuilder) {
+  _urlBuilder.setServerType(this.getType());
+
+  document.write('<' + 'scr' + 'ipt src="' + _urlBuilder.buildUrl() +
+  '" language="JavaScript"><' + '\/scr' + 'ipt>');
+};
+
+mboxStandardFetcher.prototype.cancel = function() { };
+
+/**
+ * Fetches the content given the url builder by creating the script dynamically
+ * in the DOM.
+ * @PrivateClass
+ */
+mboxAjaxFetcher = function() { };
+
+mboxAjaxFetcher.prototype.getType = function() {
+  return 'ajax';
+};
+
+mboxAjaxFetcher.prototype.fetch = function(_urlBuilder) {
+  _urlBuilder.setServerType(this.getType());
+  var _url = _urlBuilder.buildUrl();
+
+  this._include = document.createElement('script');
+  this._include.src = _url;
+
+  document.body.appendChild(this._include);
+};
+
+mboxAjaxFetcher.prototype.cancel = function() { };
+
+/**
+ * A map of elements.
+ *
+ * @PrivateClass
+ */
+mboxMap = function() {
+  this._backingMap = {};
+  this._keys = [];
+};
+
+mboxMap.prototype.put = function(_key, _value) {
+  if (!this._backingMap[_key]) {
+    this._keys[this._keys.length] = _key;
+  }
+  this._backingMap[_key] = _value;
+};
+
+mboxMap.prototype.get = function(_key) {
+  return this._backingMap[_key];
+};
+
+mboxMap.prototype.remove = function(_key) {
+  this._backingMap[_key] = undefined;
+  var _updatedKeys = [];
+
+  for (var i = 0; i < this._keys.length; i++) {
+    if (this._keys[i] !== _key) {
+      _updatedKeys.push(this._keys[i]);
+    }
+  }
+  this._keys = _updatedKeys;
+};
+
+mboxMap.prototype.each = function(_action) {
+  for (var _i = 0; _i < this._keys.length; _i++ ) {
+    var _key = this._keys[_i];
+    var _value = this._backingMap[_key];
+    if (_value) {
+      var _result = _action(_key, _value);
+      if (_result === false) {
+        break;
       }
-      return ret
-    },
+    }
+  }
+};
 
-    // `any(arr, cond, context)`
-    // -------------------------
-    //
-    // Another array helper function. Returns true if `cond(item)` returns true
-    // for any item in the array.
-    any: function(arr, cond, context){
-      for (var i = 0, len = arr.length; i < len; i++){
-        var item = arr[i]
-        if (cond.call(context, item, i, arr))
-          return true
+mboxMap.prototype.isEmpty = function() {
+  return this._keys.length === 0;
+};
+
+/**
+ * Creates and updates mboxes.
+ *
+ * @param _mboxServer host of the mbox server e.g.
+ *   mbox-test.dev.tt.omtrdc.net
+ * @param _clientCode - client's code e.g. 'demo'
+ * @param _factoryId - a unique string identifying this factory
+ */
+mboxFactory = function(_server, _clientCode, _factoryId) {
+  this._pageLoaded = false;
+  this._server = _server;
+  this._factoryId = _factoryId;
+  this._mboxes = new mboxList();
+
+  mboxFactories.put(_factoryId, this);
+
+  // mboxIsSupported is a client defined function to test if mbox is supported
+  // on this platform (defaults to just returning true)
+  this._supported =
+      typeof document.createElement('div').replaceChild != 'undefined' &&
+      TNT._internal._settings.mboxIsSupportedFunction() &&
+      typeof document.getElementById != 'undefined' &&
+      typeof (window.attachEvent || document.addEventListener || window.addEventListener) != 'undefined' &&
+      typeof encodeURIComponent  != 'undefined';
+
+  this._enabled = this._supported && mboxGetPageParameter(TNT._internal._pageParams.disable) === null;
+
+  var _isDefaultFactory = _factoryId == TNT._internal._constants.defaultFactoryId;
+  this._cookieManager = new mboxCookieManager(
+      TNT._internal._constants.cookiePrefix + (_isDefaultFactory ? '' : ('-' + _factoryId)),
+      TNT._internal._settings.cookieDomainFunction());
+
+  if (TNT._internal._settings.crossDomainXOnly) {
+    this._enabled = this._enabled && this._cookieManager.isEnabled() &&
+    (this._cookieManager.getCookie(TNT._internal._cookies.disable) === null);
+  } else {
+    this._enabled = this._enabled && (this._cookieManager.getCookie(TNT._internal._cookies.disable) === null);
+  }
+
+  if (this.isAdmin()) {
+    this.enable();
+  }
+
+  this._listenForDomReady();
+  this._mboxPageId = mboxGenerateId();
+  this._mboxScreenHeight = mboxScreenHeight();
+  this._mboxScreenWidth = mboxScreenWidth();
+  this._mboxBrowserWidth = mboxBrowserWidth();
+  this._mboxBrowserHeight = mboxBrowserHeight();
+  this._mboxColorDepth = mboxScreenColorDepth();
+  this._mboxBrowserTimeOffset = mboxBrowserTimeOffset();
+  this._mboxSessionId = new mboxSession(
+      this._mboxPageId,
+      TNT._internal._pageParams.session,
+      TNT._internal._cookies.session,
+      31 * 60, this._cookieManager);
+
+  this._mboxPCId = new mboxPC(
+      TNT._internal._cookies.tntId,
+      TNT._internal._settings.tntIdLifetime,
+      this._cookieManager);
+
+  this._urlBuilder = new mboxUrlBuilder(_server, _clientCode);
+  this._initGlobalParameters(this._urlBuilder, _isDefaultFactory);
+
+  this._pageStartTime = new Date().getTime();
+  this._pageEndTime = this._pageStartTime;
+
+  var _self = this;
+  this.addOnLoad(function() { _self._pageEndTime = new Date().getTime(); });
+
+  if (this._supported) {
+    // Checks that all mboxes have been successfully imported
+    // and shows default content for any that failed
+    this.addOnLoad(function() {
+      _self._pageLoaded = true;
+      _self.getMboxes().each(function(_mbox) {
+        _mbox._disableWaitForNestedMboxes();
+        _mbox.setFetcher(new mboxAjaxFetcher());
+        _mbox.finalize(); });
+      TNT._internal.nestedMboxes = [];
+      TNT._internal.isDomLoaded = true;
+    });
+
+    if (this._enabled) {
+      this.limitTraffic(TNT._internal._settings.trafficLevelPercentage, TNT._internal._settings.trafficDuration);
+
+      this._makeDefaultContentInvisible();
+
+      this._mboxSignaler = new mboxSignaler(function(_mboxName, _parameters) {
+        return _self.create(_mboxName, _parameters);
+      }, this._cookieManager);
+    }
+    else {
+      if (!TNT._internal._settings.isProduction) {
+        if (this.isAdmin()) {
+          if (!this.isEnabled()) {
+            alert("mbox disabled, probably due to timeout\n" +
+            "Reset your cookies to re-enable\n(this message will only appear in administrative mode)");
+          } else {
+            alert("It looks like your browser will not allow " +
+            TNT._internal._settings.companyName +
+            " to set its administrative cookie. To allow setting the" +
+            " cookie please lower the privacy settings of your browser.\n" +
+            "(this message will only appear in administrative mode)");
+          }
+        }
       }
-      return false
-    },
+    }
+  }
+};
 
-    // `every(arr, cond, context)`
-    // ---------------------------
-    //
-    // Another array helper function. Returns true if `cond(item)` returns true
-    // for every item in the array.
-    every: function(arr, cond, context){
-      var retval = true
-      for (var i = 0, len = arr.length; i < len; i++){
-        var item = arr[i]
-        retval = retval && cond.call(context, item, i, arr)
+/**
+ * Forcibly sets new PC ID.
+ * This method should be used when there is a better way to track
+ * a site user than by PC ID.
+ *
+ * @param _forcedId New PC ID to set.
+ */
+mboxFactory.prototype.forcePCId = function(_forcedId) {
+  if (!TNT._internal._settings.clientTntIdSupport) {
+    return;
+  }
+
+  if (this._mboxPCId.forceId(_forcedId)) {
+    this._mboxSessionId.forceId(mboxGenerateId());
+  }
+};
+
+/**
+ * Allows the client to use their sessionId as the mbox sessionId. This
+ * is useful if the client is required to preserve their id through their
+ * site.
+ *
+ * @param sessionId for New session id.
+ */
+mboxFactory.prototype.forceSessionId = function(_forcedId) {
+  if (!TNT._internal._settings.clientSessionIdSupport) {
+    return;
+  }
+
+  this._mboxSessionId.forceId(_forcedId);
+};
+
+/**
+ * @return true if the factory is enabled. If factory is disabled, the mboxes
+ * are still created but they show default content only.
+ */
+mboxFactory.prototype.isEnabled = function() {
+  return this._enabled;
+};
+
+/**
+ * @return cause of mbox disabling
+ */
+mboxFactory.prototype.getDisableReason = function() {
+  return this._cookieManager.getCookie(TNT._internal._cookies.disable);
+};
+
+/**
+ * @return true if the client's environment is supported (i.e. there's a way
+ *   to access DOM elements via document.getElementById and event handling
+ *   is supported)
+ */
+mboxFactory.prototype.isSupported = function() {
+  return this._supported;
+};
+
+/**
+ * Disables the factory for the specified duration.
+ *
+ * @param _duration - duration in seconds (optional)
+ * @param _cause - cause of disable (optional)
+ */
+mboxFactory.prototype.disable = function(_duration, _cause) {
+  if (typeof _duration == 'undefined') {
+    _duration = 60 * 60;
+  }
+
+  if (typeof _cause == 'undefined') {
+    _cause = 'unspecified';
+  }
+
+  if (!this.isAdmin()) {
+    this._enabled = false;
+    this._cookieManager.setCookie(TNT._internal._cookies.disable, _cause, _duration);
+  }
+};
+
+mboxFactory.prototype.enable = function() {
+  this._enabled = true;
+  this._cookieManager.deleteCookie(TNT._internal._cookies.disable);
+};
+
+mboxFactory.prototype.isAdmin = function() {
+  return document.location.href.indexOf(TNT._internal._pageParams.environment) != -1;
+};
+
+/**
+ * Limits the traffic (by disabling the factory for certain users) to the given
+ * level for the specified duration.
+ */
+mboxFactory.prototype.limitTraffic = function(_level, _duration) {
+  if (TNT._internal._settings.trafficLevelPercentage != 100) {
+    if (_level == 100) {
+      return;
+    }
+
+    var _enable = true;
+
+    if (parseInt(this._cookieManager.getCookie(TNT._internal._cookies.level)) != _level) {
+      _enable = (Math.random() * 100) <= _level;
+    }
+
+    this._cookieManager.setCookie(TNT._internal._cookies.level, _level, _duration);
+
+    if (!_enable) {
+      this.disable(60 * 60, 'limited by traffic');
+    }
+  }
+};
+
+/**
+ * Adds a function to be called with body onload.
+ */
+mboxFactory.prototype.addOnLoad = function(_function) {
+
+  // This extra checking is so that if there is a race, where addOnLoad
+  // is called as the onload functions are being called, we'll detect this
+  // and correctly call the passed in function exactly once, after the dom
+  // has loaded.
+
+  if (this.isDomLoaded()) {
+    _function();
+  } else {
+    var _calledFunction = false;
+    var _wrapper = function() {
+      if (_calledFunction) {
+        return;
       }
-      return retval
-    },
+      _calledFunction = true;
+      _function();
+    };
 
-    // `contains(arr, obj)`
-    // -----------------------
-    //
-    // Tells you whether an array contains an object.
-    //
-    // Parameters:
-    //
-    // - `arr` - said array
-    // - `obj` - said object
-    contains: function(arr, obj){
-      return SL.indexOf(arr, obj) !== -1
-    },
+    this._onloadFunctions.push(_wrapper);
 
-    // `indexOf(arr, obj)`
-    // -------------------
-    //
-    // Return the index of an object within an array.
-    //
-    // Parameters;
-    //
-    // - `arr` - said array
-    // - `obj` - said object
-    indexOf: function(arr, obj){
-      if (arr.indexOf)
-        return arr.indexOf(obj)
-      for (var i = arr.length; i--;)
-        if (obj === arr[i])
-          return i
-      return -1
-    },
+    if (this.isDomLoaded() && !_calledFunction) {
+      _wrapper();
+    }
+  }
+};
 
+mboxFactory.prototype.getEllapsedTime = function() {
+  return this._pageEndTime - this._pageStartTime;
+};
 
-    // `find(arr, obj)`
-    // -------------------
-    //
-    // Return the index of an object within an array.
-    //
-    // Parameters;
-    //
-    // - `arr` - said array
-    // - `obj` - said object
-    find: function(arr, cond, context){
-      var ret = []
-      if (!arr) return null
-      for (var i = 0, len = arr.length; i < len; i++){
-        var item = arr[i]
-        if (cond.call(context, item, i, arr))
-          return item
-      }
-      return null
-    },
+mboxFactory.prototype.getEllapsedTimeUntil = function(_time) {
+  return _time - this._pageStartTime;
+};
 
-    // `textMatch(str, str_or_regex)`
-    // ------------------------------
-    //
-    // Perform a string match based on another string or a regex.
-    //
-    // Parameters:
-    //
-    // `str` - the input string to be matched
-    // `str_or_regex` - the pattern to match against, if this is a string, it requires exact match, if
-    //      it's a regex, then it will do regex match
-    textMatch: function(str, pattern){
-      if (pattern == null) throw new Error('Illegal Argument: Pattern is not present')
-      if (str == null) return false
-      if (typeof pattern === 'string') return str === pattern
-      else if (pattern instanceof RegExp) return pattern.test(str)
-      else return false
-    },
+/**
+ * @return An mboxList object that contains the mboxes associated with this
+ *   factory.
+ */
+mboxFactory.prototype.getMboxes = function() {
+  return this._mboxes;
+};
 
-    // `stringify(obj, [seenValues])`
-    // ------------------------------
-    //
-    // Stringify any type of object.
-    //
-    // Parameters:
-    //
-    // `obj` - the object that needs to be stringified
-    // `seenValues` - pool of parsed resources; used to avoid circular references;
-    stringify: function(obj, seenValues){
-      seenValues = seenValues || [];
-      if (SL.isObject(obj)) {
-        if (SL.contains(seenValues, obj)) {
-          return '<Cycle>';
+/**
+ * @param _mboxId the id of the mbox, defaults to 0 if not specified.
+ *
+ * @return mbox with the specified _mboxName and _mboxId.
+ */
+mboxFactory.prototype.get = function(_mboxName, _mboxId) {
+  return this._mboxes.get(_mboxName).getById(_mboxId || 0);
+};
+
+/**
+ * Updates one or more mboxes with the name _mboxName
+ *
+ * @param _mboxName - name of the mbox
+ * @param _parameters - array of 0 or more items of the form "name=value"
+ *   (the values need to be escaped for inclusion in the url)
+ */
+mboxFactory.prototype.update = function(_mboxName, _parameters) {
+  if (!this.isEnabled()) {
+    return;
+  }
+
+  var _self = this;
+
+  if (!this.isDomLoaded()) {
+    this.addOnLoad(function() { _self.update(_mboxName, _parameters); });
+    return;
+  }
+
+  if (this._mboxes.get(_mboxName).length() === 0) {
+    throw "Mbox " + _mboxName + " is not defined";
+  }
+
+  this._mboxes.get(_mboxName).each(function(_mbox) {
+    var _urlBuilder = _mbox.getUrlBuilder();
+    var _tntId = _self.getPCId().getId();
+
+    if (_tntId) {
+      _urlBuilder.addParameter(TNT._internal._params.tntId, _tntId);
+    }
+
+    _urlBuilder.addParameter(TNT._internal._params.page, mboxGenerateId());
+    _self.setVisitorIdParameters(_urlBuilder, _mboxName);
+    _mbox.load(_parameters);
+  });
+};
+
+/**
+ * This method sets the value for the visitor Ids that come from the VisitorAPI.js
+ */
+mboxFactory.prototype.setVisitorIdParameters =  function(_url, _mboxName) {
+  if (typeof Visitor == 'undefined' || !TNT._internal._settings.imsOrgId) {
+    return;
+  }
+
+  var visitor = Visitor.getInstance(TNT._internal._settings.imsOrgId);
+
+  if (visitor.isAllowed()) {
+    // calling a getter on the visitor may either return a value, or invoke
+    // the callback, depending on if the value is immediately available.
+    var addVisitorValueToUrl = function(param, getter, mboxName) {
+      if (visitor[getter]) {
+        var callback = function(value) {
+          if (value) {
+            _url.addParameter(param, value);
+          }
+        };
+        var value;
+        if (typeof mboxName != 'undefined') {
+          value = visitor[getter]("mbox:" + mboxName);
         } else {
-          seenValues.push(obj);
+          value = visitor[getter](callback);
         }
+        callback(value);
+      }
+    };
+
+    addVisitorValueToUrl(TNT._internal._params.mcgvid, "getMarketingCloudVisitorID");
+    addVisitorValueToUrl(TNT._internal._params.mcglh, "getAudienceManagerLocationHint");
+    addVisitorValueToUrl(TNT._internal._params.aamb, "getAudienceManagerBlob");
+    addVisitorValueToUrl(TNT._internal._params.mcavid, "getAnalyticsVisitorID");
+    addVisitorValueToUrl(TNT._internal._params.mcsdid, "getSupplementalDataID", _mboxName);
+  }
+};
+
+/**
+ * Creates an mbox called _mboxName.
+ *
+ * There is a small chance that an mbox with the same name is created after
+ * we call update - we will ignore this chance.
+ *
+ * @param _mboxName - name of the mbox
+ * @param _parameters - array of 0 or more items of the form "name=value"
+ *   (the values need to be escaped for inclusion in the url)
+ * @param _defaultNode - the DOM node that is the default content
+ *                       the name of the DOM that is the default content
+ *                       or is not specified, search bacwords for
+ *                       mboxDefault class to use as default content
+ */
+mboxFactory.prototype.create = function(_mboxName, _parameters, _defaultNode) {
+
+  if (!this.isSupported()) {
+    return null;
+  }
+
+  var _url = this._urlBuilder.clone();
+  _url.addParameter(TNT._internal._params.count, this._mboxes.length() + 1);
+  _url.addParameters(_parameters);
+
+  this.setVisitorIdParameters(_url, _mboxName);
+
+  var _mboxId = this._mboxes.get(_mboxName).length();
+  var _divSuffix = this._factoryId + '-' + _mboxName + '-' + _mboxId;
+  var _locator;
+  var _mbox;
+
+  if (_defaultNode) {
+    _locator = new mboxLocatorNode(_defaultNode);
+  } else {
+    if (this._pageLoaded) {
+      throw 'The page has already been loaded, can\'t write marker';
+    }
+    _locator = new mboxLocatorDefault(_divSuffix);
+  }
+
+  try {
+    var _self = this;
+    var _importName = TNT._internal._constants.divImportPrefix + _divSuffix;
+    _mbox = new mbox(_mboxName, _mboxId, _url, _locator, _importName);
+
+    if (this._enabled) {
+      _mbox.setFetcher(
+          this._pageLoaded ? new mboxAjaxFetcher() : new mboxStandardFetcher());
+    }
+
+    _mbox.setOnError(function(_message, _type) {
+      _mbox.setMessage(_message);
+      _mbox.activate();
+      if (!_mbox.isActivated()) {
+        _self.disable(60 * 60, _message);
+        window.location.reload(false);
       }
 
-      if (SL.isArray(obj)) {
-        return '[' + SL.map(obj, function(value){
-              return SL.stringify(value, seenValues)
-            }).join(',') + ']';
-      } else if (SL.isString(obj)) {
-        return '"' + String(obj) + '"';
-      } if (SL.isObject(obj)) {
-        var data = [];
-        for (var prop in obj) {
-          data.push(prop + ': ' + SL.stringify(obj[prop], seenValues));
-        }
-        return '{' + data.join(', ') + '}';
+
+    });
+    this._mboxes.add(_mbox);
+  } catch (_e) {
+    this.disable();
+    throw 'Failed creating mbox "' + _mboxName + '", the error was: ' + _e;
+  }
+
+  var _now = new Date();
+  var _time = _now.getTime() - (_now.getTimezoneOffset() * TNT._internal._constants.millisInMinute);
+  var _tntId = _self.getPCId().getId();
+
+  if (_tntId) {
+    _url.addParameter(TNT._internal._params.tntId, _tntId);
+  }
+
+  _url.addParameter(TNT._internal._params.time, _time);
+
+  return _mbox;
+};
+
+mboxFactory.prototype.getCookieManager = function() {
+  return this._cookieManager;
+};
+
+mboxFactory.prototype.getPageId = function() {
+  return this._mboxPageId;
+};
+
+mboxFactory.prototype.getPCId = function() {
+  return this._mboxPCId;
+};
+
+mboxFactory.prototype.getSessionId = function() {
+  return this._mboxSessionId;
+};
+
+mboxFactory.prototype.getSignaler = function() {
+  return this._mboxSignaler;
+};
+
+mboxFactory.prototype.getUrlBuilder = function() {
+  return this._urlBuilder;
+};
+
+mboxFactory.prototype._initGlobalParameters = function(_url, _isDefaultFactory) {
+  _url.addParameter(TNT._internal._params.host, document.location.hostname)
+      .addParameter(TNT._internal._pageParams.session, this._mboxSessionId.getId());
+  if (!_isDefaultFactory) {
+    _url.addParameter(TNT._internal._params.factoryId, this._factoryId);
+  }
+  if (this._mboxPCId.getId()) {
+    _url.addParameter(TNT._internal._params.tntId, this._mboxPCId.getId());
+  }
+  _url.addParameter(TNT._internal._params.page, this._mboxPageId);
+  _url.addParameter(TNT._internal._params.screeHeight, this._mboxScreenHeight);
+  _url.addParameter(TNT._internal._params.screenWidth, this._mboxScreenWidth);
+  _url.addParameter(TNT._internal._params.browserWidth, this._mboxBrowserWidth);
+  _url.addParameter(TNT._internal._params.browserHeight, this._mboxBrowserHeight);
+  _url.addParameter(TNT._internal._params.browserTimeOffset, this._mboxBrowserTimeOffset);
+  _url.addParameter(TNT._internal._params.colorDepth, this._mboxColorDepth);
+
+
+  if (TNT._internal._settings.crossDomainEnabled) {
+    _url.addParameter(TNT._internal._params.crossDomain, TNT._internal._settings.crossDomain);
+  }
+
+  var params = TNT._internal._settings.parametersFunction();
+
+  if (params) {
+    _url.addParameters(this._mboxParametersClient().split('&'));
+  }
+
+  _url.setUrlProcessAction(function(_url) {
+    if (TNT._internal._settings.passPageParameters) {
+      _url += '&';
+      _url += TNT._internal._params.url;
+      _url += '=' + encodeURIComponent(document.location);
+
+      var _referrer = encodeURIComponent(document.referrer);
+
+      if (_url.length + _referrer.length < 2000) {
+        _url += '&';
+        _url += TNT._internal._params.referrer;
+        _url += '=' + _referrer;
+      }
+    }
+
+    _url += '&';
+    _url += TNT._internal._params.version;
+    _url += '=' + mboxVersion;
+
+    return _url;
+  });
+};
+
+mboxFactory.prototype._mboxParametersClient = function() {
+  return TNT._internal._settings.parametersFunction();
+};
+
+/**
+ * Causes all mbox default content to not be displayed:
+ */
+mboxFactory.prototype._makeDefaultContentInvisible = function() {
+  document.write('<style>.' + TNT._internal._constants.divDefaultClass + ' { visibility:hidden; }</style>');
+};
+
+mboxFactory.prototype.isDomLoaded = function() {
+  return this._pageLoaded;
+};
+
+mboxFactory.prototype._listenForDomReady = function() {
+  if (this._onloadFunctions) {
+    return;
+  }
+
+  this._onloadFunctions = [];
+
+  var _self = this;
+  (function() {
+    var _eventName = document.addEventListener ? "DOMContentLoaded" : "onreadystatechange";
+    var _loaded = false;
+    var _ready = function() {
+      if (_loaded) {
+        return;
+      }
+      _loaded = true;
+      for (var i = 0; i < _self._onloadFunctions.length; ++i) {
+        _self._onloadFunctions[i]();
+      }
+    };
+
+    if (document.addEventListener) {
+      document.addEventListener(_eventName, function() {
+        document.removeEventListener(_eventName, arguments.callee, false);
+        _ready();
+      }, false);
+
+      window.addEventListener("load", function(){
+        document.removeEventListener("load", arguments.callee, false);
+        _ready();
+      }, false);
+
+    } else if (document.attachEvent) {
+      if (self !== self.top) {
+        document.attachEvent(_eventName, function() {
+          if (document.readyState === 'complete') {
+            document.detachEvent(_eventName, arguments.callee);
+            _ready();
+          }
+        });
       } else {
-        return String(obj);
-      }
-    },
-
-    // `trim(str)`
-    // -----------
-    //
-    // Trims a string.
-    //
-    // Parameters:
-    //
-    // `str` - the input string to be trimmed.
-    trim: function(str){
-      if (str == null) return null
-      if (str.trim){
-        return str.trim()
-      }else{
-        return str.replace(/^ */, '').replace(/ *$/, '')
-      }
-    },
-
-    // `bind(func, context)`
-    // ---------------------
-    //
-    // Binds a context permanently to a context. The returned function is a new function
-    // which - when called - will call the passed in function with `context` bound to it.
-    //
-    // Parameters:
-    //
-    // `func` - a function
-    // `context` - an object to be bound as the context of this function
-    bind: function(func, context) {
-      return function() {
-        return func.apply(context, arguments)
-      }
-    },
-
-    // `throttle(fn, delay)`
-    // ---------------------
-    //
-    // *Throttles* a function `fn` to be called no more than once during the interval
-    // specified by `delay`.
-    //
-    // Parameters:
-    //
-    // - `fn` - a function
-    // - `delay` - delay in milliseconds
-    //
-    // *Throttle function stolen from
-    //     <http://remysharp.com/2010/07/21/throttling-function-calls/>*
-    throttle: function(fn, delay) {
-      var timer = null;
-      return function () {
-        var context = this, args = arguments;
-        clearTimeout(timer);
-        timer = setTimeout(function () {
-          fn.apply(context, args);
-        }, delay);
-      };
-    },
-
-    // `domReady(callback)`
-    // --------------------
-    //
-    // Registers a callback to be called when the DOM is fully parsed and loaded.
-    //
-    // Parameters:
-    //
-    // - `callback` - a function to be called at `domready`
-    //
-    // *domReady is borrowed from <https://github.com/ded/domready>*
-    domReady: (function (ready) {
-
-      var fns = [], fn, f = false
-          , doc = document
-          , testEl = doc.documentElement
-          , hack = testEl.doScroll
-          , domContentLoaded = 'DOMContentLoaded'
-          , addEventListener = 'addEventListener'
-          , onreadystatechange = 'onreadystatechange'
-          , loaded = /^loade|^c/.test(doc.readyState)
-
-      function flush(f) {
-        loaded = 1
-        while (f = fns.shift()) f()
-      }
-
-      doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
-        doc.removeEventListener(domContentLoaded, fn, f)
-        flush()
-      }, f)
-
-
-      hack && doc.attachEvent(onreadystatechange, (fn = function () {
-        if (/^c/.test(doc.readyState)) {
-          doc.detachEvent(onreadystatechange, fn)
-          flush()
-        }
-      }))
-
-      return (ready = hack ?
-          function (fn) {
-            self != top ?
-                loaded ? fn() : fns.push(fn) :
-                function () {
-                  try {
-                    testEl.doScroll('left')
-                  } catch (e) {
-                    return setTimeout(function() { ready(fn) }, 50)
-                  }
-                  fn()
-                }()
-          } :
-          function (fn) {
-            loaded ? fn() : fns.push(fn)
-          })
-    }()),
-
-    // `loadScript(url, [callback])`
-    // -----------------------------
-    //
-    // Load an external script.
-    //
-    // Parameters:
-    //
-    // - `url` - the URL of the script
-    // - `callback`(optional) - the function to be called after the script has loaded.
-    loadScript: function(url, callback){
-      var script = document.createElement('script')
-      SL.scriptOnLoad(url, script, callback)
-      script.src = url
-      document.getElementsByTagName('head')[0]
-          .appendChild(script)
-    },
-
-    scriptOnLoad: function(url, script, callback){
-      function cb(err){
-        if (err) SL.logError(err)
-        if (callback) callback(err)
-      }
-      if ('onload' in script){
-        script.onload = function(){
-          cb()
-        }
-        script.onerror = function(){
-          cb(new Error('Failed to load script ' + url))
-        }
-      }else if ('readyState' in script){
-        script.onreadystatechange = function(){
-          var rs = script.readyState
-          if (rs === 'loaded' || rs === 'complete'){
-            script.onreadystatechange = null
-            cb()
+        var _checkScrollable = function() {
+          try {
+            document.documentElement.doScroll('left');
+            _ready();
+          } catch (_domNotReady) {
+            setTimeout(_checkScrollable, 13);
           }
-        }
-      }
-    },
-
-    // `loadScriptOnce(url, [callback])`
-    // -----------------------------
-    //
-    // Load an external script only if it hasn't been loaded until now.
-    //
-    // Parameters:
-    //
-    // - `url` - the URL of the script
-    // - `callback`(optional) - the function to be called after the script has loaded.
-    loadScriptOnce: function(url, callback){
-      if (SL.loadedScriptRegistry[url]) return
-
-      SL.loadScript(url, function(err) {
-        if (!err) {
-          SL.loadedScriptRegistry[url] = true
-        }
-
-        if (callback) callback(err)
-      })
-    },
-
-    loadedScriptRegistry: {},
-
-    // `loadScriptSync(url)`
-    // -----------------------------
-    //
-    // Load an external script using document.write.
-    //
-    // Parameters:
-    //
-    // - `url` - the URL of the script
-    loadScriptSync: function(url){
-      if (!document.write) {
-        SL.notify('Cannot load sync the "' + url + '" script because "document.write" is not available', 1)
-        return
-      }
-
-      if (SL.domReadyFired){
-        SL.notify('Cannot load sync the "' + url + '" script after DOM Ready.', 1)
-        return
-      }
-
-      document.write('<script src="' + url + '"></scr' + 'ipt>');
-    },
-
-    // `pushAsyncScript(callback)`
-    // -------------------
-    //
-    // Called by an async custom user script.
-    pushAsyncScript: function(cb){
-      SL.tools['default'].pushAsyncScript(cb)
-    },
-
-    // `pushBlockingScript(callback)`
-    // ------------------------------
-    //
-    // Called by a blocking custom user script.
-    pushBlockingScript: function(cb){
-      SL.tools['default'].pushBlockingScript(cb)
-    },
-
-    // `addEventHandler(elm, evt, callback)`
-    // -------------------------------------
-    //
-    // Register an event handler for a element
-    //
-    // Parameters:
-    //
-    // - `elm` - the element in question
-    // - `evt` - the event type to listen to
-    // - `callback` - callback function
-    addEventHandler: window.addEventListener ?
-        function(node, evt, cb){ node.addEventListener(evt, cb, false) } :
-        function(node, evt, cb){ node.attachEvent('on' + evt, cb) },
-
-    // `preventDefault(evt)`
-    // ---------------------
-    //
-    // Prevent the default browser behavior for this event
-    //
-    // Parameters:
-    //
-    // `evt` - the event triggered
-    preventDefault: window.addEventListener ?
-        function(e){ e.preventDefault() } :
-        function(e){ e.returnValue = false },
-
-    // `stopPropagation(evt)`
-    // ----------------------
-    //
-    // Cross-browser `stopPropagation`
-    //
-    // Parameters:
-    //
-    // `evt` - the event triggered
-    stopPropagation: function(e){
-      e.cancelBubble = true
-      if (e.stopPropagation) e.stopPropagation()
-    },
-
-    // `containsElement(elm1, elm2)`
-    // ----------------------
-    //
-    // Given DOM elements `elm1` and `elm2`, returns whether `elm1` contains `elm2`.
-    //
-    // Parameters:
-    //
-    // `elm1` - the possible parent
-    // `elm2` - the possible child
-    //
-    // *Ripped from <http://stackoverflow.com/questions/6130737/mouseenter-without-jquery>*
-    containsElement: function(container, maybe) {
-      return container.contains ? container.contains(maybe) :
-          !!(container.compareDocumentPosition(maybe) & 16);
-    },
-
-    // `matchesCss(css, elm)`
-    // ----------------------
-    //
-    // Returns whether a DOM element matches a given css selector
-    //
-    // Parameters:
-    //
-    // - `css` - the CSS selector
-    // - `elm` - the element
-    matchesCss: (function(docEl){
-
-      function simpleTagMatch(selector, elm){
-        var tagName = elm.tagName
-        if (!tagName) return false
-        return selector.toLowerCase() === tagName.toLowerCase()
-      }
-
-      var matches =
-          docEl.matchesSelector ||
-          docEl.mozMatchesSelector ||
-          docEl.webkitMatchesSelector ||
-          docEl.oMatchesSelector ||
-          docEl.msMatchesSelector
-      if (matches) {
-        return function(selector, elm){
-          if (elm === document || elm === window) return false
-          try{
-            return matches.call(elm, selector)
-          }catch(e){
-            return false
-          }
-        }
-      } else if(docEl.querySelectorAll) {
-        return function(selector, elm) {
-          var parent = elm.parentNode
-          if (!parent) return false
-          if (selector.match(/^[a-z]+$/i)){
-            return simpleTagMatch(selector, elm)
-          }
-          try{
-            var nodeList = elm.parentNode.querySelectorAll(selector)
-            for (var i = nodeList.length; i--;)
-              if (nodeList[i] === elm) return true
-          }catch(e){
-            //
-          }
-          return false
-        }
-      }else{
-        return function(selector, elm){
-          if (selector.match(/^[a-z]+$/i)){
-            return simpleTagMatch(selector, elm)
-          }
-          try{
-            return SL.Sizzle.matches(selector, [elm]).length > 0
-          }catch(e){
-            return false
-          }
-        }
-      }
-    }(document.documentElement)),
-
-    // `cssQuery(css)`
-    // ---------------
-    //
-    // Return a list of element matching the given css selector
-    //
-    // Parameters:
-    //
-    // - `css` - the CSS selector
-    cssQuery: (function(doc){
-      if (doc.querySelectorAll) {
-        return function(css, cb){
-          var results
-          try{
-            results = doc.querySelectorAll(css)
-          }catch(e){
-            results = []
-          }
-          cb(results)
-        }
-      }else{
-        return function(css, cb){
-          if (SL.Sizzle){
-            var results
-            try{
-              results = SL.Sizzle(css)
-            }catch(e){
-              results = []
-            }
-            cb(results)
-          }else
-            SL.sizzleQueue.push([css, cb])
-        }
-      }
-    })(document),
-
-    // `hasAttr(elem, attrName)`
-    // ---------------
-    //
-    // Check if attribute is defined on element
-    //
-    // Parameters:
-    //
-    // - `elem` - the DOM element
-    // - `attrName` - attribute name
-    hasAttr: function(elem, attrName) {
-      return elem.hasAttribute ? elem.hasAttribute(attrName) : elem[attrName] !== undefined;
-    },
-
-    // `inherit(subClass, superClass)`
-    // -------------------------------
-    //
-    // Make `subClass` inherit `superClass`.
-    //
-    // Parameters:
-    //
-    // - `subClass` - a Javascript function representing a constructor - the inheritor
-    // - `superClass` - another constructor - the one to inherit from
-    inherit: function(subClass, superClass){
-      var f = function() {}
-      f.prototype = superClass.prototype
-      subClass.prototype = new f()
-      subClass.prototype.constructor = subClass
-    },
-
-    // `extend(dst, src)`
-    // ----------------
-    //
-    // Extend an object with the properties of another.
-    //
-    // Parameters:
-    //
-    // - `dst` - object to copy to
-    // - `src` - object to copy from
-    extend: function(dst, src){
-      for (var prop in src)
-        if (src.hasOwnProperty(prop))
-          dst[prop] = src[prop]
-    },
-
-    // `toArray(arrayLike)`
-    // --------------------
-    //
-    // Converts an array-like object to an array.
-    //
-    // Parameters:
-    //
-    // - `arrayLike` - an array-like object, meaning it has a length property
-    //   which is a number
-    toArray: (function(){
-      try {
-        var slice = Array.prototype.slice
-        slice.call( document.documentElement.childNodes, 0 )[0].nodeType;
-        return function(thing){
-          return slice.call(thing, 0)
-        }
-        // Provide a fallback method if it does not work
-      } catch( e ) {
-        return function(thing){
-          var ret = []
-          for (var i = 0, len = thing.length; i < len; i++)
-            ret.push(thing[i])
-          return ret
-        }
-      }
-    })(),
-
-    // `equalsIgnoreCase(str1, str2)`
-    // ------------------------------
-    //
-    // Returns true iff str1 and str2 are equal ignoring case.
-    //
-    // Parameters:
-    //
-    // * `str1` - the first string
-    // * `str2` - the second string
-    equalsIgnoreCase: function(str1, str2){
-      if (str1 == null) return str2 == null
-      if (str2 == null) return false
-      return String(str1).toLowerCase() === String(str2).toLowerCase()
-    },
-
-    // `poll(fn, [freq], [max_retries])`
-    // ------------------
-    //
-    // Runs `fn` for every `freq` ms. `freq` defaults to 1000. If any
-    // invocation of `fn()` returns true, polling will stop.
-    // The polling will stop if the number or retries exceeds the
-    // provided `max_retries`.
-    //
-    // Parameters:
-    //
-    // * `fn` - function to be called repeatedly
-    // * `freq` - frequency to call the function
-    // * `max_retries` - number of times to retry
-    poll: function(fn, freq, max_retries){
-      var retries = 0
-
-      freq = freq || 1000
-      check()
-
-      function check(){
-        if (SL.isNumber(max_retries) && retries++ >= max_retries) {
-          return;
-        }
-
-        if (!fn()){
-          setTimeout(check, freq)
-        }
-      }
-    },
-    // `escapeForHtml(str)`
-    // --------------------
-    //
-    // Escapes a string for being used in an HTML context. Returns
-    // the escaped version of the string. Replaces the characters
-    // `&` `<` `>` `"` `'` and `/`.
-    //
-    // Parameters:
-    //
-    // * `str` - the string to be escaped
-    escapeForHtml: function(str){
-      if (!str) return str
-      return str
-          .replace(/\&/g, '&amp;')
-          .replace(/\</g, '&lt;')
-          .replace(/\>/g, '&gt;')
-          .replace(/\"/g, '&quot;')
-          .replace(/\'/g, '&#x27;')
-          .replace(/\//g, '&#x2F;')
-    }
-  }
-
-// The available tools to use.
-  SL.availableTools = {}
-
-// The avaliable event emitters to use.
-  SL.availableEventEmitters = []
-
-// The names of the events which can only fire once.
-  SL.fireOnceEvents = ['condition', 'elementexists']
-
-// Initialize all event emitters.
-  SL.initEventEmitters = function(){
-    SL.eventEmitters = SL.map(SL.availableEventEmitters, function(ee){
-      return new ee()
-    })
-  }
-
-// Call `registerElements` on all event emitters.
-  SL.eventEmitterBackgroundTasks = function(){
-    SL.each(SL.eventEmitters, function(ee){
-      if ('backgroundTasks' in ee)
-        ee.backgroundTasks()
-    })
-  }
-
-// Initialize all tools.
-  SL.initTools = function(toolSpecs){
-    var tools = { 'default': new DefaultTool() }
-    var euCookieName = SL.settings.euCookieName || 'sat_track'
-    for (var id in toolSpecs){
-      var toolSpec, ctr, tool
-      toolSpec = toolSpecs[id]
-      if (toolSpec.euCookie){
-        var cookieSet = SL.readCookie(euCookieName) !== 'true'
-        if (cookieSet) continue
-      }
-      ctr = SL.availableTools[toolSpec.engine]
-      if (!ctr){
-        var available = []
-        for (var key in SL.availableTools){
-          available.push(key)
-        }
-        throw new Error('No tool engine named ' + toolSpec.engine +
-        ', available: ' + available.join(',') + '.')
-      }
-      tool = new ctr(toolSpec)
-      tool.id = id
-      tools[id] = tool
-    }
-    return tools
-  }
-
-// Pre-process arguments (variable substitutions and lower-casing) before
-// feeding them to the tools.
-  SL.preprocessArguments = function(args, elm, evt, forceLowerCase){
-    if (!args) return args
-    return preprocessArray(args, forceLowerCase)
-    function forceLowerCaseIfNeeded(value) {
-      return forceLowerCase && SL.isString(value) ? value.toLowerCase() : value
-    }
-
-    function preprocessObject(obj){
-      var ret = {}
-      for (var key in obj){
-        if (obj.hasOwnProperty(key)){
-          var value = obj[key]
-          if (SL.isObject(value)){
-            ret[key] = preprocessObject(value)
-          }else if (SL.isArray(value)){
-            ret[key] = preprocessArray(value)
-          }else{
-            ret[key] = forceLowerCaseIfNeeded(SL.replace(value, elm, evt))
-          }
-        }
-      }
-      return ret
-    }
-
-    function preprocessArray(args, forceLowerCase){
-      var ret = []
-      for (var i = 0, len = args.length; i < len; i++){
-        var value = args[i]
-        if (SL.isString(value)){
-          value = forceLowerCaseIfNeeded(SL.replace(value, elm, evt))
-        }else if (value && value.constructor === Object){
-          value = preprocessObject(value)
-        }
-        ret.push(value)
-      }
-      return ret
-    }
-
-  }
-
-// Execute a command.
-  SL.execute = function(trig, elm, evt, tools){
-    if (_satellite.settings.hideActivity) return
-    tools = tools || SL.tools
-
-    function doit(toolName){
-      var tool = tools[toolName || 'default']
-      if (!tool)
-        return
-      try{
-        tool.triggerCommand(trig, elm, evt)
-      }catch(e){
-        SL.logError(e)
+        };
+        _checkScrollable();
       }
     }
-    if (trig.engine){
-      var engine = trig.engine
-      for (var toolName in tools){
-        var tool = tools[toolName]
-        if (tool.settings && tool.settings.engine === engine)
-          doit(toolName)
-      }
-    }else if (trig.tool instanceof Array)
-      SL.each(trig.tool, function(toolName){
-        doit(toolName)
-      })
-    else
-      doit(trig.tool)
-  }
 
-// `notify(msg, pty)`
-// ------------------
+    if (document.readyState === "complete") {
+      _ready();
+    }
+
+  })();
+};
+
+/**
+ * Iterates all signal cookies (e.g. prefixed with mboxSignalPrefix), and
+ * creates a signal mbox for each signal cookie.
+ *
+ * @param _createMboxMethod Takes two arguments, first is the name of the mbox,
+ *   second is an array of parameters.
+ * @PrivateClass
+ */
+mboxSignaler = function(_createMboxMethod, _cookieManager) {
+  this._cookieManager = _cookieManager;
+  var _signalCookieNames =
+      _cookieManager.getCookieNames(TNT._internal._cookies.signalPrefix);
+  for (var _i = 0; _i < _signalCookieNames.length; _i++) {
+    var _cookieName = _signalCookieNames[_i];
+    var _args = _cookieManager.getCookie(_cookieName).split('&');
+    var _mbox = _createMboxMethod(_args[0], _args);
+    _mbox.load();
+    _cookieManager.deleteCookie(_cookieName);
+  }
+};
+
+/**
+ * Called from the imported div tag to signal that an mbox was clicked on.
+ */
+mboxSignaler.prototype.signal = function(_signalType, _mboxName /*,...*/) {
+  this._cookieManager.setCookie(TNT._internal._cookies.signalPrefix +_signalType,
+      mboxShiftArray(arguments).join('&'), 45 * 60);
+};
+
+/**
+ * Represents a list of mboxes.
+ *
+ * @PrivateClass
+ */
+mboxList = function() {
+  this._mboxes = [];
+};
+
+mboxList.prototype.add = function(_mbox) {
+  if (_mbox) {
+    this._mboxes[this._mboxes.length] = _mbox;
+  }
+};
+
+/**
+ * @return a subset of this mbox list with items of the specified name.
+ */
+mboxList.prototype.get = function(_mboxName) {
+  var _result = new mboxList();
+  for (var _i = 0; _i < this._mboxes.length; _i++) {
+    var _mbox = this._mboxes[_i];
+    if (_mbox.getName() == _mboxName) {
+      _result.add(_mbox);
+    }
+  }
+  return _result;
+};
+
+mboxList.prototype.getById = function(_index) {
+  return this._mboxes[_index];
+};
+
+mboxList.prototype.length = function() {
+  return this._mboxes.length;
+};
+
+/**
+ * @param _action a function that taken an mbox instance as parameter.
+ */
+mboxList.prototype.each = function(_action) {
+  if (typeof _action !== 'function') {
+    throw 'Action must be a function, was: ' + typeof(_action);
+  }
+  for (var _i = 0; _i < this._mboxes.length; _i++) {
+    _action(this._mboxes[_i]);
+  }
+};
+
 //
-// Notify the user of things happening in Satellite using `console.log`
+// Note this constructor also writes a node to the DOM, do not create
+// after the page is loaded
 //
-// - msg - message to print
-// - pty - priority
-  SL.notify = window.console ? function(msg, pty) {
-    if (SL.settings.notifications) {
-      switch (pty) {
-        case 1:
-        case 2:
-        case 3:
-          console['log']("SATELLITE: " + msg);
-          break;
-        case 4:
-          console.warn("SATELLITE: " + msg);
-          break;
-        case 5:
-          console.error("SATELLITE: " + msg);
-          break;
-        default:
-          console['log']("SATELLITE: Notify called with incorrect priority.");
+mboxLocatorDefault = function(_name) {
+  this._name = TNT._internal._constants.divMarkerPrefix + _name;
+
+  document.write('<div id="' + this._name + '" style="visibility:hidden;display:none">&nbsp;</div>');
+};
+
+mboxLocatorDefault.prototype.locate = function() {
+  var _node = document.getElementById(this._name);
+  while (_node) {
+    // check is DOM_ELEMENT_NODE before testing class name
+    if (_node.nodeType == 1) {
+      if (_node.className == 'mboxDefault') {
+        return _node;
       }
     }
-  } : function(){}
-
-// `cleanText(str)`
-// ================
-//
-// "Cleans" the text from an element's innerText. This is used directly by the
-// @cleanText special property.
-  SL.cleanText = function(str){
-    if (str == null) return null
-    return SL.trim(str).replace(/\s{2,}/g, ' ')
-        .replace(/[^\000-\177]*/g, '')
+    _node = _node.previousSibling;
   }
 
-  SL.text = function(obj){
-    return obj.textContent || obj.innerText
+  return null;
+};
+
+mboxLocatorDefault.prototype.force = function() {
+  // There was no default div, add an empty one
+  var _div = document.createElement('div');
+  _div.className = 'mboxDefault';
+
+  var _marker = document.getElementById(this._name);
+  if (_marker) {
+    _marker.parentNode.insertBefore(_div, _marker);
   }
 
-// Special Properties for DOM elements. You use special properties using
-// the @ prefix. Example:
-//
-//     this.@text
-  SL.specialProperties = {
-    text: SL.text,
-    cleanText: function(obj){
-      return SL.cleanText(SL.text(obj))
+  return _div;
+};
+
+mboxLocatorNode = function(_DOMNode) {
+  this._node = _DOMNode;
+};
+
+mboxLocatorNode.prototype.locate = function() {
+  return typeof this._node == 'string' ?
+      document.getElementById(this._node) : this._node;
+};
+
+mboxLocatorNode.prototype.force = function() {
+  return null;
+};
+
+/*
+ * Creates an mbox called '_mboxName' and attempts to load it
+ *
+ * @return the created mbox or null if the platform is not supported
+ */
+mboxCreate = function(_mboxName /*, ... */) {
+  var _mbox = mboxFactoryDefault.create( _mboxName, mboxShiftArray(arguments));
+
+  if (_mbox) {
+    _mbox.load();
+  }
+  return _mbox;
+};
+
+/*
+ * Creates and associates an mbox with a specified '_DOMNode'
+ * The created mbox needs to be load()ed
+ *
+ * @param _defaultNode of default content
+ *        - if null or empty string looks back for mboxDefault
+ *        - if a string looks for a DOM node with the passed id
+ *        - otherwise it is assumed to be a DOM node
+ *
+ * @return the created mbox or null if the platform is not supported
+ */
+mboxDefine = function(_defaultNode, _mboxName /*, ...*/) {
+  var _mbox = mboxFactoryDefault.create(_mboxName,
+      mboxShiftArray(mboxShiftArray(arguments)), _defaultNode);
+
+  return _mbox;
+};
+
+mboxUpdate = function(_mboxName /*, ... */) {
+  mboxFactoryDefault.update(_mboxName, mboxShiftArray(arguments));
+};
+
+/**
+ * Class that is the base of all mbox types.
+ * @PrivateClass
+ *
+ * @parm _name - name of mbox
+ * @param _id - index of this mbox in the list of mboxes of the same name
+ * @param _urlBuilder - used to build url of the request
+ * @param _mboxLocator object must support
+ *   DOMNode locate() which should return null until the DOMNode is found.
+ *   DOMNode force() which as a last resort should attempt to create
+ *                   a DOMNOde and return it or null
+ * @param _importName id of the node containing offer content
+ */
+mbox = function(_name, _id, _urlBuilder, _mboxLocator, _importName) {
+  this._timeout = null;
+  this._activated = 0;
+  this._locator = _mboxLocator;
+  this._importName = _importName;
+  this._contentFetcher = null;
+
+  this._offer = new mboxOfferContent();
+  this._div = null;
+  this._urlBuilder = _urlBuilder;
+
+  // Information to support debugging
+  this.message = '';
+  this._times = {};
+  this._activateCount = 0;
+
+  this._id = _id;
+  this._name = _name;
+
+  this._validateName();
+
+  _urlBuilder.addParameter(TNT._internal._params.name, _name)
+      .addParameter(TNT._internal._params.id, _id);
+
+  this._onError = function() {};
+  this._onLoad = function() {};
+
+  this._defaultDiv = null;
+  // enabled for IE10+ only during page load
+  this._waitForNestedMboxes = document.documentMode >= 10 && !TNT._internal.isDomLoaded;
+
+  if (this._waitForNestedMboxes) {
+    this._nestedMboxes = TNT._internal.nestedMboxes;
+    this._nestedMboxes.push(this._name);
+  }
+};
+
+mbox.prototype.getId = function() {
+  return this._id;
+};
+
+mbox.prototype._validateName = function() {
+  if (this._name.length > TNT._internal._constants.nameLength) {
+    throw "Mbox Name " + this._name + " exceeds max length of " + TNT._internal._constants.nameLength + " characters.";
+  } else if (this._name.match(/^\s+|\s+$/g)) {
+    throw "Mbox Name " + this._name + " has leading/trailing whitespace(s).";
+  }
+};
+
+mbox.prototype.getName = function() {
+  return this._name;
+};
+
+/**
+ * @return an array of parameters
+ */
+mbox.prototype.getParameters = function() {
+  var _parameters = this._urlBuilder.getParameters();
+  var _result = [];
+  for (var _i = 0; _i < _parameters.length; _i++) {
+    // do not include internal parameters
+    if (_parameters[_i].name.indexOf('mbox') !== 0) {
+      _result[_result.length] = _parameters[_i].name + '=' + _parameters[_i].value;
     }
   }
+  return _result;
+};
 
-// `getObjectProperty(obj, property)`
-// ============================
-//
-// Get property(potentially nested) from an object.
-  SL.getObjectProperty = function(obj, property, supportSpecial){
-    var propChain = property.split('.')
-    var currValue = obj
-    var special = SL.specialProperties
-    var attrMatch
-    for (var i = 0, len = propChain.length; i < len; i++){
-      if (currValue == null) return undefined
-      var prop = propChain[i]
-      if (supportSpecial && prop.charAt(0) === '@'){
-        var specialProp = prop.slice(1)
-        currValue = special[specialProp](currValue)
-        continue
-      }
-      if (currValue.getAttribute &&
-          (attrMatch = prop.match(/^getAttribute\((.+)\)$/))){
-        var attr = attrMatch[1]
-        currValue = currValue.getAttribute(attr)
-        continue
-      }
-      currValue = currValue[prop]
-    }
-    return currValue
+/**
+ * Sets the action to execute when the offer has loaded.
+ * To be used with mboxUpdate.
+ */
+mbox.prototype.setOnLoad = function(_action) {
+  this._onLoad = _action;
+  return this;
+};
+
+mbox.prototype.setMessage = function(_message) {
+  this.message = _message;
+  return this;
+};
+
+/**
+ * @param _onError is a function that takes two string arguments:
+ *   message, fetch type
+ */
+mbox.prototype.setOnError = function(_onError) {
+  this._onError = _onError;
+  return this;
+};
+
+mbox.prototype.setFetcher = function(_fetcher) {
+  if (this._contentFetcher) {
+    this._contentFetcher.cancel();
+  }
+  this._contentFetcher = _fetcher;
+  return this;
+};
+
+mbox.prototype.getFetcher = function() {
+  return this._contentFetcher;
+};
+
+/**
+ * Loads mbox content.
+ * @param _parameters - Optional parameters to be added to the request.
+ */
+mbox.prototype.load = function(_parameters) {
+  if (this._contentFetcher === null) {
+    return this;
   }
 
-// `getToolsByType(type)`
-// ------------------------------------------------
-//
-// Returns an array containing all the tools whose engine property match
-// the provided type.
-//
-// - `type` - The searched tool type
-  SL.getToolsByType = function(type){
-    if (!type) {
-      throw new Error('Tool type is missing')
-    }
+  this.setEventTime("load.start");
+  this.cancelTimeout();
+  this._activated = 0;
 
-    var result = []
-    for (var t in SL.tools) {
-      var tool = SL.tools[t]
-      if (tool.settings && tool.settings.engine === type) {
-        result.push(tool)
-      }
-    }
+  var _urlBuilder = (_parameters && _parameters.length > 0) ?
+      this._urlBuilder.clone().addParameters(_parameters) : this._urlBuilder;
+  this._contentFetcher.fetch(_urlBuilder);
 
-    return result
+  var _self = this;
+  this._timer = setTimeout(function() {
+    _self._onError('browser timeout', _self._contentFetcher.getType());
+  }, TNT._internal._settings.timeout);
+
+  this.setEventTime("load.end");
+
+  return this;
+};
+
+/*
+ * Used by the server to signal that all assets have been loaded by
+ * the browser.
+ */
+mbox.prototype.loaded = function() {
+  this.cancelTimeout();
+  if (!this.activate()) {
+    var _self = this;
+    setTimeout(function() { _self.loaded();  }, 100);
+  }
+};
+
+/**
+ * Called when the mbox has been successfully loaded to activate
+ * the mbox for display.
+ *
+ * This call may fail if the DOM has not been fully constructed
+ */
+mbox.prototype.activate = function() {
+  if (this._activated) {
+    return this._activated;
+  }
+  this.setEventTime('activate' + (++this._activateCount) + '.start');
+
+  if (this._waitForNestedMboxes && this._nestedMboxes[this._nestedMboxes.length - 1] !== this._name) {
+    return this._activated;
   }
 
-// `setVar(name, value)` or `setVar(mapping)`
-// ==========================================
-//
-// Set a customer variable. Can be either called like this
-//
-//     _satellite.setVar('name', 'value')
-//
-// Or by passing in a mapping(object literall) which allows setting multiple variables at
-// the same time.
-//
-//     _satellite.setVar({name: 'value', foo: 'bar'})
-  SL.setVar = function(){
-    var customVars = SL.data.customVars
-    if(customVars == null) SL.data.customVars = {}, customVars = SL.data.customVars
-    if (typeof arguments[0] === 'string'){
-      var prop = arguments[0]
-      customVars[prop] = arguments[1]
-    }else if (arguments[0]){ // assume an object literal
-      var mapping = arguments[0]
-      for (var key in mapping)
-        customVars[key] = mapping[key]
-    }
+  if (this.show()) {
+    this.cancelTimeout();
+    this._activated = 1;
   }
+  this.setEventTime('activate' + this._activateCount + '.end');
 
-  SL.dataElementSafe = function(key, length){
-    if (arguments.length > 2){
-      // setter
-      var value = arguments[2]
-      if (length === 'pageview'){
-        SL.dataElementSafe.pageviewCache[key] = value
-      }else if (length === 'session'){
-        SL.setCookie('_sdsat_' + key, value)
-      }else if (length === 'visitor') {
-        SL.setCookie('_sdsat_' + key, value, 365 * 2)
-      }
-    }else{
-      // getter
-      if (length === 'pageview'){
-        return SL.dataElementSafe.pageviewCache[key]
-      }else if (length === 'session' || length === 'visitor'){
-        return SL.readCookie('_sdsat_' + key)
-      }
-    }
+  if (this._waitForNestedMboxes) {
+    this._nestedMboxes.pop();
   }
-  SL.dataElementSafe.pageviewCache = {}
+  return this._activated;
+};
 
-  SL.realGetDataElement = function(dataDef){
-    var ret
-    if (dataDef.selector) {
-      if (SL.hasSelector) {
-        SL.cssQuery(dataDef.selector, function(elms) {
-          if (elms.length > 0) {
-            var elm = elms[0]
-            if (dataDef.property === 'text') {
-              ret = elm.innerText || elm.textContent
-            }else if (SL.hasAttr(elm, dataDef.property)) {
-              ret = elm[dataDef.property] || elm.getAttribute(dataDef.property)
-            }
-          }
-        })
-      }
-    }else if (dataDef.queryParam) {
-      if (dataDef.ignoreCase){
-        ret = SL.getQueryParamCaseInsensitive(dataDef.queryParam)
-      }else{
-        ret = SL.getQueryParam(dataDef.queryParam)
-      }
-    }else if (dataDef.cookie) {
-      ret = SL.readCookie(dataDef.cookie)
-    }else if (dataDef.jsVariable) {
-      ret = SL.getObjectProperty(window, dataDef.jsVariable)
-    }else if (dataDef.customJS) {
-      ret = dataDef.customJS()
-    }
-    if (dataDef.cleanText){
-      ret = SL.cleanText(ret)
-    }
-    return ret
+/**
+ * @return true if the mbox has been successfully activated
+ */
+mbox.prototype.isActivated = function() {
+  return this._activated;
+};
+
+/**
+ * Sets an offer into mbox.
+ *
+ * @param _offer Offer object that must have 'show(mbox)' method which
+ * will be called to render this offer within the mbox passed in.
+ *
+ * The offer.show() method should return 1 on success and 0 on error.
+ */
+mbox.prototype.setOffer = function(_offer) {
+  if (_offer && _offer.show && _offer.setOnLoad) {
+    this._offer = _offer;
+  } else {
+    throw 'Invalid offer';
   }
+  return this;
+};
 
-  SL.getDataElement = function(variable, suppressDefault, dataDef) {
-    dataDef = dataDef || SL.dataElements[variable]
-    var ret = SL.realGetDataElement(dataDef)
-    if (ret === undefined && dataDef.storeLength) {
-      ret = SL.dataElementSafe(variable, dataDef.storeLength)
-    }else if (ret !== undefined && dataDef.storeLength) {
-      SL.dataElementSafe(variable, dataDef.storeLength, ret)
-    }
-    if (ret === undefined && !suppressDefault) {
-      ret = dataDef['default'] || ''
-    }
+mbox.prototype.getOffer = function() {
+  return this._offer;
+};
 
-    if (dataDef.forceLowerCase) {
-      ret = ret.toLowerCase()
-    }
-    return ret
+/**
+ * Shows the offer.
+ *
+ * @return 1 if it was possible to show the content, 0 otherwise.
+ */
+mbox.prototype.show = function() {
+  this.setEventTime('show.start');
+  var _result = this._offer.show(this);
+  this.setEventTime(_result == 1 ? "show.end.ok" : "show.end");
+
+  return _result;
+};
+
+/**
+ * Shows the specified content in the mbox.
+ *
+ * @return 1 if it was possible to show the content, 0 otherwise.
+ */
+mbox.prototype.showContent = function(_content) {
+  if (_content === null) {
+    // content is not loaded into DOM yet
+    return 0;
   }
+  // div might be non-null but no longer in the DOM, so we check if the
+  // parentNode exists
+  if (this._div === null || !this._div.parentNode) {
+    this._div = this.getDefaultDiv();
 
-// getVar(variable, elm, evt)
-// ==========================
-//
-// Return the value of a variable, where the variable
-// can be a data element, defined in the "data" section
-// of the initial settings, or reference properties on
-// an element, event, or target of the event in question,
-// a query parameter, or a random number.
-//
-// - `variable` - the name of the variable to get
-// - `[elm]` - the associated element, if any
-// - `[evt]` - the associated event, if any
-  SL.getVar = function(variable, elm, evt){
-    var custVars = SL.data.customVars
-        , target = evt ? (evt.target || evt.srcElement) : null
-        , randMatch
-        , value
-    var map = {
-      URI: SL.data.URI,
-      uri: SL.data.URI,
-      protocol: document.location.protocol,
-      hostname: document.location.hostname
-    }
-    if (SL.dataElements && variable in SL.dataElements){
-      return SL.getDataElement(variable)
-    }
-    value = map[variable]
-    if (value === undefined){
-      if (variable.substring(0, 5) === 'this.'){
-        variable = variable.slice(5)
-        value = SL.getObjectProperty(elm, variable, true)
-      }else if(variable.substring(0, 6) === 'event.'){
-        variable = variable.slice(6)
-        value = SL.getObjectProperty(evt, variable)
-      }else if(variable.substring(0, 7) === 'target.'){
-        variable = variable.slice(7)
-        value = SL.getObjectProperty(target, variable)
-      }else if(variable.substring(0, 7) === 'window.'){
-        variable = variable.slice(7)
-        value = SL.getObjectProperty(window, variable)
-      }else if (variable.substring(0, 6) === 'param.'){
-        variable = variable.slice(6)
-        value = SL.getQueryParam(variable)
-      }else if(randMatch = variable.match(/^rand([0-9]+)$/)){
-        var len = Number(randMatch[1])
-            , s = (Math.random() * (Math.pow(10, len) - 1)).toFixed(0)
-        value = Array(len - s.length + 1).join('0') + s
-      }else{
-        value = SL.getObjectProperty(custVars, variable)
-      }
-    }
-    return value
-  }
-
-  SL.getVars = function(variables, elm, evt){
-    var ret = {}
-    SL.each(variables, function(variable){
-      ret[variable] = SL.getVar(variable, elm, evt)
-    })
-    return ret
-  }
-
-// `replace(str, [elm], [target])`
-// ---------------------
-//
-// Perform variable subtitutions substitute to a string where subtitions are
-// specified in the form `"%foo%"`. Variables are lookup either in `SL.data.customVars`, or
-// if the `elm` parameter is passed it, and the variable spec is of the form `"%this.tagName%"`, it
-// is subsituted with the properties on `elm`, *i.e. `elm.tagName`.
-//
-// Parameters:
-//
-// - `str` - string to apply substitutions to
-// - `elm`(optional) - object or element to use for substitutions of the form `%this.property%`
-// - `target`(optional) - element to use for subsitution of the form `%target.property%`
-  SL.replace = function(str, elm, evt) {
-    if (typeof str !== 'string') return str
-    return str
-        .replace(/%(.*?)%/g, function(m, variable){
-          var val = SL.getVar(variable, elm, evt)
-          if (val == null)
-            return m
-          else
-            return val
-        })
-  }
-
-
-
-// From a object literal of variable, generate a query string.
-  SL.searchVariables = function(vars, elm, evt){
-    if (!vars || vars.length === 0) return ''
-    var qsParts = []
-    for (var i = 0, len = vars.length; i < len; i++){
-      var varr = vars[i]
-          , value = SL.getVar(varr, elm, evt)
-      qsParts.push(varr + '=' + escape(value))
-    }
-    return '?' + qsParts.join('&')
-  }
-
-// Fire all the trigger actions associated with a rule.
-  SL.fireRule = function(rule, elm, evt){
-    var triggers = rule.trigger
-    if (!triggers) return
-    for (var i = 0, len = triggers.length; i < len; i++){
-      var trig = triggers[i]
-      SL.execute(trig, elm, evt)
-    }
-    if (SL.contains(SL.fireOnceEvents, rule.event))
-      rule.expired = true
-  }
-
-// `isLinked(elm)`
-// ---------------
-//
-// Returns whether the element is either an anchor or a descendant of an anchor or contains an anchor.
-//
-// `elm` - the element to test
-  SL.isLinked = function(elm){
-    for (var cur = elm; cur; cur = cur.parentNode) {
-      if (SL.isLinkTag(cur))
-        return true
-    }
-    return false
-  }
-
-// Fire a page load event. `type` is one of `pagetop`, `pagebottom`, `domready` and
-// `windowload`.
-  SL.firePageLoadEvent = function(type) {
-    var location = document.location
-        , evt = {type: type, target: location}
-    var rules = SL.pageLoadRules
-    for (var i = rules.length; i--;){
-      var rule = rules[i]
-      if (SL.ruleMatches(rule, evt, location)){
-        SL.notify('Rule "' + rule.name + '" fired.', 1)
-        SL.fireRule(rule, location, evt)
-        rules.splice(i, 1) // remove this page-load rule once fired
-      }
-    }
-    for (var id in SL.tools){
-      var tool = SL.tools[id]
-      if (tool.endPLPhase) {
-        tool.endPLPhase(type)
-      }
+    if (this._div === null) {
+      // default div is not in the DOM yet
+      return 0;
     }
   }
 
-// `track(id)`
-// -----------
-//
-// Directly fire a direct call rule by id.
-  SL.track = function(ruleName) {
-    // trim extra spaces that may exist at beginning or end of string
-    ruleName = ruleName.replace(/^\s*/,"").replace(/\s*$/,"")
-    for (var i = 0; i < SL.directCallRules.length; i++){
-      var rule = SL.directCallRules[i]
-      if (rule.name === ruleName){
-        SL.notify('Direct call Rule "' + ruleName + '" fired.', 1)
-        SL.fireRule(rule, location, {type: ruleName})
-        return
-      }
-    }
-    SL.notify('Direct call Rule "' + ruleName + '" not found.', 1)
+  if (this._div !== _content) {
+    this._hideDiv(this._div);
+    this._div.parentNode.replaceChild(_content, this._div);
+    this._div = _content;
   }
 
-// `basePath()`
-// ------------
-//
-// Returns the base path of all Satellite generated assets.
-  SL.basePath = function(){
-    if (SL.data.host)
-      return (document.location.protocol === 'https:' ?
-          'https://' + SL.data.host.https :
-          'http://' + SL.data.host.http) + '/'
-    else
-      return this.settings.basePath
-  }
+  this._showDiv(_content);
 
-// `setLocation(url)`
-// ------------------
-//
-// Set the current URL
-//
-// - `url` - the URL to set to
-  SL.setLocation = function(url){
-    window.location = url
-  }
+  this._onLoad();
 
-  SL.parseQueryParams = function(str){
-    var URIDecode = function (str) {
-      var result = str
-      try {
-        result = decodeURIComponent(str)
-      } catch(err) {}
+  // Content was successfully displayed in place of the previous content node
+  return 1;
+};
 
-      return result
-    }
+/**
+ * Hides any fetched content and show Default Content associated
+ * with the mbox if it is avaliable yet.
+ *
+ * @return 1 if it was possible to show the default content
+ */
+mbox.prototype.hide = function() {
+  this.setEventTime('hide.start');
+  var _result = this.showContent(this.getDefaultDiv());
+  this.setEventTime(_result == 1 ? 'hide.end.ok' : 'hide.end.fail');
+  return _result;
+};
 
-    if (str === '' || SL.isString(str) === false) return {}
-    if (str.indexOf('?') === 0) {
-      str = str.substring(1)
-    }
-    var ret = {}
-        , pairs = str.split('&')
-    SL.each(pairs, function(pair){
-      pair = pair.split('=')
-      if (!pair[1]) {
-        return
-      }
-      ret[URIDecode(pair[0])] = SL.escapeForHtml(URIDecode(pair[1]))
-    })
-    return ret
-  }
+/**
+ * Puts the mbox into a shown state, if that fails shows default content
+ * Also cancels any timeouts associated with the mbox
+ */
+mbox.prototype.finalize = function() {
+  this.setEventTime('finalize.start');
+  this.cancelTimeout();
 
-  SL.getCaseSensitivityQueryParamsMap = function (str) {
-    var normal = SL.parseQueryParams(str)
-    var insensitive = {}
-
-    for (var prop in normal)
-      if (normal.hasOwnProperty(prop))
-        insensitive[prop.toLowerCase()] = normal[prop]
-
-    return {
-      normal: normal,
-      caseInsensitive: insensitive
+  if (!this.getDefaultDiv()) {
+    if (this._locator.force()) {
+      this.setMessage('No default content, an empty one has been added');
+    } else {
+      this.setMessage('Unable to locate mbox');
     }
   }
 
-  SL.QueryParams = SL.getCaseSensitivityQueryParamsMap(window.location.search)
-
-  SL.getQueryParam = function(key){
-    return SL.QueryParams.normal[key]
+  if (!this.activate()) {
+    this.hide();
+    this.setEventTime('finalize.end.hide');
   }
+  this.setEventTime('finalize.end.ok');
+};
 
-  SL.getQueryParamCaseInsensitive = function(key){
-    return SL.QueryParams.caseInsensitive[key.toLowerCase()]
+mbox.prototype.cancelTimeout = function() {
+  if (this._timer) {
+    clearTimeout(this._timer);
   }
-
-  SL.encodeObjectToURI = function(obj) {
-    if (SL.isObject(obj) === false) {
-      return ''
-    }
-
-    var uri = []
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        uri.push(encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]))
-      }
-    }
-
-    return uri.join('&')
+  if (this._contentFetcher) {
+    this._contentFetcher.cancel();
   }
+};
 
-  SL.readCookie = function(name) {
-    var nameEQ = name + "="
-    var parts = document.cookie.split(';')
-    for(var i=0;i < parts.length;i++) {
-      var c = parts[i]
-      while (c.charAt(0)==' '){
-        c = c.substring(1,c.length)
-      }
-      if (c.indexOf(nameEQ) === 0){
-        return c.substring(nameEQ.length,c.length)
-      }
-    }
-    return undefined
+mbox.prototype.getDiv = function() {
+  return this._div;
+};
+
+/**
+ * returns valid default div
+ * (even if it's not present in the DOM anymore)
+ */
+mbox.prototype.getDefaultDiv = function() {
+  if (this._defaultDiv === null) {
+    this._defaultDiv = this._locator.locate();
   }
+  return this._defaultDiv;
+};
 
-  SL.setCookie = function(name,value,days) {
-    var expires
-    if (days) {
-      var date = new Date()
-      date.setTime(date.getTime()+(days*24*60*60*1000))
-      expires = "; expires="+date.toGMTString()
-    }
-    else{
-      expires = ""
-    }
-    document.cookie = name+"="+value+expires+"; path=/"
+mbox.prototype.setEventTime = function(_event) {
+  this._times[_event] = (new Date()).getTime();
+};
+
+mbox.prototype.getEventTimes = function() {
+  return this._times;
+};
+
+mbox.prototype.getImportName = function() {
+  return this._importName;
+};
+
+mbox.prototype.getURL = function() {
+  return this._urlBuilder.buildUrl();
+};
+
+mbox.prototype.getUrlBuilder = function() {
+  return this._urlBuilder;
+};
+
+mbox.prototype._isVisible = function(_div) {
+  return _div.style.display != 'none';
+};
+
+mbox.prototype._showDiv = function(_div) {
+  this._toggleDiv(_div, true);
+};
+
+mbox.prototype._hideDiv = function(_div) {
+  this._toggleDiv(_div, false);
+};
+
+mbox.prototype._toggleDiv = function(_div, _visible) {
+  _div.style.visibility = _visible ? "visible" : "hidden";
+  _div.style.display = _visible ? "block" : "none";
+};
+
+mbox.prototype._disableWaitForNestedMboxes = function() {
+  this._waitForNestedMboxes = false;
+};
+
+mbox.prototype.relocateDefaultDiv = function() {
+  this._defaultDiv = this._locator.locate();
+};
+
+mboxOfferContent = function() {
+  this._onLoad = function() {};
+};
+
+mboxOfferContent.prototype.show = function(_mbox) {
+  var _result = _mbox.showContent(document.getElementById(_mbox.getImportName()));
+  if (_result == 1) {
+    this._onLoad();
   }
+  return _result;
+};
 
-  SL.removeCookie = function(name) {
-    SL.setCookie(name,"",-1);
+mboxOfferContent.prototype.setOnLoad = function(_onLoad) {
+  this._onLoad = _onLoad;
+};
+
+/**
+ * Ajax offer.
+ */
+mboxOfferAjax = function(_content) {
+  this._content = _content;
+  this._onLoad = function() {};
+};
+
+mboxOfferAjax.prototype.setOnLoad = function(_onLoad) {
+  this._onLoad = _onLoad;
+};
+
+mboxOfferAjax.prototype.show = function(_mbox) {
+  var _contentDiv = document.createElement('div');
+
+  _contentDiv.id = _mbox.getImportName();
+  _contentDiv.innerHTML = this._content;
+
+  var _result = _mbox.showContent(_contentDiv);
+  if (_result == 1) {
+    this._onLoad();
   }
+  return _result;
+};
 
+/**
+ * Offer that shows default content.
+ */
+mboxOfferDefault = function() {
+  this._onLoad = function() {};
+};
 
-  SL.getElementProperty = function(elm, prop){
-    if (prop.charAt(0) === '@'){
-      var special = SL.specialProperties[prop.substring(1)]
-      if (special){
-        return special(elm)
-      }
-    }
-    if (prop === 'innerText'){
-      return SL.text(elm)
-    }
-    if (prop in elm)
-      return elm[prop]
-    return elm.getAttribute ? elm.getAttribute(prop) : undefined
+mboxOfferDefault.prototype.setOnLoad = function(_onLoad) {
+  this._onLoad = _onLoad;
+};
+
+mboxOfferDefault.prototype.show = function(_mbox) {
+  var _result = _mbox.hide();
+  if (_result == 1) {
+    this._onLoad();
   }
+  return _result;
+};
 
-  SL.propertiesMatch = function(property, elm){
-    if (property){
-      for (var prop in property){
-        var target = property[prop]
-        var value = SL.getElementProperty(elm, prop)
-        if (typeof target === 'string' && target !== value) return false
-        if (target instanceof RegExp && !target.test(value)) return false
-      }
-    }
-    return true
+mboxCookieManager = function mboxCookieManager(_name, _domain) {
+  this._name = _name;
+  // single word domains are not accepted in a cookie domain clause
+  this._domain = _domain === '' || _domain.indexOf('.') === -1 ? '' : '; domain=' + _domain;
+  this._cookiesMap = new mboxMap();
+  this.loadCookies();
+};
+
+mboxCookieManager.prototype.isEnabled = function() {
+  this.setCookie(TNT._internal._cookies.check, 'true', 60);
+  this.loadCookies();
+  return this.getCookie(TNT._internal._cookies.check) == 'true';
+};
+
+/**
+ * Sets cookie inside of mbox cookies string.
+ *
+ * @param name Cookie name.
+ * @param value Cookie value.
+ * @param duration Cookie duration time in seconds.
+ */
+mboxCookieManager.prototype.setCookie = function(_name, _value, _duration) {
+  if (typeof _name != 'undefined' && typeof _value != 'undefined' &&
+      typeof _duration != 'undefined') {
+    var _cookie = {};
+    _cookie.name = _name;
+    _cookie.value = encodeURIComponent(_value);
+    // Store expiration time in seconds to save space.
+    _cookie.expireOn = Math.ceil(_duration + new Date().getTime() / 1000);
+    this._cookiesMap.put(_name, _cookie);
+    this.saveCookies();
   }
+};
 
-// from http://www.quirksmode.org/js/events_properties.html
-  SL.isRightClick = function(e){
-    var ret
-    if (e.which){
-      ret = e.which == 3
-    }else if (e.button){
-      ret = e.button == 2
-    }
-    return ret
-  }
+mboxCookieManager.prototype.getCookie = function(_name) {
+  var _cookie = this._cookiesMap.get(_name);
+  return _cookie ? decodeURIComponent(_cookie.value) : null;
+};
 
-// `ruleMatches(rule, evt, elm, eventEntriesFound)`
-// ------------------------------------------------
-//
-// - `rule` - the rules to match
-// - `evt` - the event triggered
-// - `elm` - the element the event was on
-// - `eventEntriesFound` - number of rules matched so far
-  SL.ruleMatches = function(rule, evt, elm, eventEntriesFound){
-    var location = document.location
-        , cnd = rule.condition
-        , cnds = rule.conditions
-        , property = rule.property
-        , eventType = evt.type
-        , matchValue = rule.value
-        , target = evt.target || evt.srcElement
-        , initialTarget = elm === target
-    if (rule.event !== eventType) return false
-    // ignore all right-clicks
-    if (rule.event === 'click' && SL.isRightClick(evt)){
-      return false
-    }
-    if (rule.isDefault && eventEntriesFound > 0)
-      return false
-    if (rule.expired) return false
-    if (eventType === 'inview' && evt.inviewDelay !== rule.inviewDelay){
-      return false
-    }
-    if (!(initialTarget ||
-        ((rule.bubbleFireIfParent !== false) && (eventEntriesFound === 0 || (rule.bubbleFireIfChildFired !== false))))) return false
+mboxCookieManager.prototype.deleteCookie = function(_name) {
+  this._cookiesMap.remove(_name);
+  this.saveCookies();
+};
 
-    if (rule.selector && !SL.matchesCss(rule.selector, elm)) return false
-    if (!SL.propertiesMatch(property, elm)) return false
-    if (matchValue != null){
-      if (typeof matchValue === 'string'){
-        if (matchValue !== elm.value)
-          return false
-      }else if (!matchValue.test(elm.value))
-        return false
+mboxCookieManager.prototype.getCookieNames = function(_namePrefix) {
+  var _cookieNames = [];
+  this._cookiesMap.each(function(_name, _cookie) {
+    if (_name.indexOf(_namePrefix) === 0) {
+      _cookieNames[_cookieNames.length] = _name;
     }
-    if (cnd){
-      try{
-        if (!cnd.call(elm, evt, target)){
-          SL.notify('Condition for rule "' + rule.name + '" not met.', 1)
-          return false
-        }
-      }catch(e){
-        SL.notify('Condition for rule "' + rule.name + '" not met. Error: ' + e.message, 1)
-        return false
-      }
-    }
-    if (cnds){
-      var failed = SL.find(cnds, function(cnd){
-        try{
-          return !cnd.call(elm, evt, target)
-        }catch(e){
-          SL.notify('Condition for rule "' + rule.name + '" not met. Error: ' + e.message, 1)
-          return true
-        }
-      })
-      if (failed){
-        SL.notify('Condition ' + failed.toString() + ' for rule "' + rule.name + '" not met.', 1)
-        return false
+  });
+  return _cookieNames;
+};
+
+mboxCookieManager.prototype.saveCookies = function() {
+  var _xDomainOnly = TNT._internal._settings.crossDomainXOnly;
+  var _disabledCookieName = TNT._internal._cookies.disable;
+  var _cookieValues = [];
+  var _maxExpireOn = 0;
+
+  this._cookiesMap.each(function(_name, _cookie) {
+    if(!_xDomainOnly || _name === _disabledCookieName) {
+      _cookieValues[_cookieValues.length] = _name + '#' + _cookie.value + '#' +
+      _cookie.expireOn;
+      if (_maxExpireOn < _cookie.expireOn) {
+        _maxExpireOn = _cookie.expireOn;
       }
     }
-    return true
+  });
+
+  var _expiration = new Date(_maxExpireOn * 1000);
+  var _parts = [];
+
+  _parts.push(this._name, '=', _cookieValues.join('|'));
+
+  if (TNT._internal._settings.usePersistentCookies) {
+    _parts.push('; expires=', _expiration.toGMTString());
   }
 
+  _parts.push('; path=/', this._domain);
 
-  SL.evtHandlers = {}
-// `bindEvent(evtName, callback)`
-// ------------------------------
-//
-// Register for an event by name. Alias: `whenEvent`.
-//
-// `evtName` - the name of the event
-// `callback` - the function to be called when even fires
-  SL.bindEvent = function(evtName, callback){
-    var handlers = SL.evtHandlers
-    if (!handlers[evtName])
-      handlers[evtName] = []
-    handlers[evtName].push(callback)
-  }
-  SL.whenEvent = SL.bindEvent
+  document.cookie = _parts.join("");
+};
 
-// `unbindEvent(evtName, callback)
-// -------------------------------
-//
-// Unregister for an event by name.
-//
-// `evtName` - the name of the event
-// `callback` - the function to unregister
-  SL.unbindEvent = function(evtName, callback){
-    var handlers = SL.evtHandlers
-    if (!handlers[evtName]) return
-    var idx = SL.indexOf(handlers[evtName], callback)
-    handlers[evtName].splice(idx, 1)
-  }
-
-  SL.bindEventOnce = function(evtName, callback){
-    var wrapped = function(){
-      SL.unbindEvent(evtName, wrapped)
-      callback.apply(null, arguments)
-    }
-    SL.bindEvent(evtName, wrapped)
-  }
-
-// See <http://tobyho.com/2014/02/26/attribute-only-valid-on-v-image/>
-  SL.isVMLPoisoned = function(elm){
-    if (!elm) return false
-    try{
-      elm.nodeName
-    }catch(e){
-      if (e.message === 'Attribute only valid on v:image'){
-        return true
+mboxCookieManager.prototype.loadCookies = function() {
+  this._cookiesMap = new mboxMap();
+  var _cookieStart = document.cookie.indexOf(this._name + '=');
+  if (_cookieStart != -1) {
+    var _cookieEnd = document.cookie.indexOf(';', _cookieStart);
+    if (_cookieEnd == -1) {
+      _cookieEnd =  document.cookie.indexOf(',', _cookieStart);
+      if (_cookieEnd == -1) {
+        _cookieEnd = document.cookie.length;
       }
     }
-    return false
+    var _internalCookies = document.cookie.substring(
+        _cookieStart + this._name.length + 1, _cookieEnd).split('|');
+
+    var _nowInSeconds = Math.ceil(new Date().getTime() / 1000);
+    for (var _i = 0; _i < _internalCookies.length; _i++) {
+      var _cookie = _internalCookies[_i].split('#');
+      if (_nowInSeconds <= _cookie[2]) {
+        var _newCookie = {};
+        _newCookie.name = _cookie[0];
+        _newCookie.value = _cookie[1];
+        _newCookie.expireOn = _cookie[2];
+        this._cookiesMap.put(_newCookie.name, _newCookie);
+      }
+    }
+  }
+};
+
+/**
+ * Class representing the users Session Id
+ *
+ * Retrieves the users sessionId from the url or cookie
+ * Uses the specified _randomId if no id is found
+ * @PrivateClass
+ */
+mboxSession = function(_randomId, _idArg, _cookieName, _expireTime,
+                       _cookieManager) {
+  this._idArg = _idArg;
+  this._cookieName = _cookieName;
+  this._expireTime = _expireTime;
+  this._cookieManager = _cookieManager;
+
+  this._newSession = false;
+
+  this._id = typeof mboxForceSessionId != 'undefined' ?
+      mboxForceSessionId : mboxGetPageParameter(this._idArg);
+
+  if (this._id === null || this._id.length === 0) {
+    this._id = _cookieManager.getCookie(_cookieName);
+    if (this._id === null || this._id.length === 0) {
+      this._id = _randomId;
+      this._newSession = true;
+    }
   }
 
-  SL.handleEvent = function(evt) {
-    // Don't process an event twice.
-    if (SL.$data(evt, 'eventProcessed')) return
+  _cookieManager.setCookie(_cookieName, this._id, _expireTime);
+};
 
-    var eventType = evt.type.toLowerCase()
-        , target = evt.target || evt.srcElement
-        , rulesMatched = 0
-        , rules = SL.rules
-        , tools = SL.tools
-        , handlers = SL.evtHandlers[evt.type]
+/**
+ * @return the users session id
+ */
+mboxSession.prototype.getId = function() {
+  return this._id;
+};
 
-    if (SL.isVMLPoisoned(target)){
-      SL.notify('detected ' + eventType + ' on poisoned VML element, skipping.', 1)
-      return
-    }
+mboxSession.prototype.forceId = function(_forcedId) {
+  this._id = _forcedId;
 
-    if (handlers){
-      SL.each(handlers, function(cb){
-        cb(evt)
-      })
-    }
+  this._cookieManager.setCookie(this._cookieName, this._id, this._expireTime);
+};
 
-    var nodeName = target && target.nodeName;
-    if (nodeName)
-      SL.notify("detected " + eventType + " on " + target.nodeName, 1)
-    else
-      SL.notify("detected " + eventType, 1)
+/**
+ * Class representing users PC Id.
+ * @PrivateClass
+ *
+ * @param _randomId Randomly assigned ID to user PC.
+ * @param _expireTime Expiration time in seconds for this PC ID.
+ */
+mboxPC = function(_cookieName, _expireTime, _cookieManager) {
+  this._cookieName = _cookieName;
+  this._expireTime = _expireTime;
+  this._cookieManager = _cookieManager;
+  this._id = typeof mboxForcePCId != 'undefined' ? mboxForcePCId : _cookieManager.getCookie(_cookieName);
 
-    for (var curr = target; curr; curr = curr.parentNode) {
-      var bubbleStop = false
-      SL.each(rules, function(rule){
-        if (SL.ruleMatches(rule, evt, curr, rulesMatched)){
-          SL.notify('Rule "' + rule.name + '" fired.', 1)
-          SL.fireRule(rule, curr, evt)
-          rulesMatched++
-          if (rule.bubbleStop)
-            bubbleStop = true
-        }
-      })
-      if (bubbleStop) break
-    }
-
-
-    SL.$data(evt, 'eventProcessed', true)
+  if (this._id) {
+    _cookieManager.setCookie(_cookieName, this._id, _expireTime);
   }
 
-// `onEvent(evt)`
-// ------------
-//
-// Handle an event, whether it is a DOM event or a synthetic event.
-//
-// - `evt` - the event triggered
-  SL.onEvent = document.querySelectorAll ?
-      function(evt){ SL.handleEvent(evt) } :
-      (function(){
-        var q = []
-        var onEvent = function(evt) {
-          if (evt.selector)
-            q.push(evt)
-          else
-            SL.handleEvent(evt)
-        }
-        onEvent.pendingEvents = q
-        return onEvent
-      })()
+};
 
-// `fireEvent(eventType, eventTarget)`
-// ------------
-//
-// Conviniently programmatically fire an event.
-//
-// - `eventType` - the type of event
-// - `eventTarget` - the target object that fired the event
-  SL.fireEvent = function(type, target){
-    SL.onEvent({type: type, target: target})
+/**
+ * @return the PC id
+ */
+mboxPC.prototype.getId = function() {
+  return this._id;
+};
+
+/**
+ * @return True if forced ID value was set, false otherwise.
+ */
+mboxPC.prototype.forceId = function(_forcedId) {
+  if (this._id != _forcedId) {
+    this._id = _forcedId;
+    this._cookieManager.setCookie(this._cookieName, this._id, this._expireTime);
+    return true;
+  }
+  return false;
+};
+
+mboxGetPageParameter = function(_name) {
+  var _result = null;
+  var _parameterRegExp = new RegExp("\\?[^#]*" + _name + "=([^\&;#]*)");
+  var _parameterMatch = _parameterRegExp.exec(document.location);
+
+  if (_parameterMatch && _parameterMatch.length >= 2) {
+    _result = _parameterMatch[1];
   }
 
-// `registerEvents(elm, events)`
-// -----------------------------
-//
-// Register events for an element using `track` as the callback
-//
-// - `elm` - the element to listen for events on
-// - `events` - an array of event types (strings)
-  SL.registerEvents = function(elm, events){
-    for (var i = events.length - 1; i >= 0; i--){
-      var event = events[i]
-      if (!SL.$data(elm, event + '.tracked')){
-        SL.addEventHandler(elm, event, SL.onEvent)
-        SL.$data(elm, event + '.tracked', true)
+  return _result;
+};
+
+mboxSetCookie = function(_name, _value, _duration) {
+  return mboxFactoryDefault.getCookieManager().setCookie(_name, _value, _duration);
+};
+
+mboxGetCookie = function(_name) {
+  return mboxFactoryDefault.getCookieManager().getCookie(_name);
+};
+
+mboxCookiePageDomain = function() {
+  var _domain = (/([^:]*)(:[0-9]{0,5})?/).exec(document.location.host)[1];
+  var _ipRegExp = /[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/;
+
+  if (!_ipRegExp.exec(_domain)) {
+    var _baseDomain = (/([^\.]+\.[^\.]{3}|[^\.]+\.[^\.]+\.[^\.]{2})$/).exec(_domain);
+
+    if (_baseDomain) {
+      _domain = _baseDomain[0];
+
+      if (_domain.indexOf("www.") === 0) {
+        _domain=_domain.substr(4);
       }
     }
   }
 
-// `registerEventsForTags(tags, events)`
-// -------------------------------------
-//
-// Register events for all element that have the specified tags
-//
-// - `tags` - an array of tags to match for (strings)
-// - `events` - an array of event types (strings)
-  SL.registerEventsForTags = function(tags, events){
-    for (var i = tags.length - 1; i >= 0; i--){
-      var tag = tags[i]
-      var elms = document.getElementsByTagName(tag);
-      for (var j = elms.length - 1; j >= 0; j--)
-        SL.registerEvents(elms[j], events)
-    }
+  return _domain ? _domain: "";
+};
+
+mboxShiftArray = function(_iterable) {
+  var _result = [];
+
+  for (var _i = 1; _i < _iterable.length; _i++) {
+    _result[_result.length] = _iterable[_i];
   }
 
-// `setListeners()`
-// ----------------
-//
-// Set events for `document`
-  SL.setListeners = function() {
-    SL.registerEvents(document, ["click","submit"]);
+  return _result;
+};
+
+mboxGenerateId = function() {
+  return (new Date()).getTime() + "-" + Math.floor(Math.random() * 999999);
+};
+
+mboxScreenHeight = function() {
+  return screen.height;
+};
+
+mboxScreenWidth = function() {
+  return screen.width;
+};
+
+mboxBrowserWidth = function() {
+  return (window.innerWidth) ? window.innerWidth :
+      document.documentElement ? document.documentElement.clientWidth :
+          document.body.clientWidth;
+};
+
+mboxBrowserHeight = function() {
+  return (window.innerHeight) ? window.innerHeight :
+      document.documentElement ? document.documentElement.clientHeight :
+          document.body.clientHeight;
+};
+
+mboxBrowserTimeOffset = function() {
+  return -new Date().getTimezoneOffset();
+};
+
+mboxScreenColorDepth = function() {
+  return screen.pixelDepth;
+};
+
+if (typeof mboxVersion == 'undefined') {
+  var mboxVersion = TNT._internal._settings.version;
+
+  if (!mboxVersion) {
+    mboxVersion = TNT._internal._constants.version;
+  }
+
+  var mboxFactories = new mboxMap();
+  var mboxFactoryDefault = new mboxFactory(
+      TNT._internal._settings.serverHost,
+      TNT._internal._settings.clientCode,
+      TNT._internal._constants.defaultFactoryId);
+}
+
+if (mboxGetPageParameter(TNT._internal._pageParams.debug) ||
+    mboxFactoryDefault.getCookieManager().getCookie(TNT._internal._cookies.debug)) {
+
+  setTimeout(function() {
+    if (typeof mboxDebugLoaded == 'undefined') {
+      alert('Could not load the remote debug.\nPlease check your connection to ' +
+      TNT._internal._settings.companyName + ' servers');
+    }
+  }, 60*60);
+
+  document.write('<' + 'scr' + 'ipt language="Javascript1.2" src="' +
+  TNT._internal._settings.adminUrl +
+  '/mbox/mbox_debug.jsp?mboxServerHost=' +
+  TNT._internal._settings.serverHost +
+  '&clientCode=' +
+  TNT._internal._settings.clientCode +
+  '"><' + '\/scr' + 'ipt>');
+}
+
+if (TNT._internal._settings.includeScPlugin) {
+  mboxScPluginFetcher = function (_clientCode, _siteCatalystCore) {
+    this._clientCode = _clientCode;
+    this._siteCatalystCore = _siteCatalystCore;
   };
 
-// `setFormListeners()`
-// --------------------
-//
-// Listen for events on form elements.
-  SL.setFormListeners = function() {
-    SL.registerEventsForTags(
-        ['input', 'select', 'textarea', 'button'],
-        ["select","change","focus","blur","keypress"]);
+  /**
+   * @PrivateClass
+   */
+  mboxScPluginFetcher.prototype._buildUrl = function (_urlBuilder) {
+    _urlBuilder.setBasePath('/m2/' + this._clientCode + '/sc/standard');
+    this._addParameters(_urlBuilder);
+
+    var _url = _urlBuilder.buildUrl();
+    _url += '&' + TNT._internal._params.scPluginVersion + '=' + TNT._internal._constants.scPluginVersion;
+    return _url;
   };
 
-// `setVideoListeners()`
-// ---------------------
-//
-// Listen for events on video elements.
-  SL.setVideoListeners = function() {
-    SL.registerEventsForTags(['video'],
-        ["play","pause","ended","volumechange","stalled","timeupdate","loadeddata"])
-  }
+  /**
+   * Deliberately ignores "pageURL","referrer"
+   */
+  mboxScPluginFetcher.prototype._addParameters = function (_urlBuilder) {
+    var _parametersToRead = [
+      "dynamicVariablePrefix", "visitorID", "vmk", "ppu", "charSet",
+      "visitorNamespace", "cookieDomainPeriods", "cookieLifetime", "pageName",
+      "currencyCode", "variableProvider", "channel", "server",
+      "pageType", "transactionID", "purchaseID", "campaign", "state", "zip", "events",
+      "products", "linkName", "linkType", "resolution", "colorDepth",
+      "javascriptVersion", "javaEnabled", "cookiesEnabled", "browserWidth",
+      "browserHeight", "connectionType", "homepage", "pe", "pev1", "pev2", "pev3",
+      "visitorSampling", "visitorSamplingGroup", "dynamicAccountSelection",
+      "dynamicAccountList", "dynamicAccountMatch", "trackDownloadLinks",
+      "trackExternalLinks", "trackInlineStats", "linkLeaveQueryString",
+      "linkDownloadFileTypes", "linkExternalFilters", "linkInternalFilters",
+      "linkTrackVars", "linkTrackEvents", "linkNames", "lnk", "eo" ];
 
-// `readStoredSetting(name)`
-// ==================
-//
-// Reads the cookie of the given name.
-// Stolen from <http://www.quirksmode.org/js/cookies.html>
-  SL.readStoredSetting = function(name) {
-    if (!window.localStorage) return null
-    name = 'sdsat_' + name
-    try{
-      return window.localStorage.getItem(name)
-    }catch(e){
-      SL.notify('Cannot read stored setting from localStorage: ' + e.message, 2)
-      return null
-    }
-  }
-
-// Read satelliteUtilsCookie values to see about getting bookmarklet running / settings
-  SL.loadStoredSettings = function () {
-    var debug = SL.readStoredSetting('debug')
-        , hideActivity = SL.readStoredSetting('hide_activity')
-    if (debug)
-      SL.settings.notifications = debug === 'true'
-    if (hideActivity)
-      SL.settings.hideActivity = hideActivity === 'true'
-  }
-
-  SL.isRuleActive = function(rule, date){
-    var schd = rule.schedule
-    if (!schd) return true
-
-    var utc = schd.utc
-        , getDate = utc ? 'getUTCDate' : 'getDate'
-        , getDay = utc ? 'getUTCDay' : 'getDay'
-        , getFullYear = utc ? 'getUTCFullYear' : 'getFullYear'
-        , getMonth = utc ? 'getUTCMonth' : 'getMonth'
-        , getHours = utc ? 'getUTCHours' : 'getHours'
-        , getMinutes = utc ? 'getUTCMinutes' : 'getMinutes'
-        , setHours = utc ? 'setUTCHours' : 'setHours'
-        , setMinutes = utc ? 'setUTCMinutes' : 'setMinutes'
-        , setDate = utc ? 'setUTCDate' : 'setDate'
-
-    date = date || new Date()
-
-    function dayDiff(one, other){
-      other = modifyDate(other, {
-        hour: one[getHours](),
-        minute: one[getMinutes]()
-      })
-      return Math.floor(Math.abs((one.getTime() - other.getTime()) / (1000 * 60 * 60 * 24)))
-    }
-    function monthDiff(one, other){
-      function months(date){
-        return date[getFullYear]() * 12 + date[getMonth]()
-      }
-      return Math.abs(months(one) - months(other))
-    }
-    function modifyDate(date, fields){
-      var retval = new Date(date.getTime())
-      for (var field in fields){
-        var val = fields[field]
-        switch(field){
-          case 'hour':
-            retval[setHours](val)
-            break
-          case 'minute':
-            retval[setMinutes](val)
-            break
-          case 'date':
-            retval[setDate](val)
-            break
-        }
-      }
-      return retval
-    }
-    function timeGreaterThan(one, other){
-      var h1 = one[getHours]()
-          , m1 = one[getMinutes]()
-          , h2 = other[getHours]()
-          , m2 = other[getMinutes]()
-      return (h1 * 60 + m1) > (h2 * 60 + m2)
-    }
-    function timeLessThan(one, other){
-      var h1 = one[getHours]()
-          , m1 = one[getMinutes]()
-          , h2 = other[getHours]()
-          , m2 = other[getMinutes]()
-      return (h1 * 60 + m1) < (h2 * 60 + m2)
+    for (var _i = 0; _i < _parametersToRead.length; _i++) {
+      this._addParameterFromCore(_parametersToRead[_i], _urlBuilder);
     }
 
-
-    if (schd.repeat){
-      if (timeGreaterThan(schd.start, date)) return false
-      if (timeLessThan(schd.end, date)) return false
-      if (date < schd.start) return false
-      if (schd.endRepeat && date >= schd.endRepeat) return false
-      if (schd.repeat === 'daily'){
-        if (schd.repeatEvery){
-          var dd = dayDiff(schd.start, date)
-          if (dd % schd.repeatEvery !== 0) return false
-        }
-      }else if (schd.repeat === 'weekly'){
-        if (schd.days){
-          if (!SL.contains(schd.days, date[getDay]())) return false
-        }else
-        if (schd.start[getDay]() !== date[getDay]()) return false
-        if (schd.repeatEvery){
-          var diff = dayDiff(schd.start, date)
-          if (diff % (7 * schd.repeatEvery) !== 0)
-            return false
-        }
-      }else if (schd.repeat === 'monthly'){
-        if (schd.repeatEvery){
-          var md = monthDiff(schd.start, date)
-          if (md % schd.repeatEvery !== 0) return false
-        }
-        if (schd.nthWeek && schd.mthDay){
-          if (schd.mthDay !== date[getDay]()) return false
-          var nthWeek = Math.floor((date[getDate]() - date[getDay]() + 1) / 7)
-          if (schd.nthWeek !== nthWeek) return false
-        }else
-        if (schd.start[getDate]() !== date[getDate]()) return false
-      }else if (schd.repeat === 'yearly'){
-        if (schd.start[getMonth]() !== date[getMonth]()) return false
-        if (schd.start[getDate]() !== date[getDate]()) return false
-        if (schd.repeatEvery){
-          var diff = Math.abs(schd.start[getFullYear]() - date[getFullYear]())
-          if (diff % schd.repeatEvery !== 0) return false
-        }
-      }
-    }else{
-      if (schd.start > date) return false
-      if (schd.end < date) return false
+    for (_i = 1; _i <= 75; _i++) {
+      this._addParameterFromCore('prop' + _i, _urlBuilder);
+      this._addParameterFromCore('eVar' + _i, _urlBuilder);
+      this._addParameterFromCore('hier' + _i, _urlBuilder);
     }
-    return true
-  }
+  };
 
-  SL.isOutboundLink = function(elm){
-    if (!elm.getAttribute('href')) return false
-    var hostname = elm.hostname
-    var href = elm.href
-    var protocol = elm.protocol
-    if (protocol !== 'http:' && protocol !== 'https:') return false
-    var isMyDomain = SL.any(SL.settings.domainList, function(domain){
-      return SL.isSubdomainOf(hostname, domain)
-    })
-    if (isMyDomain) return false
-    return hostname !== location.hostname
-  }
+  mboxScPluginFetcher.prototype._addParameterFromCore = function (_name, _urlBuilder) {
+    var _value = this._siteCatalystCore[_name];
 
-  SL.isLinkerLink = function(elm){
-    if (!elm.getAttribute || !elm.getAttribute('href')) return false
-    return SL.hasMultipleDomains() &&
-        elm.hostname != location.hostname &&
-        !elm.href.match(/^javascript/i) &&
-        !SL.isOutboundLink(elm)
-  }
+    if (typeof _value === 'undefined' || _value === null || _value === '' || typeof _value === 'object') {
+      return;
+    }
 
-  SL.isSubdomainOf = function(sub, root){
-    if (sub === root) return true
-    var idx = sub.length - root.length
-    if (idx > 0)
-      return SL.equalsIgnoreCase(sub.substring(idx), root)
-    return false
-  }
+    _urlBuilder.addParameter(_name, _value);
+  };
 
-// `getVisitorId()`
-// ------------------------------------------------
-//
-// Returns the library instance associated to a VisitorId tool if the tool exists
-//
-  SL.getVisitorId = function(){
-    var visitorIdTools = SL.getToolsByType('visitor_id')
-    if (visitorIdTools.length === 0) {
+  mboxScPluginFetcher.prototype.cancel = function () {
+  };
+
+  mboxScPluginFetcher.prototype.fetch = function (_urlBuilder) {
+    _urlBuilder.setServerType(this.getType());
+    var _url = this._buildUrl(_urlBuilder);
+
+    this._include = document.createElement('script');
+    this._include.src = _url;
+
+    document.body.appendChild(this._include);
+  };
+
+  mboxScPluginFetcher.prototype.getType = function () {
+    return 'ajax';
+  };
+
+  /**
+   * This function returns the plugin, or null if it was not loaded.
+   */
+  mboxLoadSCPlugin = function (_siteCatalystCore) {
+    if (!_siteCatalystCore) {
       return null;
     }
 
-    return visitorIdTools[0].getInstance()
-  }
-
-// Filter `SL.rules` down to only the once relevant for the current page.
-  SL.filterRules = function(){
-    var locationData = {
-      hostname: location.hostname
-      , protocol: location.protocol
-      , URI: SL.data.URI
-    }
-
-    function matches(rule){
-      if (!SL.ruleInScope(rule, locationData)) return false
-      if (!SL.isRuleActive(rule)) return false
-      return true
-    }
-
-    SL.rules = SL.filter(SL.rules, matches)
-    SL.pageLoadRules = SL.filter(SL.pageLoadRules, matches)
-
-  }
-
-  SL.ruleInScope = function(rule, location){
-    var scope = rule.scope
-    if (!scope) return true
-    var URI = scope.URI
-    var subdomains = scope.subdomains
-    var domains = scope.domains
-    var protocols = scope.protocols
-
-    if (URI && includeExcludeFails(URI, location.URI)) return false
-    if (subdomains && includeExcludeFails(subdomains, location.hostname)) return false
-    if (domains && matchFails(domains, location.hostname)) return false
-    if (protocols && matchFails(protocols, location.protocol)) return false
-
-    function includeExcludeFails(matcher, matchee){
-      var include = matcher.include
-      var exclude = matcher.exclude
-      if (include && matchFails(include, matchee)) return true
-      if (exclude){
-        if (SL.isString(exclude) && exclude === matchee)
-          return true
-        if (SL.isArray(exclude) && SL.any(exclude, matches))
-          return true
-        if (SL.isRegex(exclude) && matches(exclude))
-          return true
-      }
-
-      return false
-
-      function matches(regex){
-        return matchee.match(regex)
-      }
-    }
-
-    function matchFails(matcher, matchee){
-      if (SL.isString(matcher) && matcher !== matchee)
-        return true
-      if (SL.isArray(matcher) && !SL.any(matcher, matches))
-        return true
-      if (SL.isRegex(matcher) && !matches(matcher))
-        return true
-      return false
-
-      function matches(regex){
-        return matchee.match(regex)
-      }
-
-    }
-
-    return true
-  }
-
-
-// Run background tasks once. This will get invoked periodically.
-  SL.backgroundTasks = function(){
-    var start = +new Date()
-    SL.setFormListeners()
-    SL.setVideoListeners()
-    SL.loadStoredSettings()
-    SL.registerNewElementsForDynamicRules()
-    SL.eventEmitterBackgroundTasks()
-
-    // Trigger condition events
-    //SL.onEvent({type: 'condition', target: 'document'})
-    var end = +new Date()
-    // We want to keep an eye on the execution time here.
-    // If it gets to around 50ms for any customer site,
-    // we want to either optimize or start using a task queue
-    //SL.notify('Background tasks executed in ' + (end - start) + 'ms', 3)
-  }
-
-
-
-// For rules that poll for dynamically injected elements on the page,
-// find them and register events for them.
-  SL.registerNewElementsForDynamicRules = function(){
-    function cssQuery(selector, callback){
-      var hit = cssQuery.cache[selector]
-      if (hit){
-        return callback(hit)
-      }else{
-        SL.cssQuery(selector, function(elms){
-          cssQuery.cache[selector] = elms
-          callback(elms)
-        })
-      }
-    }
-    cssQuery.cache = {}
-
-
-    SL.each(SL.dynamicRules, function(rule){
-      cssQuery(rule.selector, function(elms){
-        SL.each(elms, function(elm){
-          if (SL.$data(elm, 'dynamicRules.seen')) return
-          SL.$data(elm, 'dynamicRules.seen', true)
-          if (SL.propertiesMatch(rule.property, elm)){
-            SL.registerEvents(elm, [rule.event])
-          }
-        })
-      })
-    })
-  }
-
-// If the browser doesn't support CSS selector queries, we have to include one.
-  SL.ensureCSSSelector = function(){
-    if (document.querySelectorAll){
-      SL.hasSelector = true
-      return
-    }
-    SL.loadingSizzle = true
-    SL.sizzleQueue = []
-    SL.loadScript(SL.basePath() + 'selector.js', function(){
-      if (!SL.Sizzle){
-        SL.logError(new Error('Failed to load selector.js'))
-        return
-      }
-      var pending = SL.onEvent.pendingEvents
-      SL.each(pending, function(evt){
-        SL.handleEvent(evt)
-      }, this)
-      SL.onEvent = SL.handleEvent
-      SL.hasSelector = true
-      ;delete SL.loadingSizzle
-      SL.each(SL.sizzleQueue, function(item){
-        SL.cssQuery(item[0], item[1])
-      })
-      ;delete SL.sizzleQueue
-
-    })
-  }
-
-// Error Handling
-
-  SL.errors = []
-  SL.logError = function(err){
-    SL.errors.push(err)
-    SL.notify(err.name + ' - ' + err.message, 5)
-  }
-
-// `pageBottom()`
-// --------------
-//
-// The function is to be called by the web page using an script tag like so:
-//
-//     <script>_satellite.pageBottom()</script>
-//
-// just before the `</body>` tag.
-  SL.pageBottom = function(){
-    if (!SL.initialized) return
-    SL.pageBottomFired = true
-    SL.firePageLoadEvent('pagebottom')
-  }
-
-// This allows Rover to configure the browser to use the staging library instead.
-  SL.stagingLibraryOverride = function(){
-    /*jshint evil:true */
-    var libraryOverride = SL.readStoredSetting('stagingLibrary') === 'true'
-    if (libraryOverride){ // allow Rover to override the library to staging
-      var scripts = document.getElementsByTagName('script')
-          , regex = /^(.*)satelliteLib-(.*)\.js$/
-          , regexStaging = /^(.*)satelliteLib-(.*)-staging\.js$/
-          , match
-          , matchStaging
-          , src
-      for (var i = 0, len = scripts.length; i < len; i++){
-        src = scripts[i].getAttribute('src')
-        if (!src) continue
-        if (!match) match = src.match(regex)
-        if (!matchStaging) matchStaging = src.match(regexStaging)
-        if (matchStaging) break
-      }
-      if (match && !matchStaging){
-        var stagingURL = match[1] + 'satelliteLib-' + match[2] + '-staging.js'
-        if (document.write) {
-          document.write('<script src="' + stagingURL + '"></script>')
-        } else {
-          var s = document.createElement('script')
-          s.src = stagingURL
-          document.head.appendChild(s)
-        }
-        return true
-      }
-    }
-    return false
-  }
-
-  SL.checkAsyncInclude = function(){
-    if (window.satellite_asyncLoad)
-      SL.notify('You may be using the async installation of Satellite. In-page HTML and the "pagebottom" event will not work. Please update your Satellite installation for these features.', 5)
-  }
-
-  SL.hasMultipleDomains = function(){
-    return !!SL.settings.domainList && SL.settings.domainList.length > 1
-  }
-
-  SL.handleOverrides = function(){
-    if (Overrides){
-      for (var key in Overrides){
-        if (Overrides.hasOwnProperty(key)){
-          SL.data[key] = Overrides[key]
-        }
-      }
-    }
-  }
-
-  SL.privacyManagerParams = function(){
-    var params = {}
-    SL.extend(params, SL.settings.privacyManagement)
-    var analyticsTools = []
-    for (var key in SL.tools){
-      var tool = SL.tools[key]
-      var settings = tool.settings
-      if (!settings) continue
-      if (settings.engine === 'sc'){
-        analyticsTools.push(tool)
-      }
-    }
-    var analyticsTrackingServers = SL.filter(SL.map(analyticsTools, function(tool){
-      return tool.getTrackingServer()
-    }), function(s){ return s != null })
-    params.adobeAnalyticsTrackingServers = analyticsTrackingServers
-    var substitutable = [
-      'bannerText',
-      'headline',
-      'introductoryText',
-      'customCSS'
-    ]
-    for (var i = 0; i < substitutable.length; i++){
-      var prop = substitutable[i]
-      var spec = params[prop]
-      if (!spec) continue
-      if (spec.type === 'text'){
-        params[prop] = spec.value
-      }else if (spec.type === 'data'){
-        params[prop] = SL.getVar(spec.value)
-      }else{
-        throw new Error('Invalid type: ' + spec.type)
-      }
-    }
-    return params
-  }
-
-  SL.prepareLoadPrivacyManager = function(){
-    SL.addEventHandler(window, 'load', function(){
-      loadWhenAllSCToolsLoaded(SL.loadPrivacyManager)
-    })
-
-    function loadWhenAllSCToolsLoaded(callback){
-      var scTools = SL.filter(SL.values(SL.tools), function(tool){
-        return tool.settings && tool.settings.engine === 'sc'
-      })
-      if (scTools.length === 0){
-        return callback()
-      }
-      var numLoaded = 0
-      SL.each(scTools, function(tool){
-        SL.bindEvent(tool.id + '.load', onLoad)
-      })
-      var tid = setTimeout(onTimeout, 5000)
-
-      function onLoad(){
-        numLoaded++
-        if (numLoaded === scTools.length){
-          cleanUp()
-          clearTimeout(tid)
-          callback()
-        }
-      }
-
-      function cleanUp(){
-        SL.each(scTools, function(tool){
-          SL.unbindEvent(tool.id + '.load', onLoad)
-        })
-      }
-
-      function onTimeout(){
-        cleanUp()
-        callback()
-      }
-    }
-
-  }
-
-// `loadPrivacyManager()`
-// ----------------------
-//
-// Initialize privacy manager
-  SL.loadPrivacyManager = function(){
-    var scriptUrl = SL.basePath() + 'privacy_manager.js'
-    SL.loadScript(scriptUrl, function(){
-      var pm = SL.privacyManager
-      pm.configure(SL.privacyManagerParams())
-      pm.openIfRequired()
-    })
-  }
-
-// `init()`
-// --------
-//
-// Initialize Satellite.
-//
-// - `settings` - all the settings that comprising a library.
-  SL.init = function(settings) {
-    if (SL.stagingLibraryOverride())
-      return
-
-    SL.configurationSettings = settings
-    var tools = settings.tools
-        ;delete settings.tools
-    for (var key in settings){
-      SL[key] = settings[key]
-    }
-
-    if(SL.data.customVars === undefined)
-      SL.data.customVars = {}
-
-    SL.data.queryParams = SL.QueryParams.normal
-
-    SL.handleOverrides()
-
-    SL.detectBrowserInfo()
-
-    if (SL.trackVisitorInfo)
-      SL.trackVisitorInfo()
-
-    SL.loadStoredSettings()
-
-    SL.checkAsyncInclude()
-
-    SL.ensureCSSSelector()
-
-    SL.filterRules()
-    SL.dynamicRules = SL.filter(SL.rules, function(rule){
-      return rule.eventHandlerOnElement
-    })
-
-    SL.tools = SL.initTools(tools)
-    SL.initEventEmitters()
-
-    SL.firePageLoadEvent('aftertoolinit')
-
-    if (SL.settings.forceLowerCase)
-      SL.data.URI = SL.data.URI.toLowerCase()
-
-    if (SL.settings.privacyManagement){
-      SL.prepareLoadPrivacyManager()
-    }
-
-    if (SL.hasSelector)
-      SL.domReady(SL.eventEmitterBackgroundTasks)
-
-    SL.setListeners()
-
-    // Setup background tasks
-    SL.domReady(function() {
-      SL.poll(
-          function() { SL.backgroundTasks() },
-          SL.settings.recheckEvery || 3000
-      )
-    })
-
-    // Setup page load events
-    SL.domReady(function(){
-      SL.domReadyFired = true
-      if (!SL.pageBottomFired)
-        SL.pageBottom()
-
-      SL.firePageLoadEvent('domready')
-    })
-
-    SL.addEventHandler(window, 'load', function(){
-      SL.firePageLoadEvent('windowload')
-    })
-
-    SL.firePageLoadEvent('pagetop')
-    SL.initialized = true
-  }
-
-  SL.pageLoadPhases = ['aftertoolinit', 'pagetop', 'pagebottom', 'domready', 'windowload']
-
-  SL.loadEventBefore = function(one, other){
-    return SL.indexOf(SL.pageLoadPhases, one) <= SL.indexOf(SL.pageLoadPhases, other)
-  }
-
-  SL.flushPendingCalls = function(tool){
-    if (tool.pending){
-      SL.each(tool.pending, function(call){
-        var cmd = call[0]
-            , elm = call[1]
-            , evt = call[2]
-            , args = call[3]
-        if (cmd in tool)
-          tool[cmd].apply(tool, [elm, evt].concat(args))
-        else if (tool.emit)
-          tool.emit(cmd, elm, evt, args)
-        else
-          SL.notify('Failed to trigger ' + cmd +
-          ' for tool ' + tool.id, 1)
-      })
-      ;delete tool.pending
-    }
-  }
-
-// setDebug(debug)
-// --------------
-//
-// Activate or deactivate debug mode - within which
-// log statements will be printed to the JS console.
-//
-// - `debug` - a boolean indicating whether debug mode
-//   should be turned on.
-  SL.setDebug = function(debug){
-    if (!window.localStorage) return
-    window.localStorage.setItem('sdsat_debug', debug)
-  }
-
-  SL.detectBrowserInfo = function(){
-    // Based on <http://jsbin.com/inubez/3/>
-    function matcher(regexs){
-      return function(userAgent){
-        for (var key in regexs){
-          var regex = regexs[key];
-          var match = regex.test(userAgent);
-          if (match) return key;
-        }
-        return "Unknown";
-      };
-    }
-
-    var getBrowser = matcher({
-      OmniWeb: /OmniWeb/,
-      "Opera Mini": /Opera Mini/,
-      "Opera Mobile": /Opera Mobi/,
-      Opera: /Opera/,
-      "Mobile Safari": /Mobile(\/[0-9A-z]+)? Safari/,
-      Chrome: /Chrome/,
-      Firefox: /Firefox/,
-      "IE Mobile": /IEMobile/,
-      IE: /MSIE|Trident/,
-      Safari: /Safari/
-    });
-
-    var getOS = matcher({
-      iOS: /iPhone|iPad|iPod/,
-      Blackberry: /BlackBerry/,
-      "Symbian OS": /SymbOS/,
-      Maemo: /Maemo/,
-      Android: /Android [0-9\.]+;/,
-      Linux: / Linux /,
-      Unix: /FreeBSD|OpenBSD|CrOS/,
-      Windows: /[\( ]Windows /,
-      MacOS: /Macintosh;/
-    });
-
-    var getDeviceType = matcher({
-      iPhone: /iPhone/,
-      iPad: /iPad/,
-      iPod: /iPod/,
-      Nokia: /SymbOS|Maemo/,
-      "Windows Phone": /IEMobile/,
-      Blackberry: /BlackBerry/,
-      Android: /Android [0-9\.]+;/,
-      Desktop: /.*/
-    });
-
-    var userAgent = navigator.userAgent
-    SL.browserInfo = {
-      browser: getBrowser(userAgent)
-      , os: getOS(userAgent)
-      , deviceType: getDeviceType(userAgent)
-    }
-  }
-
-  SL.isHttps = function(){
-    return 'https:' == document.location.protocol
-  }
-
-  SL.BaseTool = function(settings){
-    this.settings = settings || {}
-
-    this.forceLowerCase = SL.settings.forceLowerCase
-    if ('forceLowerCase' in this.settings){
-      this.forceLowerCase = this.settings.forceLowerCase
-    }
-  }
-  SL.BaseTool.prototype = {
-    triggerCommand: function(trig, elm, evt){
-      var settings = this.settings || {}
-
-      if (this.initialize && this.isQueueAvailable()){
-        if (this.isQueueable(trig) && evt && SL.loadEventBefore(evt.type, settings.loadOn)){
-          this.queueCommand(trig, elm, evt)
-          return
-        }
-      }
-
-      var args = SL.preprocessArguments(trig['arguments'], elm, evt, this.forceLowerCase)
-          , cmd = trig.command
-          , method = this['$' + cmd]
-
-      if (method){
-        method.apply(this, [elm, evt].concat(args))
-      }else if (this.$missing$){
-        this.$missing$(cmd, elm, evt, args)
-      }else
-        SL.notify('Failed to trigger ' + cmd +
-        ' for tool ' + this.id, 1)
-
-    },
-    endPLPhase: function(pageLoadEvent){
-      // override to handle end initialization
-    },
-    isQueueable: function(trig){
-      // everything is queueable except `cancelToolInit`
-      return trig.command !== 'cancelToolInit'
-    },
-    isQueueAvailable: function(){
-      return !this.initialized && !this.initializing
-    },
-    flushQueue: function(){
-      if (this.pending){
-        SL.each(this.pending, function(args){
-          this.triggerCommand.apply(this, args)
-        }, this)
-        this.pending = []
-      }
-    },
-    queueCommand: function(trig, elm, evt){
-      if (!this.pending)
-        this.pending = []
-      this.pending.push([trig, elm, evt])
-    },
-    $cancelToolInit: function(){
-      this._cancelToolInit = true
-    }
-  }
-
-// Set Satellite to the global variable `_satellite`.
-  window._satellite = SL
-
-// Orientation Change Event Emitter
-// ================================
-//
-// The `orientationchange` event on mobile devices fire when the devices switchs between
-// portrait and landscape modes. You can use `%event.orientation%` in your command arguments
-// to evaluate to either `portrait` or `landscape`.
-  function OrientationChangeEventEmitter(){
-    SL.addEventHandler(window, "orientationchange", OrientationChangeEventEmitter.orientationChange)
-  }
-  OrientationChangeEventEmitter.orientationChange = function (e) {
-    var orientation = window.orientation === 0 ?
-        'portrait' :
-        'landscape'
-    e.orientation = orientation
-    SL.onEvent(e)
-  }
-  SL.availableEventEmitters.push(OrientationChangeEventEmitter)
-
-// VideoPlayedEventEmitter
-// =======================
-//
-// Emits the `videoplayed` event, given a specified percentage or duration, i.e. `videoplayed`
-// is a parameterized event. A rule looks like this
-//
-//      {
-//          name: "Video 10% complete",
-//          event: "videoplayed(10%)",
-//          selector: "#video",
-//          trigger: [
-//              {
-//                  tool: "ga",
-//                  command: "trackEvent",
-//                  arguments: [
-//                      "video",
-//                      "video 10% complete",
-//                      "from: %URI%"
-//                  ]
-//              }
-//          ]
-//      }
-//
-// `10%` is in the paranthesis which indicates this rule will only fire when the 10%
-// of the total length of the video has been played.
-// You can also specifiy a duration in seconds, which looks like `videoplayed(8s)` - which
-// stands for 8 seconds.
-
-  function VideoPlayedEventEmitter(){
-    this.rules = SL.filter(SL.rules, function(rule){
-      return rule.event.substring(0, 11) === 'videoplayed'
-    })
-    this.eventHandler = SL.bind(this.onUpdateTime, this)
-  }
-  VideoPlayedEventEmitter.prototype = {
-    backgroundTasks: function(){
-      var eventHandler = this.eventHandler
-      SL.each(this.rules, function(rule){
-        SL.cssQuery(rule.selector || 'video', function(elms){
-          SL.each(elms, function(elm){
-            if (SL.$data(elm, 'videoplayed.tracked')) return
-            SL.addEventHandler(elm, 'timeupdate', SL.throttle(eventHandler, 100))
-            SL.$data(elm, 'videoplayed.tracked', true)
-          })
-        })
-      })
-    },
-    evalRule: function(elm, rule){
-      var eventType = rule.event
-          , seekable = elm.seekable
-          , startTime = seekable.start(0)
-          , endTime = seekable.end(0)
-          , currentTime = elm.currentTime
-          , m = rule.event.match(/^videoplayed\(([0-9]+)([s%])\)$/)
-      if (!m) return
-      var unit = m[2]
-          , amount = Number(m[1])
-      var func = unit === '%' ?
-          function(){
-            return amount <=
-                100 * (currentTime - startTime) / (endTime - startTime)
-          } :
-          function(){
-            return amount <= currentTime - startTime
-          }
-      if (!SL.$data(elm, eventType) && func()){
-        SL.$data(elm, eventType, true)
-        SL.onEvent({type: eventType, target: elm})
-      }
-    },
-    onUpdateTime: function(e){
-      var rules = this.rules
-          , elm = e.target
-      if (!elm.seekable || elm.seekable.length === 0) return
-      for (var i = 0, len = rules.length; i < len; i++)
-        this.evalRule(elm, rules[i])
-    }
-  }
-  SL.availableEventEmitters.push(VideoPlayedEventEmitter)
-
-// InviewEventEmitter
-// ==================
-//
-// Emits the `inview` event. The `inview` event fires on an element when the element
-// first comes into the view of the user. If the element is in view immediately upon page
-// load, it will be fired right away, if it only comes in view after some scrolling, it
-// will fire then. An optional delay interval `inviewDelay` can be specified in the rule
-// which determine how long the element has to be in view for before the event fires,
-// of which the default value is 1 second.
-
-  function InViewEventEmitter(rules){
-    rules = rules || SL.rules
-    this.rules = SL.filter(rules, function(rule){
-      return rule.event === 'inview'
-    })
-    this.elements = []
-    this.eventHandler = SL.bind(this.track, this)
-    SL.addEventHandler(window, 'scroll', this.eventHandler)
-    SL.addEventHandler(window, 'load', this.eventHandler)
-  }
-
-// Util functions needed by `InViewEventEmitter`
-  InViewEventEmitter.offset = function(elem) {
-    var box
-
-    try {
-      box = elem.getBoundingClientRect()
-    } catch(e) {}
-
-    var doc = document,
-        docElem = doc.documentElement
-
-    var body = doc.body,
-        win = window,
-        clientTop  = docElem.clientTop  || body.clientTop  || 0,
-        clientLeft = docElem.clientLeft || body.clientLeft || 0,
-        scrollTop  = win.pageYOffset || docElem.scrollTop  || body.scrollTop,
-        scrollLeft = win.pageXOffset || docElem.scrollLeft || body.scrollLeft,
-        top  = box.top  + scrollTop  - clientTop,
-        left = box.left + scrollLeft - clientLeft
-
-    return { top: top, left: left }
-  }
-  InViewEventEmitter.getViewportHeight = function() {
-    var height = window.innerHeight // Safari, Opera
-    var mode = document.compatMode
-
-    if (mode) { // IE, Gecko
-      height = (mode == 'CSS1Compat') ?
-          document.documentElement.clientHeight : // Standards
-          document.body.clientHeight // Quirks
-    }
-
-    return height
-  }
-  InViewEventEmitter.getScrollTop = function(){
-    return (document.documentElement.scrollTop ?
-        document.documentElement.scrollTop :
-        document.body.scrollTop)
-  }
-
-  InViewEventEmitter.prototype = {
-    backgroundTasks: function(){
-      var elements = this.elements
-          , self = this
-      SL.each(this.rules, function(rule){
-        SL.cssQuery(rule.selector, function(elms){
-          var addCount = 0
-          SL.each(elms, function(elm){
-            if (!SL.contains(elements, elm)){
-              elements.push(elm)
-              addCount++
-            }
-          })
-          if (addCount){
-            SL.notify(rule.selector + ' added ' + addCount + ' elements.', 1)
-          }
-        })
-      })
-      this.track()
-    },
-    elementIsInView: function(el){
-      var vpH = InViewEventEmitter.getViewportHeight()
-          , scrolltop = InViewEventEmitter.getScrollTop()
-          , top = InViewEventEmitter.offset(el).top
-          , height = el.offsetHeight
-      return !(scrolltop > (top + height) || scrolltop + vpH < top)
-    },
-    checkInView: function(el, recheck){
-      var inview = SL.$data(el, 'inview')
-      if (this.elementIsInView(el)) {
-        // it is in view now
-        if (!inview)
-          SL.$data(el, 'inview', true)
-        var self = this
-        this.processRules(el, function(rule, viewedProp, timeoutIdProp){
-          if (recheck || !rule.inviewDelay){
-            SL.$data(el, viewedProp, true)
-            SL.onEvent({type: 'inview', target: el, inviewDelay: rule.inviewDelay})
-          }else if(rule.inviewDelay){
-            var timeout = SL.$data(el, timeoutIdProp)
-            if (timeout)
-              clearTimeout(timeout)
-            timeout = setTimeout(function(){
-              self.checkInView(el, true)
-            }, rule.inviewDelay)
-            SL.$data(el, timeoutIdProp, timeout)
-          }
-        })
-      } else {
-        // it is not in view now
-        if (inview)
-          SL.$data(el, 'inview', false)
-        this.processRules(el, function(rule, viewedProp, timeoutIdProp){
-          var timeout = SL.$data(el, timeoutIdProp)
-          if (timeout){
-            clearTimeout(timeout)
-          }
-        })
-      }
-    },
-    track: function(){
-      SL.each(this.elements, function(elm){
-        this.checkInView(elm)
-      }, this)
-    },
-    processRules: function(elm, callback){
-      SL.each(this.rules, function(rule, i){
-        // viewedProp: for rules that has a timeout, the definition for
-        // "viewed" is rule dependent. But for all rules that do not have
-        // a timeout, it is independent.
-        var viewedProp = rule.inviewDelay ? 'viewed_' + rule.inviewDelay : 'viewed'
-        var timeoutIdProp = 'inview_timeout_id_' + i
-        if (SL.$data(elm, viewedProp)) return
-        if (SL.matchesCss(rule.selector, elm)){
-          callback(rule, viewedProp, timeoutIdProp)
-        }
-      })
-    }
-  }
-
-  SL.availableEventEmitters.push(InViewEventEmitter)
-
-// Facebook Event Emitter
-// ======================
-//
-// Will track `edge.create`, `edge.remove` and `message.send` events from the Facebook
-// Javascript API and emit `facebook.like`, `facebook.unlike` and `facebook.send` events
-// respectively.
-
-  function FacebookEventEmitter(FB){
-    this.delay = 250;
-    this.FB = FB;
-
-    SL.domReady(SL.bind(function () {
-      SL.poll(SL.bind(this.initialize, this), this.delay, 8);
-    }, this));
-  }
-
-  FacebookEventEmitter.prototype = {
-    initialize: function() {
-      this.FB = this.FB || window.FB;
-
-      if (this.FB && this.FB.Event && this.FB.Event.subscribe) {
-        this.bind();
-        return true;
-      }
-    },
-
-    bind: function(){
-      this.FB.Event.subscribe('edge.create', function() {
-        SL.notify("tracking a facebook like", 1)
-        SL.onEvent({type: 'facebook.like', target: document})
-      });
-
-      this.FB.Event.subscribe('edge.remove', function() {
-        SL.notify("tracking a facebook unlike", 1)
-        SL.onEvent({type: 'facebook.unlike', target: document})
-      });
-
-      this.FB.Event.subscribe('message.send', function() {
-        SL.notify("tracking a facebook share", 1)
-        SL.onEvent({type: 'facebook.send', target: document})
-      });
-    }
-  }
-  SL.availableEventEmitters.push(FacebookEventEmitter);
-
-// Hover Event Emitter
-// =====================
-//
-// Emits the `hover` event in the event. This is better than `mouseover` because you can introduce a certain delay.
-// 
-//  {
-//        name: "Hover for 1 second"
-//        event: "hover(1000)",
-//        ...
-//  }
-  function HoverEventEmitter(){
-    var eventRegex = this.eventRegex = /^hover\(([0-9]+)\)$/
-    var rules = this.rules = []
-    SL.each(SL.rules, function(rule){
-      var m = rule.event.match(eventRegex)
-      if (m){
-        rules.push([
-          Number(rule.event.match(eventRegex)[1]),
-          rule.selector
-        ])
-      }
-    })
-  }
-  HoverEventEmitter.prototype = {
-    backgroundTasks: function(){
-      var self = this
-      SL.each(this.rules, function(rule){
-        var selector = rule[1]
-            , delay = rule[0]
-        SL.cssQuery(selector, function(newElms){
-          SL.each(newElms, function(elm){
-            self.trackElement(elm, delay)
-          })
-        })
-      }, this)
-    },
-    trackElement: function(elm, delay){
-      var self = this
-          , trackDelays = SL.$data(elm, 'hover.delays')
-      if (!trackDelays){
-        SL.addEventHandler(elm, 'mouseover', function(e){
-          self.onMouseOver(e, elm)
-        })
-        SL.addEventHandler(elm, 'mouseout', function(e){
-          self.onMouseOut(e, elm)
-        })
-        SL.$data(elm, 'hover.delays', [delay])
-      }
-      else if (!SL.contains(trackDelays, delay)){
-        trackDelays.push(delay)
-      }
-    },
-    onMouseOver: function(e, elem){
-      var target = e.target || e.srcElement
-          , related = e.relatedTarget || e.fromElement
-          , hit = (elem === target || SL.containsElement(elem, target)) &&
-              !SL.containsElement(elem, related)
-      if (hit)
-        this.onMouseEnter(elem)
-    },
-    onMouseEnter: function(elm){
-      var delays = SL.$data(elm, 'hover.delays')
-      var delayTimers = SL.map(delays, function(delay){
-        return setTimeout(function(){
-          SL.onEvent({type: 'hover(' + delay + ')', target: elm})
-        }, delay)
-      })
-      SL.$data(elm, 'hover.delayTimers', delayTimers)
-    },
-    onMouseOut: function(e, elem){
-      var target = e.target || e.srcElement
-          , related = e.relatedTarget || e.toElement
-          , hit = (elem === target || SL.containsElement(elem, target)) &&
-              !SL.containsElement(elem, related)
-      if (hit)
-        this.onMouseLeave(elem)
-    },
-    onMouseLeave: function(elm){
-      var delayTimers = SL.$data(elm, 'hover.delayTimers')
-      if (delayTimers)
-        SL.each(delayTimers, function(timer){
-          clearTimeout(timer)
-        })
-    }
-  }
-  SL.availableEventEmitters.push(HoverEventEmitter)
-
-// ElementExistsEventEmitter
-// ==================
-//
-// Emits the `elementexists` event. The `elementexists` event fires when an element
-// of a specified selector becomes into existance - either because it's in the page
-// markup or dynamically injected later on. *Each rule only fires once.*
-
-  function ElementExistsEventEmitter(){
-    this.rules = SL.filter(SL.rules, function(rule){
-      return rule.event === 'elementexists'
-    })
-  }
-  ElementExistsEventEmitter.prototype.backgroundTasks = function(){
-    SL.each(this.rules, function(rule){
-      SL.cssQuery(rule.selector, function(elms){
-        if (elms.length > 0){
-          var elm = elms[0]
-          if (SL.$data(elm, 'elementexists.seen')) return
-          SL.$data(elm, 'elementexists.seen', true)
-          SL.onEvent({type: 'elementexists', target: elm})
-        }
-      })
-    })
-  }
-
-  SL.availableEventEmitters.push(ElementExistsEventEmitter)
-
-// Twitter Event Emitter
-// =====================
-//
-// Emits the `twitter.tweet` event in the event a user tweets from the site.
-  function TwitterEventEmitter(twttr){
-    SL.domReady(SL.bind(function () {
-      this.twttr = twttr || window.twttr;
-      this.initialize();
-    }, this));
-  }
-
-  TwitterEventEmitter.prototype = {
-    initialize: function(){
-      var twttr = this.twttr;
-      if (twttr && typeof twttr.ready === 'function') {
-        twttr.ready(SL.bind(this.bind, this));
-      }
-    },
-
-    bind: function(){
-      this.twttr.events.bind('tweet', function(event) {
-        if (event) {
-          SL.notify("tracking a tweet button", 1);
-          SL.onEvent({type: 'twitter.tweet', target: document});
-        }
-      });
-
-    }
-  }
-  SL.availableEventEmitters.push(TwitterEventEmitter)
-
-// Test & Target Tool
-// ==================
-//
-// This tool lets you use Test & Target with Satellite.
-//
-//
-
-  function Tnt(settings){
-    SL.BaseTool.call(this, settings)
-
-    this.styleElements = {}
-    this.targetPageParamsStore = {}
-  }
-  SL.inherit(Tnt, SL.BaseTool)
-  SL.extend(Tnt.prototype, {
-    name: 'tnt',
-
-    endPLPhase: function(pageLoadEvent) {
-      if (pageLoadEvent === 'aftertoolinit') {
-        this.initialize();
-      }
-    },
-
-    initialize: function() {
-      SL.notify('Test & Target: Initializing', 1)
-      this.initializeTargetPageParams()
-      this.load()
-    },
-
-    initializeTargetPageParams: function() {
-      if (window.targetPageParams) {
-        this.updateTargetPageParams(
-            this.parseTargetPageParamsResult(
-                window.targetPageParams()
-            )
-        )
-      }
-
-      this.updateTargetPageParams(this.settings.pageParams)
-
-      this.setTargetPageParamsFunction()
-    },
-
-    load: function(){
-      var url = this.getMboxURL(this.settings.mboxURL)
-      if (this.settings.initTool !== false){
-        if (this.settings.loadSync) {
-          SL.loadScriptSync(url)
-          this.onScriptLoaded()
-        } else {
-          SL.loadScript(url, SL.bind(this.onScriptLoaded, this))
-          this.initializing = true
-        }
-      } else {
-        this.initialized = true
-      }
-    },
-
-    getMboxURL: function(urlData) {
-      var url = urlData
-      if (SL.isObject(urlData)) {
-        if (window.location.protocol === 'https:')
-          url = urlData.https
-        else
-          url = urlData.http
-      }
-      if (!url.match(/^https?:/))
-        return SL.basePath() + url
-      else
-        return url
-    },
-
-    onScriptLoaded: function(){
-      SL.notify('Test & Target: loaded.', 1)
-
-      this.flushQueue()
-
-      this.initialized = true
-      this.initializing = false
-    },
-
-    $addMbox: function(elm, evt, settings){
-      var mboxGoesAround = settings.mboxGoesAround
-      var styleText = mboxGoesAround + '{visibility: hidden;}'
-      var styleElm = this.appendStyle(styleText)
-      if (!(mboxGoesAround in this.styleElements)){
-        this.styleElements[mboxGoesAround] = styleElm
-      }
-
-      if (this.initialized){
-        this.$addMBoxStep2(null, null, settings)
-      }else if (this.initializing){
-        this.queueCommand({
-          command: 'addMBoxStep2'
-          , "arguments": [settings]
-        }, elm, evt)
-      }
-    },
-    $addMBoxStep2: function(elm, evt, settings){
-      var mboxID = this.generateID()
-      var self = this
-      SL.addEventHandler(window, 'load', SL.bind(function(){
-        SL.cssQuery(settings.mboxGoesAround, function(elms){
-          var elem = elms[0]
-          if (!elem) return
-          var newDiv = document.createElement("div")
-          newDiv.id = mboxID
-          elem.parentNode.replaceChild(newDiv, elem)
-          newDiv.appendChild(elem)
-          window.mboxDefine(mboxID, settings.mboxName)
-          var args = [settings.mboxName]
-          if (settings.arguments){
-            args = args.concat(settings.arguments)
-          }
-          window.mboxUpdate.apply(null, args)
-          self.reappearWhenCallComesBack(elem, mboxID, settings.timeout, settings)
-        });
-      }, this))
-      this.lastMboxID = mboxID // leave this here for easier testing
-    },
-
-    $addTargetPageParams: function(elm, evt, pageParams) {
-      this.updateTargetPageParams(pageParams)
-    },
-
-    generateID: function(){
-      var id = '_sdsat_mbox_' + String(Math.random()).substring(2) + '_'
-      return id
-    },
-    appendStyle: function(css){
-      // <http://stackoverflow.com/a/524721/5304>
-      var head = document.getElementsByTagName('head')[0]
-          , style = document.createElement('style')
-      style.type = 'text/css'
-      if(style.styleSheet){
-        style.styleSheet.cssText = css
-      }else{
-        style.appendChild(document.createTextNode(css))
-      }
-      head.appendChild(style)
-      return style
-    },
-    reappearWhenCallComesBack: function(elmGoesAround, mboxID, timeout, settings){
-      var self = this
-
-      function reappear(){
-        var styleElm = self.styleElements[settings.mboxGoesAround]
-        if (styleElm){
-          styleElm.parentNode.removeChild(styleElm)
-          ;delete self.styleElements[settings.mboxGoesAround]
-        }
-      }
-
-      SL.cssQuery('script[src*="omtrdc.net"]', function(results){
-        var script = results[0]
-        if (script){
-          SL.scriptOnLoad(script.src, script, function(){
-            SL.notify('Test & Target: request complete', 1)
-            reappear()
-            clearTimeout(timeoutID)
-          })
-          var timeoutID = setTimeout(function(){
-            SL.notify('Test & Target: bailing after ' + timeout + 'ms', 1)
-            reappear()
-          }, timeout)
-        }else{
-          SL.notify('Test & Target: failed to find T&T ajax call, bailing', 1)
-          reappear()
-        }
-      })
-    },
-
-    updateTargetPageParams: function(obj) {
-      var o = {}
-      for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          o[SL.replace(key)] = SL.replace(obj[key])
-        }
-      }
-      SL.extend(
-          this.targetPageParamsStore,
-          o
-      )
-    },
-
-    getTargetPageParams: function() {
-      return this.targetPageParamsStore
-    },
-
-    setTargetPageParamsFunction: function() {
-      window.targetPageParams = SL.bind(this.getTargetPageParams, this)
-    },
-
-    parseTargetPageParamsResult: function(data) {
-      var result = data
-
-      if(SL.isArray(data)) {
-        data = data.join('&')
-      }
-
-      if (SL.isString(data)) {
-        result = SL.parseQueryParams(data)
-      }
-
-      return result
-    }
-  })
-  SL.availableTools.tnt = Tnt
-
-// Site Catalyst Tool
-// ---------------------
-//
-// The SiteCatalystTool allows to set variables, add events, track link, etc.
-// Example:
-//
-//      trigger: [
-//          {
-//              tool: "sc",
-//              command: "trackLink"
-//          }
-//      ]
-//
-  function SiteCatalystTool(settings){
-    SL.BaseTool.call(this, settings)
-
-    this.varBindings = {}
-    this.events = []
-    this.products = []
-    this.customSetupFuns = []
-  }
-  SL.inherit(SiteCatalystTool, SL.BaseTool)
-  SL.extend(SiteCatalystTool.prototype, {
-    name: 'SC',
-    initialize: function(pageLoadEvent){
-
-      if (this._cancelToolInit) return
-      this.settings.initVars = this.substituteVariables(
-          this.settings.initVars, { type: pageLoadEvent }
-      )
-
-      if (this.settings.initTool !== false){
-        var url = this.settings.sCodeURL || SL.basePath() + 's_code.js'
-        if (typeof url === 'object'){
-          if (window.location.protocol === 'https:')
-            url = url.https
-          else
-            url = url.http
-        }
-        if (!url.match(/^https?:/))
-          url = SL.basePath() + url
-        if (this.settings.initVars){
-          this.$setVars(null, null, this.settings.initVars)
-        }
-        SL.loadScript(url, SL.bind(this.onSCodeLoaded, this))
-        this.initializing = true
-      }else{
-        // set to initializing because we are
-        // waiting on the s_code.js loaded by
-        // the site to potentially load
-        // and we'll detect the completion of the load
-        // in a background task
-        this.initializing = true
-        this.pollForSC()
-      }
-    },
-    onSCodeLoaded: function(){
-      this.initialized = true
-      this.initializing = false
-      SL.notify('Adobe Analytics: loaded.', 1)
-      SL.fireEvent(this.id + '.load', this.getS())
-      this.flushQueueExceptTrackLink()
-      this.sendBeacon()
-      this.flushQueue()
-    },
-    pollForSC: function(){
-      SL.poll(SL.bind(function(){
-        if (typeof window.s_gi === 'function'){
-          this.initialized = true
-          this.initializing = false
-          SL.notify('Adobe Analytics: loaded (manual).', 1)
-          SL.fireEvent(this.id + '.load', this.getS())
-          this.flushQueue()
-          return true
-        }
-      }, this))
-    },
-    flushQueueExceptTrackLink: function(){
-      // because we always s.tl() after the first s.t()
-      // that way the variables set by s.tl() will not
-      // contaminate the s.t() call
-      if (!this.pending) return
-      var left = []
-      for (var i = 0; i < this.pending.length; i++){
-        var args = this.pending[i]
-        var trig = args[0]
-        if (trig.command === 'trackLink'){
-          left.push(args)
-        }else{
-          this.triggerCommand.apply(this, args)
-        }
-      }
-      this.pending = left
-    },
-    isQueueAvailable: function(){
-      return !this.initialized
-    },
-    substituteVariables: function(obj, evt){
-      var ret = {}
-      for (var key in obj){
-        var value = obj[key]
-        ret[key] = SL.replace(value, location, evt)
-      }
-      return ret
-    },
-    endPLPhase: function(pageLoadEvent){
-      var loadOn = this.settings.loadOn
-      if (pageLoadEvent === loadOn){
-        this.initialize(pageLoadEvent)
-      }
-    },
-    $setVars: function(elm, evt, vars){
-      for (var v in vars){
-        var val = vars[v]
-        if (typeof val === 'function')
-          val = val()
-        this.varBindings[v] = val
-      }
-      SL.notify('Adobe Analytics: set variables.', 2)
-    },
-    $customSetup: function(elm, evt, setup){
-      this.customSetupFuns.push(function(s){
-        setup.call(elm, evt, s)
-      })
-    },
-    getAccount: function(hostname){
-      if (window.s_account){
-        return window.s_account
-      }
-      if (hostname && this.settings.accountByHost){
-        return this.settings.accountByHost[hostname] || this.settings.account
-      }else{
-        return this.settings.account
-      }
-    },
-    isValidSCInstance: function(s) {
-      return !!s && typeof s.t === 'function' && typeof s.tl === 'function'
-    },
-    getS: function(s, options){
-      var hostname = options && options.hostname || window.location.hostname
-      var varBindings = this.concatWithToolVarBindings(
-          options && options.setVars || this.varBindings
-      )
-      var events = options && options.addEvent || this.events
-      var acct = this.getAccount(hostname)
-      var s_gi = window.s_gi
-      if (!s_gi) return null
-      if (!this.isValidSCInstance(s)) s = null
-      if (!acct && !s) {
-        SL.notify('Adobe Analytics: tracker not initialized because account was not found', 1)
-        return null
-      }
-      var s = s || s_gi(acct)
-
-      var DTMversion = 'D' + SL.appVersion;
-      if(typeof s.tagContainerMarker !== 'undefined') {
-        s.tagContainerMarker = DTMversion
-      } else {
-        if (typeof s.version === 'string' &&
-            s.version.substring(s.version.length - 5) !==
-            ('-' + DTMversion)){
-          s.version += '-' + DTMversion
-        }
-      }
-
-      if (s.sa && this.settings.skipSetAccount !== true && this.settings.initTool !== false) s.sa(this.settings.account)
-      this.applyVarBindingsOnTracker(s, varBindings)
-      if (events.length > 0)
-        s.events = events.join(',')
-
-      var visitorIdInstance = SL.getVisitorId()
-      if (visitorIdInstance) {
-        s.visitor = SL.getVisitorId()
-      }
-
-      return s
-    },
-    concatWithToolVarBindings: function(varBindings){
-      var settingsInitVars = this.settings.initVars || {}
-
-      SL.map(['trackingServer', 'trackingServerSecure'], function (item) {
-        if (settingsInitVars[item] && !varBindings[item]) {
-          varBindings[item] = settingsInitVars[item]
-        }
-      });
-
-      return varBindings
-    },
-    applyVarBindingsOnTracker: function (s, varBindings) {
-      for (var v in varBindings){
-        s[v] = varBindings[v]
-      }
-    },
-    clearVarBindings: function(){
-      this.varBindings = {}
-    },
-    clearCustomSetup: function(){
-      this.customSetupFuns = []
-    },
-    sendBeacon: function(){
-      var s = this.getS(window[this.settings.renameS || 's'])
-      if (!s){
-        SL.notify('Adobe Analytics: page code not loaded', 1)
-        return
-      }
-      if (this.settings.customInit){
-        if (this.settings.customInit(s) === false){
-          SL.notify("Adobe Analytics: custom init suppressed beacon", 1)
-          return
-        }
-      }
-
-      if (this.settings.executeCustomPageCodeFirst) {
-        this.applyVarBindingsOnTracker(s, this.varBindings)
-      }
-      this.executeCustomSetupFuns(s)
-      s.t()
-      this.clearVarBindings()
-      this.clearCustomSetup()
-      SL.notify("Adobe Analytics: tracked page view", 1)
-    },
-    executeCustomSetupFuns: function(s){
-      SL.each(this.customSetupFuns, function(fun){
-        fun.call(window, s)
-      })
-    },
-    $trackLink: function(elm, evt, params){
-      params = params || {}
-      var type = params.type
-      var linkName = params.linkName
-      if (!linkName &&
-          elm &&
-          elm.nodeName &&
-          elm.nodeName.toLowerCase() === 'a'){
-        linkName = elm.innerHTML
-      }
-      if (!linkName){
-        linkName = 'link clicked'
-      }
-      var vars = params && params.setVars
-      var events = (params && params.addEvent) || []
-
-      var s = this.getS(null, {
-        setVars: vars,
-        addEvent: events
-      })
-
-      if (!s){
-        SL.notify('Adobe Analytics: page code not loaded', 1)
-        return
-      }
-
-      var orgLinkTrackVars = s.linkTrackVars
-      var orgLinkTrackEvents = s.linkTrackEvents
-      var definedVarNames = this.definedVarNames(vars)
-
-      if (params && params.customSetup){
-        params.customSetup.call(elm, evt, s)
-      }
-
-      if (events.length > 0)
-        definedVarNames.push('events')
-      if (s.products)
-        definedVarNames.push('products')
-
-      // add back the vars from s
-      definedVarNames = this.mergeTrackLinkVars(s.linkTrackVars, definedVarNames)
-
-      // add back events from s
-      events = this.mergeTrackLinkVars(s.linkTrackEvents, events)
-
-      s.linkTrackVars = this.getCustomLinkVarsList(definedVarNames)
-
-      var eventsKeys = SL.map(events, function(item) {
-        return item.split(':')[0]
-      });
-      s.linkTrackEvents = this.getCustomLinkVarsList(eventsKeys)
-
-      s.tl(true, type || 'o', linkName)
-      SL.notify([
-        'Adobe Analytics: tracked link ',
-        'using: linkTrackVars=',
-        SL.stringify(s.linkTrackVars),
-        '; linkTrackEvents=',
-        SL.stringify(s.linkTrackEvents)
-      ].join(''), 1)
-
-      s.linkTrackVars = orgLinkTrackVars
-      s.linkTrackEvents = orgLinkTrackEvents
-    },
-    mergeTrackLinkVars: function(newVarsStr, varsArr){
-      if (newVarsStr) {
-        varsArr = newVarsStr.split(',').concat(varsArr)
-      }
-
-      return varsArr
-    },
-    getCustomLinkVarsList: function (keysArr) {
-      var noneIndex = SL.indexOf(keysArr, 'None');
-      if (noneIndex > -1 && keysArr.length > 1) {
-        keysArr.splice(noneIndex, 1)
-      }
-
-      return keysArr.join(',');
-    },
-    definedVarNames: function(vars){
-      vars = vars || this.varBindings
-      var ret = []
-      for (var varname in vars){
-        if (/^(eVar[0-9]+)|(prop[0-9]+)|(hier[0-9]+)|campaign|purchaseID|channel|server|state|zip|pageType$/.test(varname))
-          ret.push(varname)
-      }
-      return ret
-    },
-    getTrackingServer: function(){
-      var tool = this
-      var s = tool.getS()
-      if (s && s.trackingServer) return s.trackingServer
-      var account = tool.getAccount(window.location.hostname)
-      if (!account) return null
-      // based on code in app measurement
-      var w
-      var c = ''
-      var d = s && s.dc
-      var e
-      var f
-      w = account
-      e = w.indexOf(",")
-      e >= 0 && (w = w.gb(0, e))
-      w = w.replace(/[^A-Za-z0-9]/g, "")
-      c || (c = "2o7.net")
-      d = d ? ("" + d).toLowerCase() : "d1"
-      c == "2o7.net" && (d == "d1" ? d = "112" : d == "d2" && (d = "122"), f = "")
-      e = w + "." + d + "." + f + c
-      return e
-    },
-    $trackPageView: function(elm, evt, params){
-      var vars = params && params.setVars
-      var events = (params && params.addEvent) || []
-
-      var s = this.getS(null, {
-        setVars: vars,
-        addEvent: events
-      })
-
-      if (!s){
-        SL.notify('Adobe Analytics: page code not loaded', 1)
-        return
-      }
-      s.linkTrackVars = ''
-      s.linkTrackEvents = ''
-      this.executeCustomSetupFuns(s)
-      if (params && params.customSetup){
-        params.customSetup.call(elm, evt, s)
-      }
-      s.t()
-      this.clearVarBindings()
-      this.clearCustomSetup()
-      SL.notify("Adobe Analytics: tracked page view", 1)
-    },
-    $postTransaction: function(elm, evt, varname){
-      var trans = SL.data.transaction = window[varname]
-          , s = this.varBindings
-          , mapping = this.settings.fieldVarMapping
-
-      SL.each(trans.items, function(item){
-        this.products.push(item)
-      }, this)
-
-      s.products = SL.map(this.products, function(item){
-        var vars = []
-        if (mapping && mapping.item){
-          for (var field in mapping.item){
-            var varname = mapping.item[field]
-            vars.push(varname + '=' + item[field])
-            if (varname.substring(0, 5) === 'event')
-              this.events.push(varname)
-          }
-        }
-        var arr = ['', item.product, item.quantity, item.unitPrice * item.quantity]
-        if (vars.length > 0)
-          arr.push(vars.join('|'))
-        return arr.join(';')
-      }, this).join(',')
-
-      if (mapping && mapping.transaction){
-        // Add top-level events/eVars to products string
-        var topLevelVars = []
-        for (var field in mapping.transaction){
-          var varname = mapping.transaction[field]
-          topLevelVars.push(varname + '=' + trans[field])
-          if (varname.substring(0, 5) === 'event')
-            this.events.push(varname)
-        }
-        if (s.products.length > 0)
-          s.products += ','
-        s.products += ';;;;' + topLevelVars.join('|')
-      }
-
-
-    },
-    $addEvent: function(elm, evt){
-      for (var i = 2, len = arguments.length; i < len; i++){
-        this.events.push(arguments[i])
-      }
-    },
-    $addProduct: function(elm, evt){
-      for (var i = 2, len = arguments.length; i < len; i++){
-        this.products.push(arguments[i])
-      }
-    }
-  })
-  SL.availableTools.sc = SiteCatalystTool
-
-// Basic Tool
-// ------------
-//
-// This is a generic tool that allows integrating with
-// various simple tools.
-//
-
-  function BasicTool(settings){
-    SL.BaseTool.call(this, settings)
-
-    this.name = settings.name || 'Basic'
-  }
-
-  SL.inherit(BasicTool, SL.BaseTool)
-
-  SL.extend(BasicTool.prototype, {
-    initialize: function(){
-      var settings = this.settings
-      if (this.settings.initTool !== false){
-        var url = settings.url
-        if (typeof url === 'string'){
-          url = SL.basePath() + url
-        }else{
-          url = SL.isHttps() ? url.https : url.http
-        }
-        SL.loadScript(url, SL.bind(this.onLoad, this))
-        this.initializing = true
-      }else{
-        this.initialized = true
-      }
-    },
-    isQueueAvailable: function(){
-      return !this.initialized
-    },
-    onLoad: function(){
-      this.initialized = true
-      this.initializing = false
-      if (this.settings.initialBeacon){
-        this.settings.initialBeacon()
-      }
-      this.flushQueue()
-    },
-    endPLPhase: function(pageLoadEvent){
-      var loadOn = this.settings.loadOn
-      if (pageLoadEvent === loadOn){
-        SL.notify(this.name + ': Initializing at ' + pageLoadEvent, 1)
-        this.initialize()
-      }
-    },
-    $fire: function(elm, evt, fun){
-      if (this.initializing){
-        this.queueCommand({
-          command: 'fire',
-          arguments: [fun]
-        }, elm, evt)
-        return
-      }
-      fun.call(this.settings, elm, evt)
-    }
-  })
-
-  SL.availableTools.am = BasicTool
-  SL.availableTools.adlens = BasicTool
-  SL.availableTools.__basic = BasicTool
-
-// The Google Analytics Universal Tool
-// ================
-//
-// This tool interacts with the [GAU library](https://developers.google.com/analytics/devguides/collection/analyticsjs/).
-//
-// From a high end perspective the following steps will happen. A `ga` dummy
-// object will be initialized. Until the `analytics.js` file will be loaded in
-// the browser, any triggered command will be queued in the `ga` object. Once
-// the `analytics.js` will finish to load, all the queued commands will be
-// executed.
-//
-// The tool is initialized during one of the following page load phases:
-// top, bottom. Find out more info about the initializing sequence by clicking
-// [here](#-endplphase-).
-//
-// Beside the settings that are processed by the BaseTool code, this tool uses
-// the following extra settings:
-//
-// - `engine` - The engine identifier (ga_universal)
-// - `loadOn` - The PL phase when this tool will be initialized (top | bottom)
-// - `url` - Custom URL of the `analytics.js` URL location. If none is provided
-//      the Google default URL will be used.
-// - `initTool` - Boolean flag that can suppress the tool initialization phase.
-//      When set to `false` no JS library will be loaded and no initial command
-//      will be executed. All the later commands triggered by this tool will
-//      piggy back on any availble `ga` function from the page.
-// - `trackerSettings` - Object containing properties that will be added on the
-//      command that will create the GAU tracker. For a list of all supported
-//      properties please click [here](https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#create)
-// - `initCommands` - It's an array containing commands. A command example:
-//      `["set", "anonymizeIp", true]`. For a list of all supported commands
-//      please click [here](https://developers.google.com/analytics/devguides/collection/analyticsjs/method-reference#tracker)
-//      The commands defined here will be executed after the tracker is created.
-// - `allowLinker` - Flag that will make the GAU library load the cross domain
-//      linking plugin.
-// - `customInit` - JS code that will be executed immediately after the tool is
-//      initialized. The boolean result from `customInit` will affect the
-//      initial page view call.
-
-  function GAUniversalTool(settings) {
-    SL.BaseTool.call(this, settings)
-  }
-
-  SL.inherit(GAUniversalTool, SL.BaseTool);
-
-  SL.extend(GAUniversalTool.prototype, {
-    // Public
-    // ------------------------------------------------
-    name: 'GAUniversal',
-
-    // `endPLPhase()`
-    // ------------------------------------------------
-    //
-    // Method that starts the tool initialization when the page load phase is
-    // matched and only if the tool initialization has not been previously
-    // cancelled. Find out more info about the initializing sequence by clicking
-    // [here](#-initialize-).
-    //
-    // After the tool is initialized a page view call is triggered if
-    // `suppressInitialPageView` flag is not set to `true`.
-    endPLPhase: function(pageLoadEvent) {
-      var settings = this.settings;
-      var loadOn = settings.loadOn;
-
-      if (this.isPageCodeLoadSuppressed()) {
-        SL.notify('GAU: Page code not loaded(suppressed).', 1);
-        return;
-      }
-
-      if (pageLoadEvent === loadOn) {
-        SL.notify('GAU: Initializing at ' + pageLoadEvent, 1);
-        this.initialize();
-        this.flushQueue();
-
-        if (this.suppressInitialPageView)
+    _siteCatalystCore["m_" + TNT._internal._settings.pluginName] = function (_siteCatalystCore) {
+      var _plugin = _siteCatalystCore.m_i(TNT._internal._settings.pluginName);
+
+      _plugin._enabled = true;
+      _plugin._clientCode = TNT._internal._settings.clientCode;
+
+      /** This method is called by the core when it's ready to make a request.
+       * it cannot be obfuscated, since _t is a special name.  Hence the
+       * strange syntax.
+       */
+      _plugin._t = function () {
+        if (!this.isEnabled()) {
           return;
-
-        this.call('send', 'pageview');
-      }
-    },
-
-    // `getTrackerName()`
-    // ------------------------------------------------
-    //
-    // Returns the name of the GA tracker initialized by this tool.
-    getTrackerName: function () {
-      return this.settings.trackerSettings.name || '';
-    },
-
-    // Private
-    // ------------------------------------------------
-    isPageCodeLoadSuppressed: function() {
-      return this.settings.initTool === false || this._cancelToolInit === true;
-    },
-
-    // `initialize()`
-    // ------------------------------------------------
-    //
-    // The method first creates the GA scaffolding objects (the `ga` object and
-    // the `GoogleAnalyticsObject` object.
-    //
-    // Then it loads the `analytics.js` library and append the command that will
-    // create the GAU tracker object to the `ga` object.
-    //
-    // Next, the commands from the `initCommands` array will be appended to
-    // the `ga` object. Finally the JS code defined in the `customInit` setting
-    // variable will be called.
-    initialize: function() {
-      var gaName = 'ga';
-
-      window[gaName] = window[gaName] || this.createGAObject();
-      window.GoogleAnalyticsObject = gaName;
-
-      SL.notify('GAU: Page code loaded.', 1);
-      SL.loadScriptOnce(this.getToolUrl());
-
-      var settings = this.settings;
-
-      if (GAUtils.allowLinker() && settings.allowLinker !== false) {
-        this.createAccountForLinker();
-      } else {
-        this.createAccount();
-      }
-
-      this.executeInitCommands();
-
-      if (settings.customInit){
-        var customInit = settings.customInit
-        var result = customInit(window[gaName], this.getTrackerName())
-        if (result === false){
-          this.suppressInitialPageView = true;
         }
-      }
 
-      this.initialized = true;
-    },
+        var _mbox = this._createMbox();
 
-    createGAObject: function() {
-      var ga = function() {
-        ga.q.push(arguments);
+        if (_mbox) {
+          var _fetcher = new mboxScPluginFetcher(this._clientCode, this.s);
+          _mbox.setFetcher(_fetcher);
+          _mbox.load();
+        }
       };
 
-      ga.q = [];
-      ga.l = 1 * new Date();
-      return ga;
-    },
+      _plugin.isEnabled = function () {
+        return this._enabled && mboxFactoryDefault.isEnabled();
+      };
 
-    createAccount: function() {
-      this.create();
-    },
+      _plugin._createMbox = function () {
+        var _mboxName = this._generateMboxName();
+        var _div = document.createElement('DIV');
+        return mboxFactoryDefault.create(_mboxName, [], _div);
+      };
 
-    createAccountForLinker: function() {
-      var options = {};
-      if (GAUtils.allowLinker())
-        options.allowLinker = true;
+      _plugin._generateMboxName = function () {
+        var _isPurchase = this.s.events && this.s.events.indexOf('purchase') != -1;
+        return 'SiteCatalyst: ' + (_isPurchase ? 'purchase' : 'event');
+      };
+    };
 
-      this.create(options);
-      this.call('require', 'linker');
-      this.call('linker:autoLink', this.autoLinkDomains(), false, true);
-    },
-
-    create: function(extra){
-      var options = this.settings.trackerSettings;
-
-      if (!options.cookieDomain) {
-        options.cookieDomain = GAUtils.cookieDomain();
-      }
-
-      SL.extend(options, extra || {});
-      this.call('create', options);
-    },
-
-    autoLinkDomains: function() {
-      var ourDomain = location.hostname;
-      return SL.filter(SL.settings.domainList, function(domain) {
-        return domain !== ourDomain;
-      });
-    },
-
-    executeInitCommands: function() {
-      var settings = this.settings;
-
-      if (settings.initCommands) {
-        SL.each(settings.initCommands, function(command) {
-          this.call.apply(this, command);
-        }, this);
-      }
-    },
-
-    call: function() {
-      if (typeof ga !== 'function') {
-        SL.notify('GA Universal function not found!', 4);
-        return;
-      }
-
-      if (this.isCallSuppressed()) {
-        return;
-      }
-
-      arguments[0] = this.cmd(arguments[0]);
-      this.log(SL.toArray(arguments));
-      ga.apply(window, arguments);
-    },
-
-    isCallSuppressed: function() {
-      return this._cancelToolInit === true;
-    },
-
-    $missing$: function(command, elm, evt, args) {
-      args = args || [];
-
-      args = [command].concat(args);
-      this.call.apply(this, args);
-    },
-
-    getToolUrl: function() {
-      var settings = this.settings;
-      var isHttps = SL.isHttps();
-
-      if (settings.url) {
-        return isHttps ? settings.url.https : settings.url.http;
-      }
-
-      return (isHttps ? 'https://ssl' : 'http://www') + '.google-analytics.com/analytics.js';
-    },
-
-    cmd: function(command) {
-      var trackerCommands = ['send', 'set', 'get'];
-      var trackerName = this.getTrackerName();
-
-      if (!trackerName || SL.indexOf(trackerCommands, command) === -1) {
-        return command;
-      }
-
-      return trackerName + '.' + command;
-    },
-
-    log: function(args) {
-      var cmd = args[0];
-      var tracker = this.getTrackerName() || 'default';
-
-      var msg = 'GA Universal: sent command ' + cmd + ' to tracker ' + tracker;
-      if (args.length > 1) {
-        var parameters = SL.stringify(args.slice(1));
-        msg += ' with parameters ' + SL.stringify(args.slice(1));
-      }
-      msg += '.';
-      SL.notify(msg, 1);
-    }
-  });
-
-  SL.availableTools.ga_universal = GAUniversalTool;
-
-// Google Analytics Tool
-// ---------------------
-//
-// The GATool allows you to use any Google Analytics command.
-// Example:
-//
-//      trigger: [
-//          {
-//              tool: "ga",
-//              command: "trackEvent",
-//              arguments: [
-//                  "video",
-//                  "video 10% complete"
-//              ]
-//          }
-//      ]
-//
-// This trigger will call the `trackEvent` method, which is equivalent to
-//
-//     _gaq.push(['_trackEvent', 'video', 'video 10% complete'])
-  function GATool(settings){
-    SL.BaseTool.call(this, settings)
-  }
-  SL.inherit(GATool, SL.BaseTool)
-  SL.extend(GATool.prototype, {
-    name: 'GA',
-    initialize: function(){
-      var settings = this.settings
-      var before = window._gaq
-          , initCommands = settings.initCommands || []
-          , customInit = settings.customInit
-
-      if (!before){
-        // And yes, I *do* mean to set a global variable
-        // of `_gaq` here
-        _gaq = []
-      }
-
-      if (!this.isSuppressed()){
-        if (!before && !GATool.scriptLoaded){
-          var https = SL.isHttps()
-          var url =
-              (https ? 'https://ssl' : 'http://www') +
-              '.google-analytics.com/ga.js'
-          if (settings.url){
-            url = https ? settings.url.https : settings.url.http
-          }
-          SL.loadScript(url)
-          GATool.scriptLoaded = true
-          SL.notify('GA: page code loaded.', 1)
-        }
-        var domain = settings.domain
-            , trackerName = settings.trackerName
-            , allowLinker = GAUtils.allowLinker()
-            , account = settings.account
-            , domainList = SL.settings.domainList || []
-        _gaq.push([this.cmd('setAccount'), account])
-        if (allowLinker)
-          _gaq.push([this.cmd('setAllowLinker'), allowLinker])
-        _gaq.push([this.cmd('setDomainName'), GAUtils.cookieDomain()])
-        SL.each(initCommands, function(cmd){
-          var arr = [this.cmd(cmd[0])].concat(cmd.slice(1))
-          _gaq.push(arr)
-        }, this)
-        if (customInit)
-          this.suppressInitialPageView = false === customInit(_gaq, trackerName)
-        if (settings.pageName)
-          this.$overrideInitialPageView(null, null, settings.pageName)
-      }else{
-        SL.notify('GA: page code not loaded(suppressed).', 1)
-      }
-
-      this.initialized = true
-      SL.fireEvent(this.id + '.configure', _gaq, trackerName)
-
-    },
-    isSuppressed: function(){
-      return this._cancelToolInit || this.settings.initTool === false
-    },
-    tracker: function(){
-      return this.settings.trackerName
-    },
-    cmd: function(cmd){
-      var tracker = this.tracker()
-      return tracker ? tracker + '._' + cmd : '_' + cmd
-    },
-    $overrideInitialPageView: function(elm, evt, url){
-      this.urlOverride = url
-    },
-    trackInitialPageView: function(){
-      if (this.isSuppressed()) return
-      if (this.suppressInitialPageView) return
-      if (this.urlOverride){
-        var args = SL.preprocessArguments([this.urlOverride], location, null, this.forceLowerCase)
-        this.$missing$('trackPageview', null, null, args)
-      }else{
-        this.$missing$('trackPageview')
-      }
-    },
-    endPLPhase: function(pageLoadEvent){
-      var loadOn = this.settings.loadOn
-      if (pageLoadEvent === loadOn){
-        SL.notify('GA: Initializing at ' + pageLoadEvent, 1)
-        this.initialize()
-        this.flushQueue()
-        this.trackInitialPageView()
-      }
-    },
-    call: function(cmd, elm, evt, args){
-      if (this._cancelToolInit) return
-      var settings = this.settings
-          , tracker = this.tracker()
-          , fullCmd = this.cmd(cmd)
-          , args = args ? [fullCmd].concat(args) : [fullCmd]
-      _gaq.push(args)
-      if (tracker)
-        SL.notify("GA: sent command " + cmd + " to tracker " + tracker +
-        (args.length > 1 ?
-        " with parameters [" + args.slice(1).join(', ') + "]" :
-            '') + ".", 1)
-      else
-        SL.notify("GA: sent command " + cmd +
-        (args.length > 1 ?
-        " with parameters [" + args.slice(1).join(', ') + "]":
-            '') + ".", 1)
-    },
-    $missing$: function(cmd, elm, evt, args){
-      this.call(cmd, elm, evt, args)
-    },
-    // individual command methods
-    $postTransaction: function(elm, evt, varname){
-      var trans = SL.data.customVars.transaction = window[varname]
-      this.call('addTrans', elm, evt, [
-        trans.orderID,
-        trans.affiliation,
-        trans.total,
-        trans.tax,
-        trans.shipping,
-        trans.city,
-        trans.state,
-        trans.country
-      ])
-      SL.each(trans.items, function(item){
-        this.call('addItem', elm, evt, [
-          item.orderID,
-          item.sku,
-          item.product,
-          item.category,
-          item.unitPrice,
-          item.quantity
-        ])
-      }, this)
-      this.call('trackTrans', elm, evt)
-    },
-    delayLink: function(elm, evt){
-      var ga = this
-      if (!GAUtils.allowLinker()) return
-      if (!elm.hostname.match(this.settings.linkerDomains)) return
-      if (SL.isSubdomainOf(elm.hostname, location.hostname)) return
-      SL.preventDefault(evt)
-      var linkDelay = SL.settings.linkDelay || 100
-      setTimeout(function(){
-        ga.call('link', elm, evt, [elm.href])
-      }, linkDelay)
-    },
-    popupLink: function(elm, evt){
-      if (!window._gat) return
-      SL.preventDefault(evt)
-      var account = this.settings.account
-      var tracker = window._gat._createTracker(account)
-      var url = tracker._getLinkerUrl(elm.href)
-      window.open(url)
-    },
-    $link: function(elm, evt){
-      if (elm.getAttribute('target') === '_blank'){
-        this.popupLink(elm, evt)
-      }else{
-        this.delayLink(elm, evt)
-      }
-    },
-    $trackEvent: function(elm, evt){
-      var args = Array.prototype.slice.call(arguments, 2)
-      if (args.length >= 4 && args[3] != null){
-        // acertain that the 4th element is a number, falling back to 1
-        var value = parseInt(args[3], 10)
-        if (SL.isNaN(value)){
-          value = 1
-        }
-        args[3] = value
-      }
-      this.call('trackEvent', elm, evt, args)
-    }
-  })
-  SL.availableTools.ga = GATool
-
-  var GAUtils = {
-    allowLinker: function() {
-      return SL.hasMultipleDomains();
-    },
-    cookieDomain: function() {
-      var domainList = SL.settings.domainList;
-      var domainName = SL.find(domainList, function(domain) {
-        var hostname = window.location.hostname;
-        return SL.equalsIgnoreCase(
-            hostname.slice(hostname.length - domain.length),
-            domain);
-      });
-      var cookieDomain = domainName ? ('.' + domainName) : 'auto';
-
-      return cookieDomain;
-    }
+    return _siteCatalystCore.loadModule(TNT._internal._settings.pluginName);
   };
+}
 
-// The Default Tool
-// ================
-//
-// The default tool comes with several handy utilities.
 
-  function DefaultTool(){
-    SL.BaseTool.call(this)
-
-    this.asyncScriptCallbackQueue = []
-    this.argsForBlockingScripts = []
-  }
-  SL.inherit(DefaultTool, SL.BaseTool)
-  SL.extend(DefaultTool.prototype, {
-    name: 'Default',
-
-    // `loadIframe(src, variables)`
-    // ----------------------------
-    //
-    // Dynamically create an iframe to load a URL.
-    //
-    // - src - the URL to load
-    // - variables - an object literal of which the key/value pairs will be used
-    //      to create the query string to use in the src URL
-    $loadIframe: function(elm, evt, options){
-      var pages = options.pages
-          , loadOn = options.loadOn
-      var doit = SL.bind(function(){
-        SL.each(pages, function(page){
-          this.loadIframe(elm, evt, page)
-        }, this)
-      }, this)
-      if (!loadOn) doit()
-      if (loadOn === 'domready') SL.domReady(doit)
-      if (loadOn === 'load') SL.addEventHandler(window, 'load', doit)
-    },
-
-    loadIframe: function(elm, evt, page){
-      var iframe = document.createElement('iframe')
-      iframe.style.display = 'none'
-      var host = SL.data.host
-          , data = page.data
-          , src = this.scriptURL(page.src)
-          , search = SL.searchVariables(data, elm, evt)
-      if (host)
-        src = SL.basePath() + src
-      src += search
-      iframe.src = src
-      var body = document.getElementsByTagName('body')[0]
-      if (body)
-        body.appendChild(iframe)
-      else
-        SL.domReady(function(){
-          document.getElementsByTagName('body')[0].appendChild(iframe)
-        })
-    },
-
-    scriptURL: function(url){
-      var scriptDir = SL.settings.scriptDir || ''
-      return scriptDir + url
-    },
-
-    // `loadScript(options)
-    // ------------------------------
-    //
-    // Load any number of Javascript files using dynamically generated script tags.
-    // If you provide multiple file URLs, they will be loaded sequentially.
-    $loadScript: function(elm, evt, options){
-      var scripts = options.scripts
-          , sequential = options.sequential
-          , loadOn = options.loadOn
-      var doit = SL.bind(function(){
-        if (sequential){
-          this.loadScripts(elm, evt, scripts)
-        }else{
-          SL.each(scripts, function(script){
-            this.loadScripts(elm, evt, [script])
-          }, this)
-        }
-      }, this)
-
-      if (!loadOn) doit()
-      else if (loadOn === 'domready') SL.domReady(doit)
-      else if (loadOn === 'load') SL.addEventHandler(window, 'load', doit)
-    },
-
-    loadScripts: function(elm, evt, scripts) {
-      try{
-        var scripts = scripts.slice(0)
-            , q = this.asyncScriptCallbackQueue
-            , lastScript
-            , target = evt.target || evt.srcElement
-            , self = this
-      }catch(e){
-        console.error('scripts is', SL.stringify(scripts))
-      }
-      function loadNext(){
-        if (q.length > 0 && lastScript){
-          var callback = q.shift()
-          callback.call(elm, evt, target)
-        }
-        var script = scripts.shift()
-        if (script){
-          var host = SL.data.host
-              , src = self.scriptURL(script.src)
-          if (host)
-            src = SL.basePath() + src
-          lastScript = script
-          SL.loadScript(src, loadNext)
-        }
-      }
-      loadNext()
-    },
-
-    $loadBlockingScript: function(elm, evt, options){
-      var scripts = options.scripts
-          , loadOn = options.loadOn
-      var doit = SL.bind(function(){
-        SL.each(scripts, function(script){
-          this.loadBlockingScript(elm, evt, script)
-        }, this)
-      }, this)
-      //if (!loadOn || loadOn === evt.type) doit()
-      doit()
-    },
-
-    loadBlockingScript: function(elm, evt, script){
-      /*jshint evil:true */
-      var src = this.scriptURL(script.src)
-          , host = SL.data.host
-          , target = evt.target || evt.srcElement
-      if (host)
-        src = SL.basePath() + src
-      this.argsForBlockingScripts.push([elm, evt, target])
-      SL.loadScriptSync(src)
-    },
-
-    pushAsyncScript: function(callback){
-      this.asyncScriptCallbackQueue.push(callback)
-    },
-
-    pushBlockingScript: function(callback){
-      var args = this.argsForBlockingScripts.shift()
-      var element = args[0]
-      callback.apply(element, args.slice(1))
-    },
-
-    // `writeHTML(html)`
-    // -----------------
-    //
-    // Write an HTML fragment onto the page using `document.write()`.
-    //
-    // - `html` - the HTML fragment
-    $writeHTML: function(elm, evt){
-      /*jshint evil:true */
-      if (SL.domReadyFired || !document.write){
-        SL.notify('Command writeHTML failed. You should try appending HTML using the async option.', 1)
-        return
-      }
-      if (evt.type !== 'pagebottom' && evt.type !== 'pagetop'){
-        SL.notify('You can only use writeHTML on the `pagetop` and `pagebottom` events.', 1)
-        return
-      }
-      for (var i = 2, len = arguments.length; i < len; i++){
-        var html = arguments[i].html
-        html = SL.replace(html, elm, evt)
-        document.write(html)
-      }
-    },
-
-    linkNeedsDelayActivate: function(a, win){
-      win = win || window
-      var tagName = a.tagName
-          , target = a.getAttribute('target')
-          , location = a.getAttribute('href')
-      if (tagName && tagName.toLowerCase() !== 'a')
-        return false
-      if (!location)
-        return false
-      else if (!target)
-        return true
-      else if (target === '_blank')
-        return false
-      else if (target === '_top')
-        return win.top === win
-      else if (target === '_parent')
-        return false
-      else if (target === '_self')
-        return true
-      else if (win.name)
-        return target === win.name
-      else
-        return true
-    },
-
-    // `delayActivateLink()`
-    // ---------------------
-    //
-    // Delay the activation of an anchor link by first using `evt.preventDefault()` on
-    // the click event, and then setting the window location to the destination after
-    // a small delay. The default delay is 100 milliseconds, which can be configured in
-    // `_satellite.settings.linkDelay`
-    $delayActivateLink: function(elm, evt){
-      if (!this.linkNeedsDelayActivate(elm)) return
-      SL.preventDefault(evt)
-      var linkDelay = SL.settings.linkDelay || 100
-      setTimeout(function(){
-        SL.setLocation(elm.href)
-      }, linkDelay)
-    },
-
-    isQueueable: function(trig){
-      return trig.command !== 'writeHTML'
-    }
-  })
-  SL.availableTools['default'] = DefaultTool
-
-// The Marketing Cloud Visitor ID Service Tool
-// ================
-//
-// This tool interacts with the [Visitor ID library](https://git.corp.adobe.com/mc-visitor/VisitorAPI/tree/master/js/src).
-// The tool initilizes the Visitor ID library as soon as the tool itself is
-// created, by calling the `initialize` method. Find out more info about the
-// initializing sequence by clicking [here](#-initialize-).
-//
-// The tool accepts the following settings:
-//
-// - `mcOrgId` - The Adobe Marketing Cloud Organization ID (Required)
-// - `namespace` - Namespace to migrate from (Optional)
-// - `initVars` - Map containing properties that can be set on the Visitor ID
-//      instance. The following keys can be set here:
-//      * `trackingServer`,
-//      * `trackingServerSecure`,
-//      * `marketingCloudServer`
-//      * `marketingCloudServerSecure`
-// - `customerIDs` - Map containing Customer IDs values that will be set on the
-//      instance
-// - `autoRequest` - Flag that will read the Marketing Cloud Visitor ID by
-//      calling `getMarketingCloudVisitorID` method
-  function VisitorIdTool(settings) {
-    SL.BaseTool.call(this, settings);
-    this.name = settings.name || 'VisitorID';
-
-    this.initialize();
+mboxVizTargetUrl = function(_mboxName /*, ... */) {
+  if (!mboxFactoryDefault.isEnabled()) {
+    return;
   }
 
-  SL.extend(VisitorIdTool.prototype, {
-    // Public
-    // ------------------------------------------------
-    //
-    // `getInstance()`
-    // ------------------------------------------------
-    //
-    // Returns the Visitor ID instance that was created when the tool was
-    // initialized.
-    getInstance: function() {
-      return this.instance;
-    },
+  var _urlBuilder = mboxFactoryDefault.getUrlBuilder().clone();
 
-    // Private
-    // ------------------------------------------------
-    //
-    // `initialize()`
-    // ------------------------------------------------
-    //
-    // The method creates a Visitor ID instance if all the data provided is valid.
-    // The instance will contain all the keys defined in the `initVar` setting.
-    // Any `dataElement` present as a value in the initVars map will be replaced
-    // with the correct value.
-    //
-    // It applies then a the map of Customer IDs by calling the `setCustomerIDs`
-    // method from the newly created instance. Any `dataElement` present as a
-    // value in the Customer IDs map will be replaced with the correct value.
-    //
-    // After that, the `getMarketingCloudVisitorID` method from the newly created
-    // instance is called, provided that the `autoRequest` settings is set to true.
-    initialize: function() {
-      var settings = this.settings, visitor;
+  _urlBuilder.setBasePath('/m2/' + TNT._internal._settings.clientCode + '/viztarget');
+  _urlBuilder.addParameter(TNT._internal._params.name, _mboxName);
+  _urlBuilder.addParameter(TNT._internal._params.id, 0);
+  _urlBuilder.addParameter(TNT._internal._params.count, mboxFactoryDefault.getMboxes().length() + 1);
 
-      SL.notify('Visitor ID: Initializing tool', 1);
+  var _now = new Date();
+  _urlBuilder.addParameter(TNT._internal._params.time, _now.getTime() -
+  (_now.getTimezoneOffset() * TNT._internal._constants.millisInMinute));
 
-      visitor = this.createInstance(
-          settings.mcOrgId,
-          settings.namespace,
-          settings.initVars
-      );
-      if (visitor === null) {
-        return;
-      }
+  _urlBuilder.addParameter(TNT._internal._params.page, mboxGenerateId());
 
-      if (settings.customerIDs) {
-        this.applyCustomerIDs(visitor, settings.customerIDs);
-      }
-
-      if (settings.autoRequest) {
-        visitor.getMarketingCloudVisitorID();
-      }
-
-      this.instance = visitor;
-    },
-
-    createInstance: function(mcOrgId, namespace, initVars) {
-      if(!SL.isString(mcOrgId)) {
-        SL.notify(
-            'Visitor ID: Cannot create instance using mcOrgId: "' + mcOrgId + '"', 4);
-        return null;
-      }
-
-      SL.notify(
-          'Visitor ID: Create instance using mcOrgId: "' + mcOrgId + '"', 1);
-
-      var instance = new Visitor(mcOrgId, namespace);
-      this.applyInitVars(instance, initVars);
-
-      return instance;
-    },
-
-    applyInitVars: function(obj, vars) {
-      if (SL.isObject(vars) === false) {
-        return;
-      }
-      vars = this.parseValues(vars);
-
-      SL.extend(obj, vars);
-      SL.notify('Visitor ID: Set variables: ' + SL.stringify(vars), 1);
-    },
-
-    applyCustomerIDs: function(instance, ids) {
-      if (SL.isObject(ids) === false) {
-        return;
-      }
-      ids = this.parseValues(ids);
-
-      instance.setCustomerIDs(ids);
-      SL.notify('Visitor ID: Set Customer IDs: ' + SL.stringify(ids), 1);
-    },
-
-    parseValues: function(hash) {
-      var obj = {};
-
-      for (var v in hash) {
-        if (hash.hasOwnProperty(v)) {
-          obj[v] = SL.replace(hash[v]);
-        }
-      }
-
-      return obj;
-    }
-  });
-
-  SL.availableTools.visitor_id = VisitorIdTool;
-
-// E-Commerce APIs
-// ---------------
-//
-// The ecommerce API allows web admins to integrate e-commerce tracking with Satellite.
-// More details on the [GA E-Commerce API's](http://code.google.com/apis/analytics/docs/gaJS/gaJSApiEcommerce.html).
-// Upon any of the methods on the API being called, they will fire an event, which
-// in turn can be handled by a rule in the library.
-
-  SL.ecommerce = {
-    // `addItem(orderId, sku, name, category, price, quantity)`
-    // -------------------------------------
-    //
-    // Add an item to the transaction.
-    addItem: function(){
-      var args = [].slice.call(arguments)
-      SL.onEvent({type: 'ecommerce.additem', target: args})
-    },
-
-    // `addTrans(orderId, affiliation, total, tax, shipping, city, state, country)`
-    // ----------------------------------------------------------------------------
-    //
-    // Add a new transaction.
-    addTrans: function(){
-      var args = [].slice.call(arguments)
-      SL.data.saleData.sale = {
-        orderId: args[0],
-        revenue: args[2]
-      }
-      SL.onEvent({type: 'ecommerce.addtrans', target: args})
-    },
-
-    // `trackTrans()`
-    // --------------
-    //
-    // Send the transaction data that's been set up using `addItem()` and `addTrans()`
-    // to GA to be tracked.
-    trackTrans: function(){
-      SL.onEvent({type: 'ecommerce.tracktrans', target: []})
-    }
+  var _parameters = mboxShiftArray(arguments);
+  if (_parameters && _parameters.length > 0) {
+    _urlBuilder.addParameters(_parameters);
   }
 
+  _urlBuilder.addParameter(TNT._internal._params.domLoaded, mboxFactoryDefault.isDomLoaded());
 
-  _satellite.init({
-    "tools": {
-      "f489afdcde1a53ef58aec319401144f7": {
-        "engine": "sc",
-        "loadOn": "pagebottom",
-        "account": "aaronhardyprod",
-        "euCookie": false,
-        "sCodeURL": "7adf9ad51d40b4e06390693913f85f1a37e869de/s-code-contents-22c7cbe13317f4c9e99900c0b530d66471196f02-staging.js",
-        "initVars": {
-          "charSet": "UTF-8",
-          "currencyCode": "TND",
-          "dc": "122",
-          "referrer": "myreferreroverride",
-          "campaign": "mycamp",
-          "pageURL": "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
-          "trackInlineStats": true,
-          "trackDownloadLinks": false,
-          "trackExternalLinks": true,
-          "linkInternalFilters": "javascript:,mailto:,tel:",
-          "linkLeaveQueryString": false,
-          "dynamicVariablePrefix": "$$",
-          "eVar50": "toolevar50",
-          "prop50": "toolprop50"
-        }
-      },
-      "e3480c7056b1d0d9356d2c17cd2063c5aa35bdce": {
-        "engine": "tnt",
-        "mboxURL": "7adf9ad51d40b4e06390693913f85f1a37e869de/mbox-contents-e3480c7056b1d0d9356d2c17cd2063c5aa35bdce-staging.js",
-        "loadSync": true,
-        "pageParams": {
-        }
-      }
-    },
-    "pageLoadRules": [
-      {"name":"Hero Banner","trigger":[{"engine":"tnt","command":"addMbox","arguments":[{"mboxGoesAround":".hero","mboxName":"tdtm-01","arguments":["localmboxparam1=localmboxvalue1"],"timeout":"1500"}]}],"event":"pagetop"},
-      {"name":"KitchenSink","trigger":[{"engine":"sc","command":"setVars","arguments":[{"eVar10":"MyEvar10","eVar11":"MyEvar11","prop10":"MyProp10","prop11":"MyProp11","pageName":"MyPageName","channel":"MyChannel","pageURL":"MyPageUrl","campaign":"MyCampaign","hier1":"HierLev1|HierLev2|HierLev3|HierLev4"}]},{"engine":"sc","command":"addEvent","arguments":["event10:MyEvent10","event11:MyEvent11","prodView:MyProdView"]},{"engine":"tnt","command":"addMbox","arguments":[{"mboxGoesAround":"","mboxName":"","arguments":[],"timeout":"1500"}]}],"event":"pagebottom"},
-      {"name":"Hero Banner - (Global Mbox Parameters)","event":"aftertoolinit","trigger":[{"engine":"tnt","command":"addTargetPageParams","arguments":[{"globalmboxparam1":"globalmboxvalue1"}]}]}
-    ],
-    "rules": [
-      {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
-          SL.getQueryParam('dead')
-      },"customSetup":function(event,s){
-        console.log('Am I a custom setup function?');
-      },"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
-        return !_satellite.isLinked(target)
-      },function(){
-        return _satellite.textMatch(_satellite.getQueryParam('woot'), "niner")
-      }],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false},
-      {"name":"Download Link","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"d","linkName":"%this.href%"}]},{"command":"delayActivateLink"}],"selector":"a","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false,"property":{"href":/\.(?:doc|docx|eps|xls|ppt|pptx|pdf|xlsx|tab|csv|zip|txt|vsd|vxd|xml|js|css|rar|exe|wma|mov|avi|wmv|mp3|wav|m4v)($|\&|\?)/i}},
-      {"name":"Transaction","conditions":[function(){
-        return _satellite.getVar("browserWidth") > 3;
-      }],"selector":"a","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false}
-    ],
-    "directCallRules": [
+  mboxFactoryDefault.setVisitorIdParameters(_urlBuilder, _mboxName);
 
-    ],
-    "settings": {
-      "trackInternalLinks": true,
-      "libraryName": "satelliteLib-802733f55cb916def018044ee9a299e20898b26d",
-      "isStaging": true,
-      "allowGATTcalls": false,
-      "downloadExtensions": /\.(?:doc|docx|eps|jpg|png|svg|xls|ppt|pptx|pdf|xlsx|tab|csv|zip|txt|vsd|vxd|xml|js|css|rar|exe|wma|mov|avi|wmv|mp3|wav|m4v)($|\&|\?)/i,
-      "notifications": false,
-      "utilVisible": false,
-      "domainList": [
-        "aaronhardy.com"
-      ],
-      "scriptDir": "7adf9ad51d40b4e06390693913f85f1a37e869de/scripts/",
-      "tagTimeout": 3000
-    },
-    "data": {
-      "URI":
-      document.location.pathname + document.location.search
-      ,
-      "browser": {
-      },
-      "cartItems": [
+  return _urlBuilder.buildUrl();
+};
 
-      ],
-      "revenue": "",
-      "host": {
-        "http": "assets.adobedtm.com",
-        "https": "assets.adobedtm.com"
-      }
-    },
-    "dataElements": {
-      "browserWidth": {"customJS":function(){
-        return _satellite.getBrowserWidth();
-      },"storeLength":"session"}
-    },
-    "appVersion": "53O",
-    "buildDate": "2015-04-03 21:18:56 UTC",
-    "publishDate": "2015-03-16 14:43:44 -0600"
-  });
-})(window, document);
+TNT.createGlobalMbox = function () {
+  if (!mboxFactoryDefault.isEnabled()) {
+    return;
+  }
+
+  var _globalMboxName = TNT._internal._settings.globalMboxName;
+  var _globalMboxDomElementId = TNT._internal._settings.globalMboxLocationDomId;
+  var _globalMboxDiv;
+
+  if (!_globalMboxDomElementId) {
+    _globalMboxDomElementId = "mbox-" + _globalMboxName + "-" + mboxGenerateId();
+    _globalMboxDiv = document.createElement("div");
+    _globalMboxDiv.className = "mboxDefault";
+    _globalMboxDiv.id = _globalMboxDomElementId;
+    _globalMboxDiv.style.visibility = "hidden";
+    _globalMboxDiv.style.display = "none";
+    mboxFactoryDefault.addOnLoad(function(){
+      document.body.insertBefore(_globalMboxDiv, document.body.firstChild);
+    });
+  }
+
+  var _globalMbox = mboxFactoryDefault.create(_globalMboxName,
+      TNT._internal._getGlobalMboxParameters(), _globalMboxDomElementId);
+
+  if (_globalMbox && mboxFactoryDefault.isEnabled()) {
+    _globalMbox.setFetcher(new TNT._internal._globalMboxFetcher());
+    _globalMbox.load();
+  }
+};
+
+if (TNT._internal._settings.includeExperienceManagerPlugin) {
+  if (!("_AT" in window)) {
+    window._AT = {};
+    window._AT.applyWhenReady = function (_actions) {
+      setTimeout(function () {
+        window._AT.applyWhenReady(_actions);
+      }, 50);
+    };
+  }
+
+  document.write('<scr' + 'ipt src="' + TNT._internal._settings.experienceManagerPluginUrl + '"></sc' + 'ript>');
+}
+
+TNT._internal._settings.clientJavascriptFunction();
+
+if (TNT._internal._settings.globalMboxAutoCreate) {
+  TNT.createGlobalMbox();
+}

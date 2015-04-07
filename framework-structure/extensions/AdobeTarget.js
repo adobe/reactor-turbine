@@ -1,9 +1,13 @@
 // TODO...very much TODO.
-var mboxByName = {};
+////// Begin mbox stub code.
+var mboxes = [];
 
-var mbox = function() {}
+var mbox = function(name, setOfferCallback) {
+  this.name = name;
+  this.setOfferCallback = setOfferCallback;
+}
 mbox.prototype.setOffer = function(mboxOfferAjax) {
-  document.body.innerHTML = mboxOfferAjax.content;
+  this.setOfferCallback(mboxOfferAjax.content);
 };
 mbox.prototype.getOffer = function() {
   return {
@@ -17,11 +21,17 @@ window.mboxFactories = {
   get: function() {
     return {
       get: function(name) {
-        return mboxByName[name];
+        for (var i = 0; i < mboxes.length; i++) {
+          var mbox = mboxes[i];
+          if (mbox.name === name) {
+            return mbox;
+          }
+        }
       }
     }
   }
 }
+////// End mbox stub code.
 
 window.mboxOfferAjax = function(content) {
   this.content = content;
@@ -86,8 +96,11 @@ _satellite.utils.extend(AdobeTargetExtension.prototype, {
       mboxVersion: 56 // TODO remove when using framework?
     };
 
-    // TODO what if mboxName is reserved like "prototype".
-    mboxByName[actionSettings.mboxName] = new mbox();
+    var setOffer = function(mboxContent) {
+      document.querySelector(actionSettings.mboxGoesAround).innerHTML = mboxContent;
+    };
+
+    mboxes.push(new mbox(actionSettings.mboxName, setOffer));
 
     var requestType = 'ajax';
 

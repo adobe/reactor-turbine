@@ -61,6 +61,13 @@ extensions: {
         dc: '122'
       }
     }
+  },
+  'efghi': {
+    extensionId: 'adobeTarget',
+    settings: {
+      serverHost: 'adobeinternaldtmdemo.tt.omtrdc.net',
+      clientCode: 'adobeinternaldtmdemo'
+    }
   }
 },
 newRules: [{
@@ -153,6 +160,18 @@ newRules: [{
       trackEvents: [
         'event20:deadevent'
       ]
+    }
+  }]
+},{
+  name: 'Hero Mbox',
+  actions: [{
+    extensionInstanceIds: ['efghi'],
+    method: 'addMbox',
+    settings: {
+      mboxName: 'tdtm-01',
+      mboxGoesAround: '#hero',
+      arguments: [],
+      timeout: '1500'
     }
   }]
 }],

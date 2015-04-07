@@ -390,13 +390,13 @@
     domReady: (function (ready) {
 
       var fns = [], fn, f = false
-          , doc = document
-          , testEl = doc.documentElement
-          , hack = testEl.doScroll
-          , domContentLoaded = 'DOMContentLoaded'
-          , addEventListener = 'addEventListener'
-          , onreadystatechange = 'onreadystatechange'
-          , loaded = /^loade|^c/.test(doc.readyState)
+        , doc = document
+        , testEl = doc.documentElement
+        , hack = testEl.doScroll
+        , domContentLoaded = 'DOMContentLoaded'
+        , addEventListener = 'addEventListener'
+        , onreadystatechange = 'onreadystatechange'
+        , loaded = /^loade|^c/.test(doc.readyState)
 
       function flush(f) {
         loaded = 1
@@ -417,21 +417,21 @@
       }))
 
       return (ready = hack ?
-          function (fn) {
-            self != top ?
-                loaded ? fn() : fns.push(fn) :
-                function () {
-                  try {
-                    testEl.doScroll('left')
-                  } catch (e) {
-                    return setTimeout(function() { ready(fn) }, 50)
-                  }
-                  fn()
-                }()
-          } :
-          function (fn) {
-            loaded ? fn() : fns.push(fn)
-          })
+        function (fn) {
+          self != top ?
+            loaded ? fn() : fns.push(fn) :
+            function () {
+              try {
+                testEl.doScroll('left')
+              } catch (e) {
+                return setTimeout(function() { ready(fn) }, 50)
+              }
+              fn()
+            }()
+        } :
+        function (fn) {
+          loaded ? fn() : fns.push(fn)
+        })
     }()),
 
     // `loadScript(url, [callback])`
@@ -448,7 +448,7 @@
       SL.scriptOnLoad(url, script, callback)
       script.src = url
       document.getElementsByTagName('head')[0]
-          .appendChild(script)
+        .appendChild(script)
     },
 
     scriptOnLoad: function(url, script, callback){
@@ -546,8 +546,8 @@
     // - `evt` - the event type to listen to
     // - `callback` - callback function
     addEventHandler: window.addEventListener ?
-        function(node, evt, cb){ node.addEventListener(evt, cb, false) } :
-        function(node, evt, cb){ node.attachEvent('on' + evt, cb) },
+      function(node, evt, cb){ node.addEventListener(evt, cb, false) } :
+      function(node, evt, cb){ node.attachEvent('on' + evt, cb) },
 
     // `preventDefault(evt)`
     // ---------------------
@@ -558,8 +558,8 @@
     //
     // `evt` - the event triggered
     preventDefault: window.addEventListener ?
-        function(e){ e.preventDefault() } :
-        function(e){ e.returnValue = false },
+      function(e){ e.preventDefault() } :
+      function(e){ e.returnValue = false },
 
     // `stopPropagation(evt)`
     // ----------------------
@@ -587,7 +587,7 @@
     // *Ripped from <http://stackoverflow.com/questions/6130737/mouseenter-without-jquery>*
     containsElement: function(container, maybe) {
       return container.contains ? container.contains(maybe) :
-          !!(container.compareDocumentPosition(maybe) & 16);
+        !!(container.compareDocumentPosition(maybe) & 16);
     },
 
     // `matchesCss(css, elm)`
@@ -608,11 +608,11 @@
       }
 
       var matches =
-          docEl.matchesSelector ||
-          docEl.mozMatchesSelector ||
-          docEl.webkitMatchesSelector ||
-          docEl.oMatchesSelector ||
-          docEl.msMatchesSelector
+        docEl.matchesSelector ||
+        docEl.mozMatchesSelector ||
+        docEl.webkitMatchesSelector ||
+        docEl.oMatchesSelector ||
+        docEl.msMatchesSelector
       if (matches) {
         return function(selector, elm){
           if (elm === document || elm === window) return false
@@ -815,12 +815,12 @@
     escapeForHtml: function(str){
       if (!str) return str
       return str
-          .replace(/\&/g, '&amp;')
-          .replace(/\</g, '&lt;')
-          .replace(/\>/g, '&gt;')
-          .replace(/\"/g, '&quot;')
-          .replace(/\'/g, '&#x27;')
-          .replace(/\//g, '&#x2F;')
+        .replace(/\&/g, '&amp;')
+        .replace(/\</g, '&lt;')
+        .replace(/\>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/\'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;')
     }
   }
 
@@ -982,7 +982,7 @@
   SL.cleanText = function(str){
     if (str == null) return null
     return SL.trim(str).replace(/\s{2,}/g, ' ')
-        .replace(/[^\000-\177]*/g, '')
+      .replace(/[^\000-\177]*/g, '')
   }
 
   SL.text = function(obj){
@@ -1018,7 +1018,7 @@
         continue
       }
       if (currValue.getAttribute &&
-          (attrMatch = prop.match(/^getAttribute\((.+)\)$/))){
+        (attrMatch = prop.match(/^getAttribute\((.+)\)$/))){
         var attr = attrMatch[1]
         currValue = currValue.getAttribute(attr)
         continue
@@ -1163,9 +1163,9 @@
 // - `[evt]` - the associated event, if any
   SL.getVar = function(variable, elm, evt){
     var custVars = SL.data.customVars
-        , target = evt ? (evt.target || evt.srcElement) : null
-        , randMatch
-        , value
+      , target = evt ? (evt.target || evt.srcElement) : null
+      , randMatch
+      , value
     var map = {
       URI: SL.data.URI,
       uri: SL.data.URI,
@@ -1194,7 +1194,7 @@
         value = SL.getQueryParam(variable)
       }else if(randMatch = variable.match(/^rand([0-9]+)$/)){
         var len = Number(randMatch[1])
-            , s = (Math.random() * (Math.pow(10, len) - 1)).toFixed(0)
+          , s = (Math.random() * (Math.pow(10, len) - 1)).toFixed(0)
         value = Array(len - s.length + 1).join('0') + s
       }else{
         value = SL.getObjectProperty(custVars, variable)
@@ -1227,13 +1227,13 @@
   SL.replace = function(str, elm, evt) {
     if (typeof str !== 'string') return str
     return str
-        .replace(/%(.*?)%/g, function(m, variable){
-          var val = SL.getVar(variable, elm, evt)
-          if (val == null)
-            return m
-          else
-            return val
-        })
+      .replace(/%(.*?)%/g, function(m, variable){
+        var val = SL.getVar(variable, elm, evt)
+        if (val == null)
+          return m
+        else
+          return val
+      })
   }
 
 
@@ -1244,7 +1244,7 @@
     var qsParts = []
     for (var i = 0, len = vars.length; i < len; i++){
       var varr = vars[i]
-          , value = SL.getVar(varr, elm, evt)
+        , value = SL.getVar(varr, elm, evt)
       qsParts.push(varr + '=' + escape(value))
     }
     return '?' + qsParts.join('&')
@@ -1280,7 +1280,7 @@
 // `windowload`.
   SL.firePageLoadEvent = function(type) {
     var location = document.location
-        , evt = {type: type, target: location}
+      , evt = {type: type, target: location}
     var rules = SL.pageLoadRules
     for (var i = rules.length; i--;){
       var rule = rules[i]
@@ -1323,8 +1323,8 @@
   SL.basePath = function(){
     if (SL.data.host)
       return (document.location.protocol === 'https:' ?
-          'https://' + SL.data.host.https :
-          'http://' + SL.data.host.http) + '/'
+        'https://' + SL.data.host.https :
+        'http://' + SL.data.host.http) + '/'
     else
       return this.settings.basePath
   }
@@ -1354,7 +1354,7 @@
       str = str.substring(1)
     }
     var ret = {}
-        , pairs = str.split('&')
+      , pairs = str.split('&')
     SL.each(pairs, function(pair){
       pair = pair.split('=')
       if (!pair[1]) {
@@ -1484,13 +1484,13 @@
 // - `eventEntriesFound` - number of rules matched so far
   SL.ruleMatches = function(rule, evt, elm, eventEntriesFound){
     var location = document.location
-        , cnd = rule.condition
-        , cnds = rule.conditions
-        , property = rule.property
-        , eventType = evt.type
-        , matchValue = rule.value
-        , target = evt.target || evt.srcElement
-        , initialTarget = elm === target
+      , cnd = rule.condition
+      , cnds = rule.conditions
+      , property = rule.property
+      , eventType = evt.type
+      , matchValue = rule.value
+      , target = evt.target || evt.srcElement
+      , initialTarget = elm === target
     if (rule.event !== eventType) return false
     // ignore all right-clicks
     if (rule.event === 'click' && SL.isRightClick(evt)){
@@ -1503,7 +1503,7 @@
       return false
     }
     if (!(initialTarget ||
-        ((rule.bubbleFireIfParent !== false) && (eventEntriesFound === 0 || (rule.bubbleFireIfChildFired !== false))))) return false
+      ((rule.bubbleFireIfParent !== false) && (eventEntriesFound === 0 || (rule.bubbleFireIfChildFired !== false))))) return false
 
     if (rule.selector && !SL.matchesCss(rule.selector, elm)) return false
     if (!SL.propertiesMatch(property, elm)) return false
@@ -1599,11 +1599,11 @@
     if (SL.$data(evt, 'eventProcessed')) return
 
     var eventType = evt.type.toLowerCase()
-        , target = evt.target || evt.srcElement
-        , rulesMatched = 0
-        , rules = SL.rules
-        , tools = SL.tools
-        , handlers = SL.evtHandlers[evt.type]
+      , target = evt.target || evt.srcElement
+      , rulesMatched = 0
+      , rules = SL.rules
+      , tools = SL.tools
+      , handlers = SL.evtHandlers[evt.type]
 
     if (SL.isVMLPoisoned(target)){
       SL.notify('detected ' + eventType + ' on poisoned VML element, skipping.', 1)
@@ -1647,18 +1647,18 @@
 //
 // - `evt` - the event triggered
   SL.onEvent = document.querySelectorAll ?
-      function(evt){ SL.handleEvent(evt) } :
-      (function(){
-        var q = []
-        var onEvent = function(evt) {
-          if (evt.selector)
-            q.push(evt)
-          else
-            SL.handleEvent(evt)
-        }
-        onEvent.pendingEvents = q
-        return onEvent
-      })()
+    function(evt){ SL.handleEvent(evt) } :
+    (function(){
+      var q = []
+      var onEvent = function(evt) {
+        if (evt.selector)
+          q.push(evt)
+        else
+          SL.handleEvent(evt)
+      }
+      onEvent.pendingEvents = q
+      return onEvent
+    })()
 
 // `fireEvent(eventType, eventTarget)`
 // ------------
@@ -1718,8 +1718,8 @@
 // Listen for events on form elements.
   SL.setFormListeners = function() {
     SL.registerEventsForTags(
-        ['input', 'select', 'textarea', 'button'],
-        ["select","change","focus","blur","keypress"]);
+      ['input', 'select', 'textarea', 'button'],
+      ["select","change","focus","blur","keypress"]);
   };
 
 // `setVideoListeners()`
@@ -1728,7 +1728,7 @@
 // Listen for events on video elements.
   SL.setVideoListeners = function() {
     SL.registerEventsForTags(['video'],
-        ["play","pause","ended","volumechange","stalled","timeupdate","loadeddata"])
+      ["play","pause","ended","volumechange","stalled","timeupdate","loadeddata"])
   }
 
 // `readStoredSetting(name)`
@@ -1750,7 +1750,7 @@
 // Read satelliteUtilsCookie values to see about getting bookmarklet running / settings
   SL.loadStoredSettings = function () {
     var debug = SL.readStoredSetting('debug')
-        , hideActivity = SL.readStoredSetting('hide_activity')
+      , hideActivity = SL.readStoredSetting('hide_activity')
     if (debug)
       SL.settings.notifications = debug === 'true'
     if (hideActivity)
@@ -1762,15 +1762,15 @@
     if (!schd) return true
 
     var utc = schd.utc
-        , getDate = utc ? 'getUTCDate' : 'getDate'
-        , getDay = utc ? 'getUTCDay' : 'getDay'
-        , getFullYear = utc ? 'getUTCFullYear' : 'getFullYear'
-        , getMonth = utc ? 'getUTCMonth' : 'getMonth'
-        , getHours = utc ? 'getUTCHours' : 'getHours'
-        , getMinutes = utc ? 'getUTCMinutes' : 'getMinutes'
-        , setHours = utc ? 'setUTCHours' : 'setHours'
-        , setMinutes = utc ? 'setUTCMinutes' : 'setMinutes'
-        , setDate = utc ? 'setUTCDate' : 'setDate'
+      , getDate = utc ? 'getUTCDate' : 'getDate'
+      , getDay = utc ? 'getUTCDay' : 'getDay'
+      , getFullYear = utc ? 'getUTCFullYear' : 'getFullYear'
+      , getMonth = utc ? 'getUTCMonth' : 'getMonth'
+      , getHours = utc ? 'getUTCHours' : 'getHours'
+      , getMinutes = utc ? 'getUTCMinutes' : 'getMinutes'
+      , setHours = utc ? 'setUTCHours' : 'setHours'
+      , setMinutes = utc ? 'setUTCMinutes' : 'setMinutes'
+      , setDate = utc ? 'setUTCDate' : 'setDate'
 
     date = date || new Date()
 
@@ -1807,16 +1807,16 @@
     }
     function timeGreaterThan(one, other){
       var h1 = one[getHours]()
-          , m1 = one[getMinutes]()
-          , h2 = other[getHours]()
-          , m2 = other[getMinutes]()
+        , m1 = one[getMinutes]()
+        , h2 = other[getHours]()
+        , m2 = other[getMinutes]()
       return (h1 * 60 + m1) > (h2 * 60 + m2)
     }
     function timeLessThan(one, other){
       var h1 = one[getHours]()
-          , m1 = one[getMinutes]()
-          , h2 = other[getHours]()
-          , m2 = other[getMinutes]()
+        , m1 = one[getMinutes]()
+        , h2 = other[getHours]()
+        , m2 = other[getMinutes]()
       return (h1 * 60 + m1) < (h2 * 60 + m2)
     }
 
@@ -1883,9 +1883,9 @@
   SL.isLinkerLink = function(elm){
     if (!elm.getAttribute || !elm.getAttribute('href')) return false
     return SL.hasMultipleDomains() &&
-        elm.hostname != location.hostname &&
-        !elm.href.match(/^javascript/i) &&
-        !SL.isOutboundLink(elm)
+      elm.hostname != location.hostname &&
+      !elm.href.match(/^javascript/i) &&
+      !SL.isOutboundLink(elm)
   }
 
   SL.isSubdomainOf = function(sub, root){
@@ -2087,11 +2087,11 @@
     var libraryOverride = SL.readStoredSetting('stagingLibrary') === 'true'
     if (libraryOverride){ // allow Rover to override the library to staging
       var scripts = document.getElementsByTagName('script')
-          , regex = /^(.*)satelliteLib-(.*)\.js$/
-          , regexStaging = /^(.*)satelliteLib-(.*)-staging\.js$/
-          , match
-          , matchStaging
-          , src
+        , regex = /^(.*)satelliteLib-(.*)\.js$/
+        , regexStaging = /^(.*)satelliteLib-(.*)-staging\.js$/
+        , match
+        , matchStaging
+        , src
       for (var i = 0, len = scripts.length; i < len; i++){
         src = scripts[i].getAttribute('src')
         if (!src) continue
@@ -2236,7 +2236,7 @@
 
     SL.configurationSettings = settings
     var tools = settings.tools
-        ;delete settings.tools
+      ;delete settings.tools
     for (var key in settings){
       SL[key] = settings[key]
     }
@@ -2284,8 +2284,8 @@
     // Setup background tasks
     SL.domReady(function() {
       SL.poll(
-          function() { SL.backgroundTasks() },
-          SL.settings.recheckEvery || 3000
+        function() { SL.backgroundTasks() },
+        SL.settings.recheckEvery || 3000
       )
     })
 
@@ -2316,9 +2316,9 @@
     if (tool.pending){
       SL.each(tool.pending, function(call){
         var cmd = call[0]
-            , elm = call[1]
-            , evt = call[2]
-            , args = call[3]
+          , elm = call[1]
+          , evt = call[2]
+          , args = call[3]
         if (cmd in tool)
           tool[cmd].apply(tool, [elm, evt].concat(args))
         else if (tool.emit)
@@ -2425,8 +2425,8 @@
       }
 
       var args = SL.preprocessArguments(trig['arguments'], elm, evt, this.forceLowerCase)
-          , cmd = trig.command
-          , method = this['$' + cmd]
+        , cmd = trig.command
+        , method = this['$' + cmd]
 
       if (method){
         method.apply(this, [elm, evt].concat(args))
@@ -2468,246 +2468,36 @@
 // Set Satellite to the global variable `_satellite`.
   window._satellite = SL
 
-// Orientation Change Event Emitter
-// ================================
+// Twitter Event Emitter
+// =====================
 //
-// The `orientationchange` event on mobile devices fire when the devices switchs between
-// portrait and landscape modes. You can use `%event.orientation%` in your command arguments
-// to evaluate to either `portrait` or `landscape`.
-  function OrientationChangeEventEmitter(){
-    SL.addEventHandler(window, "orientationchange", OrientationChangeEventEmitter.orientationChange)
+// Emits the `twitter.tweet` event in the event a user tweets from the site.
+  function TwitterEventEmitter(twttr){
+    SL.domReady(SL.bind(function () {
+      this.twttr = twttr || window.twttr;
+      this.initialize();
+    }, this));
   }
-  OrientationChangeEventEmitter.orientationChange = function (e) {
-    var orientation = window.orientation === 0 ?
-        'portrait' :
-        'landscape'
-    e.orientation = orientation
-    SL.onEvent(e)
-  }
-  SL.availableEventEmitters.push(OrientationChangeEventEmitter)
 
-// VideoPlayedEventEmitter
-// =======================
-//
-// Emits the `videoplayed` event, given a specified percentage or duration, i.e. `videoplayed`
-// is a parameterized event. A rule looks like this
-//
-//      {
-//          name: "Video 10% complete",
-//          event: "videoplayed(10%)",
-//          selector: "#video",
-//          trigger: [
-//              {
-//                  tool: "ga",
-//                  command: "trackEvent",
-//                  arguments: [
-//                      "video",
-//                      "video 10% complete",
-//                      "from: %URI%"
-//                  ]
-//              }
-//          ]
-//      }
-//
-// `10%` is in the paranthesis which indicates this rule will only fire when the 10%
-// of the total length of the video has been played.
-// You can also specifiy a duration in seconds, which looks like `videoplayed(8s)` - which
-// stands for 8 seconds.
-
-  function VideoPlayedEventEmitter(){
-    this.rules = SL.filter(SL.rules, function(rule){
-      return rule.event.substring(0, 11) === 'videoplayed'
-    })
-    this.eventHandler = SL.bind(this.onUpdateTime, this)
-  }
-  VideoPlayedEventEmitter.prototype = {
-    backgroundTasks: function(){
-      var eventHandler = this.eventHandler
-      SL.each(this.rules, function(rule){
-        SL.cssQuery(rule.selector || 'video', function(elms){
-          SL.each(elms, function(elm){
-            if (SL.$data(elm, 'videoplayed.tracked')) return
-            SL.addEventHandler(elm, 'timeupdate', SL.throttle(eventHandler, 100))
-            SL.$data(elm, 'videoplayed.tracked', true)
-          })
-        })
-      })
-    },
-    evalRule: function(elm, rule){
-      var eventType = rule.event
-          , seekable = elm.seekable
-          , startTime = seekable.start(0)
-          , endTime = seekable.end(0)
-          , currentTime = elm.currentTime
-          , m = rule.event.match(/^videoplayed\(([0-9]+)([s%])\)$/)
-      if (!m) return
-      var unit = m[2]
-          , amount = Number(m[1])
-      var func = unit === '%' ?
-          function(){
-            return amount <=
-                100 * (currentTime - startTime) / (endTime - startTime)
-          } :
-          function(){
-            return amount <= currentTime - startTime
-          }
-      if (!SL.$data(elm, eventType) && func()){
-        SL.$data(elm, eventType, true)
-        SL.onEvent({type: eventType, target: elm})
+  TwitterEventEmitter.prototype = {
+    initialize: function(){
+      var twttr = this.twttr;
+      if (twttr && typeof twttr.ready === 'function') {
+        twttr.ready(SL.bind(this.bind, this));
       }
     },
-    onUpdateTime: function(e){
-      var rules = this.rules
-          , elm = e.target
-      if (!elm.seekable || elm.seekable.length === 0) return
-      for (var i = 0, len = rules.length; i < len; i++)
-        this.evalRule(elm, rules[i])
-    }
-  }
-  SL.availableEventEmitters.push(VideoPlayedEventEmitter)
 
-// InviewEventEmitter
-// ==================
-//
-// Emits the `inview` event. The `inview` event fires on an element when the element
-// first comes into the view of the user. If the element is in view immediately upon page
-// load, it will be fired right away, if it only comes in view after some scrolling, it
-// will fire then. An optional delay interval `inviewDelay` can be specified in the rule
-// which determine how long the element has to be in view for before the event fires,
-// of which the default value is 1 second.
-
-  function InViewEventEmitter(rules){
-    rules = rules || SL.rules
-    this.rules = SL.filter(rules, function(rule){
-      return rule.event === 'inview'
-    })
-    this.elements = []
-    this.eventHandler = SL.bind(this.track, this)
-    SL.addEventHandler(window, 'scroll', this.eventHandler)
-    SL.addEventHandler(window, 'load', this.eventHandler)
-  }
-
-// Util functions needed by `InViewEventEmitter`
-  InViewEventEmitter.offset = function(elem) {
-    var box
-
-    try {
-      box = elem.getBoundingClientRect()
-    } catch(e) {}
-
-    var doc = document,
-        docElem = doc.documentElement
-
-    var body = doc.body,
-        win = window,
-        clientTop  = docElem.clientTop  || body.clientTop  || 0,
-        clientLeft = docElem.clientLeft || body.clientLeft || 0,
-        scrollTop  = win.pageYOffset || docElem.scrollTop  || body.scrollTop,
-        scrollLeft = win.pageXOffset || docElem.scrollLeft || body.scrollLeft,
-        top  = box.top  + scrollTop  - clientTop,
-        left = box.left + scrollLeft - clientLeft
-
-    return { top: top, left: left }
-  }
-  InViewEventEmitter.getViewportHeight = function() {
-    var height = window.innerHeight // Safari, Opera
-    var mode = document.compatMode
-
-    if (mode) { // IE, Gecko
-      height = (mode == 'CSS1Compat') ?
-          document.documentElement.clientHeight : // Standards
-          document.body.clientHeight // Quirks
-    }
-
-    return height
-  }
-  InViewEventEmitter.getScrollTop = function(){
-    return (document.documentElement.scrollTop ?
-        document.documentElement.scrollTop :
-        document.body.scrollTop)
-  }
-
-  InViewEventEmitter.prototype = {
-    backgroundTasks: function(){
-      var elements = this.elements
-          , self = this
-      SL.each(this.rules, function(rule){
-        SL.cssQuery(rule.selector, function(elms){
-          var addCount = 0
-          SL.each(elms, function(elm){
-            if (!SL.contains(elements, elm)){
-              elements.push(elm)
-              addCount++
-            }
-          })
-          if (addCount){
-            SL.notify(rule.selector + ' added ' + addCount + ' elements.', 1)
-          }
-        })
-      })
-      this.track()
-    },
-    elementIsInView: function(el){
-      var vpH = InViewEventEmitter.getViewportHeight()
-          , scrolltop = InViewEventEmitter.getScrollTop()
-          , top = InViewEventEmitter.offset(el).top
-          , height = el.offsetHeight
-      return !(scrolltop > (top + height) || scrolltop + vpH < top)
-    },
-    checkInView: function(el, recheck){
-      var inview = SL.$data(el, 'inview')
-      if (this.elementIsInView(el)) {
-        // it is in view now
-        if (!inview)
-          SL.$data(el, 'inview', true)
-        var self = this
-        this.processRules(el, function(rule, viewedProp, timeoutIdProp){
-          if (recheck || !rule.inviewDelay){
-            SL.$data(el, viewedProp, true)
-            SL.onEvent({type: 'inview', target: el, inviewDelay: rule.inviewDelay})
-          }else if(rule.inviewDelay){
-            var timeout = SL.$data(el, timeoutIdProp)
-            if (timeout)
-              clearTimeout(timeout)
-            timeout = setTimeout(function(){
-              self.checkInView(el, true)
-            }, rule.inviewDelay)
-            SL.$data(el, timeoutIdProp, timeout)
-          }
-        })
-      } else {
-        // it is not in view now
-        if (inview)
-          SL.$data(el, 'inview', false)
-        this.processRules(el, function(rule, viewedProp, timeoutIdProp){
-          var timeout = SL.$data(el, timeoutIdProp)
-          if (timeout){
-            clearTimeout(timeout)
-          }
-        })
-      }
-    },
-    track: function(){
-      SL.each(this.elements, function(elm){
-        this.checkInView(elm)
-      }, this)
-    },
-    processRules: function(elm, callback){
-      SL.each(this.rules, function(rule, i){
-        // viewedProp: for rules that has a timeout, the definition for
-        // "viewed" is rule dependent. But for all rules that do not have
-        // a timeout, it is independent.
-        var viewedProp = rule.inviewDelay ? 'viewed_' + rule.inviewDelay : 'viewed'
-        var timeoutIdProp = 'inview_timeout_id_' + i
-        if (SL.$data(elm, viewedProp)) return
-        if (SL.matchesCss(rule.selector, elm)){
-          callback(rule, viewedProp, timeoutIdProp)
+    bind: function(){
+      this.twttr.events.bind('tweet', function(event) {
+        if (event) {
+          SL.notify("tracking a tweet button", 1);
+          SL.onEvent({type: 'twitter.tweet', target: document});
         }
-      })
+      });
+
     }
   }
-
-  SL.availableEventEmitters.push(InViewEventEmitter)
+  SL.availableEventEmitters.push(TwitterEventEmitter)
 
 // Facebook Event Emitter
 // ======================
@@ -2782,7 +2572,7 @@
       var self = this
       SL.each(this.rules, function(rule){
         var selector = rule[1]
-            , delay = rule[0]
+          , delay = rule[0]
         SL.cssQuery(selector, function(newElms){
           SL.each(newElms, function(elm){
             self.trackElement(elm, delay)
@@ -2792,7 +2582,7 @@
     },
     trackElement: function(elm, delay){
       var self = this
-          , trackDelays = SL.$data(elm, 'hover.delays')
+        , trackDelays = SL.$data(elm, 'hover.delays')
       if (!trackDelays){
         SL.addEventHandler(elm, 'mouseover', function(e){
           self.onMouseOver(e, elm)
@@ -2808,9 +2598,9 @@
     },
     onMouseOver: function(e, elem){
       var target = e.target || e.srcElement
-          , related = e.relatedTarget || e.fromElement
-          , hit = (elem === target || SL.containsElement(elem, target)) &&
-              !SL.containsElement(elem, related)
+        , related = e.relatedTarget || e.fromElement
+        , hit = (elem === target || SL.containsElement(elem, target)) &&
+          !SL.containsElement(elem, related)
       if (hit)
         this.onMouseEnter(elem)
     },
@@ -2825,9 +2615,9 @@
     },
     onMouseOut: function(e, elem){
       var target = e.target || e.srcElement
-          , related = e.relatedTarget || e.toElement
-          , hit = (elem === target || SL.containsElement(elem, target)) &&
-              !SL.containsElement(elem, related)
+        , related = e.relatedTarget || e.toElement
+        , hit = (elem === target || SL.containsElement(elem, target)) &&
+          !SL.containsElement(elem, related)
       if (hit)
         this.onMouseLeave(elem)
     },
@@ -2840,6 +2630,104 @@
     }
   }
   SL.availableEventEmitters.push(HoverEventEmitter)
+
+// VideoPlayedEventEmitter
+// =======================
+//
+// Emits the `videoplayed` event, given a specified percentage or duration, i.e. `videoplayed`
+// is a parameterized event. A rule looks like this
+//
+//      {
+//          name: "Video 10% complete",
+//          event: "videoplayed(10%)",
+//          selector: "#video",
+//          trigger: [
+//              {
+//                  tool: "ga",
+//                  command: "trackEvent",
+//                  arguments: [
+//                      "video",
+//                      "video 10% complete",
+//                      "from: %URI%"
+//                  ]
+//              }
+//          ]
+//      }
+//
+// `10%` is in the paranthesis which indicates this rule will only fire when the 10%
+// of the total length of the video has been played.
+// You can also specifiy a duration in seconds, which looks like `videoplayed(8s)` - which
+// stands for 8 seconds.
+
+  function VideoPlayedEventEmitter(){
+    this.rules = SL.filter(SL.rules, function(rule){
+      return rule.event.substring(0, 11) === 'videoplayed'
+    })
+    this.eventHandler = SL.bind(this.onUpdateTime, this)
+  }
+  VideoPlayedEventEmitter.prototype = {
+    backgroundTasks: function(){
+      var eventHandler = this.eventHandler
+      SL.each(this.rules, function(rule){
+        SL.cssQuery(rule.selector || 'video', function(elms){
+          SL.each(elms, function(elm){
+            if (SL.$data(elm, 'videoplayed.tracked')) return
+            SL.addEventHandler(elm, 'timeupdate', SL.throttle(eventHandler, 100))
+            SL.$data(elm, 'videoplayed.tracked', true)
+          })
+        })
+      })
+    },
+    evalRule: function(elm, rule){
+      var eventType = rule.event
+        , seekable = elm.seekable
+        , startTime = seekable.start(0)
+        , endTime = seekable.end(0)
+        , currentTime = elm.currentTime
+        , m = rule.event.match(/^videoplayed\(([0-9]+)([s%])\)$/)
+      if (!m) return
+      var unit = m[2]
+        , amount = Number(m[1])
+      var func = unit === '%' ?
+        function(){
+          return amount <=
+            100 * (currentTime - startTime) / (endTime - startTime)
+        } :
+        function(){
+          return amount <= currentTime - startTime
+        }
+      if (!SL.$data(elm, eventType) && func()){
+        SL.$data(elm, eventType, true)
+        SL.onEvent({type: eventType, target: elm})
+      }
+    },
+    onUpdateTime: function(e){
+      var rules = this.rules
+        , elm = e.target
+      if (!elm.seekable || elm.seekable.length === 0) return
+      for (var i = 0, len = rules.length; i < len; i++)
+        this.evalRule(elm, rules[i])
+    }
+  }
+  SL.availableEventEmitters.push(VideoPlayedEventEmitter)
+
+// Orientation Change Event Emitter
+// ================================
+//
+// The `orientationchange` event on mobile devices fire when the devices switchs between
+// portrait and landscape modes. You can use `%event.orientation%` in your command arguments
+// to evaluate to either `portrait` or `landscape`.
+  function OrientationChangeEventEmitter(){
+    SL.addEventHandler(window, "orientationchange", OrientationChangeEventEmitter.orientationChange)
+  }
+  OrientationChangeEventEmitter.orientationChange = function (e) {
+    var orientation = window.orientation === 0 ?
+      'portrait' :
+      'landscape'
+    e.orientation = orientation
+    SL.onEvent(e)
+  }
+  SL.availableEventEmitters.push(OrientationChangeEventEmitter)
 
 // ElementExistsEventEmitter
 // ==================
@@ -2868,36 +2756,213 @@
 
   SL.availableEventEmitters.push(ElementExistsEventEmitter)
 
-// Twitter Event Emitter
-// =====================
+// InviewEventEmitter
+// ==================
 //
-// Emits the `twitter.tweet` event in the event a user tweets from the site.
-  function TwitterEventEmitter(twttr){
-    SL.domReady(SL.bind(function () {
-      this.twttr = twttr || window.twttr;
-      this.initialize();
-    }, this));
+// Emits the `inview` event. The `inview` event fires on an element when the element
+// first comes into the view of the user. If the element is in view immediately upon page
+// load, it will be fired right away, if it only comes in view after some scrolling, it
+// will fire then. An optional delay interval `inviewDelay` can be specified in the rule
+// which determine how long the element has to be in view for before the event fires,
+// of which the default value is 1 second.
+
+  function InViewEventEmitter(rules){
+    rules = rules || SL.rules
+    this.rules = SL.filter(rules, function(rule){
+      return rule.event === 'inview'
+    })
+    this.elements = []
+    this.eventHandler = SL.bind(this.track, this)
+    SL.addEventHandler(window, 'scroll', this.eventHandler)
+    SL.addEventHandler(window, 'load', this.eventHandler)
   }
 
-  TwitterEventEmitter.prototype = {
-    initialize: function(){
-      var twttr = this.twttr;
-      if (twttr && typeof twttr.ready === 'function') {
-        twttr.ready(SL.bind(this.bind, this));
+// Util functions needed by `InViewEventEmitter`
+  InViewEventEmitter.offset = function(elem) {
+    var box
+
+    try {
+      box = elem.getBoundingClientRect()
+    } catch(e) {}
+
+    var doc = document,
+      docElem = doc.documentElement
+
+    var body = doc.body,
+      win = window,
+      clientTop  = docElem.clientTop  || body.clientTop  || 0,
+      clientLeft = docElem.clientLeft || body.clientLeft || 0,
+      scrollTop  = win.pageYOffset || docElem.scrollTop  || body.scrollTop,
+      scrollLeft = win.pageXOffset || docElem.scrollLeft || body.scrollLeft,
+      top  = box.top  + scrollTop  - clientTop,
+      left = box.left + scrollLeft - clientLeft
+
+    return { top: top, left: left }
+  }
+  InViewEventEmitter.getViewportHeight = function() {
+    var height = window.innerHeight // Safari, Opera
+    var mode = document.compatMode
+
+    if (mode) { // IE, Gecko
+      height = (mode == 'CSS1Compat') ?
+        document.documentElement.clientHeight : // Standards
+        document.body.clientHeight // Quirks
+    }
+
+    return height
+  }
+  InViewEventEmitter.getScrollTop = function(){
+    return (document.documentElement.scrollTop ?
+      document.documentElement.scrollTop :
+      document.body.scrollTop)
+  }
+
+  InViewEventEmitter.prototype = {
+    backgroundTasks: function(){
+      var elements = this.elements
+        , self = this
+      SL.each(this.rules, function(rule){
+        SL.cssQuery(rule.selector, function(elms){
+          var addCount = 0
+          SL.each(elms, function(elm){
+            if (!SL.contains(elements, elm)){
+              elements.push(elm)
+              addCount++
+            }
+          })
+          if (addCount){
+            SL.notify(rule.selector + ' added ' + addCount + ' elements.', 1)
+          }
+        })
+      })
+      this.track()
+    },
+    elementIsInView: function(el){
+      var vpH = InViewEventEmitter.getViewportHeight()
+        , scrolltop = InViewEventEmitter.getScrollTop()
+        , top = InViewEventEmitter.offset(el).top
+        , height = el.offsetHeight
+      return !(scrolltop > (top + height) || scrolltop + vpH < top)
+    },
+    checkInView: function(el, recheck){
+      var inview = SL.$data(el, 'inview')
+      if (this.elementIsInView(el)) {
+        // it is in view now
+        if (!inview)
+          SL.$data(el, 'inview', true)
+        var self = this
+        this.processRules(el, function(rule, viewedProp, timeoutIdProp){
+          if (recheck || !rule.inviewDelay){
+            SL.$data(el, viewedProp, true)
+            SL.onEvent({type: 'inview', target: el, inviewDelay: rule.inviewDelay})
+          }else if(rule.inviewDelay){
+            var timeout = SL.$data(el, timeoutIdProp)
+            if (timeout)
+              clearTimeout(timeout)
+            timeout = setTimeout(function(){
+              self.checkInView(el, true)
+            }, rule.inviewDelay)
+            SL.$data(el, timeoutIdProp, timeout)
+          }
+        })
+      } else {
+        // it is not in view now
+        if (inview)
+          SL.$data(el, 'inview', false)
+        this.processRules(el, function(rule, viewedProp, timeoutIdProp){
+          var timeout = SL.$data(el, timeoutIdProp)
+          if (timeout){
+            clearTimeout(timeout)
+          }
+        })
       }
     },
-
-    bind: function(){
-      this.twttr.events.bind('tweet', function(event) {
-        if (event) {
-          SL.notify("tracking a tweet button", 1);
-          SL.onEvent({type: 'twitter.tweet', target: document});
+    track: function(){
+      SL.each(this.elements, function(elm){
+        this.checkInView(elm)
+      }, this)
+    },
+    processRules: function(elm, callback){
+      SL.each(this.rules, function(rule, i){
+        // viewedProp: for rules that has a timeout, the definition for
+        // "viewed" is rule dependent. But for all rules that do not have
+        // a timeout, it is independent.
+        var viewedProp = rule.inviewDelay ? 'viewed_' + rule.inviewDelay : 'viewed'
+        var timeoutIdProp = 'inview_timeout_id_' + i
+        if (SL.$data(elm, viewedProp)) return
+        if (SL.matchesCss(rule.selector, elm)){
+          callback(rule, viewedProp, timeoutIdProp)
         }
-      });
-
+      })
     }
   }
-  SL.availableEventEmitters.push(TwitterEventEmitter)
+
+  SL.availableEventEmitters.push(InViewEventEmitter)
+
+// Basic Tool
+// ------------
+//
+// This is a generic tool that allows integrating with
+// various simple tools.
+//
+
+  function BasicTool(settings){
+    SL.BaseTool.call(this, settings)
+
+    this.name = settings.name || 'Basic'
+  }
+
+  SL.inherit(BasicTool, SL.BaseTool)
+
+  SL.extend(BasicTool.prototype, {
+    initialize: function(){
+      var settings = this.settings
+      if (this.settings.initTool !== false){
+        var url = settings.url
+        if (typeof url === 'string'){
+          url = SL.basePath() + url
+        }else{
+          url = SL.isHttps() ? url.https : url.http
+        }
+        SL.loadScript(url, SL.bind(this.onLoad, this))
+        this.initializing = true
+      }else{
+        this.initialized = true
+      }
+    },
+    isQueueAvailable: function(){
+      return !this.initialized
+    },
+    onLoad: function(){
+      this.initialized = true
+      this.initializing = false
+      if (this.settings.initialBeacon){
+        this.settings.initialBeacon()
+      }
+      this.flushQueue()
+    },
+    endPLPhase: function(pageLoadEvent){
+      var loadOn = this.settings.loadOn
+      if (pageLoadEvent === loadOn){
+        SL.notify(this.name + ': Initializing at ' + pageLoadEvent, 1)
+        this.initialize()
+      }
+    },
+    $fire: function(elm, evt, fun){
+      if (this.initializing){
+        this.queueCommand({
+          command: 'fire',
+          arguments: [fun]
+        }, elm, evt)
+        return
+      }
+      fun.call(this.settings, elm, evt)
+    }
+  })
+
+  SL.availableTools.am = BasicTool
+  SL.availableTools.adlens = BasicTool
+  SL.availableTools.__basic = BasicTool
 
 // Test & Target Tool
 // ==================
@@ -2931,9 +2996,9 @@
     initializeTargetPageParams: function() {
       if (window.targetPageParams) {
         this.updateTargetPageParams(
-            this.parseTargetPageParamsResult(
-                window.targetPageParams()
-            )
+          this.parseTargetPageParamsResult(
+            window.targetPageParams()
+          )
         )
       }
 
@@ -3031,7 +3096,7 @@
     appendStyle: function(css){
       // <http://stackoverflow.com/a/524721/5304>
       var head = document.getElementsByTagName('head')[0]
-          , style = document.createElement('style')
+        , style = document.createElement('style')
       style.type = 'text/css'
       if(style.styleSheet){
         style.styleSheet.cssText = css
@@ -3079,8 +3144,8 @@
         }
       }
       SL.extend(
-          this.targetPageParamsStore,
-          o
+        this.targetPageParamsStore,
+        o
       )
     },
 
@@ -3136,7 +3201,7 @@
 
       if (this._cancelToolInit) return
       this.settings.initVars = this.substituteVariables(
-          this.settings.initVars, { type: pageLoadEvent }
+        this.settings.initVars, { type: pageLoadEvent }
       )
 
       if (this.settings.initTool !== false){
@@ -3249,7 +3314,7 @@
     getS: function(s, options){
       var hostname = options && options.hostname || window.location.hostname
       var varBindings = this.concatWithToolVarBindings(
-          options && options.setVars || this.varBindings
+        options && options.setVars || this.varBindings
       )
       var events = options && options.addEvent || this.events
       var acct = this.getAccount(hostname)
@@ -3267,8 +3332,8 @@
         s.tagContainerMarker = DTMversion
       } else {
         if (typeof s.version === 'string' &&
-            s.version.substring(s.version.length - 5) !==
-            ('-' + DTMversion)){
+          s.version.substring(s.version.length - 5) !==
+          ('-' + DTMversion)){
           s.version += '-' + DTMversion
         }
       }
@@ -3339,9 +3404,9 @@
       var type = params.type
       var linkName = params.linkName
       if (!linkName &&
-          elm &&
-          elm.nodeName &&
-          elm.nodeName.toLowerCase() === 'a'){
+        elm &&
+        elm.nodeName &&
+        elm.nodeName.toLowerCase() === 'a'){
         linkName = elm.innerHTML
       }
       if (!linkName){
@@ -3470,8 +3535,8 @@
     },
     $postTransaction: function(elm, evt, varname){
       var trans = SL.data.transaction = window[varname]
-          , s = this.varBindings
-          , mapping = this.settings.fieldVarMapping
+        , s = this.varBindings
+        , mapping = this.settings.fieldVarMapping
 
       SL.each(trans.items, function(item){
         this.products.push(item)
@@ -3522,70 +3587,200 @@
   })
   SL.availableTools.sc = SiteCatalystTool
 
-// Basic Tool
-// ------------
+// Google Analytics Tool
+// ---------------------
 //
-// This is a generic tool that allows integrating with
-// various simple tools.
+// The GATool allows you to use any Google Analytics command.
+// Example:
 //
-
-  function BasicTool(settings){
+//      trigger: [
+//          {
+//              tool: "ga",
+//              command: "trackEvent",
+//              arguments: [
+//                  "video",
+//                  "video 10% complete"
+//              ]
+//          }
+//      ]
+//
+// This trigger will call the `trackEvent` method, which is equivalent to
+//
+//     _gaq.push(['_trackEvent', 'video', 'video 10% complete'])
+  function GATool(settings){
     SL.BaseTool.call(this, settings)
-
-    this.name = settings.name || 'Basic'
   }
-
-  SL.inherit(BasicTool, SL.BaseTool)
-
-  SL.extend(BasicTool.prototype, {
+  SL.inherit(GATool, SL.BaseTool)
+  SL.extend(GATool.prototype, {
+    name: 'GA',
     initialize: function(){
       var settings = this.settings
-      if (this.settings.initTool !== false){
-        var url = settings.url
-        if (typeof url === 'string'){
-          url = SL.basePath() + url
-        }else{
-          url = SL.isHttps() ? url.https : url.http
+      var before = window._gaq
+        , initCommands = settings.initCommands || []
+        , customInit = settings.customInit
+
+      if (!before){
+        // And yes, I *do* mean to set a global variable
+        // of `_gaq` here
+        _gaq = []
+      }
+
+      if (!this.isSuppressed()){
+        if (!before && !GATool.scriptLoaded){
+          var https = SL.isHttps()
+          var url =
+            (https ? 'https://ssl' : 'http://www') +
+            '.google-analytics.com/ga.js'
+          if (settings.url){
+            url = https ? settings.url.https : settings.url.http
+          }
+          SL.loadScript(url)
+          GATool.scriptLoaded = true
+          SL.notify('GA: page code loaded.', 1)
         }
-        SL.loadScript(url, SL.bind(this.onLoad, this))
-        this.initializing = true
+        var domain = settings.domain
+          , trackerName = settings.trackerName
+          , allowLinker = GAUtils.allowLinker()
+          , account = settings.account
+          , domainList = SL.settings.domainList || []
+        _gaq.push([this.cmd('setAccount'), account])
+        if (allowLinker)
+          _gaq.push([this.cmd('setAllowLinker'), allowLinker])
+        _gaq.push([this.cmd('setDomainName'), GAUtils.cookieDomain()])
+        SL.each(initCommands, function(cmd){
+          var arr = [this.cmd(cmd[0])].concat(cmd.slice(1))
+          _gaq.push(arr)
+        }, this)
+        if (customInit)
+          this.suppressInitialPageView = false === customInit(_gaq, trackerName)
+        if (settings.pageName)
+          this.$overrideInitialPageView(null, null, settings.pageName)
       }else{
-        this.initialized = true
+        SL.notify('GA: page code not loaded(suppressed).', 1)
       }
-    },
-    isQueueAvailable: function(){
-      return !this.initialized
-    },
-    onLoad: function(){
+
       this.initialized = true
-      this.initializing = false
-      if (this.settings.initialBeacon){
-        this.settings.initialBeacon()
+      SL.fireEvent(this.id + '.configure', _gaq, trackerName)
+
+    },
+    isSuppressed: function(){
+      return this._cancelToolInit || this.settings.initTool === false
+    },
+    tracker: function(){
+      return this.settings.trackerName
+    },
+    cmd: function(cmd){
+      var tracker = this.tracker()
+      return tracker ? tracker + '._' + cmd : '_' + cmd
+    },
+    $overrideInitialPageView: function(elm, evt, url){
+      this.urlOverride = url
+    },
+    trackInitialPageView: function(){
+      if (this.isSuppressed()) return
+      if (this.suppressInitialPageView) return
+      if (this.urlOverride){
+        var args = SL.preprocessArguments([this.urlOverride], location, null, this.forceLowerCase)
+        this.$missing$('trackPageview', null, null, args)
+      }else{
+        this.$missing$('trackPageview')
       }
-      this.flushQueue()
     },
     endPLPhase: function(pageLoadEvent){
       var loadOn = this.settings.loadOn
       if (pageLoadEvent === loadOn){
-        SL.notify(this.name + ': Initializing at ' + pageLoadEvent, 1)
+        SL.notify('GA: Initializing at ' + pageLoadEvent, 1)
         this.initialize()
+        this.flushQueue()
+        this.trackInitialPageView()
       }
     },
-    $fire: function(elm, evt, fun){
-      if (this.initializing){
-        this.queueCommand({
-          command: 'fire',
-          arguments: [fun]
-        }, elm, evt)
-        return
+    call: function(cmd, elm, evt, args){
+      if (this._cancelToolInit) return
+      var settings = this.settings
+        , tracker = this.tracker()
+        , fullCmd = this.cmd(cmd)
+        , args = args ? [fullCmd].concat(args) : [fullCmd]
+      _gaq.push(args)
+      if (tracker)
+        SL.notify("GA: sent command " + cmd + " to tracker " + tracker +
+        (args.length > 1 ?
+        " with parameters [" + args.slice(1).join(', ') + "]" :
+          '') + ".", 1)
+      else
+        SL.notify("GA: sent command " + cmd +
+        (args.length > 1 ?
+        " with parameters [" + args.slice(1).join(', ') + "]":
+          '') + ".", 1)
+    },
+    $missing$: function(cmd, elm, evt, args){
+      this.call(cmd, elm, evt, args)
+    },
+    // individual command methods
+    $postTransaction: function(elm, evt, varname){
+      var trans = SL.data.customVars.transaction = window[varname]
+      this.call('addTrans', elm, evt, [
+        trans.orderID,
+        trans.affiliation,
+        trans.total,
+        trans.tax,
+        trans.shipping,
+        trans.city,
+        trans.state,
+        trans.country
+      ])
+      SL.each(trans.items, function(item){
+        this.call('addItem', elm, evt, [
+          item.orderID,
+          item.sku,
+          item.product,
+          item.category,
+          item.unitPrice,
+          item.quantity
+        ])
+      }, this)
+      this.call('trackTrans', elm, evt)
+    },
+    delayLink: function(elm, evt){
+      var ga = this
+      if (!GAUtils.allowLinker()) return
+      if (!elm.hostname.match(this.settings.linkerDomains)) return
+      if (SL.isSubdomainOf(elm.hostname, location.hostname)) return
+      SL.preventDefault(evt)
+      var linkDelay = SL.settings.linkDelay || 100
+      setTimeout(function(){
+        ga.call('link', elm, evt, [elm.href])
+      }, linkDelay)
+    },
+    popupLink: function(elm, evt){
+      if (!window._gat) return
+      SL.preventDefault(evt)
+      var account = this.settings.account
+      var tracker = window._gat._createTracker(account)
+      var url = tracker._getLinkerUrl(elm.href)
+      window.open(url)
+    },
+    $link: function(elm, evt){
+      if (elm.getAttribute('target') === '_blank'){
+        this.popupLink(elm, evt)
+      }else{
+        this.delayLink(elm, evt)
       }
-      fun.call(this.settings, elm, evt)
+    },
+    $trackEvent: function(elm, evt){
+      var args = Array.prototype.slice.call(arguments, 2)
+      if (args.length >= 4 && args[3] != null){
+        // acertain that the 4th element is a number, falling back to 1
+        var value = parseInt(args[3], 10)
+        if (SL.isNaN(value)){
+          value = 1
+        }
+        args[3] = value
+      }
+      this.call('trackEvent', elm, evt, args)
     }
   })
-
-  SL.availableTools.am = BasicTool
-  SL.availableTools.adlens = BasicTool
-  SL.availableTools.__basic = BasicTool
+  SL.availableTools.ga = GATool
 
 // The Google Analytics Universal Tool
 // ================
@@ -3840,201 +4035,6 @@
 
   SL.availableTools.ga_universal = GAUniversalTool;
 
-// Google Analytics Tool
-// ---------------------
-//
-// The GATool allows you to use any Google Analytics command.
-// Example:
-//
-//      trigger: [
-//          {
-//              tool: "ga",
-//              command: "trackEvent",
-//              arguments: [
-//                  "video",
-//                  "video 10% complete"
-//              ]
-//          }
-//      ]
-//
-// This trigger will call the `trackEvent` method, which is equivalent to
-//
-//     _gaq.push(['_trackEvent', 'video', 'video 10% complete'])
-  function GATool(settings){
-    SL.BaseTool.call(this, settings)
-  }
-  SL.inherit(GATool, SL.BaseTool)
-  SL.extend(GATool.prototype, {
-    name: 'GA',
-    initialize: function(){
-      var settings = this.settings
-      var before = window._gaq
-          , initCommands = settings.initCommands || []
-          , customInit = settings.customInit
-
-      if (!before){
-        // And yes, I *do* mean to set a global variable
-        // of `_gaq` here
-        _gaq = []
-      }
-
-      if (!this.isSuppressed()){
-        if (!before && !GATool.scriptLoaded){
-          var https = SL.isHttps()
-          var url =
-              (https ? 'https://ssl' : 'http://www') +
-              '.google-analytics.com/ga.js'
-          if (settings.url){
-            url = https ? settings.url.https : settings.url.http
-          }
-          SL.loadScript(url)
-          GATool.scriptLoaded = true
-          SL.notify('GA: page code loaded.', 1)
-        }
-        var domain = settings.domain
-            , trackerName = settings.trackerName
-            , allowLinker = GAUtils.allowLinker()
-            , account = settings.account
-            , domainList = SL.settings.domainList || []
-        _gaq.push([this.cmd('setAccount'), account])
-        if (allowLinker)
-          _gaq.push([this.cmd('setAllowLinker'), allowLinker])
-        _gaq.push([this.cmd('setDomainName'), GAUtils.cookieDomain()])
-        SL.each(initCommands, function(cmd){
-          var arr = [this.cmd(cmd[0])].concat(cmd.slice(1))
-          _gaq.push(arr)
-        }, this)
-        if (customInit)
-          this.suppressInitialPageView = false === customInit(_gaq, trackerName)
-        if (settings.pageName)
-          this.$overrideInitialPageView(null, null, settings.pageName)
-      }else{
-        SL.notify('GA: page code not loaded(suppressed).', 1)
-      }
-
-      this.initialized = true
-      SL.fireEvent(this.id + '.configure', _gaq, trackerName)
-
-    },
-    isSuppressed: function(){
-      return this._cancelToolInit || this.settings.initTool === false
-    },
-    tracker: function(){
-      return this.settings.trackerName
-    },
-    cmd: function(cmd){
-      var tracker = this.tracker()
-      return tracker ? tracker + '._' + cmd : '_' + cmd
-    },
-    $overrideInitialPageView: function(elm, evt, url){
-      this.urlOverride = url
-    },
-    trackInitialPageView: function(){
-      if (this.isSuppressed()) return
-      if (this.suppressInitialPageView) return
-      if (this.urlOverride){
-        var args = SL.preprocessArguments([this.urlOverride], location, null, this.forceLowerCase)
-        this.$missing$('trackPageview', null, null, args)
-      }else{
-        this.$missing$('trackPageview')
-      }
-    },
-    endPLPhase: function(pageLoadEvent){
-      var loadOn = this.settings.loadOn
-      if (pageLoadEvent === loadOn){
-        SL.notify('GA: Initializing at ' + pageLoadEvent, 1)
-        this.initialize()
-        this.flushQueue()
-        this.trackInitialPageView()
-      }
-    },
-    call: function(cmd, elm, evt, args){
-      if (this._cancelToolInit) return
-      var settings = this.settings
-          , tracker = this.tracker()
-          , fullCmd = this.cmd(cmd)
-          , args = args ? [fullCmd].concat(args) : [fullCmd]
-      _gaq.push(args)
-      if (tracker)
-        SL.notify("GA: sent command " + cmd + " to tracker " + tracker +
-        (args.length > 1 ?
-        " with parameters [" + args.slice(1).join(', ') + "]" :
-            '') + ".", 1)
-      else
-        SL.notify("GA: sent command " + cmd +
-        (args.length > 1 ?
-        " with parameters [" + args.slice(1).join(', ') + "]":
-            '') + ".", 1)
-    },
-    $missing$: function(cmd, elm, evt, args){
-      this.call(cmd, elm, evt, args)
-    },
-    // individual command methods
-    $postTransaction: function(elm, evt, varname){
-      var trans = SL.data.customVars.transaction = window[varname]
-      this.call('addTrans', elm, evt, [
-        trans.orderID,
-        trans.affiliation,
-        trans.total,
-        trans.tax,
-        trans.shipping,
-        trans.city,
-        trans.state,
-        trans.country
-      ])
-      SL.each(trans.items, function(item){
-        this.call('addItem', elm, evt, [
-          item.orderID,
-          item.sku,
-          item.product,
-          item.category,
-          item.unitPrice,
-          item.quantity
-        ])
-      }, this)
-      this.call('trackTrans', elm, evt)
-    },
-    delayLink: function(elm, evt){
-      var ga = this
-      if (!GAUtils.allowLinker()) return
-      if (!elm.hostname.match(this.settings.linkerDomains)) return
-      if (SL.isSubdomainOf(elm.hostname, location.hostname)) return
-      SL.preventDefault(evt)
-      var linkDelay = SL.settings.linkDelay || 100
-      setTimeout(function(){
-        ga.call('link', elm, evt, [elm.href])
-      }, linkDelay)
-    },
-    popupLink: function(elm, evt){
-      if (!window._gat) return
-      SL.preventDefault(evt)
-      var account = this.settings.account
-      var tracker = window._gat._createTracker(account)
-      var url = tracker._getLinkerUrl(elm.href)
-      window.open(url)
-    },
-    $link: function(elm, evt){
-      if (elm.getAttribute('target') === '_blank'){
-        this.popupLink(elm, evt)
-      }else{
-        this.delayLink(elm, evt)
-      }
-    },
-    $trackEvent: function(elm, evt){
-      var args = Array.prototype.slice.call(arguments, 2)
-      if (args.length >= 4 && args[3] != null){
-        // acertain that the 4th element is a number, falling back to 1
-        var value = parseInt(args[3], 10)
-        if (SL.isNaN(value)){
-          value = 1
-        }
-        args[3] = value
-      }
-      this.call('trackEvent', elm, evt, args)
-    }
-  })
-  SL.availableTools.ga = GATool
-
   var GAUtils = {
     allowLinker: function() {
       return SL.hasMultipleDomains();
@@ -4044,8 +4044,8 @@
       var domainName = SL.find(domainList, function(domain) {
         var hostname = window.location.hostname;
         return SL.equalsIgnoreCase(
-            hostname.slice(hostname.length - domain.length),
-            domain);
+          hostname.slice(hostname.length - domain.length),
+          domain);
       });
       var cookieDomain = domainName ? ('.' + domainName) : 'auto';
 
@@ -4078,7 +4078,7 @@
     //      to create the query string to use in the src URL
     $loadIframe: function(elm, evt, options){
       var pages = options.pages
-          , loadOn = options.loadOn
+        , loadOn = options.loadOn
       var doit = SL.bind(function(){
         SL.each(pages, function(page){
           this.loadIframe(elm, evt, page)
@@ -4093,9 +4093,9 @@
       var iframe = document.createElement('iframe')
       iframe.style.display = 'none'
       var host = SL.data.host
-          , data = page.data
-          , src = this.scriptURL(page.src)
-          , search = SL.searchVariables(data, elm, evt)
+        , data = page.data
+        , src = this.scriptURL(page.src)
+        , search = SL.searchVariables(data, elm, evt)
       if (host)
         src = SL.basePath() + src
       src += search
@@ -4121,8 +4121,8 @@
     // If you provide multiple file URLs, they will be loaded sequentially.
     $loadScript: function(elm, evt, options){
       var scripts = options.scripts
-          , sequential = options.sequential
-          , loadOn = options.loadOn
+        , sequential = options.sequential
+        , loadOn = options.loadOn
       var doit = SL.bind(function(){
         if (sequential){
           this.loadScripts(elm, evt, scripts)
@@ -4141,10 +4141,10 @@
     loadScripts: function(elm, evt, scripts) {
       try{
         var scripts = scripts.slice(0)
-            , q = this.asyncScriptCallbackQueue
-            , lastScript
-            , target = evt.target || evt.srcElement
-            , self = this
+          , q = this.asyncScriptCallbackQueue
+          , lastScript
+          , target = evt.target || evt.srcElement
+          , self = this
       }catch(e){
         console.error('scripts is', SL.stringify(scripts))
       }
@@ -4156,7 +4156,7 @@
         var script = scripts.shift()
         if (script){
           var host = SL.data.host
-              , src = self.scriptURL(script.src)
+            , src = self.scriptURL(script.src)
           if (host)
             src = SL.basePath() + src
           lastScript = script
@@ -4168,7 +4168,7 @@
 
     $loadBlockingScript: function(elm, evt, options){
       var scripts = options.scripts
-          , loadOn = options.loadOn
+        , loadOn = options.loadOn
       var doit = SL.bind(function(){
         SL.each(scripts, function(script){
           this.loadBlockingScript(elm, evt, script)
@@ -4181,8 +4181,8 @@
     loadBlockingScript: function(elm, evt, script){
       /*jshint evil:true */
       var src = this.scriptURL(script.src)
-          , host = SL.data.host
-          , target = evt.target || evt.srcElement
+        , host = SL.data.host
+        , target = evt.target || evt.srcElement
       if (host)
         src = SL.basePath() + src
       this.argsForBlockingScripts.push([elm, evt, target])
@@ -4225,8 +4225,8 @@
     linkNeedsDelayActivate: function(a, win){
       win = win || window
       var tagName = a.tagName
-          , target = a.getAttribute('target')
-          , location = a.getAttribute('href')
+        , target = a.getAttribute('target')
+        , location = a.getAttribute('href')
       if (tagName && tagName.toLowerCase() !== 'a')
         return false
       if (!location)
@@ -4334,9 +4334,9 @@
       SL.notify('Visitor ID: Initializing tool', 1);
 
       visitor = this.createInstance(
-          settings.mcOrgId,
-          settings.namespace,
-          settings.initVars
+        settings.mcOrgId,
+        settings.namespace,
+        settings.initVars
       );
       if (visitor === null) {
         return;
@@ -4356,12 +4356,12 @@
     createInstance: function(mcOrgId, namespace, initVars) {
       if(!SL.isString(mcOrgId)) {
         SL.notify(
-            'Visitor ID: Cannot create instance using mcOrgId: "' + mcOrgId + '"', 4);
+          'Visitor ID: Cannot create instance using mcOrgId: "' + mcOrgId + '"', 4);
         return null;
       }
 
       SL.notify(
-          'Visitor ID: Create instance using mcOrgId: "' + mcOrgId + '"', 1);
+        'Visitor ID: Create instance using mcOrgId: "' + mcOrgId + '"', 1);
 
       var instance = new Visitor(mcOrgId, namespace);
       this.applyInitVars(instance, initVars);
@@ -4480,13 +4480,13 @@
       }
     },
     "pageLoadRules": [
-      {"name":"Hero Banner","trigger":[{"engine":"tnt","command":"addMbox","arguments":[{"mboxGoesAround":".hero","mboxName":"tdtm-01","arguments":["localmboxparam1=localmboxvalue1"],"timeout":"1500"}]}],"event":"windowload"},
+      {"name":"Hero Banner","trigger":[{"engine":"tnt","command":"addMbox","arguments":[{"mboxGoesAround":"#hero","mboxName":"tdtm-01","arguments":["localmboxparam1=localmboxvalue1"],"timeout":"1500"}]}],"event":"pagetop"},
       {"name":"KitchenSink","trigger":[{"engine":"sc","command":"setVars","arguments":[{"eVar10":"MyEvar10","eVar11":"MyEvar11","prop10":"MyProp10","prop11":"MyProp11","pageName":"MyPageName","channel":"MyChannel","pageURL":"MyPageUrl","campaign":"MyCampaign","hier1":"HierLev1|HierLev2|HierLev3|HierLev4"}]},{"engine":"sc","command":"addEvent","arguments":["event10:MyEvent10","event11:MyEvent11","prodView:MyProdView"]},{"engine":"tnt","command":"addMbox","arguments":[{"mboxGoesAround":"","mboxName":"","arguments":[],"timeout":"1500"}]}],"event":"pagebottom"},
       {"name":"Hero Banner - (Global Mbox Parameters)","event":"aftertoolinit","trigger":[{"engine":"tnt","command":"addTargetPageParams","arguments":[{"globalmboxparam1":"globalmboxvalue1"}]}]}
     ],
     "rules": [
       {"name":"Dead Header","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
-          SL.getQueryParam('dead')
+        SL.getQueryParam('dead')
       },"customSetup":function(event,s){
         console.log('Am I a custom setup function?');
       },"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
@@ -4536,8 +4536,8 @@
         return _satellite.getBrowserWidth();
       },"storeLength":"session"}
     },
-    "appVersion": "53O",
-    "buildDate": "2015-04-03 21:21:27 UTC",
+    "appVersion": "547",
+    "buildDate": "2015-04-07 20:11:29 UTC",
     "publishDate": "2015-03-16 14:43:44 -0600"
   });
 })(window, document);

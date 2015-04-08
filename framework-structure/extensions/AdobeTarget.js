@@ -2,6 +2,15 @@
 ////// Begin mbox stub code.
 var mboxes = [];
 
+function getMboxByName(name) {
+  for (var i = 0; i < mboxes.length; i++) {
+    var mbox = mboxes[i];
+    if (mbox.name === name) {
+      return mbox;
+    }
+  }
+};
+
 var mbox = function(name, setOfferCallback) {
   this.name = name;
   this.setOfferCallback = setOfferCallback;
@@ -20,12 +29,10 @@ mbox.prototype.setEventTime = function() {};
 window.mboxFactories = {
   get: function() {
     return {
-      get: function(name) {
-        for (var i = 0; i < mboxes.length; i++) {
-          var mbox = mboxes[i];
-          if (mbox.name === name) {
-            return mbox;
-          }
+      get: getMboxByName,
+      getPCId: function() {
+        return {
+          forceId: function() {}
         }
       }
     }
@@ -72,11 +79,15 @@ _satellite.utils.extend(AdobeTargetExtension.prototype, {
     document.body.appendChild(script);
   },
   addMbox: function(actionSettings) {
+    if (getMboxByName(actionSettings.mboxName)) {
+      return;
+    }
+
     //{"mboxGoesAround":".hero","mboxName":"myhero","arguments":["localmboxparam1=localmboxvalue1"],"timeout":"1500"}]}
 
     var protocol = document.location.protocol == 'file:' ? 'http:' : document.location.protocol;
 
-    var params = {
+    var args = {
       mboxHost: document.location.hostname,
       mboxPage: this._mboxPageId,
       screenWidth: _satellite.data.clientInfo.screenWidth,
@@ -96,8 +107,13 @@ _satellite.utils.extend(AdobeTargetExtension.prototype, {
       mboxVersion: 56 // TODO remove when using framework?
     };
 
+    _satellite.utils.extend(args, actionSettings.mboxArguments);
+
+    var showPage = _satellite.utils.hidePage();
+
     var setOffer = function(mboxContent) {
       document.querySelector(actionSettings.mboxGoesAround).innerHTML = mboxContent;
+      showPage();
     };
 
     mboxes.push(new mbox(actionSettings.mboxName, setOffer));
@@ -106,9 +122,10 @@ _satellite.utils.extend(AdobeTargetExtension.prototype, {
 
     var url = protocol + '//' + this._extensionSettings.serverHost + '/m2/' +
         this._extensionSettings.clientCode + '/mbox/' + requestType + '?' +
-        _satellite.utils.encodeObjectToURI(params);
+        _satellite.utils.encodeObjectToURI(args);
 
     this._createScript(url);
+
   }
 });
 

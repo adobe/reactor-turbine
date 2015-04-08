@@ -2,7 +2,8 @@ events = require('./events/events');
 
 module.exports ={
 "events": {
-  'click': events.click
+  'click': events.click,
+  //'timeout': events.timeout
 },
 "tools": {
   "f489afdcde1a53ef58aec319401144f7": {
@@ -68,6 +69,10 @@ extensions: {
       serverHost: 'adobeinternaldtmdemo.tt.omtrdc.net',
       clientCode: 'adobeinternaldtmdemo'
     }
+  },
+  'jklmno': {
+    extensionId: 'adobeAlert',
+    settings: {}
   }
 },
 newRules: [{
@@ -164,14 +169,38 @@ newRules: [{
   }]
 },{
   name: 'Hero Mbox',
+  event: {
+    type: 'click',
+    settings: {
+      selector: '#hero'
+    }
+  },
   actions: [{
     extensionInstanceIds: ['efghi'],
     method: 'addMbox',
     settings: {
-      mboxName: 'tdtm-01',
+      mboxName: 'frameworkdemo',
       mboxGoesAround: '#hero',
-      arguments: [],
+      mboxArguments: {
+        localmboxparam1: 'localmboxvalue1'
+      },
       timeout: '1500'
+    }
+  }]
+},{
+  name: 'Click Me',
+  event: {
+    type: 'click',
+    settings: {
+      selector: '.clickme',
+      eventHandlerOnElement: true
+    }
+  },
+  actions: [{
+    extensionInstanceIds: ['jklmno'],
+    method: 'alert',
+    settings: {
+      text: 'Click Me rule fired'
     }
   }]
 }],

@@ -9,7 +9,8 @@ dynamicListener = require('./utils/private/dynamicListener');
 // configured for the property.
 _satellite.availableExtensions = {
   adobeAnalytics: require('./extensions/AdobeAnalytics'),
-  adobeTarget: require('./extensions/AdobeTarget')
+  adobeTarget: require('./extensions/AdobeTarget'),
+  adobeAlert: require('./extensions/AdobeAlert')
 };
 
 var createExtensionInstances = function(propertyMeta) {

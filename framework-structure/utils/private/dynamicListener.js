@@ -2,18 +2,13 @@ var each = require('../public/each');
 var dataOnElement = require('../public/dataOnElement');
 var querySelectorAll = require('../public/querySelectorAll');
 var addEventListener = require('../public/addEventListener');
-var poll = require('../public/poll');
+var globalPolling = require('../private/globalPolling');
 
 function cssQuery(selector, callback){
-  var hit = cssQuery.cache[selector]
-  if (hit){
-    return callback(hit)
-  }else{
-    querySelectorAll(selector, function(elms){
-      cssQuery.cache[selector] = elms
-      callback(elms)
-    })
-  }
+  //TODO: find a way to cache these lightly
+  querySelectorAll(selector, function(elms){
+    callback(elms);
+  });
 }
 cssQuery.cache = {};
 
@@ -25,21 +20,10 @@ module.exports.register = function(eventSettings,callback){
     eventSettings:eventSettings,
     callback:callback
   })
-  // each(rules, function(rule){
-  //   cssQuery(rule.selector, function(elms){
-  //     each(elms, function(elm){
-  //       if (dataOnElement(elm, 'dynamicRules.seen')) return
-  //       dataOnElement(elm, 'dynamicRules.seen', true)
-  //       if (SL.propertiesMatch(rule.property, elm)){
-  //         SL.registerEvents(elm, [rule.event])
-  //       }
-  //     })
-  //   })
-  // })
 }
 
 module.exports.init = function (){
-  poll(attachDynamicEvents,3000)
+  globalPolling.add('dynamicEvents',attachDynamicEvents);
 };
 
 function attachDynamicEvents(){

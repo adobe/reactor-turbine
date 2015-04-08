@@ -32,7 +32,7 @@ var events = {
   },
   domReady: function(eventSettingsCollection, callback){
     utils.each(eventSettingsCollection,function (eventSettings){
-      domReady(eventSettings);
+      domReady(callback.bind(this,eventSettings));
     });
   }
 };

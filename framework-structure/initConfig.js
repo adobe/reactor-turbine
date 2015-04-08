@@ -4,6 +4,7 @@ module.exports ={
 "events": {
   'click': events.click,
   //'timeout': events.timeout
+  'domReady':events.domReady
 },
 "tools": {
   "f489afdcde1a53ef58aec319401144f7": {
@@ -201,6 +202,19 @@ newRules: [{
     method: 'alert',
     settings: {
       text: 'Click Me rule fired'
+    }
+  }]
+},{
+  name: 'Dom Ready',
+  event: {
+    type: 'domReady',
+    settings: {}
+  },
+  actions: [{
+    extensionInstanceIds: ['jklmno'],
+    method: 'alert',
+    settings: {
+      text: 'Dom Ready rule fired'
     }
   }]
 }],

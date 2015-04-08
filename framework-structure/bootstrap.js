@@ -1,9 +1,11 @@
+var dynamicListener = require('./utils/private/dynamicListener');
+var globalPolling = require('./utils/private/globalPolling');
+
 window._satellite = {};
 
 _satellite.utils = require('./utils/public/index');
 _satellite.data = require('./data/public/index');
 _satellite.pageBottom = require('./pageBottom');
-dynamicListener = require('./utils/private/dynamicListener');
 
 // TODO: This will need to be more flexible to handle inclusion of only the extensions
 // configured for the property.
@@ -33,6 +35,7 @@ _satellite.init = function(propertyMeta) {
   require('./rules/initRules')(propertyMeta);
   //TODO: move polling from dynamic listener out to a global place
   //TODO: add logic to check conditions
+  globalPolling.init();
   dynamicListener.init();
 };
 

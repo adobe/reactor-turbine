@@ -39,10 +39,10 @@ module.exports.register = function(eventSettings,callback){
 }
 
 module.exports.init = function (){
-  poll(attatchDynamicEvents,3000)
+  poll(attachDynamicEvents,3000)
 };
 
-function attatchDynamicEvents(){
+function attachDynamicEvents(){
   each(eventSettingsCollection, function(event){
     cssQuery(event.eventSettings.selector, function(elms){
       each(elms, function(elm){

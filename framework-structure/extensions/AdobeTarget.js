@@ -1,5 +1,21 @@
 // TODO...very much TODO.
 ////// Begin mbox stub code.
+
+// EXAMPLE RESPONSE FROM LOADING MBOX WITH HTML OFFER
+// var mboxCurrent = mboxFactories.get('default').get('frameworkdemo',0);
+// mboxCurrent.setOffer(new mboxOfferAjax('<!-- Offer Id: 127993  -->Framework Demo Content'));
+// mboxCurrent.getOffer().setOnLoad(function() {});
+// mboxCurrent.loaded();
+
+// EXAMPLE RESPONSE FROM LOADING MBOX WITH REDIRECT OFFER
+// var mboxCurrent = mboxFactories.get('default').get('frameworkredirectdemo', 0);
+// mboxCurrent.setOffer(new mboxOfferAjax(''));
+// mboxCurrent.getOffer().setOnLoad(function() {
+//   window.location.replace('http://dtm.aaronhardy.com/redirected.html');
+// });
+// mboxCurrent.loaded();
+// mboxFactories.get('default').getPCId().forceId("1428596329084-332984.28_38");
+
 var mboxes = [];
 
 function getMboxByName(name) {
@@ -14,17 +30,23 @@ function getMboxByName(name) {
 var mbox = function(name, setOfferCallback) {
   this.name = name;
   this.setOfferCallback = setOfferCallback;
-}
+};
 mbox.prototype.setOffer = function(mboxOfferAjax) {
   this.setOfferCallback(mboxOfferAjax.content);
+  return {
+    show: function() {}
+  };
 };
 mbox.prototype.getOffer = function() {
   return {
-    setOnLoad: function() {}
+    setOnLoad: function(fn) {
+      fn(); // Normally not called until mbox.loaded() is called.
+    }
   }
 };
 mbox.prototype.loaded = function() {};
 mbox.prototype.setEventTime = function() {};
+mbox.prototype.cancelTimeout = function() {};
 
 window.mboxFactories = {
   get: function() {
@@ -37,12 +59,17 @@ window.mboxFactories = {
       }
     }
   }
-}
-////// End mbox stub code.
+};
+
+var mboxOfferDefault = function() {};
+mboxOfferDefault.prototype.show = function() {};
+window.mboxOfferDefault = mboxOfferDefault;
 
 window.mboxOfferAjax = function(content) {
   this.content = content;
 };
+////// End mbox stub code.
+
 
 var MILLIS_IN_MINUTE = 60000;
 
@@ -83,8 +110,6 @@ _satellite.utils.extend(AdobeTargetExtension.prototype, {
       return;
     }
 
-    //{"mboxGoesAround":".hero","mboxName":"myhero","arguments":["localmboxparam1=localmboxvalue1"],"timeout":"1500"}]}
-
     var protocol = document.location.protocol == 'file:' ? 'http:' : document.location.protocol;
 
     var args = {
@@ -112,7 +137,12 @@ _satellite.utils.extend(AdobeTargetExtension.prototype, {
     var showPage = _satellite.utils.hidePage();
 
     var setOffer = function(mboxContent) {
-      document.querySelector(actionSettings.mboxGoesAround).innerHTML = mboxContent;
+      if (mboxContent !== undefined) {
+        var mboxContainer = document.querySelector(actionSettings.mboxGoesAround);
+        if (mboxContainer) {
+          mboxContainer.innerHTML = mboxContent;
+        }
+      }
       showPage();
     };
 

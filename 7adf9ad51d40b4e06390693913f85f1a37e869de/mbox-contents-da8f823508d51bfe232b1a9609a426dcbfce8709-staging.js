@@ -1,16 +1,16 @@
 
+
 // compression: 1
 
 var mboxCopyright = "Copyright 1996-2014. Adobe Systems Incorporated. All rights reserved.";
 var TNT = TNT || {};
 TNT._internal = TNT._internal || {};
 TNT._internal.nestedMboxes = [];
-TNT._internal.isDomLoaded = false;
 
 TNT._internal._settings = {
   "companyName": "Test&amp;Target",
   "isProduction": true,
-  "adminUrl": "//admin3.testandtarget.omniture.com/admin",
+  "adminUrl": "http://admin3.testandtarget.omniture.com/admin",
   "clientCode": "adobeinternaldtmdemo",
   "serverHost": "adobeinternaldtmdemo.tt.omtrdc.net",
   "mboxTimeout": 15000,
@@ -39,75 +39,71 @@ TNT._internal._settings = {
   "siteCatalystPluginName": "tt",
   "includeSiteCatalystPlugin": false,
   "mboxVersion": 56,
-  "mboxIsSupportedFunction": function () {
+  "mboxIsSupportedFunction": function() {
     return true;
   },
-  "clientJavascriptFunction": function () {
+  "clientJavascriptFunction": function() {
+    
   },
-  "parametersFunction": function () {
+  "parametersFunction": function() {
     return "";
   },
-  "cookieDomainFunction": function () {
+  "cookieDomainFunction": function() {
     return mboxCookiePageDomain();
   }
 };
 
-TNT._internal._params = {
-  "page": "mboxPage",
-  "mcgvid": "mboxMCGVID",
-  "mcglh": "mboxMCGLH",
-  "aamb": "mboxAAMB",
-  "mcavid": "mboxMCAVID",
-  "mcsdid": "mboxMCSDID",
-  "count": "mboxCount",
-  "host": "mboxHost",
-  "factoryId": "mboxFactoryId",
-  "tntId": "mboxPC",
-  "screeHeight": "screenHeight",
-  "screenWidth": "screenWidth",
-  "browserWidth": "browserWidth",
-  "browserHeight": "browserHeight",
-  "browserTimeOffset": "browserTimeOffset",
-  "colorDepth": "colorDepth",
-  "crossDomain": "mboxXDomain",
-  "url": "mboxURL",
-  "referrer": "mboxReferrer",
-  "version": "mboxVersion",
-  "name": "mbox",
-  "id": "mboxId",
-  "domLoaded": "mboxDOMLoaded",
-  "time": "mboxTime",
-  "scPluginVersion": "scPluginVersion"
-};
+TNT._internal._params = {};
+TNT._internal._params._page = "mboxPage";
+TNT._internal._params._marketingCloudVisitorId = "mboxMCGVID";
+TNT._internal._params._audienceManagerLocationHint = "mboxMCGLH";
+TNT._internal._params._audienceManagerBlob = "mboxAAMB";
+TNT._internal._params._analyticsVisitorId = "mboxMCAVID";
+TNT._internal._params._supplementalDataId = "mboxMCSDID";
+TNT._internal._params._count = "mboxCount";
+TNT._internal._params._host = "mboxHost";
+TNT._internal._params._mboxFactoryId = "mboxFactoryId";
+TNT._internal._params._tntId = "mboxPC";
+TNT._internal._params._screenHeight = "screenHeight";
+TNT._internal._params._screenWidth = "screenWidth";
+TNT._internal._params._browserWidth = "browserWidth";
+TNT._internal._params._browserHeight = "browserHeight";
+TNT._internal._params._browserTimeOffset = "browserTimeOffset";
+TNT._internal._params._screenColorDepth = "colorDepth";
+TNT._internal._params._crossDomain = "mboxXDomain";
+TNT._internal._params._url = "mboxURL";
+TNT._internal._params._referrer = "mboxReferrer";
+TNT._internal._params._mboxVersion = "mboxVersion";
+TNT._internal._params._mboxName = "mbox";
+TNT._internal._params._mboxId = "mboxId";
+TNT._internal._params._domLoaded = "mboxDOMLoaded";
+TNT._internal._params._time = "mboxTime";
+TNT._internal._params._siteCatalystPluginVersion = "scPluginVersion";
 
-TNT._internal._pageParams = {
-  "disable": "mboxDisable",
-  "session": "mboxSession",
-  "environment": "mboxEnv",
-  "debug": "mboxDebug"
-};
+TNT._internal._pageParams = {};
+TNT._internal._pageParams._disable = "mboxDisable";
+TNT._internal._pageParams._sessionId = "mboxSession";
+TNT._internal._pageParams._environment = "mboxEnv";
+TNT._internal._pageParams._debug = "mboxDebug";
 
-TNT._internal._cookies = {
-  "disable": "disable",
-  "session": "session",
-  "tntId": "PC",
-  "level": "level",
-  "signalPrefix": "signal-",
-  "check": "check",
-  "debug": "debug"
-};
+TNT._internal._cookies = {};
+TNT._internal._cookies._disable = "disable";
+TNT._internal._cookies._sessionId = "session";
+TNT._internal._cookies._tntId = "PC";
+TNT._internal._cookies._trafficLevel = "level";
+TNT._internal._cookies._check = "check";
+TNT._internal._cookies._debug = "debug";
+TNT._internal._cookies._experienceManagerDisabled = "em-disabled";
 
-TNT._internal._constants = {
-  "defaultFactoryId": "default",
-  "cookiePrefix": "mbox",
-  "divImportPrefix": "mboxImported-",
-  "millisInMinute": 60000,
-  "divDefaultClass": "mboxDefault",
-  "divMarkerPrefix": "mboxMarker-",
-  "nameLength": 250,
-  "scPluginVersion": 1,
-  "version": 54
-};
+TNT._internal._constants = {};
+TNT._internal._constants._defaultFactoryId = "default";
+TNT._internal._constants._cookieNamePrefix = "mbox";
+TNT._internal._constants._divImportPrefix = "mboxImported-";
+TNT._internal._constants._millisInMinute = 60000;
+TNT._internal._constants._divDefaultClass = "mboxDefault";
+TNT._internal._constants._divMarkerPrefix = "mboxMarker-";
+TNT._internal._constants._mboxNameMaxLength = 250;
+TNT._internal._constants._siteCatalystPluginVersion = 1;
 
 TNT.getGlobalMboxName = function () {
   return TNT._internal._settings.globalMboxName;
@@ -125,105 +121,135 @@ TNT.getClientMboxExtraParameters = function () {
   return TNT._internal._settings.parametersFunction();
 };
 
-TNT.getMboxSettings = function () {
-  return TNT._internal._settings;
+TNT._internal._helper = {};
+
+TNT._internal._helper._isUndefined = function(_value) {
+  var _str = {}.toString;
+
+  return _str.call(_value) === '[object Undefined]';
 };
 
-TNT.setMboxSettings = function (_settings) {
-  TNT._internal._settings = _settings;
+TNT._internal._helper._isNull = function(_value) {
+  var _str = {}.toString;
+
+  return _str.call(_value) === '[object Null]';
 };
 
-TNT._internal._getGlobalMboxParameters = function () {
-  var _getClass = {}.toString;
-  var _possibleFunction = window.targetPageParams;
-  var _functionResult = null;
+TNT._internal._helper._isEmpty = function(_value) {
+  var _helper = TNT._internal._helper;
 
-  if (typeof(_possibleFunction) === 'undefined' || _getClass.call(_possibleFunction) !== '[object Function]') {
+  if (_helper._isUndefined(_value) || _helper._isNull(_value)) {
+    return true;
+  }
+
+  return _value.length === 0;
+};
+
+TNT._internal._helper._isFunction = function(_value) {
+  var _str = {}.toString;
+
+  return _str.call(_value) === '[object Function]';
+};
+
+TNT._internal._helper._isArray = function(_value) {
+  var _str = {}.toString;
+
+  return _str.call(_value) === '[object Array]';
+};
+
+TNT._internal._helper._isString = function(_value) {
+  var _str = {}.toString;
+
+  return _str.call(_value) === '[object String]';
+};
+
+TNT._internal._helper._isObject = function(_value) {
+  var _str = {}.toString;
+
+  return _str.call(_value) === '[object Object]';
+};
+
+TNT.getTargetPageParameters = function () {
+  var _helper = TNT._internal._helper;
+  var _targetPageParams = window.targetPageParams;
+
+  if (!_helper._isFunction(_targetPageParams)) {
     return [];
   }
+
+  var _result = null;
 
   try {
-    _functionResult = _possibleFunction();
-  } catch (_ignore) { }
+    _result = _targetPageParams();
+  } catch (_ignore) {}
 
-  if (_functionResult === null) {
+  if (_helper._isNull(_result)) {
     return [];
   }
 
-  if (_getClass.call(_functionResult) === '[object Array]') {
-    return _functionResult;
+  if (_helper._isArray(_result)) {
+    return _result;
   }
 
-  if (_getClass.call(_functionResult) === '[object String]' && _functionResult.length > 0) {
-    var _params = _functionResult.trim().split("&");
-    for (var _index = 0; _index < _params.length; _index++) {
-      if (_params[_index].indexOf('=') <= 0) {
-        _params.splice(_index, 1);
-        continue;
-      }
-      _params[_index] = decodeURIComponent(_params[_index]);
-    }
-    return _params;
+  if (_helper._isString(_result) && !_helper._isEmpty(_result)) {
+    return TNT._internal._extractParamsFromQueryString(_result);
   }
 
-  if (_getClass.call(_functionResult) === '[object Object]') {
-    return TNT._internal._extractParamsFromObject([], _functionResult);
+  if (_helper._isObject(_result)) {
+    return TNT._internal._extractParamsFromObject(_result, []);
   }
 
   return [];
 };
 
-TNT._internal._extractParamsFromObject = function (_nestedParams, _objectWithParams) {
+TNT._internal._extractParamsFromQueryString = function(_queryString) {
   var _result = [];
-  var _paramNamePrefix = _nestedParams.join('.');
-  var _paramValue;
+  var _regex = /([^&=]+)=([^&]*)/g;
+  var _decode = decodeURIComponent;
+  var _match = _regex.exec(_queryString);
 
-  for (var _paramName in _objectWithParams) {
-    if (!_objectWithParams.hasOwnProperty(_paramName)) {
-      continue;
-    }
-
-    _paramValue = _objectWithParams[_paramName];
-
-    if (typeof _paramValue === "object") {
-      _nestedParams.push(_paramName);
-      var _nestedResult = TNT._internal._extractParamsFromObject(_nestedParams, _paramValue);
-      _nestedParams.pop();
-
-      for (var _index = 0; _index < _nestedResult.length; _index++) {
-        _result.push(_nestedResult[_index]);
-      }
-      continue;
-    }
-
-    _result.push((_paramNamePrefix.length > 0 ? _paramNamePrefix + '.' : '') + _paramName + '=' + _paramValue);
+  while (_match) {
+    _result.push([_decode(_match[1]), _decode(_match[2])].join('='));
+    _match = _regex.exec(_queryString);
   }
 
   return _result;
 };
 
-TNT._internal._globalMboxFetcher = function() { };
+TNT._internal._extractParamsFromObject = function (_obj, _keys) {
+  var _helper = TNT._internal._helper;
+  var _result = [];
 
-TNT._internal._globalMboxFetcher.prototype.getType = function() {
-  return 'ajax';
+  for (var _key in _obj) {
+    if (!_obj.hasOwnProperty(_key)) {
+      continue;
+    }
+
+    var _value = _obj[_key];
+
+    if (_helper._isObject(_value)) {
+      _keys.push(_key);
+      _result = _result.concat(TNT._internal._extractParamsFromObject(_value, _keys));
+      _keys.pop();
+    } else {
+      if (_keys.length > 0) {
+        _result.push([_keys.concat(_key).join('.'), _value].join('='));
+      } else {
+        _result.push([_key, _value].join('='));
+      }
+    }
+  }
+
+  return _result;
 };
-
-TNT._internal._globalMboxFetcher.prototype.fetch = function(_urlBuilder) {
-  _urlBuilder.setServerType(this.getType());
-  document.write('<' + 'scr' + 'ipt src="' + _urlBuilder.buildUrl() +'" language="JavaScript"><' + '\/scr' + 'ipt>');
-};
-
-TNT._internal._globalMboxFetcher.prototype.cancel = function() { };
-
-
 
 /**
  * Builds the url of a request given the mbox server host, client code
  * and server type.
  * @PrivateClass
  *
- * @param _mboxServer host of the mbox server e.g.
- *   mbox-test.dev.tt.omtrdc.net
+ * @param _mboxServer host of the mbox server e.g.mbox-test.dev.tt.omtrdc.net
+ * @param _clientCode client code
  */
 mboxUrlBuilder = function(_mboxServer, _clientCode) {
   this._mboxServer = _mboxServer;
@@ -297,7 +323,7 @@ mboxUrlBuilder.prototype.addParameters = function(_parameters) {
       continue;
     }
     this.addParameter(_parameters[_i].substring(0, _splitIndex),
-        _parameters[_i].substring(_splitIndex + 1, _parameters[_i].length));
+      _parameters[_i].substring(_splitIndex + 1, _parameters[_i].length));
   }
   return this;
 };
@@ -319,26 +345,22 @@ mboxUrlBuilder.prototype.setUrlProcessAction = function(_action) {
 };
 
 mboxUrlBuilder.prototype.buildUrl = function() {
-  var _path = this._basePath ? this._basePath :
-  '/m2/' + this._clientCode + '/mbox/' + this._serverType;
-
-  var _protocol = document.location.protocol == 'file:' ? 'http:' :
-      document.location.protocol;
-
+  var _path = this._basePath ? this._basePath : '/m2/' + this._clientCode + '/mbox/' + this._serverType;
+  var _protocol = document.location.protocol == 'file:' ? 'http:' : document.location.protocol;
   var _url = _protocol + "//" + this._mboxServer + _path;
-
   var _separator = _url.indexOf('?') != -1 ? '&' : '?';
+
   for (var _i = 0; _i < this._parameters.length; _i++) {
     var _parameter = this._parameters[_i];
-    _url += _separator + encodeURIComponent(_parameter.name) + '=' +
-    encodeURIComponent(_parameter.value);
+    _url += _separator + encodeURIComponent(_parameter.name) + '=' + encodeURIComponent(_parameter.value);
     _separator = '&';
   }
+
   return this._escapeQuote(this._urlProcess(_url));
 };
 
 /**
- * @return An array of objects with two properties "name" and "value"
+ * @return Array an array of objects with two properties "name" and "value"
  */
 mboxUrlBuilder.prototype.getParameters = function() {
   return this._parameters;
@@ -350,13 +372,15 @@ mboxUrlBuilder.prototype.setParameters = function(_parameters) {
 
 mboxUrlBuilder.prototype.clone = function() {
   var _newUrlBuilder = new mboxUrlBuilder(this._mboxServer, this._clientCode);
+
   _newUrlBuilder.setServerType(this._serverType);
   _newUrlBuilder.setBasePath(this._basePath);
   _newUrlBuilder.setUrlProcessAction(this._urlProcess);
+
   for (var _i = 0; _i < this._parameters.length; _i++) {
-    _newUrlBuilder.addParameter(this._parameters[_i].name,
-        this._parameters[_i].value);
+    _newUrlBuilder.addParameter(this._parameters[_i].name, this._parameters[_i].value);
   }
+
   return _newUrlBuilder;
 };
 
@@ -365,14 +389,15 @@ mboxUrlBuilder.prototype._escapeQuote = function(_text) {
 };
 
 /**
- * Checks a parameter's name for prohibited chars
- */
-mboxUrlBuilder.prototype.checkInvalidCharacters = function (_name) {
-  var _invalidCharacters = new RegExp('(\'|")');
-  if (_invalidCharacters.exec(_name)) {
-    throw "Parameter '" + _name + "' contains invalid characters";
-  }
-};
+  * Checks a parameter's name for prohibited chars
+  */
+ mboxUrlBuilder.prototype.checkInvalidCharacters = function (_name) {
+   var _invalidCharacters = new RegExp('(\'|")');
+
+   if (_invalidCharacters.exec(_name)) {
+     throw "Parameter '" + _name + "' contains invalid characters";
+   }
+ };
 
 /**
  * Fetches the content given the url builder by including the script using
@@ -388,8 +413,7 @@ mboxStandardFetcher.prototype.getType = function() {
 mboxStandardFetcher.prototype.fetch = function(_urlBuilder) {
   _urlBuilder.setServerType(this.getType());
 
-  document.write('<' + 'scr' + 'ipt src="' + _urlBuilder.buildUrl() +
-  '" language="JavaScript"><' + '\/scr' + 'ipt>');
+  document.write('<' + 'scr' + 'ipt src="' + _urlBuilder.buildUrl() + '"><' + '\/scr' + 'ipt>');
 };
 
 mboxStandardFetcher.prototype.cancel = function() { };
@@ -431,6 +455,7 @@ mboxMap.prototype.put = function(_key, _value) {
   if (!this._backingMap[_key]) {
     this._keys[this._keys.length] = _key;
   }
+
   this._backingMap[_key] = _value;
 };
 
@@ -447,6 +472,7 @@ mboxMap.prototype.remove = function(_key) {
       _updatedKeys.push(this._keys[i]);
     }
   }
+
   this._keys = _updatedKeys;
 };
 
@@ -454,8 +480,10 @@ mboxMap.prototype.each = function(_action) {
   for (var _i = 0; _i < this._keys.length; _i++ ) {
     var _key = this._keys[_i];
     var _value = this._backingMap[_key];
+
     if (_value) {
       var _result = _action(_key, _value);
+
       if (_result === false) {
         break;
       }
@@ -470,14 +498,18 @@ mboxMap.prototype.isEmpty = function() {
 /**
  * Creates and updates mboxes.
  *
- * @param _mboxServer host of the mbox server e.g.
- *   mbox-test.dev.tt.omtrdc.net
+ * @param _server host of the mbox server e.g.mbox-test.dev.tt.omtrdc.net
  * @param _clientCode - client's code e.g. 'demo'
  * @param _factoryId - a unique string identifying this factory
+ * @param _version - mboxVersion
  */
-mboxFactory = function(_server, _clientCode, _factoryId) {
+mboxFactory = function(_server, _clientCode, _factoryId, _version) {
+  var _settings = TNT._internal._settings;
+  var _cookies = TNT._internal._cookies;
+  var _pageParams = TNT._internal._pageParams;
+  var _constants = TNT._internal._constants;
+
   this._pageLoaded = false;
-  this._server = _server;
   this._factoryId = _factoryId;
   this._mboxes = new mboxList();
 
@@ -485,26 +517,20 @@ mboxFactory = function(_server, _clientCode, _factoryId) {
 
   // mboxIsSupported is a client defined function to test if mbox is supported
   // on this platform (defaults to just returning true)
-  this._supported =
-      typeof document.createElement('div').replaceChild != 'undefined' &&
-      TNT._internal._settings.mboxIsSupportedFunction() &&
-      typeof document.getElementById != 'undefined' &&
-      typeof (window.attachEvent || document.addEventListener || window.addEventListener) != 'undefined' &&
-      typeof encodeURIComponent  != 'undefined';
+  this._supported = _settings.mboxIsSupportedFunction() &&
+     typeof (window.attachEvent || document.addEventListener || window.addEventListener) != 'undefined';
 
-  this._enabled = this._supported && mboxGetPageParameter(TNT._internal._pageParams.disable) === null;
+  this._enabled = this._supported && mboxGetPageParameter(_pageParams._disable) === null;
 
-  var _isDefaultFactory = _factoryId == TNT._internal._constants.defaultFactoryId;
-  this._cookieManager = new mboxCookieManager(
-      TNT._internal._constants.cookiePrefix + (_isDefaultFactory ? '' : ('-' + _factoryId)),
-      TNT._internal._settings.cookieDomainFunction());
+  var _isDefaultFactory = _factoryId == _constants._defaultFactoryId;
+  var _cookieName = _constants._cookieNamePrefix + (_isDefaultFactory ? '' : ('-' + _factoryId));
+  this._cookieManager = new mboxCookieManager(_cookieName, _settings.cookieDomainFunction());
 
-  if (TNT._internal._settings.crossDomainXOnly) {
-    this._enabled = this._enabled && this._cookieManager.isEnabled() &&
-    (this._cookieManager.getCookie(TNT._internal._cookies.disable) === null);
-  } else {
-    this._enabled = this._enabled && (this._cookieManager.getCookie(TNT._internal._cookies.disable) === null);
+  if (_settings.crossDomainXOnly) {
+    this._enabled = this._enabled && this._cookieManager.isEnabled();
   }
+
+  this._enabled = this._enabled && (this._cookieManager.getCookie(_cookies._disable) === null);
 
   if (this.isAdmin()) {
     this.enable();
@@ -518,19 +544,13 @@ mboxFactory = function(_server, _clientCode, _factoryId) {
   this._mboxBrowserHeight = mboxBrowserHeight();
   this._mboxColorDepth = mboxScreenColorDepth();
   this._mboxBrowserTimeOffset = mboxBrowserTimeOffset();
-  this._mboxSessionId = new mboxSession(
-      this._mboxPageId,
-      TNT._internal._pageParams.session,
-      TNT._internal._cookies.session,
-      31 * 60, this._cookieManager);
+  this._mboxSessionId = new mboxSession(this._mboxPageId, _pageParams._sessionId, _cookies._sessionId,
+   _settings.sessionExpirationTimeout, this._cookieManager);
 
-  this._mboxPCId = new mboxPC(
-      TNT._internal._cookies.tntId,
-      TNT._internal._settings.tntIdLifetime,
-      this._cookieManager);
-
+  this._mboxPCId = new mboxPC(_cookies._tntId, _settings.tntIdLifetime, this._cookieManager);
   this._urlBuilder = new mboxUrlBuilder(_server, _clientCode);
-  this._initGlobalParameters(this._urlBuilder, _isDefaultFactory);
+
+  this._initGlobalParameters(this._urlBuilder, _isDefaultFactory, _version);
 
   this._pageStartTime = new Date().getTime();
   this._pageEndTime = this._pageStartTime;
@@ -548,27 +568,24 @@ mboxFactory = function(_server, _clientCode, _factoryId) {
         _mbox.setFetcher(new mboxAjaxFetcher());
         _mbox.finalize(); });
       TNT._internal.nestedMboxes = [];
-      TNT._internal.isDomLoaded = true;
     });
 
     if (this._enabled) {
-      this.limitTraffic(TNT._internal._settings.trafficLevelPercentage, TNT._internal._settings.trafficDuration);
+      this.limitTraffic(_settings.trafficLevelPercentage, _settings.trafficDuration);
 
       this._makeDefaultContentInvisible();
 
-      this._mboxSignaler = new mboxSignaler(function(_mboxName, _parameters) {
-        return _self.create(_mboxName, _parameters);
-      }, this._cookieManager);
+      this._mboxSignaler = new mboxSignaler(this);
     }
     else {
-      if (!TNT._internal._settings.isProduction) {
+      if (!_settings.isProduction) {
         if (this.isAdmin()) {
           if (!this.isEnabled()) {
             alert("mbox disabled, probably due to timeout\n" +
             "Reset your cookies to re-enable\n(this message will only appear in administrative mode)");
           } else {
             alert("It looks like your browser will not allow " +
-            TNT._internal._settings.companyName +
+            _settings.companyName +
             " to set its administrative cookie. To allow setting the" +
             " cookie please lower the privacy settings of your browser.\n" +
             "(this message will only appear in administrative mode)");
@@ -623,7 +640,7 @@ mboxFactory.prototype.isEnabled = function() {
  * @return cause of mbox disabling
  */
 mboxFactory.prototype.getDisableReason = function() {
-  return this._cookieManager.getCookie(TNT._internal._cookies.disable);
+  return this._cookieManager.getCookie(TNT._internal._cookies._disable);
 };
 
 /**
@@ -652,17 +669,17 @@ mboxFactory.prototype.disable = function(_duration, _cause) {
 
   if (!this.isAdmin()) {
     this._enabled = false;
-    this._cookieManager.setCookie(TNT._internal._cookies.disable, _cause, _duration);
+    this._cookieManager.setCookie(TNT._internal._cookies._disable, _cause, _duration);
   }
 };
 
 mboxFactory.prototype.enable = function() {
   this._enabled = true;
-  this._cookieManager.deleteCookie(TNT._internal._cookies.disable);
+  this._cookieManager.deleteCookie(TNT._internal._cookies._disable);
 };
 
 mboxFactory.prototype.isAdmin = function() {
-  return document.location.href.indexOf(TNT._internal._pageParams.environment) != -1;
+  return document.location.href.indexOf(TNT._internal._pageParams._environment) != -1;
 };
 
 /**
@@ -677,11 +694,11 @@ mboxFactory.prototype.limitTraffic = function(_level, _duration) {
 
     var _enable = true;
 
-    if (parseInt(this._cookieManager.getCookie(TNT._internal._cookies.level)) != _level) {
+    if (parseInt(this._cookieManager.getCookie(TNT._internal._cookies._trafficLevel)) != _level) {
       _enable = (Math.random() * 100) <= _level;
     }
 
-    this._cookieManager.setCookie(TNT._internal._cookies.level, _level, _duration);
+    this._cookieManager.setCookie(TNT._internal._cookies._trafficLevel, _level, _duration);
 
     if (!_enable) {
       this.disable(60 * 60, 'limited by traffic');
@@ -769,14 +786,14 @@ mboxFactory.prototype.update = function(_mboxName, _parameters) {
 
   this._mboxes.get(_mboxName).each(function(_mbox) {
     var _urlBuilder = _mbox.getUrlBuilder();
-    var _tntId = _self.getPCId().getId();
 
-    if (_tntId) {
-      _urlBuilder.addParameter(TNT._internal._params.tntId, _tntId);
-    }
+    _urlBuilder.addParameter(TNT._internal._params._page, mboxGenerateId());
 
-    _urlBuilder.addParameter(TNT._internal._params.page, mboxGenerateId());
+    _self._addTntIdIfExists(_urlBuilder);
+    _self._addTargetPageParamsIfRequired(_urlBuilder, _mboxName);
+
     _self.setVisitorIdParameters(_urlBuilder, _mboxName);
+
     _mbox.load(_parameters);
   });
 };
@@ -811,11 +828,11 @@ mboxFactory.prototype.setVisitorIdParameters =  function(_url, _mboxName) {
       }
     };
 
-    addVisitorValueToUrl(TNT._internal._params.mcgvid, "getMarketingCloudVisitorID");
-    addVisitorValueToUrl(TNT._internal._params.mcglh, "getAudienceManagerLocationHint");
-    addVisitorValueToUrl(TNT._internal._params.aamb, "getAudienceManagerBlob");
-    addVisitorValueToUrl(TNT._internal._params.mcavid, "getAnalyticsVisitorID");
-    addVisitorValueToUrl(TNT._internal._params.mcsdid, "getSupplementalDataID", _mboxName);
+    addVisitorValueToUrl(TNT._internal._params._marketingCloudVisitorId, "getMarketingCloudVisitorID");
+    addVisitorValueToUrl(TNT._internal._params._audienceManagerLocationHint, "getAudienceManagerLocationHint");
+    addVisitorValueToUrl(TNT._internal._params._audienceManagerBlob, "getAudienceManagerBlob");
+    addVisitorValueToUrl(TNT._internal._params._analyticsVisitorId, "getAnalyticsVisitorID");
+    addVisitorValueToUrl(TNT._internal._params._supplementalDataId, "getSupplementalDataID", _mboxName);
   }
 };
 
@@ -834,21 +851,24 @@ mboxFactory.prototype.setVisitorIdParameters =  function(_url, _mboxName) {
  *                       mboxDefault class to use as default content
  */
 mboxFactory.prototype.create = function(_mboxName, _parameters, _defaultNode) {
-
   if (!this.isSupported()) {
     return null;
   }
 
-  var _url = this._urlBuilder.clone();
-  _url.addParameter(TNT._internal._params.count, this._mboxes.length() + 1);
-  _url.addParameters(_parameters);
+  var _now = new Date();
+  var _time = _now.getTime() - (_now.getTimezoneOffset() * TNT._internal._constants._millisInMinute);
+  var _urlBuilder = this._urlBuilder.clone();
 
-  this.setVisitorIdParameters(_url, _mboxName);
+  _urlBuilder.addParameter(TNT._internal._params._count, this._mboxes.length() + 1);
+  _urlBuilder.addParameter(TNT._internal._params._time, _time);
+  _urlBuilder.addParameters(_parameters);
 
-  var _mboxId = this._mboxes.get(_mboxName).length();
-  var _divSuffix = this._factoryId + '-' + _mboxName + '-' + _mboxId;
-  var _locator;
-  var _mbox;
+  this._addTntIdIfExists(_urlBuilder);
+  this._addTargetPageParamsIfRequired(_urlBuilder, _mboxName);
+
+  this.setVisitorIdParameters(_urlBuilder, _mboxName);
+
+  var _mboxId, _locator, _mbox;
 
   if (_defaultNode) {
     _locator = new mboxLocatorNode(_defaultNode);
@@ -856,46 +876,53 @@ mboxFactory.prototype.create = function(_mboxName, _parameters, _defaultNode) {
     if (this._pageLoaded) {
       throw 'The page has already been loaded, can\'t write marker';
     }
-    _locator = new mboxLocatorDefault(_divSuffix);
+
+    _locator = new mboxLocatorDefault(this._getMboxMarkerDivId(_mboxName));
   }
 
   try {
-    var _self = this;
-    var _importName = TNT._internal._constants.divImportPrefix + _divSuffix;
-    _mbox = new mbox(_mboxName, _mboxId, _url, _locator, _importName);
+    _mboxId = this._mboxes.get(_mboxName).length();
+    _mbox = new mbox(_mboxName, _mboxId, _urlBuilder, _locator, this._getMboxImportDivId(_mboxName), this);
 
     if (this._enabled) {
-      _mbox.setFetcher(
-          this._pageLoaded ? new mboxAjaxFetcher() : new mboxStandardFetcher());
+      _mbox.setFetcher(this._pageLoaded ? new mboxAjaxFetcher() : new mboxStandardFetcher());
     }
+
+    var _self = this;
 
     _mbox.setOnError(function(_message, _type) {
       _mbox.setMessage(_message);
       _mbox.activate();
+
       if (!_mbox.isActivated()) {
-        _self.disable(60 * 60, _message);
+        _self.disable(TNT._internal._settings.mboxFactoryDisabledTimeout, _message);
         window.location.reload(false);
       }
-
-
     });
+
     this._mboxes.add(_mbox);
   } catch (_e) {
     this.disable();
     throw 'Failed creating mbox "' + _mboxName + '", the error was: ' + _e;
   }
 
-  var _now = new Date();
-  var _time = _now.getTime() - (_now.getTimezoneOffset() * TNT._internal._constants.millisInMinute);
-  var _tntId = _self.getPCId().getId();
+  return _mbox;
+};
+
+mboxFactory.prototype._addTntIdIfExists = function(_urlBuilder) {
+  var _tntId = this._mboxPCId.getId();
 
   if (_tntId) {
-    _url.addParameter(TNT._internal._params.tntId, _tntId);
+    _urlBuilder.addParameter(TNT._internal._params._tntId, _tntId);
   }
+};
 
-  _url.addParameter(TNT._internal._params.time, _time);
+mboxFactory.prototype._addTargetPageParamsIfRequired = function(_urlBuilder, _mboxName) {
+  var _shouldAddParams = !TNT.isAutoCreateGlobalMbox() && TNT.getGlobalMboxName() === _mboxName;
 
-  return _mbox;
+  if (_shouldAddParams) {
+    _urlBuilder.addParameters(TNT.getTargetPageParameters());
+  }
 };
 
 mboxFactory.prototype.getCookieManager = function() {
@@ -922,66 +949,73 @@ mboxFactory.prototype.getUrlBuilder = function() {
   return this._urlBuilder;
 };
 
-mboxFactory.prototype._initGlobalParameters = function(_url, _isDefaultFactory) {
-  _url.addParameter(TNT._internal._params.host, document.location.hostname)
-      .addParameter(TNT._internal._pageParams.session, this._mboxSessionId.getId());
-  if (!_isDefaultFactory) {
-    _url.addParameter(TNT._internal._params.factoryId, this._factoryId);
-  }
-  if (this._mboxPCId.getId()) {
-    _url.addParameter(TNT._internal._params.tntId, this._mboxPCId.getId());
-  }
-  _url.addParameter(TNT._internal._params.page, this._mboxPageId);
-  _url.addParameter(TNT._internal._params.screeHeight, this._mboxScreenHeight);
-  _url.addParameter(TNT._internal._params.screenWidth, this._mboxScreenWidth);
-  _url.addParameter(TNT._internal._params.browserWidth, this._mboxBrowserWidth);
-  _url.addParameter(TNT._internal._params.browserHeight, this._mboxBrowserHeight);
-  _url.addParameter(TNT._internal._params.browserTimeOffset, this._mboxBrowserTimeOffset);
-  _url.addParameter(TNT._internal._params.colorDepth, this._mboxColorDepth);
+mboxFactory.prototype._getMboxDivSuffix = function(_mboxName) {
+  return this._factoryId + '-' + _mboxName + '-' + this._mboxes.get(_mboxName).length();
+};
 
+mboxFactory.prototype._getMboxMarkerDivId = function(_mboxName) {
+  return TNT._internal._constants._divMarkerPrefix + this._getMboxDivSuffix(_mboxName);
+};
+
+mboxFactory.prototype._getMboxImportDivId = function(_mboxName) {
+   return TNT._internal._constants._divImportPrefix + this._getMboxDivSuffix(_mboxName);
+};
+
+mboxFactory.prototype._initGlobalParameters = function(_urlBuilder, _isDefaultFactory, _version) {
+  _urlBuilder.addParameter(TNT._internal._params._host, document.location.hostname);
+  _urlBuilder.addParameter(TNT._internal._params._page, this._mboxPageId);
+  _urlBuilder.addParameter(TNT._internal._params._screenHeight, this._mboxScreenHeight);
+  _urlBuilder.addParameter(TNT._internal._params._screenWidth, this._mboxScreenWidth);
+  _urlBuilder.addParameter(TNT._internal._params._browserWidth, this._mboxBrowserWidth);
+  _urlBuilder.addParameter(TNT._internal._params._browserHeight, this._mboxBrowserHeight);
+  _urlBuilder.addParameter(TNT._internal._params._browserTimeOffset, this._mboxBrowserTimeOffset);
+  _urlBuilder.addParameter(TNT._internal._params._screenColorDepth, this._mboxColorDepth);
+  _urlBuilder.addParameter(TNT._internal._pageParams._sessionId, this._mboxSessionId.getId());
+
+  if (!_isDefaultFactory) {
+    _urlBuilder.addParameter(TNT._internal._params._mboxFactoryId, this._factoryId);
+  }
+
+  this._addTntIdIfExists(_urlBuilder);
 
   if (TNT._internal._settings.crossDomainEnabled) {
-    _url.addParameter(TNT._internal._params.crossDomain, TNT._internal._settings.crossDomain);
+    _urlBuilder.addParameter(TNT._internal._params._crossDomain, TNT._internal._settings.crossDomain);
   }
 
-  var params = TNT._internal._settings.parametersFunction();
+  var _params = TNT.getClientMboxExtraParameters();
 
-  if (params) {
-    _url.addParameters(this._mboxParametersClient().split('&'));
+  if (_params) {
+    _urlBuilder.addParameters(_params.split('&'));
   }
 
-  _url.setUrlProcessAction(function(_url) {
+  _urlBuilder.setUrlProcessAction(function(_url) {
     if (TNT._internal._settings.passPageParameters) {
       _url += '&';
-      _url += TNT._internal._params.url;
+      _url += TNT._internal._params._url;
       _url += '=' + encodeURIComponent(document.location);
 
       var _referrer = encodeURIComponent(document.referrer);
 
       if (_url.length + _referrer.length < 2000) {
         _url += '&';
-        _url += TNT._internal._params.referrer;
+        _url += TNT._internal._params._referrer;
         _url += '=' + _referrer;
       }
     }
 
     _url += '&';
-    _url += TNT._internal._params.version;
-    _url += '=' + mboxVersion;
+    _url += TNT._internal._params._mboxVersion;
+    _url += '=' + _version;
 
     return _url;
   });
-};
-
-mboxFactory.prototype._mboxParametersClient = function() {
-  return TNT._internal._settings.parametersFunction();
 };
 
 /**
  * Causes all mbox default content to not be displayed:
  */
 mboxFactory.prototype._makeDefaultContentInvisible = function() {
-  document.write('<style>.' + TNT._internal._constants.divDefaultClass + ' { visibility:hidden; }</style>');
+  document.write('<style>.' + TNT._internal._constants._divDefaultClass + ' { visibility:hidden; }</style>');
 };
 
 mboxFactory.prototype.isDomLoaded = function() {
@@ -1031,7 +1065,7 @@ mboxFactory.prototype._listenForDomReady = function() {
       } else {
         var _checkScrollable = function() {
           try {
-            document.documentElement.doScroll('left');
+           document.documentElement.doScroll('left');
             _ready();
           } catch (_domNotReady) {
             setTimeout(_checkScrollable, 13);
@@ -1056,25 +1090,42 @@ mboxFactory.prototype._listenForDomReady = function() {
  *   second is an array of parameters.
  * @PrivateClass
  */
-mboxSignaler = function(_createMboxMethod, _cookieManager) {
-  this._cookieManager = _cookieManager;
-  var _signalCookieNames =
-      _cookieManager.getCookieNames(TNT._internal._cookies.signalPrefix);
-  for (var _i = 0; _i < _signalCookieNames.length; _i++) {
-    var _cookieName = _signalCookieNames[_i];
-    var _args = _cookieManager.getCookie(_cookieName).split('&');
-    var _mbox = _createMboxMethod(_args[0], _args);
-    _mbox.load();
-    _cookieManager.deleteCookie(_cookieName);
-  }
+mboxSignaler = function(_factory) {
+  this._doc = document;
+  this._factory = _factory;
 };
 
 /**
  * Called from the imported div tag to signal that an mbox was clicked on.
  */
 mboxSignaler.prototype.signal = function(_signalType, _mboxName /*,...*/) {
-  this._cookieManager.setCookie(TNT._internal._cookies.signalPrefix +_signalType,
-      mboxShiftArray(arguments).join('&'), 45 * 60);
+  if (!this._factory.isEnabled()) {
+    return;
+  }
+
+  var _divNode = this._createDivNode(this._factory._getMboxMarkerDivId(_mboxName));
+
+  this._addNodeToDom(this._doc.body, _divNode);
+
+  var _mbox = this._factory.create(_mboxName, mboxShiftArray(arguments), _divNode);
+  var _urlBuilder = _mbox.getUrlBuilder();
+
+  _urlBuilder.addParameter(TNT._internal._params._page, mboxGenerateId());
+
+  _mbox.load();
+};
+
+mboxSignaler.prototype._createDivNode = function(_id) {
+  var _result = this._doc.createElement('DIV');
+  _result.id = _id;
+  _result.style.visibility = 'hidden';
+  _result.style.display = 'none';
+
+  return _result;
+};
+
+mboxSignaler.prototype._addNodeToDom = function(_dom, _node) {
+  _dom.appendChild(_node);
 };
 
 /**
@@ -1087,9 +1138,13 @@ mboxList = function() {
 };
 
 mboxList.prototype.add = function(_mbox) {
-  if (_mbox) {
-    this._mboxes[this._mboxes.length] = _mbox;
+  var _helper = TNT._internal._helper;
+
+  if (_helper._isUndefined(_mbox) || _helper._isNull(_mbox)) {
+    return;
   }
+
+  this._mboxes[this._mboxes.length] = _mbox;
 };
 
 /**
@@ -1097,12 +1152,15 @@ mboxList.prototype.add = function(_mbox) {
  */
 mboxList.prototype.get = function(_mboxName) {
   var _result = new mboxList();
+
   for (var _i = 0; _i < this._mboxes.length; _i++) {
     var _mbox = this._mboxes[_i];
+
     if (_mbox.getName() == _mboxName) {
       _result.add(_mbox);
     }
   }
+
   return _result;
 };
 
@@ -1121,6 +1179,7 @@ mboxList.prototype.each = function(_action) {
   if (typeof _action !== 'function') {
     throw 'Action must be a function, was: ' + typeof(_action);
   }
+
   for (var _i = 0; _i < this._mboxes.length; _i++) {
     _action(this._mboxes[_i]);
   }
@@ -1130,17 +1189,18 @@ mboxList.prototype.each = function(_action) {
 // Note this constructor also writes a node to the DOM, do not create
 // after the page is loaded
 //
-mboxLocatorDefault = function(_name) {
-  this._name = TNT._internal._constants.divMarkerPrefix + _name;
+mboxLocatorDefault = function(_divId) {
+  this._divId = _divId;
 
-  document.write('<div id="' + this._name + '" style="visibility:hidden;display:none">&nbsp;</div>');
+  document.write('<div id="' + this._divId + '" style="visibility:hidden;display:none">&nbsp;<\/div>');
 };
 
 mboxLocatorDefault.prototype.locate = function() {
-  var _node = document.getElementById(this._name);
+  var _ELEMENT_NODE = 1;
+  var _node = document.getElementById(this._divId);
+
   while (_node) {
-    // check is DOM_ELEMENT_NODE before testing class name
-    if (_node.nodeType == 1) {
+    if (_node.nodeType == _ELEMENT_NODE) {
       if (_node.className == 'mboxDefault') {
         return _node;
       }
@@ -1156,7 +1216,8 @@ mboxLocatorDefault.prototype.force = function() {
   var _div = document.createElement('div');
   _div.className = 'mboxDefault';
 
-  var _marker = document.getElementById(this._name);
+  var _marker = document.getElementById(this._divId);
+
   if (_marker) {
     _marker.parentNode.insertBefore(_div, _marker);
   }
@@ -1164,13 +1225,12 @@ mboxLocatorDefault.prototype.force = function() {
   return _div;
 };
 
-mboxLocatorNode = function(_DOMNode) {
-  this._node = _DOMNode;
+mboxLocatorNode = function(_node) {
+  this._node = _node;
 };
 
 mboxLocatorNode.prototype.locate = function() {
-  return typeof this._node == 'string' ?
-      document.getElementById(this._node) : this._node;
+  return typeof this._node == 'string' ?  document.getElementById(this._node) : this._node;
 };
 
 mboxLocatorNode.prototype.force = function() {
@@ -1185,9 +1245,10 @@ mboxLocatorNode.prototype.force = function() {
 mboxCreate = function(_mboxName /*, ... */) {
   var _mbox = mboxFactoryDefault.create( _mboxName, mboxShiftArray(arguments));
 
-  if (_mbox) {
+  if (_mbox && mboxFactoryDefault.isEnabled()) {
     _mbox.load();
   }
+
   return _mbox;
 };
 
@@ -1203,8 +1264,7 @@ mboxCreate = function(_mboxName /*, ... */) {
  * @return the created mbox or null if the platform is not supported
  */
 mboxDefine = function(_defaultNode, _mboxName /*, ...*/) {
-  var _mbox = mboxFactoryDefault.create(_mboxName,
-      mboxShiftArray(mboxShiftArray(arguments)), _defaultNode);
+  var _mbox = mboxFactoryDefault.create(_mboxName, mboxShiftArray(mboxShiftArray(arguments)), _defaultNode);
 
   return _mbox;
 };
@@ -1217,7 +1277,7 @@ mboxUpdate = function(_mboxName /*, ... */) {
  * Class that is the base of all mbox types.
  * @PrivateClass
  *
- * @parm _name - name of mbox
+ * @param _name - name of mbox
  * @param _id - index of this mbox in the list of mboxes of the same name
  * @param _urlBuilder - used to build url of the request
  * @param _mboxLocator object must support
@@ -1225,8 +1285,9 @@ mboxUpdate = function(_mboxName /*, ... */) {
  *   DOMNode force() which as a last resort should attempt to create
  *                   a DOMNOde and return it or null
  * @param _importName id of the node containing offer content
+ * @param _factory factory that tries to create this mbox
  */
-mbox = function(_name, _id, _urlBuilder, _mboxLocator, _importName) {
+mbox = function(_name, _id, _urlBuilder, _mboxLocator, _importName, _factory) {
   this._timeout = null;
   this._activated = 0;
   this._locator = _mboxLocator;
@@ -1247,15 +1308,15 @@ mbox = function(_name, _id, _urlBuilder, _mboxLocator, _importName) {
 
   this._validateName();
 
-  _urlBuilder.addParameter(TNT._internal._params.name, _name)
-      .addParameter(TNT._internal._params.id, _id);
+  _urlBuilder.addParameter(TNT._internal._params._mboxName, _name);
+  _urlBuilder.addParameter(TNT._internal._params._mboxId, _id);
 
   this._onError = function() {};
   this._onLoad = function() {};
 
   this._defaultDiv = null;
   // enabled for IE10+ only during page load
-  this._waitForNestedMboxes = document.documentMode >= 10 && !TNT._internal.isDomLoaded;
+  this._waitForNestedMboxes = document.documentMode >= 10 && !_factory.isDomLoaded();
 
   if (this._waitForNestedMboxes) {
     this._nestedMboxes = TNT._internal.nestedMboxes;
@@ -1268,8 +1329,10 @@ mbox.prototype.getId = function() {
 };
 
 mbox.prototype._validateName = function() {
-  if (this._name.length > TNT._internal._constants.nameLength) {
-    throw "Mbox Name " + this._name + " exceeds max length of " + TNT._internal._constants.nameLength + " characters.";
+  var maxLength = TNT._internal._constants._mboxNameMaxLength;
+
+  if (this._name.length > maxLength) {
+    throw "Mbox Name " + this._name + " exceeds max length of " + maxLength + " characters.";
   } else if (this._name.match(/^\s+|\s+$/g)) {
     throw "Mbox Name " + this._name + " has leading/trailing whitespace(s).";
   }
@@ -1280,17 +1343,19 @@ mbox.prototype.getName = function() {
 };
 
 /**
- * @return an array of parameters
+ * @return Array an array of parameters
  */
 mbox.prototype.getParameters = function() {
   var _parameters = this._urlBuilder.getParameters();
   var _result = [];
+
   for (var _i = 0; _i < _parameters.length; _i++) {
     // do not include internal parameters
     if (_parameters[_i].name.indexOf('mbox') !== 0) {
       _result[_result.length] = _parameters[_i].name + '=' + _parameters[_i].value;
     }
   }
+
   return _result;
 };
 
@@ -1343,13 +1408,13 @@ mbox.prototype.load = function(_parameters) {
   this._activated = 0;
 
   var _urlBuilder = (_parameters && _parameters.length > 0) ?
-      this._urlBuilder.clone().addParameters(_parameters) : this._urlBuilder;
+    this._urlBuilder.clone().addParameters(_parameters) : this._urlBuilder;
   this._contentFetcher.fetch(_urlBuilder);
 
   var _self = this;
   this._timer = setTimeout(function() {
     _self._onError('browser timeout', _self._contentFetcher.getType());
-  }, TNT._internal._settings.timeout);
+  }, TNT._internal._settings.mboxTimeout);
 
   this.setEventTime("load.end");
 
@@ -1364,7 +1429,7 @@ mbox.prototype.loaded = function() {
   this.cancelTimeout();
   if (!this.activate()) {
     var _self = this;
-    setTimeout(function() { _self.loaded();  }, 100);
+    setTimeout(function() { _self.loaded();  }, TNT._internal._settings.mboxLoadedTimeout);
   }
 };
 
@@ -1646,9 +1711,9 @@ mboxCookieManager = function mboxCookieManager(_name, _domain) {
 };
 
 mboxCookieManager.prototype.isEnabled = function() {
-  this.setCookie(TNT._internal._cookies.check, 'true', 60);
+  this.setCookie(TNT._internal._cookies._check, 'true', 60);
   this.loadCookies();
-  return this.getCookie(TNT._internal._cookies.check) == 'true';
+  return this.getCookie(TNT._internal._cookies._check) == 'true';
 };
 
 /**
@@ -1660,7 +1725,7 @@ mboxCookieManager.prototype.isEnabled = function() {
  */
 mboxCookieManager.prototype.setCookie = function(_name, _value, _duration) {
   if (typeof _name != 'undefined' && typeof _value != 'undefined' &&
-      typeof _duration != 'undefined') {
+    typeof _duration != 'undefined') {
     var _cookie = {};
     _cookie.name = _name;
     _cookie.value = encodeURIComponent(_value);
@@ -1693,14 +1758,14 @@ mboxCookieManager.prototype.getCookieNames = function(_namePrefix) {
 
 mboxCookieManager.prototype.saveCookies = function() {
   var _xDomainOnly = TNT._internal._settings.crossDomainXOnly;
-  var _disabledCookieName = TNT._internal._cookies.disable;
+  var _disabledCookieName = TNT._internal._cookies._disable;
   var _cookieValues = [];
   var _maxExpireOn = 0;
 
   this._cookiesMap.each(function(_name, _cookie) {
     if(!_xDomainOnly || _name === _disabledCookieName) {
-      _cookieValues[_cookieValues.length] = _name + '#' + _cookie.value + '#' +
-      _cookie.expireOn;
+      _cookieValues[_cookieValues.length] = _name + '#' + _cookie.value + '#' + _cookie.expireOn;
+
       if (_maxExpireOn < _cookie.expireOn) {
         _maxExpireOn = _cookie.expireOn;
       }
@@ -1733,7 +1798,7 @@ mboxCookieManager.prototype.loadCookies = function() {
       }
     }
     var _internalCookies = document.cookie.substring(
-        _cookieStart + this._name.length + 1, _cookieEnd).split('|');
+      _cookieStart + this._name.length + 1, _cookieEnd).split('|');
 
     var _nowInSeconds = Math.ceil(new Date().getTime() / 1000);
     for (var _i = 0; _i < _internalCookies.length; _i++) {
@@ -1756,27 +1821,22 @@ mboxCookieManager.prototype.loadCookies = function() {
  * Uses the specified _randomId if no id is found
  * @PrivateClass
  */
-mboxSession = function(_randomId, _idArg, _cookieName, _expireTime,
-                       _cookieManager) {
+mboxSession = function(_randomId, _idArg, _cookieName, _expireTime, _cookieManager) {
   this._idArg = _idArg;
   this._cookieName = _cookieName;
   this._expireTime = _expireTime;
   this._cookieManager = _cookieManager;
-
-  this._newSession = false;
-
-  this._id = typeof mboxForceSessionId != 'undefined' ?
-      mboxForceSessionId : mboxGetPageParameter(this._idArg);
+  this._id = typeof mboxForceSessionId != 'undefined' ? mboxForceSessionId : mboxGetPageParameter(this._idArg);
 
   if (this._id === null || this._id.length === 0) {
     this._id = _cookieManager.getCookie(_cookieName);
+
     if (this._id === null || this._id.length === 0) {
       this._id = _randomId;
-      this._newSession = true;
     }
   }
 
-  _cookieManager.setCookie(_cookieName, this._id, _expireTime);
+  this._cookieManager.setCookie(_cookieName, this._id, _expireTime);
 };
 
 /**
@@ -1795,9 +1855,6 @@ mboxSession.prototype.forceId = function(_forcedId) {
 /**
  * Class representing users PC Id.
  * @PrivateClass
- *
- * @param _randomId Randomly assigned ID to user PC.
- * @param _expireTime Expiration time in seconds for this PC ID.
  */
 mboxPC = function(_cookieName, _expireTime, _cookieManager) {
   this._cookieName = _cookieName;
@@ -1819,14 +1876,16 @@ mboxPC.prototype.getId = function() {
 };
 
 /**
- * @return True if forced ID value was set, false otherwise.
+ * @return Boolean if forced ID value was set, false otherwise.
  */
 mboxPC.prototype.forceId = function(_forcedId) {
   if (this._id != _forcedId) {
     this._id = _forcedId;
     this._cookieManager.setCookie(this._cookieName, this._id, this._expireTime);
+
     return true;
   }
+
   return false;
 };
 
@@ -1893,14 +1952,14 @@ mboxScreenWidth = function() {
 
 mboxBrowserWidth = function() {
   return (window.innerWidth) ? window.innerWidth :
-      document.documentElement ? document.documentElement.clientWidth :
-          document.body.clientWidth;
+    document.documentElement ? document.documentElement.clientWidth :
+      document.body.clientWidth;
 };
 
 mboxBrowserHeight = function() {
   return (window.innerHeight) ? window.innerHeight :
-      document.documentElement ? document.documentElement.clientHeight :
-          document.body.clientHeight;
+    document.documentElement ? document.documentElement.clientHeight :
+      document.body.clientHeight;
 };
 
 mboxBrowserTimeOffset = function() {
@@ -1911,164 +1970,43 @@ mboxScreenColorDepth = function() {
   return screen.pixelDepth;
 };
 
-if (typeof mboxVersion == 'undefined') {
-  var mboxVersion = TNT._internal._settings.version;
 
-  if (!mboxVersion) {
-    mboxVersion = TNT._internal._constants.version;
+TNT._internal._disableExperienceManagerAndReload = function(_win, _atObj, _cookieName, _duration, _cookieManager) {
+  if (!_atObj.targetJSLoaded) {
+    _cookieManager.setCookie(_cookieName, true, _duration);
+    _win.location.reload();
+  }
+};
+
+TNT._internal._initExperienceManager = function(_win, _doc, _settings, _cookies, _cookieManager) {
+  var _AT_KEY = '_AT';
+  var _RETRY = 50;
+  var _cookieName = _cookies._experienceManagerDisabled;
+  var _duration = _settings.experienceManagerDisabledTimeout;
+  var _timeout = _settings.experienceManagerTimeout;
+  var _url = _settings.experienceManagerPluginUrl;
+  var _delayFunc = _win.setTimeout;
+  var _emptyFunc = function(_actions){};
+  var _dummyFunc = function(_actions){ _delayFunc(function() {_win[_AT_KEY].applyWhenReady(_actions);}, _RETRY); };
+
+  if (_AT_KEY in _win) {
+    return;
   }
 
-  var mboxFactories = new mboxMap();
-  var mboxFactoryDefault = new mboxFactory(
-      TNT._internal._settings.serverHost,
-      TNT._internal._settings.clientCode,
-      TNT._internal._constants.defaultFactoryId);
-}
+  _win[_AT_KEY] = {};
 
-if (mboxGetPageParameter(TNT._internal._pageParams.debug) ||
-    mboxFactoryDefault.getCookieManager().getCookie(TNT._internal._cookies.debug)) {
+  if (_cookieManager.getCookie(_cookieName) !== 'true') {
+    _doc.write('<scr' + 'ipt src="' + _url + '"><\/sc' + 'ript>');
 
-  setTimeout(function() {
-    if (typeof mboxDebugLoaded == 'undefined') {
-      alert('Could not load the remote debug.\nPlease check your connection to ' +
-      TNT._internal._settings.companyName + ' servers');
-    }
-  }, 60*60);
+    _win[_AT_KEY].applyWhenReady = _dummyFunc;
 
-  document.write('<' + 'scr' + 'ipt language="Javascript1.2" src="' +
-  TNT._internal._settings.adminUrl +
-  '/mbox/mbox_debug.jsp?mboxServerHost=' +
-  TNT._internal._settings.serverHost +
-  '&clientCode=' +
-  TNT._internal._settings.clientCode +
-  '"><' + '\/scr' + 'ipt>');
-}
-
-if (TNT._internal._settings.includeScPlugin) {
-  mboxScPluginFetcher = function (_clientCode, _siteCatalystCore) {
-    this._clientCode = _clientCode;
-    this._siteCatalystCore = _siteCatalystCore;
-  };
-
-  /**
-   * @PrivateClass
-   */
-  mboxScPluginFetcher.prototype._buildUrl = function (_urlBuilder) {
-    _urlBuilder.setBasePath('/m2/' + this._clientCode + '/sc/standard');
-    this._addParameters(_urlBuilder);
-
-    var _url = _urlBuilder.buildUrl();
-    _url += '&' + TNT._internal._params.scPluginVersion + '=' + TNT._internal._constants.scPluginVersion;
-    return _url;
-  };
-
-  /**
-   * Deliberately ignores "pageURL","referrer"
-   */
-  mboxScPluginFetcher.prototype._addParameters = function (_urlBuilder) {
-    var _parametersToRead = [
-      "dynamicVariablePrefix", "visitorID", "vmk", "ppu", "charSet",
-      "visitorNamespace", "cookieDomainPeriods", "cookieLifetime", "pageName",
-      "currencyCode", "variableProvider", "channel", "server",
-      "pageType", "transactionID", "purchaseID", "campaign", "state", "zip", "events",
-      "products", "linkName", "linkType", "resolution", "colorDepth",
-      "javascriptVersion", "javaEnabled", "cookiesEnabled", "browserWidth",
-      "browserHeight", "connectionType", "homepage", "pe", "pev1", "pev2", "pev3",
-      "visitorSampling", "visitorSamplingGroup", "dynamicAccountSelection",
-      "dynamicAccountList", "dynamicAccountMatch", "trackDownloadLinks",
-      "trackExternalLinks", "trackInlineStats", "linkLeaveQueryString",
-      "linkDownloadFileTypes", "linkExternalFilters", "linkInternalFilters",
-      "linkTrackVars", "linkTrackEvents", "linkNames", "lnk", "eo" ];
-
-    for (var _i = 0; _i < _parametersToRead.length; _i++) {
-      this._addParameterFromCore(_parametersToRead[_i], _urlBuilder);
-    }
-
-    for (_i = 1; _i <= 75; _i++) {
-      this._addParameterFromCore('prop' + _i, _urlBuilder);
-      this._addParameterFromCore('eVar' + _i, _urlBuilder);
-      this._addParameterFromCore('hier' + _i, _urlBuilder);
-    }
-  };
-
-  mboxScPluginFetcher.prototype._addParameterFromCore = function (_name, _urlBuilder) {
-    var _value = this._siteCatalystCore[_name];
-
-    if (typeof _value === 'undefined' || _value === null || _value === '' || typeof _value === 'object') {
-      return;
-    }
-
-    _urlBuilder.addParameter(_name, _value);
-  };
-
-  mboxScPluginFetcher.prototype.cancel = function () {
-  };
-
-  mboxScPluginFetcher.prototype.fetch = function (_urlBuilder) {
-    _urlBuilder.setServerType(this.getType());
-    var _url = this._buildUrl(_urlBuilder);
-
-    this._include = document.createElement('script');
-    this._include.src = _url;
-
-    document.body.appendChild(this._include);
-  };
-
-  mboxScPluginFetcher.prototype.getType = function () {
-    return 'ajax';
-  };
-
-  /**
-   * This function returns the plugin, or null if it was not loaded.
-   */
-  mboxLoadSCPlugin = function (_siteCatalystCore) {
-    if (!_siteCatalystCore) {
-      return null;
-    }
-
-    _siteCatalystCore["m_" + TNT._internal._settings.pluginName] = function (_siteCatalystCore) {
-      var _plugin = _siteCatalystCore.m_i(TNT._internal._settings.pluginName);
-
-      _plugin._enabled = true;
-      _plugin._clientCode = TNT._internal._settings.clientCode;
-
-      /** This method is called by the core when it's ready to make a request.
-       * it cannot be obfuscated, since _t is a special name.  Hence the
-       * strange syntax.
-       */
-      _plugin._t = function () {
-        if (!this.isEnabled()) {
-          return;
-        }
-
-        var _mbox = this._createMbox();
-
-        if (_mbox) {
-          var _fetcher = new mboxScPluginFetcher(this._clientCode, this.s);
-          _mbox.setFetcher(_fetcher);
-          _mbox.load();
-        }
-      };
-
-      _plugin.isEnabled = function () {
-        return this._enabled && mboxFactoryDefault.isEnabled();
-      };
-
-      _plugin._createMbox = function () {
-        var _mboxName = this._generateMboxName();
-        var _div = document.createElement('DIV');
-        return mboxFactoryDefault.create(_mboxName, [], _div);
-      };
-
-      _plugin._generateMboxName = function () {
-        var _isPurchase = this.s.events && this.s.events.indexOf('purchase') != -1;
-        return 'SiteCatalyst: ' + (_isPurchase ? 'purchase' : 'event');
-      };
-    };
-
-    return _siteCatalystCore.loadModule(TNT._internal._settings.pluginName);
-  };
-}
+    _delayFunc(function() {
+      TNT._internal._disableExperienceManagerAndReload(_win, _win[_AT_KEY], _cookieName, _duration, _cookieManager);
+    }, _timeout);
+  } else {
+    _win[_AT_KEY].applyWhenReady = _emptyFunc;
+  }
+};
 
 
 mboxVizTargetUrl = function(_mboxName /*, ... */) {
@@ -2076,38 +2014,37 @@ mboxVizTargetUrl = function(_mboxName /*, ... */) {
     return;
   }
 
+  var _params = TNT._internal._params;
+  var _millisInMinute = TNT._internal._constants._millisInMinute;
+  var _clientCode = TNT._internal._settings.clientCode;
+  var _now = new Date();
+  var _offset = _now.getTimezoneOffset() * _millisInMinute;
   var _urlBuilder = mboxFactoryDefault.getUrlBuilder().clone();
 
-  _urlBuilder.setBasePath('/m2/' + TNT._internal._settings.clientCode + '/viztarget');
-  _urlBuilder.addParameter(TNT._internal._params.name, _mboxName);
-  _urlBuilder.addParameter(TNT._internal._params.id, 0);
-  _urlBuilder.addParameter(TNT._internal._params.count, mboxFactoryDefault.getMboxes().length() + 1);
-
-  var _now = new Date();
-  _urlBuilder.addParameter(TNT._internal._params.time, _now.getTime() -
-  (_now.getTimezoneOffset() * TNT._internal._constants.millisInMinute));
-
-  _urlBuilder.addParameter(TNT._internal._params.page, mboxGenerateId());
+  _urlBuilder.setBasePath('/m2/' + _clientCode + '/viztarget');
+  _urlBuilder.addParameter(_params._mboxName, _mboxName);
+  _urlBuilder.addParameter(_params._mboxId, 0);
+  _urlBuilder.addParameter(_params._count, mboxFactoryDefault.getMboxes().length() + 1);
+  _urlBuilder.addParameter(_params._time, _now.getTime() - _offset);
+  _urlBuilder.addParameter(_params._page, mboxGenerateId());
+  _urlBuilder.addParameter(_params._domLoaded, mboxFactoryDefault.isDomLoaded());
 
   var _parameters = mboxShiftArray(arguments);
+
   if (_parameters && _parameters.length > 0) {
     _urlBuilder.addParameters(_parameters);
   }
 
-  _urlBuilder.addParameter(TNT._internal._params.domLoaded, mboxFactoryDefault.isDomLoaded());
-
+  mboxFactoryDefault._addTntIdIfExists(_urlBuilder);
+  mboxFactoryDefault._addTargetPageParamsIfRequired(_urlBuilder, _mboxName);
   mboxFactoryDefault.setVisitorIdParameters(_urlBuilder, _mboxName);
 
   return _urlBuilder.buildUrl();
 };
 
 TNT.createGlobalMbox = function () {
-  if (!mboxFactoryDefault.isEnabled()) {
-    return;
-  }
-
-  var _globalMboxName = TNT._internal._settings.globalMboxName;
-  var _globalMboxDomElementId = TNT._internal._settings.globalMboxLocationDomId;
+  var _globalMboxName = TNT.getGlobalMboxName();
+  var _globalMboxDomElementId = TNT.getGlobalMboxLocation();
   var _globalMboxDiv;
 
   if (!_globalMboxDomElementId) {
@@ -2117,35 +2054,105 @@ TNT.createGlobalMbox = function () {
     _globalMboxDiv.id = _globalMboxDomElementId;
     _globalMboxDiv.style.visibility = "hidden";
     _globalMboxDiv.style.display = "none";
-    mboxFactoryDefault.addOnLoad(function(){
-      document.body.insertBefore(_globalMboxDiv, document.body.firstChild);
-    });
+
+    var _timerId = setInterval(function(){
+      if (document.body) {
+        clearInterval(_timerId);
+        document.body.insertBefore(_globalMboxDiv, document.body.firstChild);
+      }
+    }, TNT._internal._settings.bodyPollingTimeout);
   }
 
-  var _globalMbox = mboxFactoryDefault.create(_globalMboxName,
-      TNT._internal._getGlobalMboxParameters(), _globalMboxDomElementId);
+  var _globalParams = TNT.getTargetPageParameters();
+  var _globalMbox = mboxFactoryDefault.create(_globalMboxName, _globalParams, _globalMboxDomElementId);
 
   if (_globalMbox && mboxFactoryDefault.isEnabled()) {
-    _globalMbox.setFetcher(new TNT._internal._globalMboxFetcher());
     _globalMbox.load();
   }
 };
 
-if (TNT._internal._settings.includeExperienceManagerPlugin) {
-  if (!("_AT" in window)) {
-    window._AT = {};
-    window._AT.applyWhenReady = function (_actions) {
-      setTimeout(function () {
-        window._AT.applyWhenReady(_actions);
-      }, 50);
-    };
+TNT._internal._isDebugEnabled = function(_cookieManager, _debugParam, _debugCookie) {
+  return mboxGetPageParameter(_debugParam) || _cookieManager.getCookie(_debugCookie);
+};
+
+TNT._internal._showDebugInfo = function(_settings) {
+  setTimeout(function() {
+    if (typeof mboxDebugLoaded == 'undefined') {
+      alert('Could not load the remote debug.\nPlease check your connection to ' + _settings.companyName + ' servers');
+    }
+  }, 60*60);
+
+  var _url = _settings.adminUrl + '/mbox/mbox_debug.jsp?mboxServerHost=' + _settings.serverHost + '&clientCode=' +
+   _settings.clientCode;
+
+  document.write('<' + 'scr' + 'ipt src="' + _url + '"><' + '\/scr' + 'ipt>');
+};
+
+TNT._internal._targetGlobalSettingsExist = function(_settings) {
+  var _helper = TNT._internal._helper;
+
+  return !_helper._isUndefined(_settings) && !_helper._isNull(_settings) && _helper._isObject(_settings);
+};
+
+TNT._internal._copySettings = function(_settings, _internalSettings) {
+  var _helper = TNT._internal._helper;
+  var _keyExists;
+  var _valueExists;
+  var _value;
+
+  for (var _key in _settings) {
+    _keyExists = _settings.hasOwnProperty(_key) && _internalSettings.hasOwnProperty(_key);
+    _value = _settings[_key];
+    _valueExists = !_helper._isUndefined(_value) && !_helper._isNull(_value);
+
+    if (_keyExists && _valueExists) {
+      _internalSettings[_key] = _value;
+    }
   }
 
-  document.write('<scr' + 'ipt src="' + TNT._internal._settings.experienceManagerPluginUrl + '"></sc' + 'ript>');
-}
+  return _internalSettings;
+};
+
+TNT._internal._bootstrap = function() {
+  var _settings = window.targetGlobalSettings;
+
+  if (TNT._internal._targetGlobalSettingsExist(_settings)) {
+    TNT._internal._settings = TNT._internal._copySettings(_settings, TNT._internal._settings);
+  }
+
+  var _version = TNT._internal._settings.mboxVersion;
+  var _serverHost = TNT._internal._settings.serverHost;
+  var _clientCode = TNT._internal._settings.clientCode;
+  var _defaultFactoryId = TNT._internal._constants._defaultFactoryId;
+  var _debugParam = TNT._internal._pageParams._debug;
+  var _debugCookie = TNT._internal._cookies._debug;
+
+  if (typeof mboxVersion == 'undefined') {
+    // We should expose these variables to make sure other JS parts have access to them
+    window.mboxFactories = new mboxMap();
+    window.mboxFactoryDefault = new mboxFactory(_serverHost, _clientCode, _defaultFactoryId, _version);
+    window.mboxVersion = _version;
+  }
+
+  if (TNT._internal._isDebugEnabled(mboxFactoryDefault.getCookieManager(), _debugParam, _debugCookie)){
+    TNT._internal._showDebugInfo(TNT._internal._settings);
+  }
+};
+
+TNT._internal._bootstrap();
+
+
+(function(){
+  var _settings = TNT._internal._settings;
+  var _cookies = TNT._internal._cookies;
+  var _cookieManager = mboxFactoryDefault.getCookieManager();
+
+  TNT._internal._initExperienceManager(window, document, _settings, _cookies, _cookieManager);
+}());
+
 
 TNT._internal._settings.clientJavascriptFunction();
 
-if (TNT._internal._settings.globalMboxAutoCreate) {
+if (TNT.isAutoCreateGlobalMbox()) {
   TNT.createGlobalMbox();
 }

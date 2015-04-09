@@ -205,6 +205,26 @@ newRules: [{
     }
   }]
 },{
+  name: 'Mbox Redirect',
+  event: {
+    type: 'click',
+    settings: {
+      selector: '#redirectButton'
+    }
+  },
+  actions: [{
+    extensionInstanceIds: ['efghi'],
+    method: 'addMbox',
+    settings: {
+      mboxName: 'frameworkredirectdemo',
+      mboxGoesAround: '#redirector',
+      mboxArguments: {
+        localmboxparam1: 'localmboxvalue1'
+      },
+      timeout: '1500'
+    }
+  }]
+},{
   name: 'Dom Ready',
   event: {
     type: 'domReady',

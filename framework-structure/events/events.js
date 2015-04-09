@@ -1,6 +1,7 @@
 var dynamicListener = require('../utils/private/dynamicListener')
 var utils = _satellite.utils;
 var domReady = require('./domReady');
+var eventBus = require('../utils/private/pubsub');
 
 var events = {
   click: function(eventSettingsCollection, callback) {
@@ -33,6 +34,18 @@ var events = {
   domReady: function(eventSettingsCollection, callback){
     utils.each(eventSettingsCollection,function (eventSettings){
       domReady(callback.bind(this,eventSettings));
+    });
+  },
+  pageTop: function(eventSettingsCollection, callback){
+    utils.each(eventSettingsCollection,function (eventSettings){
+      callback(eventSettings);
+    });
+  },
+  pageBottom: function(eventSettingsCollection, callback){
+    eventBus.on('pageBottom',function (){
+      utils.each(eventSettingsCollection,function (eventSettings){
+        callback(eventSettings);
+      });
     });
   }
 };

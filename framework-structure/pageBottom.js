@@ -1,8 +1,6 @@
-var state = require('./data/state');
-var events = require('./events/events');
+var eventBus = require('./utils/private/pubsub');
+
 
 module.exports = function(){
-  if (!state.initialized) return;
-  state.pageBottomFired = true;
-  events.trigger('pagebottom');
-}
+  eventBus.trigger('pageBottom');
+};

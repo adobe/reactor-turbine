@@ -4,7 +4,9 @@ module.exports ={
 "events": {
   'click': events.click,
   //'timeout': events.timeout
-  'domReady':events.domReady
+  'domReady':events.domReady,
+  'pageTop': events.pageTop,
+  'pageBottom': events.pageBottom
 },
 "tools": {
   "f489afdcde1a53ef58aec319401144f7": {
@@ -72,7 +74,7 @@ extensions: {
     }
   },
   'jklmno': {
-    extensionId: 'adobeAlert',
+    extensionId: 'adobeDebug',
     settings: {}
   }
 },
@@ -232,9 +234,35 @@ newRules: [{
   },
   actions: [{
     extensionInstanceIds: ['jklmno'],
-    method: 'alert',
+    method: 'log',
     settings: {
       text: 'Dom Ready rule fired'
+    }
+  }]
+},{
+  name: 'Page Top',
+  event: {
+    type: 'pageTop',
+    settings: {}
+  },
+  actions: [{
+    extensionInstanceIds: ['jklmno'],
+    method: 'log',
+    settings: {
+      text: 'Page Top rule fired'
+    }
+  }]
+},{
+  name: 'Page Bottom',
+  event: {
+    type: 'pageBottom',
+    settings: {}
+  },
+  actions: [{
+    extensionInstanceIds: ['jklmno'],
+    method: 'log',
+    settings: {
+      text: 'Page Bottom rule fired'
     }
   }]
 }],

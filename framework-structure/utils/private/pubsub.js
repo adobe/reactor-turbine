@@ -11,7 +11,7 @@ bus.on = function(subscriptionName, func) {
     subscriptionId: subscriptionId,
     func: func
   });
-  return off.bind(this,subscriptionId);
+  return bus.off.bind(this,subscriptionId);
 };
 
 bus.trigger = function(subscriptionName, args) {
@@ -23,13 +23,13 @@ bus.trigger = function(subscriptionName, args) {
       len = subscribers ? subscribers.length : 0;
 
     while (len--) {
-      subscribers[len].func(subscriptionName, args);
+      subscribers[len].func(subscribers[len].subscriptionId, args);
     }
   }, 0);
   return true;
 };
 
-off = function(subscriptionId) {
+bus.off = function(subscriptionId) {
   for (var subscriptionKey in subscriptions) {
     if (subscriptions[subscriptionKey]) {
       for (var i = 0, length = subscriptions[subscriptionKey].length; i < length; i++) {

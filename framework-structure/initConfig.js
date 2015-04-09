@@ -6,7 +6,9 @@ module.exports ={
   //'timeout': events.timeout
   'domReady':events.domReady,
   'pageTop': events.pageTop,
-  'pageBottom': events.pageBottom
+  'pageBottom': events.pageBottom,
+  'onload': events.onload,
+  'directCall': events.directCall
 },
 "tools": {
   "f489afdcde1a53ef58aec319401144f7": {
@@ -263,6 +265,34 @@ newRules: [{
     method: 'log',
     settings: {
       text: 'Page Bottom rule fired'
+    }
+  }]
+},{
+  name: 'onload',
+  event: {
+    type: 'onload',
+    settings: {}
+  },
+  actions: [{
+    extensionInstanceIds: ['jklmno'],
+    method: 'log',
+    settings: {
+      text: 'onload rule fired'
+    }
+  }]
+},{
+  name: 'direct call test',
+  event: {
+    type: 'directCall',
+    settings: {
+      name: 'dc1'
+    }
+  },
+  actions: [{
+    extensionInstanceIds: ['jklmno'],
+    method: 'log',
+    settings: {
+      text: 'direct call rule fired'
     }
   }]
 }],

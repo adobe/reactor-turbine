@@ -1,4 +1,4 @@
-var dynamicListener = require('../utils/private/dynamicListener')
+var dynamicListener = require('../utils/private/dynamicListener');
 var utils = _satellite.utils;
 var domReady = require('./domReady');
 var eventBus = require('../utils/private/pubsub');
@@ -42,11 +42,27 @@ var events = {
     });
   },
   pageBottom: function(eventSettingsCollection, callback){
-    eventBus.on('pageBottom',function (){
+    eventBus.on('pageBottom',function (eventId){
       utils.each(eventSettingsCollection,function (eventSettings){
+        callback(eventSettings);
+      });
+      eventBus.off(eventId);
+    });
+  },
+  onload: function(eventSettingsCollection, callback){
+    utils.addEventListener(window, 'load', function(event){
+      utils.each(eventSettingsCollection,function (eventSettings){
+        callback(eventSettings);
+      });
+    });
+  },
+  directCall: function(eventSettingsCollection, callback){
+    utils.each(eventSettingsCollection,function (eventSettings){
+      eventBus.on('directcall.' + eventSettings.name,function (){
         callback(eventSettings);
       });
     });
   }
 };
+
 module.exports = events;

@@ -3,7 +3,8 @@
 _satellite.availableExtensions = {
   adobeAnalytics: require('./AdobeAnalytics'),
   adobeTarget: require('./AdobeTarget'),
-  adobeDebug: require('./AdobeDebug')
+  adobeDebug: require('./AdobeDebug'),
+  adobeVisitor: require('./AdobeVisitor')
 };
 
 module.exports = function(propertyMeta) {

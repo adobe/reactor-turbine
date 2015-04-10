@@ -82,6 +82,10 @@ extensions: {
   'jklmno': {
     extensionId: 'adobeDebug',
     settings: {}
+  },
+  'pqrst': {
+    extensionId: 'adobeVisitor',
+    settings: {}
   }
 },
 newRules: [{

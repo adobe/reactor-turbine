@@ -1,7 +1,10 @@
+var EventEmitter = require('./utils/public/EventEmitter');
+
 window._satellite = {};
 _satellite.utils = require('./utils/public/index');
 _satellite.data = require('./data/public/index');
-_satellite.pageBottom = require('./pageBottom');
+_satellite.runRule = require('./hooks/runRule');
+_satellite.pageBottom = require('./hooks/pageBottom');
 
 var dynamicListener = require('./utils/private/dynamicListener');
 var globalPolling = require('./utils/private/globalPolling');

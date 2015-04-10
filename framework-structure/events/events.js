@@ -1,7 +1,7 @@
 var dynamicListener = require('../utils/private/dynamicListener');
 var utils = _satellite.utils;
 var domReady = require('./domReady');
-var eventBus = require('../utils/private/pubsub');
+var eventBus = require('../eventBus');
 
 var events = {
   click: function(eventSettingsCollection, callback) {

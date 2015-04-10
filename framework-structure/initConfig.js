@@ -11,7 +11,8 @@ module.exports ={
   'directCall': events.directCall
 },
 "conditions": {
-  urlParameter: require('./conditions/urlParameter')
+  urlParameter: require('./conditions/urlParameter'),
+  custom: require('./conditions/custom')
 },
 "tools": {
   "f489afdcde1a53ef58aec319401144f7": {
@@ -243,6 +244,15 @@ newRules: [{
   //    settings: {
   //      name: 'myName',
   //      value: 'myValue'
+  //    }
+  //  },
+  //  {
+  //    type: 'custom',
+  //    settings: {
+  //      script: function() {
+  //        return _satellite.utils.textMatch(
+  //          _satellite.utils.getQueryParam('myName'), 'myValue');
+  //      }
   //    }
   //  }
   //],

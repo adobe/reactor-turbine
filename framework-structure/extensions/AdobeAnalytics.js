@@ -5,7 +5,7 @@ var AdobeAnalytics = function(propertySettings, extensionSettings) {
 };
 
 _satellite.utils.extend(AdobeAnalytics.prototype, {
-  queryStringParamMap: {
+  _queryStringParamMap: {
     browserHeight: 'bh',
     browserWidth: 'bw',
     campaign: 'v0',
@@ -63,13 +63,13 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
     marketingCloudVisitorID: 'mid',
     zip: 'zip'
   },
-  translateToQueryStringParam: function(queryStringObj, key, value) {
-    var translator = this.queryStringParamMap[key];
+  _translateToQueryStringParam: function(queryStringObj, key, value) {
+    var translator = this._queryStringParamMap[key];
 
     if (!translator) {
       // Things like prop1 and prop2 use the same translator. Also, eVar1 and eVar2.
       var prefix = key.substr(0, 4);
-      translator = this.queryStringParamMap[prefix];
+      translator = this._queryStringParamMap[prefix];
     }
 
     if (translator) {
@@ -80,11 +80,11 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
       }
     }
   },
-  remodelDataToQueryString: function(data) {
+  _remodelDataToQueryString: function(data) {
     var queryStringParams = {};
     var key;
 
-    queryStringParams.t = this.getTimestamp();
+    queryStringParams.t = this._getTimestamp();
 
     var clientInfo = data.clientInfo;
 
@@ -93,7 +93,7 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
         if (clientInfo.hasOwnProperty(key)) {
           var clientInfoValue = clientInfo[key];
           if (clientInfoValue) {
-            this.translateToQueryStringParam(queryStringParams, key, clientInfoValue);
+            this._translateToQueryStringParam(queryStringParams, key, clientInfoValue);
           }
         }
       }
@@ -106,7 +106,7 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
         if (vars.hasOwnProperty(key)) {
           var varValue = vars[key];
           if (varValue) {
-            this.translateToQueryStringParam(queryStringParams, key, varValue);
+            this._translateToQueryStringParam(queryStringParams, key, varValue);
           }
         }
       }
@@ -115,17 +115,17 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
     var events = data.events;
 
     if (events) {
-      this.translateToQueryStringParam(queryStringParams, 'events', events);
+      this._translateToQueryStringParam(queryStringParams, 'events', events);
     }
 
     return _satellite.utils.encodeObjectToURI(queryStringParams);
   },
-  getTrackingURI: function(queryString) {
+  _getTrackingURI: function(queryString) {
     var tagContainerMarker = 'D' + _satellite.appVersion;
     var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
         Math.floor(Math.random() * 10000000000000);
     var protocol = _satellite.utils.isHttps() ? 'https://' : 'http://';
-    var uri = protocol + this.getTrackingServer() + '/b/ss/' + this.extensionSettings.account +
+    var uri = protocol + this._getTrackingServer() + '/b/ss/' + this.extensionSettings.account +
         '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
 
     if (queryString) {
@@ -138,7 +138,7 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
 
     return uri;
   },
-  getTimestamp: function() {
+  _getTimestamp: function() {
     var now = new Date();
     var year = now.getYear();
     return now.getDate() + '/'
@@ -150,7 +150,7 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
         + now.getDay() + ' '
         + now.getTimezoneOffset();
   },
-  getTrackingServer: function() {
+  _getTrackingServer: function() {
     // TODO: Use getAccount from tool since it deals with accountByHost? What is accountByHost anyway?
     // TODO: What do we do if account is not default. Returning null is probably not awesome.
     if (this.extensionSettings.trackingServer) {
@@ -193,16 +193,16 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
       actionSettings.customSetup();
     }
 
-    this.track(trackVars, actionSettings.trackEvents);
+    this._track(trackVars, actionSettings.trackEvents);
   },
-  doesExtensionVarApplyToLinkTracking: function(varName){
+  _doesExtensionVarApplyToLinkTracking: function(varName){
     return !/^(eVar[0-9]+)|(prop[0-9]+)|(hier[0-9]+)|campaign|purchaseID|channel|server|state|zip|pageType$/.test(varName);
   },
   trackLink: function(actionSettings) {
     var trackVars = {};
 
     for (var varName in this.extensionSettings.trackVars) {
-      if (this.doesExtensionVarApplyToLinkTracking(varName)) {
+      if (this._doesExtensionVarApplyToLinkTracking(varName)) {
         trackVars[varName] = this.extensionSettings.trackVars[varName];
       }
     }
@@ -217,16 +217,16 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
       actionSettings.customSetup();
     }
 
-    this.track(trackVars, actionSettings.trackEvents);
+    this._track(trackVars, actionSettings.trackEvents);
   },
-  track: function(trackVars, trackEvents) {
-    var queryString = this.remodelDataToQueryString({
+  _track: function(trackVars, trackEvents) {
+    var queryString = this._remodelDataToQueryString({
       vars: trackVars,
       events: trackEvents,
       clientInfo: _satellite.data.clientInfo
     });
 
-    var uri = this.getTrackingURI(queryString);
+    var uri = this._getTrackingURI(queryString);
 
     _satellite.utils.createBeacon({
       beaconURL: uri,

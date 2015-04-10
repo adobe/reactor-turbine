@@ -1,4 +1,4 @@
-events = require('./events/events');
+var events = require('./events/events');
 
 module.exports ={
 "events": {
@@ -9,6 +9,9 @@ module.exports ={
   'pageBottom': events.pageBottom,
   'onload': events.onload,
   'directCall': events.directCall
+},
+"conditions": {
+  urlParameter: require('./conditions/urlParameter')
 },
 "tools": {
   "f489afdcde1a53ef58aec319401144f7": {
@@ -128,7 +131,7 @@ newRules: [{
         pageName: 'MyPageName',
         eVar20: 'MyDeadHeaderEvar',
         prop20: 'D=v20',
-        campaign: _satellite.utils.queryParams.getQueryParam('dead')
+        campaign: _satellite.utils.getQueryParam('dead')
       },
       trackEvents: [
         'event20:deadevent'
@@ -165,7 +168,7 @@ newRules: [{
         pageName: 'MyPageName',
         eVar20: 'MyDeadHeaderEvar',
         prop20: 'D=v20',
-        campaign: _satellite.utils.queryParams.getQueryParam('dead')
+        campaign: _satellite.utils.getQueryParam('dead')
       },
       trackEvents: [
         'event20:deadevent'
@@ -234,6 +237,15 @@ newRules: [{
     type: 'domReady',
     settings: {}
   },
+  //conditions: [
+  //  {
+  //    type: 'urlParameter',
+  //    settings: {
+  //      name: 'myName',
+  //      value: 'myValue'
+  //    }
+  //  }
+  //],
   actions: [{
     extensionInstanceIds: ['jklmno'],
     method: 'log',
@@ -340,7 +352,7 @@ newRules: [{
         "setVars": {
           "eVar20": "MyDeadHeaderEvar",
           "prop20": "D=v20",
-          "campaign": _satellite.utils.queryParams.getQueryParam('dead')
+          "campaign": _satellite.utils.getQueryParam('dead')
         },
         "addEvent": ["event20:deadevent"]
       }]

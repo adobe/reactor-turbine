@@ -1,11 +1,12 @@
+var propertyMeta = require('../initConfig');
 var each = require('../utils/public/each');
 var eventGroups = {};
 
-module.exports = function(propertyMeta){
+module.exports = function(){
   each(propertyMeta.newRules,function(rule){
     initRule(rule);
   });
-  initEvents(propertyMeta.events);
+  initEvents();
 };
 
 function initRule(rule){
@@ -20,14 +21,28 @@ function initRule(rule){
 }
 
 //TODO: put in events.js
-function initEvents(events){
-  for(var key in events){
+function initEvents(){
+  for(var key in propertyMeta.events){
     if(eventGroups[key].length > 0){
-      events[key](eventGroups[key],function (eventSettings){
-        runActions(eventSettings._rule);
+      propertyMeta.events[key](eventGroups[key],function (eventSettings){
+        checkConditions(eventSettings._rule);
       });
     }
   }
+}
+
+function checkConditions(rule, event) {
+  if (rule.conditions) {
+    for (var i = 0; i < rule.conditions.length; i++) {
+      var condition = rule.conditions[i];
+
+      if (!propertyMeta.conditions[condition.type](condition.settings, event)) {
+        return;
+      }
+    }
+  }
+
+  runActions(rule);
 }
 
 //TODO: put in actions.js

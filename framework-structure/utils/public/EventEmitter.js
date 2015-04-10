@@ -18,6 +18,13 @@ EventEmitter.prototype.on = function(type, listener) {
   return this.off.bind(this, type, listener);
 };
 
+EventEmitter.prototype.once = function(type, listener) {
+  var off = this.on(type, function(args) {
+    off();
+    listener(args);
+  });
+};
+
 EventEmitter.prototype.trigger = function(type, args) {
   if (!this._listenersByType) {
     return;

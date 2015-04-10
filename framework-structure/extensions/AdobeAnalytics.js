@@ -1,10 +1,10 @@
 // TODO: Handle canceling tool initialization. Not sure why this is supported.
-var AdobeAnalyticsExtension = function(propertySettings, extensionSettings) {
+var AdobeAnalytics = function(propertySettings, extensionSettings) {
   this.propertySettings = propertySettings;
   this.extensionSettings = extensionSettings;
 };
 
-_satellite.utils.extend(AdobeAnalyticsExtension.prototype, {
+_satellite.utils.extend(AdobeAnalytics.prototype, {
   queryStringParamMap: {
     browserHeight: 'bh',
     browserWidth: 'bw',
@@ -237,4 +237,4 @@ _satellite.utils.extend(AdobeAnalyticsExtension.prototype, {
   }
 });
 
-module.exports = AdobeAnalyticsExtension;
+module.exports = AdobeAnalytics;

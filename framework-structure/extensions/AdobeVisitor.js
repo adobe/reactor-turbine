@@ -1,9 +1,11 @@
-var AdobeVisitorExtension = function(propertySettings, extensionSettings) {};
+var AdobeVisitor = function(propertySettings, extensionSettings) {};
 
-AdobeVisitorExtension.prototype.loadVistorId = function(actionSettings) {
+AdobeVisitor.prototype.loadVisitorId = function(actionSettings) {
   setTimeout(function() {
-
-  }, 2000);
+    this.trigger('visitorIdLoaded', 'ABC123');
+  }.bind(this), 2000);
 };
 
-module.exports = AdobeVisitorExtension;
+_satellite.utils.EventEmitter.mixin(AdobeVisitor);
+
+module.exports = AdobeVisitor;

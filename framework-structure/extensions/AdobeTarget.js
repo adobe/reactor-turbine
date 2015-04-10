@@ -74,7 +74,7 @@ window.mboxOfferAjax = function(content) {
 var MILLIS_IN_MINUTE = 60000;
 
 // TODO: Handle canceling tool initialization. Not sure why this is supported.
-var AdobeTargetExtension = function(propertySettings, extensionSettings) {
+var AdobeTarget = function(propertySettings, extensionSettings, dependencies) {
   this._propertySettings = propertySettings;
   this._extensionSettings = extensionSettings;
   this._mboxPageId = this._generateId();
@@ -83,9 +83,14 @@ var AdobeTargetExtension = function(propertySettings, extensionSettings) {
   this._mboxSessionId = this._generateId();
   // TODO: This is appears to be set from the first mbox response script via forceId()
   this._mboxPCId = '1428072735333-818489.28_10';
+
+  // Demonstrating extension dependency.
+  dependencies.adobeVisitor[0].on('visitorIdLoaded', function(visitorId) {
+    console.log('VisitorID received by Target extension: ' + visitorId);
+  });
 };
 
-_satellite.utils.extend(AdobeTargetExtension.prototype, {
+_satellite.utils.extend(AdobeTarget.prototype, {
   // TODO: Can we use an ID generator util provided by DTM?
   _generateId: function() {
     return (new Date()).getTime() + "-" + Math.floor(Math.random() * 999999);
@@ -159,4 +164,4 @@ _satellite.utils.extend(AdobeTargetExtension.prototype, {
   }
 });
 
-module.exports = AdobeTargetExtension;
+module.exports = AdobeTarget;

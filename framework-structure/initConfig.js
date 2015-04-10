@@ -46,9 +46,25 @@ module.exports ={
   }
 },
 extensions: {
+  adobeAnalytics: {
+    script: require('./extensions/AdobeAnalytics')
+  },
+  adobeTarget: {
+    script: require('./extensions/AdobeTarget'),
+    dependencies: [
+      'adobeVisitor'
+    ]
+  },
+  adobeDebug: {
+    script: require('./extensions/AdobeDebug')
+  },
+  adobeVisitor: {
+    script: require('./extensions/AdobeVisitor')
+  }
+},
+extensionInstances: {
   'abcdef': {
-    instanceId: 'abcdef',
-    extensionId: 'adobeAnalytics',
+    type: 'adobeAnalytics',
     settings: {
       account: 'aaronhardyprod',
       euCookie: false,
@@ -73,18 +89,18 @@ extensions: {
     }
   },
   'efghi': {
-    extensionId: 'adobeTarget',
+    type: 'adobeTarget',
     settings: {
       serverHost: 'adobeinternaldtmdemo.tt.omtrdc.net',
       clientCode: 'adobeinternaldtmdemo'
     }
   },
   'jklmno': {
-    extensionId: 'adobeDebug',
+    type: 'adobeDebug',
     settings: {}
   },
   'pqrst': {
-    extensionId: 'adobeVisitor',
+    type: 'adobeVisitor',
     settings: {}
   }
 },
@@ -320,6 +336,17 @@ newRules: [{
     settings: {
       text: 'direct call rule fired'
     }
+  }]
+},{
+  name: 'Load Visitor ID',
+  event: {
+    type: 'pageTop',
+    settings: {}
+  },
+  actions: [{
+    extensionInstanceIds: ['pqrst'],
+    method: 'loadVisitorId',
+    settings: {}
   }]
 }],
 

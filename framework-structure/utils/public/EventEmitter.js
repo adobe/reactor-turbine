@@ -1,8 +1,11 @@
-var EventEmitter = function() {
-  this._listenersByType = {};
-};
+var extend = require('./extend');
+var isFunction = require('./isFunction');
+
+var EventEmitter = function() {};
 
 EventEmitter.prototype.on = function(type, listener) {
+  this._listenersByType = this._listenersByType || {};
+
   // Prefix with $ to avoid important Object properties from being masked (e.g., "prototype").
   var listeners = this._listenersByType['$' + type];
 
@@ -16,10 +19,14 @@ EventEmitter.prototype.on = function(type, listener) {
 };
 
 EventEmitter.prototype.trigger = function(type, args) {
+  if (!this._listenersByType) {
+    return;
+  }
+
   var listeners = this._listenersByType['$' + type];
 
   if (!listeners) {
-    return false;
+    return;
   }
 
   // Create copy so if a listener calls off() to remove itself or another while we're looping
@@ -34,6 +41,10 @@ EventEmitter.prototype.trigger = function(type, args) {
 };
 
 EventEmitter.prototype.off = function(type, listener) {
+  if (!this._listenersByType) {
+    return;
+  }
+
   var listeners = this._listenersByType['$' + type];
 
   if (listeners) {
@@ -47,5 +58,8 @@ EventEmitter.prototype.off = function(type, listener) {
   }
 };
 
+EventEmitter.mixin = function(obj) {
+  extend(isFunction(obj) ? obj.prototype : obj,  EventEmitter.prototype);
+};
 
 module.exports = EventEmitter;

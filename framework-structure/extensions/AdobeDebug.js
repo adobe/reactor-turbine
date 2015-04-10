@@ -1,11 +1,11 @@
-var AdobeAlertExtension = function(propertySettings, extensionSettings) {};
+var AdobeDebug = function(propertySettings, extensionSettings) {};
 
-AdobeAlertExtension.prototype.alert = function(actionSettings) {
+AdobeDebug.prototype.alert = function(actionSettings) {
   alert(actionSettings.text);
 };
 
-AdobeAlertExtension.prototype.log = function(actionSettings) {
+AdobeDebug.prototype.log = function(actionSettings) {
   console.log('AdobeLog: '+actionSettings.text);
 };
 
-module.exports = AdobeAlertExtension;
+module.exports = AdobeDebug;

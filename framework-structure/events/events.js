@@ -42,12 +42,13 @@ var events = {
     });
   },
   pageBottom: function(eventSettingsCollection, callback){
-    eventBus.on('pageBottom',function (eventId){
+    var handler = function (){
       utils.each(eventSettingsCollection,function (eventSettings){
         callback(eventSettings);
       });
-      eventBus.off(eventId);
-    });
+      eventBus.off('pageBotom', handler);
+    };
+    eventBus.on('pageBottom', handler);
   },
   onload: function(eventSettingsCollection, callback){
     utils.addEventListener(window, 'load', function(event){

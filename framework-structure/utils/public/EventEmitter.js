@@ -47,7 +47,7 @@ EventEmitter.prototype.off = function(type, listener) {
 
   var listeners = this._listenersByType['$' + type];
 
-  if (listeners) {
+  if (!listeners) {
     return;
   }
 

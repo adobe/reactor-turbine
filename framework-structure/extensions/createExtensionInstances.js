@@ -1,14 +1,5 @@
 var each = require('../utils/public/each');
 
-// TODO: This will need to be more flexible to handle inclusion of only the extensions
-// configured for the property.
-_satellite.availableExtensions = {
-  adobeAnalytics: require('./AdobeAnalytics'),
-  adobeTarget: require('./AdobeTarget'),
-  adobeDebug: require('./AdobeDebug'),
-  adobeVisitor: require('./AdobeVisitor')
-};
-
 function getOrderedExtensionTypes(extensions) {
   var orderedTypes = [];
 

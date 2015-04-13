@@ -23,9 +23,9 @@ function initRule(rule){
 //TODO: put in events.js
 function initEvents(){
   for(var key in propertyMeta.events){
-    if(eventGroups[key].length > 0){
-      propertyMeta.events[key](eventGroups[key],function (eventSettings){
-        checkConditions(eventSettings._rule);
+    if(eventGroups[key] && eventGroups[key].length > 0){
+      propertyMeta.events[key](eventGroups[key],function (eventSettings, event){
+        checkConditions(eventSettings._rule, event);
       });
     }
   }

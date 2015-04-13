@@ -1,3 +1,5 @@
+var each = require('../utils/public/each');
+
 // `domReady(callback)`
 // --------------------
 //
@@ -8,7 +10,7 @@
 // - `callback` - a function to be called at `domready`
 //
 // *domReady is borrowed from <https://github.com/ded/domready>*
-module.exports = (function(ready) {
+var domReady = (function(ready) {
 
   var fns = [],
     fn, f = false,
@@ -18,25 +20,25 @@ module.exports = (function(ready) {
     domContentLoaded = 'DOMContentLoaded',
     addEventListener = 'addEventListener',
     onreadystatechange = 'onreadystatechange',
-    loaded = /^loade|^c/.test(doc.readyState)
+    loaded = /^loade|^c/.test(doc.readyState);
 
   function flush(f) {
-    loaded = 1
-    while (f = fns.shift()) f()
+    loaded = 1;
+    while (f = fns.shift()) f();
   }
 
   doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function() {
-    doc.removeEventListener(domContentLoaded, fn, f)
-    flush()
-  }, f)
+    doc.removeEventListener(domContentLoaded, fn, f);
+    flush();
+  }, f);
 
 
   hack && doc.attachEvent(onreadystatechange, (fn = function() {
     if (/^c/.test(doc.readyState)) {
-      doc.detachEvent(onreadystatechange, fn)
-      flush()
+      doc.detachEvent(onreadystatechange, fn);
+      flush();
     }
-  }))
+  }));
 
   return (ready = hack ?
     function(fn) {
@@ -44,16 +46,23 @@ module.exports = (function(ready) {
         loaded ? fn() : fns.push(fn) :
         function() {
           try {
-            testEl.doScroll('left')
+            testEl.doScroll('left');
           } catch (e) {
             return setTimeout(function() {
-              ready(fn)
-            }, 50)
+              ready(fn);
+            }, 50);
           }
-          fn()
-        }()
+          fn();
+        }();
     } :
     function(fn) {
-      loaded ? fn() : fns.push(fn)
-    })
-}())
+      loaded ? fn() : fns.push(fn);
+    });
+}());
+
+
+module.exports = function(eventSettingsCollection, callback){
+  _satellite.utils.each(eventSettingsCollection,function (eventSettings){
+    domReady(callback.bind(this,eventSettings));
+  });
+};

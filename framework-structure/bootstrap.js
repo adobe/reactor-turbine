@@ -14,7 +14,5 @@ var propertyMeta = require('./initConfig');
 _satellite.appVersion = propertyMeta.appVersion;
 _satellite.extensionInstances = createExtensionInstances(propertyMeta);
 require('./rules/initRules')();
-//TODO: move polling from dynamic listener out to a global place
-//TODO: add logic to check conditions
 globalPolling.init();
 dynamicListener.init();

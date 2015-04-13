@@ -8,7 +8,10 @@ module.exports ={
   'pageTop': events.pageTop,
   'pageBottom': events.pageBottom,
   'onload': events.onload,
-  'directCall': events.directCall
+  'directCall': events.directCall,
+  'mouseover': events.mouseover,
+  'enterViewport': events.enterViewport,
+  'elementExsists': events.elementExsists
 },
 "conditions": {
   urlParameter: require('./conditions/urlParameter'),
@@ -137,11 +140,14 @@ newRules: [{
       selector: 'h1, h2, h3, h4, h5'
     },
   },
-  conditions: [
-    function(event, target) {
-      return !_satellite.utils.isLinked(target);
+  conditions: [{
+    type:'custom',
+    settings: {
+      script: function(event) {
+        return !_satellite.utils.isLinked(event.target);
+      }
     }
-  ],
+  }],
   actions: [{
     extensionInstanceIds: ['abcdef'],
     method: 'trackLink',
@@ -174,11 +180,14 @@ newRules: [{
      'eventHandlerOnElement': true
     },
   },
-  conditions: [
-    function(event, target) {
-      return !_satellite.utils.isLinked(target);
+  conditions: [{
+    type:'custom',
+    settings: {
+      script: function(event) {
+        return !_satellite.utils.isLinked(event.target);
+      }
     }
-  ],
+  }],
   actions: [{
     extensionInstanceIds: ['abcdef'],
     method: 'trackLink',
@@ -349,6 +358,41 @@ newRules: [{
     extensionInstanceIds: ['pqrst'],
     method: 'loadVisitorId',
     settings: {}
+  }]
+},{
+  'mouseover': events.mouseover,
+  'enterViewport': events.enterViewport,
+  'elementExsists': events.elementExsists
+},{
+  name: 'mouseover static',
+  event: {
+    type: 'mouseover',
+    settings: {
+      selector: '[href="file.zip"]'
+    }
+  },
+  actions: [{
+    extensionInstanceIds: ['jklmno'],
+    method: 'log',
+    settings: {
+      text: 'mouseover download link rule fired'
+    }
+  }]
+},{
+  name: 'mouseover dynamic',
+  event: {
+    type: 'mouseover',
+    settings: {
+      selector: '.clickme',
+      eventHandlerOnElement: true
+    }
+  },
+  actions: [{
+    extensionInstanceIds: ['jklmno'],
+    method: 'log',
+    settings: {
+      text: 'mouseover Click Me fired'
+    }
   }]
 }],
 

@@ -1,4 +1,4 @@
-module.exports = function (selector,callback){
+module.exports = function (selector){
   // TODO: add logic to polyfill this functionality if its not on the dom
-  callback(document.querySelectorAll(selector));
+  return document.querySelectorAll(selector);
 };

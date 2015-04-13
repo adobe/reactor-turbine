@@ -201,16 +201,17 @@ newRules: [{
   event: {
     type: 'click',
     settings: {
-      selector: '#hero'
+      selector: '#hero',
     }
   },
   actions: [{
     extensionInstanceIds: ['efghi'],
     method: 'addMbox',
     settings: {
-      mboxName: 'frameworkdemo',
-      mboxGoesAround: '#hero',
-      mboxArguments: {
+      name: 'frameworkdemo',
+      populateElement: '#hero',
+      hideElement: '#hero',
+      arguments: {
         localmboxparam1: 'localmboxvalue1'
       },
       timeout: '1500'
@@ -244,9 +245,10 @@ newRules: [{
     extensionInstanceIds: ['efghi'],
     method: 'addMbox',
     settings: {
-      mboxName: 'frameworkredirectdemo',
-      mboxGoesAround: '#redirector',
-      mboxArguments: {
+      name: 'frameworkredirectdemo',
+      populateElement: '#redirector',
+      hideElement: 'html',
+      arguments: {
         localmboxparam1: 'localmboxvalue1'
       },
       timeout: '1500'

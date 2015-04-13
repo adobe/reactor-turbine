@@ -111,7 +111,7 @@ _satellite.utils.extend(AdobeTarget.prototype, {
     document.body.appendChild(script);
   },
   addMbox: function(actionSettings) {
-    if (getMboxByName(actionSettings.mboxName)) {
+    if (getMboxByName(actionSettings.name)) {
       return;
     }
 
@@ -130,28 +130,35 @@ _satellite.utils.extend(AdobeTarget.prototype, {
       mboxPC: this._mboxPCId,
       mboxCount: 1, // TODO needs to be incremented for each Mbox I believe.
       mboxTime: this._getTime(),
-      mbox: actionSettings.mboxName,
+      mbox: actionSettings.name,
       mboxId: 0, // TODO needs to come from the number of mboxes with the same mbox name?
       mboxURL: document.location, // TODO should only get sent when passPageParameters is true? See _urlBuilder.setUrlProcessAction
       mboxReferrer: document.referrer, // TODO should only get sent when passPageParameters is true and URL is under 2000? See _urlBuilder.setUrlProcessAction
       mboxVersion: 56 // TODO remove when using framework?
     };
 
-    _satellite.utils.extend(args, actionSettings.mboxArguments);
+    _satellite.utils.extend(args, actionSettings.arguments);
 
-    var showPage = _satellite.utils.hidePage();
+    var showPage;
+
+    if (actionSettings.hideElement) {
+      showPage = _satellite.utils.hideElements(actionSettings.hideElement);
+    }
 
     var setOffer = function(mboxContent) {
       if (mboxContent !== undefined) {
-        var mboxContainer = document.querySelector(actionSettings.mboxGoesAround);
+        var mboxContainer = document.querySelector(actionSettings.populateElement);
         if (mboxContainer) {
           mboxContainer.innerHTML = mboxContent;
         }
       }
-      showPage();
+
+      if (showPage) {
+        showPage();
+      }
     };
 
-    mboxes.push(new mbox(actionSettings.mboxName, setOffer));
+    mboxes.push(new mbox(actionSettings.name, setOffer));
 
     var requestType = 'ajax';
 

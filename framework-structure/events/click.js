@@ -1,14 +1,9 @@
-var setupDynamicListener = require('./_setupDynamicListener');
-var setupGlobalListener = require('./_setupGlobalListener');
+dtmUtils.setupDynamicListener(eventSettingsCollection,function(eventSettings,event){
+  callback(eventSettings, event);
+});
 
-module.exports = function(eventSettingsCollection, callback) {
-  setupDynamicListener(eventSettingsCollection,function(eventSettings,event){
+dtmUtils.setupGlobalListener(document,'click',eventSettingsCollection,function(eventSettings,event){
+  if (eventSettings.selector && dtmUtils.matchesCss(eventSettings.selector, event.target)) {
     callback(eventSettings, event);
-  });
-
-  setupGlobalListener(document,'click',eventSettingsCollection,function(eventSettings,event){
-    if (eventSettings.selector && _satellite.utils.matchesCss(eventSettings.selector, event.target)) {
-      callback(eventSettings, event);
-    }
-  });
-};
+  }
+});

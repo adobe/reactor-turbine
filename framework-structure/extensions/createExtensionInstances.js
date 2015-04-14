@@ -45,7 +45,7 @@ module.exports = function(propertyMeta) {
           });
         }
 
-        var Extension = extensionMeta.script;
+        var Extension = extensionMeta.script();
         var extensionInstance = new Extension(
             propertyMeta,
             extensionInstanceMeta.settings,

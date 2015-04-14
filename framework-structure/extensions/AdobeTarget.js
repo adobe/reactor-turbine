@@ -85,12 +85,12 @@ var AdobeTarget = function(propertySettings, extensionSettings, dependencies) {
   this._mboxPCId = '1428072735333-818489.28_10';
 
   // Demonstrating extension dependency.
-  dependencies.adobeVisitor[0].on('visitorIdLoaded', function(visitorId) {
+  dependencies.AdobeVisitor[0].on('visitorIdLoaded', function(visitorId) {
     console.log('VisitorID received by Target extension: ' + visitorId);
   });
 };
 
-_satellite.utils.extend(AdobeTarget.prototype, {
+dtmUtils.extend(AdobeTarget.prototype, {
   // TODO: Can we use an ID generator util provided by DTM?
   _generateId: function() {
     return (new Date()).getTime() + "-" + Math.floor(Math.random() * 999999);
@@ -120,12 +120,12 @@ _satellite.utils.extend(AdobeTarget.prototype, {
     var args = {
       mboxHost: document.location.hostname,
       mboxPage: this._mboxPageId,
-      screenWidth: _satellite.data.clientInfo.screenWidth,
-      screenHeight: _satellite.data.clientInfo.screenHeight,
-      browserWidth: _satellite.data.clientInfo.browserWidth,
-      browserHeight: _satellite.data.clientInfo.browserHeight,
+      screenWidth: dtmData.clientInfo.screenWidth,
+      screenHeight: dtmData.clientInfo.screenHeight,
+      browserWidth: dtmData.clientInfo.browserWidth,
+      browserHeight: dtmData.clientInfo.browserHeight,
       browserTimeOffset: this._browserTimeOffset,
-      colorDepth: _satellite.data.clientInfo.colorDepth,
+      colorDepth: dtmData.clientInfo.colorDepth,
       mboxSession: this._mboxSessionId,
       mboxPC: this._mboxPCId,
       mboxCount: 1, // TODO needs to be incremented for each Mbox I believe.
@@ -137,12 +137,12 @@ _satellite.utils.extend(AdobeTarget.prototype, {
       mboxVersion: 56 // TODO remove when using framework?
     };
 
-    _satellite.utils.extend(args, actionSettings.arguments);
+    dtmUtils.extend(args, actionSettings.arguments);
 
     var showPage;
 
     if (actionSettings.hideElement) {
-      showPage = _satellite.utils.hideElements(actionSettings.hideElement);
+      showPage = dtmUtils.hideElements(actionSettings.hideElement);
     }
 
     var setOffer = function(mboxContent) {
@@ -164,11 +164,11 @@ _satellite.utils.extend(AdobeTarget.prototype, {
 
     var url = protocol + '//' + this._extensionSettings.serverHost + '/m2/' +
         this._extensionSettings.clientCode + '/mbox/' + requestType + '?' +
-        _satellite.utils.encodeObjectToURI(args);
+        dtmUtils.encodeObjectToURI(args);
 
     this._createScript(url);
 
   }
 });
 
-module.exports = AdobeTarget;
+return AdobeTarget;

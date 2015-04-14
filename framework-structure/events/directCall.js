@@ -1,9 +1,7 @@
-var eventBus = require('../eventBus');
-
-module.exports = function(eventSettingsCollection, callback){
-  _satellite.utils.each(eventSettingsCollection,function (eventSettings){
-    eventBus.on('directcall.' + eventSettings.name,function (){
+_satellite.runRule = function(name) {
+  dtmUtils.each(eventSettingsCollection, function (eventSettings) {
+    if (eventSettings.name === name) {
       callback(eventSettings);
-    });
+    }
   });
 };

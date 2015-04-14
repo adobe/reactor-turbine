@@ -1,4 +1,4 @@
-var dynamicListener = require('../utils/private/dynamicListener');
+var dynamicListener = require('../private/dynamicListener');
 
 module.exports = function setupDynamicListener(eventSettingsCollection,callback){
   // setup direct bindings on dynamic Dom

@@ -1,7 +1,5 @@
-module.exports = function(eventSettingsCollection, callback){
-  _satellite.utils.addEventListener(window, 'load', function(event){
-    _satellite.utils.each(eventSettingsCollection,function (eventSettings){
-      callback(eventSettings);
-    });
+dtmUtils.addEventListener(window, 'load', function(event){
+  dtmUtils.each(eventSettingsCollection,function (eventSettings){
+    callback(eventSettings);
   });
-};
+});

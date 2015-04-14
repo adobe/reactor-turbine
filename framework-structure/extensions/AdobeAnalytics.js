@@ -4,7 +4,7 @@ var AdobeAnalytics = function(propertySettings, extensionSettings) {
   this.extensionSettings = extensionSettings;
 };
 
-_satellite.utils.extend(AdobeAnalytics.prototype, {
+dtmUtils.extend(AdobeAnalytics.prototype, {
   _queryStringParamMap: {
     browserHeight: 'bh',
     browserWidth: 'bw',
@@ -118,13 +118,13 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
       this._translateToQueryStringParam(queryStringParams, 'events', events);
     }
 
-    return _satellite.utils.encodeObjectToURI(queryStringParams);
+    return dtmUtils.encodeObjectToURI(queryStringParams);
   },
   _getTrackingURI: function(queryString) {
     var tagContainerMarker = 'D' + _satellite.appVersion;
     var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
         Math.floor(Math.random() * 10000000000000);
-    var protocol = _satellite.utils.isHttps() ? 'https://' : 'http://';
+    var protocol = dtmUtils.isHttps() ? 'https://' : 'http://';
     var uri = protocol + this._getTrackingServer() + '/b/ss/' + this.extensionSettings.account +
         '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
 
@@ -178,8 +178,8 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
   },
   trackPageView: function(actionSettings) {
     var trackVars = {};
-    _satellite.utils.extend(trackVars, this.extensionSettings.trackVars);
-    _satellite.utils.extend(trackVars, actionSettings.trackVars);
+    dtmUtils.extend(trackVars, this.extensionSettings.trackVars);
+    dtmUtils.extend(trackVars, actionSettings.trackVars);
 
     // Referrer is intentionally only tracked on the first page view beacon.
     if (this.initialPageViewTracked) {
@@ -207,7 +207,7 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
       }
     }
 
-    _satellite.utils.extend(trackVars, actionSettings.trackVars);
+    dtmUtils.extend(trackVars, actionSettings.trackVars);
 
     // Referrer is never sent for link tracking.
     delete trackVars.referrer;
@@ -223,12 +223,12 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
     var queryString = this._remodelDataToQueryString({
       vars: trackVars,
       events: trackEvents,
-      clientInfo: _satellite.data.clientInfo
+      clientInfo: dtmData.clientInfo
     });
 
     var uri = this._getTrackingURI(queryString);
 
-    _satellite.utils.createBeacon({
+    dtmUtils.createBeacon({
       beaconURL: uri,
       type: 'image'
     });
@@ -237,4 +237,4 @@ _satellite.utils.extend(AdobeAnalytics.prototype, {
   }
 });
 
-module.exports = AdobeAnalytics;
+return AdobeAnalytics;

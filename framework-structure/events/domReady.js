@@ -1,5 +1,3 @@
-var each = require('../utils/public/each');
-
 // `domReady(callback)`
 // --------------------
 //
@@ -61,8 +59,6 @@ var domReady = (function(ready) {
 }());
 
 
-module.exports = function(eventSettingsCollection, callback){
-  _satellite.utils.each(eventSettingsCollection,function (eventSettings){
-    domReady(callback.bind(this,eventSettings));
-  });
-};
+dtmUtils.each(eventSettingsCollection,function (eventSettings){
+  domReady(callback.bind(this,eventSettings));
+});

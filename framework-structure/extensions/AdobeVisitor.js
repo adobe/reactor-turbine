@@ -6,6 +6,6 @@ AdobeVisitor.prototype.loadVisitorId = function(actionSettings) {
   }.bind(this), 2000);
 };
 
-_satellite.utils.EventEmitter.mixin(AdobeVisitor);
+dtmUtils.EventEmitter.mixin(AdobeVisitor);
 
-module.exports = AdobeVisitor;
+return AdobeVisitor;

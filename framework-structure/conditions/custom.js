@@ -1,3 +1,1 @@
-module.exports = function(conditionSettings, event) {
-  return conditionSettings.script(event);
-};
+return conditionSettings.script(event);

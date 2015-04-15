@@ -1,3 +1,5 @@
+var indexOf = require('./indexOf');
+
 // `contains(arr, obj)`
 // -----------------------
 //
@@ -8,5 +10,5 @@
 // - `arr` - said array
 // - `obj` - said object
 module.exports = function(arr, obj){
-  return SL.indexOf(arr, obj) !== -1;
+  return indexOf(arr, obj) !== -1;
 };

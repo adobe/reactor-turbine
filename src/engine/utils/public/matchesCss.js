@@ -42,11 +42,12 @@ module.exports = (function(docEl) {
       if (selector.match(/^[a-z]+$/i)) {
         return simpleTagMatch(selector, elm)
       }
-      try {
-        return SL.Sizzle.matches(selector, [elm]).length > 0
-      } catch (e) {
-        return false
-      }
+      // TODO: Re-implement once we start loading sizzle.
+      //try {
+      //  return SL.Sizzle.matches(selector, [elm]).length > 0
+      //} catch (e) {
+      //  return false
+      //}
     }
   }
 }(document.documentElement))

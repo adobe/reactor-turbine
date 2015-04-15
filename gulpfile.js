@@ -1,31 +1,11 @@
 var gulp = require('gulp');
 var merge = require('ordered-merge-stream');
-var concat = require('gulp-concat');
+var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var fs = require('fs');
 var path = require('path');
 
 var $ = require('gulp-load-plugins')();
-
-// var src = ['**/satelliteLib*.js', '**/satellite-overrides.js'];
-// var tests = ['**/test*'];
-//
-// gulp.task('test', function() {
-//   return gulp.src(src, {
-//       read: false
-//     })
-//     .pipe($.debug({
-//       title: 'unicorn:'
-//     }))
-//     .pipe($.cover.instrument({
-//       pattern: tests,
-//       debugDirectory: 'debug'
-//     }))
-//     .pipe($.mocha())
-//     .pipe($.cover.gather())
-//     .pipe($.cover.format())
-//     .pipe(gulp.dest('reports'));
-// });
 
 function wrapInFunction(content, argNames) {
   var argsStr = argNames ? argNames.join(', ') : '';
@@ -64,9 +44,9 @@ function getExtensions() {
     {
       name: 'AdobeDebug'
     }
-  ]
+  ];
 
-  var directory = './framework-structure/extensions/';
+  var directory = './src/config/extensions/';
 
   var extensionsStr = '{';
 
@@ -85,34 +65,36 @@ function getExtensions() {
   return extensionsStr;
 }
 
-gulp.task("webpack", function() {
-  var events = getFunctionsFromFiles('./framework-structure/events/', ['eventSettingsCollection', 'callback']);
-  var conditions = getFunctionsFromFiles('./framework-structure/conditions/', ['conditionSettings', 'event']);
+gulp.task('buildConfig', function() {
+  var events = getFunctionsFromFiles('./src/config/events/', ['eventSettingsCollection', 'callback']);
+  var conditions = getFunctionsFromFiles('./src/config/conditions/', ['conditionSettings', 'event']);
   var extensions = getExtensions();
 
-  var config = gulp.src(['./framework-structure/config.txt'])
+  return gulp.src(['./src/config/config.txt'])
     .pipe(replace('{{events}}', events))
     .pipe(replace('{{conditions}}', conditions))
-    .pipe(replace('{{extensions}}', extensions));
+    .pipe(replace('{{extensions}}', extensions))
+    .pipe(rename('config.js'))
+    .pipe(gulp.dest('./dist'));
+});
 
-  var engine = gulp.src('./framework-structure/bootstrap.js')
+gulp.task("buildEngine", function() {
+  return gulp.src('./src/engine/bootstrap.js')
     .pipe($.webpack({
       output: {
-        filename: "bundle.js"
+        filename: "engine.js"
       },
       devtool: "#inline-source-map",
       resolve: {
         extensions: ['', '.js']
       }
-    }));
-
-  return merge([config, engine])
-    .pipe(concat('bundle.js'))
-    .pipe(gulp.dest('./framework-structure/dist'));
+    }))
+    .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('watch', function() {
-  gulp.watch(['./framework-structure/**/*.js', '!./framework-structure/dist/**/*'], ['webpack']);
+  gulp.watch(['./src/config/**/*'], ['buildConfig']);
+  gulp.watch(['./src/engine/**/*.js'], ['buildEngine']);
 });
 
-gulp.task('default', ['webpack','watch']);
+gulp.task('default', ['buildConfig', 'buildEngine', 'watch']);

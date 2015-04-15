@@ -1,4 +1,4 @@
-var each = require('../utils/public/each');
+var each = require('./utils/public/each');
 
 function getOrderedExtensionTypes(extensions) {
   var orderedTypes = [];

@@ -1,4 +1,4 @@
-var each = require('../utils/public/each');
+var each = require('./utils/public/each');
 var eventGroups = {};
 
 module.exports = function(propertyMeta){

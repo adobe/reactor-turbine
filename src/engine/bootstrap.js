@@ -1,6 +1,6 @@
 var globalPolling = require('./utils/public/globalPolling');
 var dynamicListener = require('./utils/public/dynamicListener');
-var createExtensionInstances = require('./extensions/createExtensionInstances');
+var createExtensionInstances = require('./createExtensionInstances');
 var utils = require('./utils/public/index');
 var data = require('./data/public/index');
 
@@ -12,6 +12,6 @@ _satellite.runRule = function() {}; // Will get replaced if a rule is configured
 _satellite.appVersion = propertyMeta.appVersion;
 _satellite.extensionInstances = createExtensionInstances(propertyMeta);
 
-require('./rules/initRules')(propertyMeta);
+require('./initRules')(propertyMeta);
 globalPolling.init();
 dynamicListener.init();

@@ -375,6 +375,36 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
             }
           }
         ]
+      },{
+        "name": "enterViewport stuff",
+        "event": {
+          "type": "enterViewport",
+          "settings": {
+            "selector": ".clickme"
+          }
+        },
+        "actions": [{
+          "extensionInstanceIds": ["jklmno"],
+          "method": "log",
+          "settings": {
+            "text": "enterViewport fired rule fired"
+          }
+        }]
+      },{
+        "name": "elementExists stuff",
+        "event": {
+          "type": "elementExists",
+          "settings": {
+            "selector": ".clickme"
+          }
+        },
+        "actions": [{
+          "extensionInstanceIds": ["jklmno"],
+          "method": "log",
+          "settings": {
+            "text": "elementExists fired rule fired"
+          }
+        }]
       }
     ],
     "settings": {

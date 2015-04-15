@@ -1,8 +1,8 @@
-var each = require('../public/each');
-var dataOnElement = require('../public/dataOnElement');
-var querySelectorAll = require('../public/querySelectorAll');
-var addEventListener = require('../public/addEventListener');
-var globalPolling = require('../private/globalPolling');
+var each = require('./each');
+var dataOnElement = require('./dataOnElement');
+var querySelectorAll = require('./querySelectorAll');
+var addEventListener = require('./addEventListener');
+var globalPolling = require('./globalPolling');
 
 var eventSettingsCollection = [];
 var nextuid = -1;

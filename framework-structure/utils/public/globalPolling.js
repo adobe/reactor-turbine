@@ -1,5 +1,5 @@
-var poll = require('../public/poll');
-var each = require('../public/each');
+var poll = require('./poll');
+var each = require('./each');
 
 var pollList = [];
 

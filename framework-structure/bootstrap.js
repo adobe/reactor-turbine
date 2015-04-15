@@ -1,5 +1,5 @@
-var globalPolling = require('./utils/private/globalPolling');
-var dynamicListener = require('./utils/private/dynamicListener');
+var globalPolling = require('./utils/public/globalPolling');
+var dynamicListener = require('./utils/public/dynamicListener');
 var createExtensionInstances = require('./extensions/createExtensionInstances');
 var utils = require('./utils/public/index');
 var data = require('./data/public/index');

@@ -1,4 +1,4 @@
-var AdobeDebug = function(propertySettings, extensionSettings) {};
+var AdobeDebug = function(extensionSettings, propertySettings) {};
 
 AdobeDebug.prototype.alert = function(actionSettings) {
   alert(actionSettings.text);

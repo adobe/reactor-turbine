@@ -1,4 +1,4 @@
-var AdobeVisitor = function(propertySettings, extensionSettings) {};
+var AdobeVisitor = function(extensionSettings, propertySettings) {};
 
 AdobeVisitor.prototype.loadVisitorId = function(actionSettings) {
   setTimeout(function() {

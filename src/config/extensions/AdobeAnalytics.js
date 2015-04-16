@@ -1,7 +1,7 @@
 // TODO: Handle canceling tool initialization. Not sure why this is supported.
-var AdobeAnalytics = function(propertySettings, extensionSettings) {
-  this.propertySettings = propertySettings;
+var AdobeAnalytics = function(extensionSettings, propertySettings) {
   this.extensionSettings = extensionSettings;
+  this.propertySettings = propertySettings;
 };
 
 dtmUtils.extend(AdobeAnalytics.prototype, {

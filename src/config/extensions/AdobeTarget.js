@@ -74,9 +74,9 @@ window.mboxOfferAjax = function(content) {
 var MILLIS_IN_MINUTE = 60000;
 
 // TODO: Handle canceling tool initialization. Not sure why this is supported.
-var AdobeTarget = function(propertySettings, extensionSettings, dependencies) {
-  this._propertySettings = propertySettings;
+var AdobeTarget = function(extensionSettings, propertySettings, dependencies) {
   this._extensionSettings = extensionSettings;
+  this._propertySettings = propertySettings;
   this._mboxPageId = this._generateId();
   this._browserTimeOffset = this._getBrowserTimeOffset();
   // TODO: There's more involved here. See mboxSession() in mbox.js.

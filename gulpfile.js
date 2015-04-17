@@ -43,6 +43,9 @@ function getExtensions() {
     },
     {
       name: 'AdobeDebug'
+    },
+    {
+      name: 'FacebookConnect'
     }
   ];
 

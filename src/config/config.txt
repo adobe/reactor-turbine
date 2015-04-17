@@ -44,6 +44,12 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       "pqrst": {
         "type": "AdobeVisitor",
         "settings": {}
+      },
+      "uvw": {
+        "type": "FacebookConnect",
+        "settings": {
+          "appId": "8170496322"
+        }
       }
     },
     "newRules": [
@@ -405,6 +411,34 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
             "text": "elementExists fired rule fired"
           }
         }]
+      },{
+        "name": "Facebook Login",
+        "event": {
+          "type": "click",
+          "settings": {
+            "selector": ".facebook-login"
+          }
+        },
+        "actions": [{
+          "extensionInstanceIds": ["uvw"],
+          "method": "logIn",
+          "settings": {}
+        }]
+      },{
+        "name": "Share Purchase on Facebook",
+        "event": {
+          "type": "click",
+          "settings": {
+            "selector": ".facebook-share"
+          }
+        },
+        "actions": [{
+          "extensionInstanceIds": ["uvw"],
+          "method": "share",
+          "settings": {
+            "href": "http://dtm.aaronhardy.com/shoes.html"
+          }
+        }]
       }
     ],
     "settings": {
@@ -437,119 +471,5 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
     "appVersion": "52A",
     "buildDate": "2015-03-16 20:55:42 UTC",
     "publishDate": "2015-03-16 14:43:44 -0600",
-
-    // OLD ENGINE
-
-    "tools": {
-      "f489afdcde1a53ef58aec319401144f7": {
-        "engine": "sc",
-        "loadOn": "pagebottom",
-        "account": "aaronhardyprod",
-        "euCookie": false,
-        "sCodeURL": "7adf9ad51d40b4e06390693913f85f1a37e869de/s-code-contents-22c7cbe13317f4c9e99900c0b530d66471196f02-staging.js",
-        "initVars": {
-          "charSet": "UTF-8",
-          "currencyCode": "TND",
-          "referrer": "myreferreroverride",
-          "campaign": "MyToolCampaign",
-          "pageURL": "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
-          "trackInlineStats": true,
-          "trackDownloadLinks": true,
-          "linkDownloadFileTypes": "avi,css,csv,doc,docx,eps,exe,jpg,js,m4v,mov,mp3,pdf,png,ppt,pptx,rar,svg,tab,txt,vsd,vxd,wav,wma,wmv,xls,xlsx,xml,zip,fake",
-          "trackExternalLinks": true,
-          "linkInternalFilters": "javascript:,mailto:,tel:",
-          "linkLeaveQueryString": false,
-          "dynamicVariablePrefix": "$$",
-          "eVar50": "toolevar50",
-          "prop50": "toolprop50"
-        }
-      },
-      "da8f823508d51bfe232b1a9609a426dcbfce8709": {
-        "engine": "tnt",
-        "mboxURL": "7adf9ad51d40b4e06390693913f85f1a37e869de/mbox-contents-da8f823508d51bfe232b1a9609a426dcbfce8709-staging.js",
-        "loadSync": true,
-        "pageParams": {}
-      }
-    },
-    "pageLoadRules": [
-      {
-        "name": "KitchenSink",
-        "trigger": [
-          {
-            "engine": "sc",
-            "command": "setVars",
-            "arguments": [
-              {
-                "eVar10": "MyEvar10",
-                "eVar11": "MyEvar11",
-                "prop10": "MyProp10",
-                "prop11": "MyProp11",
-                "pageName": "MyPageName",
-                "channel": "MyChannel",
-                "pageURL": "http://reallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverridereallyreallyreallylongpageurloverride",
-                "campaign": "MyRuleCampaign",
-                "hier1": "HierLev1|HierLev2|HierLev3|HierLev4"
-              }
-            ]
-          },
-          {
-            "engine": "sc",
-            "command": "addEvent",
-            "arguments": ["event10:MyEvent10", "event11:MyEvent11", "prodView:MyProdView"]
-          },
-          {
-            "engine": "tnt",
-            "command": "addMbox",
-            "arguments": [
-              {
-                "mboxGoesAround": "",
-                "mboxName": "",
-                "arguments": [],
-                "timeout": "1500"
-              }
-            ]
-          }
-        ],
-        "event": "pagebottom"
-      }
-    ],
-    "rules": [
-      {
-        "name": "Dead Header",
-        "trigger": [{
-          "engine": "sc",
-          "command": "trackLink",
-          "arguments": [
-            {
-              "type": "o",
-              "linkName": "MyLink",
-              "setVars": {
-                "eVar20": "MyDeadHeaderEvar",
-                "prop20": "D=v20",
-                "campaign": dtmUtils.getQueryParam("dead")
-              },
-              "addEvent": ["event20:deadevent"]
-            }
-          ]
-        }],
-        "conditions": [function(event, target) {
-          return !dtmUtils.isLinked(target)
-        }],
-        "selector": "h1, h2, h3, h4, h5",
-        "event": "click",
-        "bubbleFireIfParent": true,
-        "bubbleFireIfChildFired": true,
-        "bubbleStop": false
-      }
-      //{"name":"Dead Header","trigger":[{"engine":"sc","command":"trackPageView","arguments":[{"type":"o","linkName":"MyLink","setVars":{"eVar20":"MyDeadHeaderEvar","prop20":"D=v20","campaign":
-      //    SL.getQueryParam("dead")
-      //},"addEvent":["event20:deadevent"]}]}],"conditions":[function(event,target){
-      //  return !dtmUtils.isLinked(target)
-      //}],"selector":"h1, h2, h3, h4, h5","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false},
-      //{"name":"Download Link","trigger":[{"engine":"sc","command":"trackLink","arguments":[{"type":"d","linkName":"%this.href%"}]},{"command":"delayActivateLink"}],"selector":"a","event":"click","bubbleFireIfParent":true,"bubbleFireIfChildFired":true,"bubbleStop":false,"property":{"href":/\.(?:doc|docx|eps|xls|ppt|pptx|pdf|xlsx|tab|csv|zip|txt|vsd|vxd|xml|js|css|rar|exe|wma|mov|avi|wmv|mp3|wav|m4v)($|\&|\?)/i}}
-    ],
-    "directCallRules": [
-
-    ],
   };
 };

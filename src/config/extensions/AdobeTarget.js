@@ -104,12 +104,6 @@ dtmUtils.extend(AdobeTarget.prototype, {
     var now = new Date();
     return now.getTime() - (now.getTimezoneOffset() * MILLIS_IN_MINUTE)
   },
-  // TODO: Should be a DTM util.
-  _createScript: function(url) {
-    var script = document.createElement('script');
-    script.src = url;
-    document.body.appendChild(script);
-  },
   addMbox: function(actionSettings) {
     if (getMboxByName(actionSettings.name)) {
       return;
@@ -166,8 +160,7 @@ dtmUtils.extend(AdobeTarget.prototype, {
         this._extensionSettings.clientCode + '/mbox/' + requestType + '?' +
         dtmUtils.encodeObjectToURI(args);
 
-    this._createScript(url);
-
+    dtmUtils.loadScript(url);
   }
 });
 

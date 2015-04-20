@@ -1,20 +1,21 @@
 var FacebookConnect = function(extensionSettings) {
   this.extensionSettings = extensionSettings;
-
-  dtmUtils.loadScript('//connect.facebook.net/en_US/sdk.js', function(error) {
-    if (!error) {
-      FB.init({
-        appId      : extensionSettings.appId,
-        cookie     : true,  // enable cookies to allow the server to access
-                            // the session
-        xfbml      : true,  // parse social plugins on this page
-        version    : 'v2.3' // use version 2.3
-      });
-    }
-  });
+  this._loadSDK();
 };
 
 dtmUtils.extend(FacebookConnect.prototype, {
+  _loadSDK: function() {
+    var self = this;
+    dtmUtils.loadScript('//connect.facebook.net/en_US/sdk.js', function(error) {
+      if (!error) {
+        FB.init({
+          appId: self.extensionSettings.appId,
+          xfbml: self.extensionSettings.hasOwnProperty('xfbml') ? self.extensionSettings.xfbml : true,
+          version: self.extensionSettings.version || 'v2.3'
+        });
+      }
+    });
+  },
   logIn: function() {
     var self = this;
     FB.getLoginStatus(function(response) {
@@ -30,12 +31,18 @@ dtmUtils.extend(FacebookConnect.prototype, {
       }
     });
   },
-  share: function(actionSettings) {
-    FB.ui({
-      method: 'share',
-      href: actionSettings.href,
-      caption: actionSettings.caption
-    }, function(response) {});
+  logOut: function() {
+    FB.logout();
+  },
+  showDialog: function(actionSettings) {
+    FB.ui(actionSettings);
+  },
+  parseXFBML: function(actionSettings) {
+    if (actionSettings.hasOwnProperty('selector')) {
+      FB.XFBML.parse(dtmUtils.querySelector(actionSettings.selector));
+    } else {
+      FB.XFBML.parse();
+    }
   }
 });
 

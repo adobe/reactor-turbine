@@ -64,8 +64,8 @@ module.exports = function(propertyMeta) {
         }
 
         var extensionInstance = new Extension(
-            extensionInstanceMeta.settings,
-            propertyMeta.settings,
+            extensionInstanceMeta.settings || {},
+            propertyMeta.settings || {},
             dependencyInstances);
 
         instanceById[extensionInstanceId] = extensionInstance;

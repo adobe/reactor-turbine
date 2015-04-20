@@ -38,12 +38,10 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
         }
       },
       "jklmno": {
-        "type": "AdobeDebug",
-        "settings": {}
+        "type": "AdobeDebug"
       },
       "pqrst": {
-        "type": "AdobeVisitor",
-        "settings": {}
+        "type": "AdobeVisitor"
       },
       "uvw": {
         "type": "FacebookConnect",
@@ -234,8 +232,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Dom Ready",
         "event": {
-          "type": "domReady",
-          "settings": {}
+          "type": "domReady"
         },
         //conditions: [
         //  {
@@ -268,8 +265,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Page Top",
         "event": {
-          "type": "pageTop",
-          "settings": {}
+          "type": "pageTop"
         },
         "actions": [
           {
@@ -284,8 +280,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Page Bottom",
         "event": {
-          "type": "pageBottom",
-          "settings": {}
+          "type": "pageBottom"
         },
         "actions": [
           {
@@ -300,8 +295,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "onload",
         "event": {
-          "type": "onload",
-          "settings": {}
+          "type": "onload"
         },
         "actions": [
           {
@@ -334,14 +328,12 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Load Visitor ID",
         "event": {
-          "type": "pageTop",
-          "settings": {}
+          "type": "pageTop"
         },
         "actions": [
           {
             "extensionInstanceIds": ["pqrst"],
-            "method": "loadVisitorId",
-            "settings": {}
+            "method": "loadVisitorId"
           }
         ]
       },
@@ -421,8 +413,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
         },
         "actions": [{
           "extensionInstanceIds": ["uvw"],
-          "method": "logIn",
-          "settings": {}
+          "method": "logIn"
         }]
       },{
         "name": "Share Purchase on Facebook",
@@ -432,13 +423,33 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
             "selector": ".facebook-share"
           }
         },
-        "actions": [{
-          "extensionInstanceIds": ["uvw"],
-          "method": "share",
-          "settings": {
-            "href": "http://dtm.aaronhardy.com/shoes.html"
+        "actions": [
+          //{
+          //  "extensionInstanceIds": ["uvw"],
+          //  "method": "share",
+          //  "settings": {
+          //    "href": "http://dtm.aaronhardy.com/shoes.html"
+          //  }
+          //},
+          //{
+          //  "extensionInstanceIds": ["uvw"],
+          //  "method": "feed",
+          //  "settings": {
+          //    "redirectURI"
+          //  }
+          //},
+          //{
+          //  "extensionInstanceIds": ["uvw"],
+          //  "method": "showDialog",
+          //  "settings": {
+          //    "method": "send",
+          //    "link": "http://dtm.aaronhardy.com/shoes.html"
+          //  }
+          {
+            "extensionInstanceIds": ["uvw"],
+            "method": "parseXFBML"
           }
-        }]
+        ]
       }
     ],
     "settings": {

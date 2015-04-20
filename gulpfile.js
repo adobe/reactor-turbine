@@ -1,5 +1,4 @@
 var gulp = require('gulp');
-var merge = require('ordered-merge-stream');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var fs = require('fs');
@@ -12,55 +11,45 @@ function wrapInFunction(content, argNames) {
   return 'function(' + argsStr + ') {\n' + content + '}\n';
 }
 
-function getFunctionsFromFiles(directory, argNames) {
+function getExtensionDirectories(baseDir) {
+  return fs.readdirSync(baseDir).filter(function(file) {
+    return fs.statSync(path.join(baseDir, file)).isDirectory();
+  });
+}
+
+function shallowStringifyWithFunctionValues(obj) {
   var output = '{';
 
-  var filenames = fs.readdirSync(directory);
-  filenames.forEach(function(filename) {
-    var type = path.basename(filename, '.js');
-    var functionContent = fs.readFileSync(directory + filename);
-    output += '\n"' + type + '": ' + wrapInFunction(functionContent, argNames) + ',';
-  });
+  for (var key in obj) {
+    var value = obj[key];
+    output += '\n"' + key + '": ' + value + ',';
+  }
 
   output += '}';
 
   return output;
 }
 
-function getExtensions() {
-  var extensions = [
-    {
-      name: 'AdobeAnalytics'
-    },
-    {
-      name: 'AdobeTarget',
-      dependencies: [
-        'AdobeVisitor'
-      ]
-    },
-    {
-      name: 'AdobeVisitor'
-    },
-    {
-      name: 'AdobeDebug'
-    },
-    {
-      name: 'FacebookConnect'
-    }
-  ];
-
-  var directory = './src/config/extensions/';
+function getExtensionFactories(baseDir) {
+  var dependencyMap = {
+    'adobeTarget': ['adobeVisitor']
+  };
 
   var extensionsStr = '{';
 
-  extensions.forEach(function(extension) {
-    extensionsStr += '"' + extension.name + '": {';
-    extensionsStr += 'script: ' + wrapInFunction(fs.readFileSync(directory + extension.name + '.js'));
+  getExtensionDirectories(baseDir).forEach(function(extensionDir) {
+    var factoryPath = path.join(baseDir, extensionDir, 'index.js');
 
-    if (extension.dependencies) {
-      extensionsStr += ', dependencies: ["' + extension.dependencies.join(',') + '"]'
+    if (fs.existsSync(factoryPath)) {
+      extensionsStr += '"' + extensionDir + '": {';
+      extensionsStr += 'script: ' + wrapInFunction(fs.readFileSync(factoryPath));
+
+      var dependencies = dependencyMap[extensionDir];
+      if (dependencies) {
+        extensionsStr += ', dependencies: ["' + dependencies.join(',') + '"]'
+      }
+      extensionsStr += '},'
     }
-    extensionsStr += '},'
   });
 
   extensionsStr += '}';
@@ -68,15 +57,35 @@ function getExtensions() {
   return extensionsStr;
 }
 
-gulp.task('buildConfig', function() {
-  var events = getFunctionsFromFiles('./src/config/events/', ['eventSettingsCollection', 'callback']);
-  var conditions = getFunctionsFromFiles('./src/config/conditions/', ['conditionSettings', 'event']);
-  var extensions = getExtensions();
+function getExtensionFeatures(baseDir, feature, functionWrapArgs) {
+  var functionByType = {};
+  var extensionDirectories = getExtensionDirectories(baseDir);
 
-  return gulp.src(['./src/config/config.txt'])
+  extensionDirectories.forEach(function(extensionDir) {
+    var featureDir = path.join(baseDir, extensionDir, feature);
+    if (fs.existsSync(featureDir)) {
+      fs.readdirSync(featureDir).forEach(function(filename) {
+        var type = path.basename(filename, '.js');
+        var eventFile = path.join(featureDir, filename);
+        var functionContent = fs.readFileSync(eventFile, { encoding: 'utf8' });
+        functionByType[extensionDir + '.' + type] = wrapInFunction(functionContent, functionWrapArgs);
+      });
+    }
+  });
+
+  return shallowStringifyWithFunctionValues(functionByType);
+}
+
+gulp.task('buildConfig', function() {
+  var baseDir = './src/config';
+  var events = getExtensionFeatures(baseDir, 'events', ['eventSettingsCollection', 'callback']);
+  var conditions = getExtensionFeatures(baseDir, 'conditions', ['conditionSettings', 'event']);
+  var factories = getExtensionFactories(baseDir);
+
+  return gulp.src([path.join(baseDir, 'config.txt')])
     .pipe(replace('{{events}}', events))
     .pipe(replace('{{conditions}}', conditions))
-    .pipe(replace('{{extensions}}', extensions))
+    .pipe(replace('{{extensions}}', factories))
     .pipe(rename('config.js'))
     .pipe(gulp.dest('./dist'));
 });

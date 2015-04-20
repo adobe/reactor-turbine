@@ -49,7 +49,7 @@ module.exports = function(propertyMeta) {
 
   each(extensionTypes, function(extensionType) {
     var extensionMeta = propertyMeta.extensions[extensionType];
-    var Extension = extensionMeta.script();
+    var extensionFactory = extensionMeta.script();
     var extensionInstances = [];
 
     for (var extensionInstanceId in propertyMeta.extensionInstances) {
@@ -63,7 +63,7 @@ module.exports = function(propertyMeta) {
           });
         }
 
-        var extensionInstance = new Extension(
+        var extensionInstance = extensionFactory(
             extensionInstanceMeta.settings || {},
             propertyMeta.settings || {},
             dependencyInstances);

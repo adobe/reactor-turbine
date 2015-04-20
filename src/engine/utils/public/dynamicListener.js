@@ -8,9 +8,10 @@ var eventSettingsCollection = [];
 var nextuid = -1;
 
 module.exports = {};
-module.exports.register = function(eventSettings,callback){
+module.exports.register = function(eventSettings,type,callback){
   eventSettingsCollection.push({
     eventSettings:eventSettings,
+    type:type,
     callback:callback,
     id:nextuid++
   });
@@ -30,7 +31,7 @@ function attachDynamicEvents(){
       // if (SL.propertiesMatch(rule.property, elm)){
       //   SL.registerEvents(elm, [rule.event])
       // }
-      addEventListener(elm,event.eventSettings._rule.event.type,event.callback.bind(this,event.eventSettings));
+      addEventListener(elm,event.type,event.callback.bind(this,event.eventSettings));
     });
   });
 }

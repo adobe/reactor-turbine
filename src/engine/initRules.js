@@ -24,7 +24,6 @@ function initRule(rule){
   }
 }
 
-//TODO: put in events.js
 function initEvents(propertyMeta){
   for(var key in propertyMeta.events){
     if(eventGroups[key] && eventGroups[key].length > 0){
@@ -50,7 +49,6 @@ function checkConditions(propertyMeta, rule, event) {
   runActions(rule);
 }
 
-//TODO: put in actions.js
 function runActions(rule){
   each(rule.actions,function(action) {
     action.settings = action.settings || {};

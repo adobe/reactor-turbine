@@ -1,5 +1,5 @@
 //direct attach , timeout
-dtmUtils.setupDynamicListener(eventSettingsCollection,function(eventSettings,event){
+dtmUtils.setupDynamicListener(eventSettingsCollection,'mouseover',function(eventSettings,event){
   callback(eventSettings, event);
 });
 

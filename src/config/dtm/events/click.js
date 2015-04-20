@@ -1,4 +1,4 @@
-dtmUtils.setupDynamicListener(eventSettingsCollection,function(eventSettings,event){
+dtmUtils.setupDynamicListener(eventSettingsCollection,'click',function(eventSettings,event){
   callback(eventSettings, event);
 });
 

@@ -6,7 +6,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
     "extensions": {{extensions}},
     "extensionInstances": {
       "abcdef": {
-        "type": "AdobeAnalytics",
+        "type": "adobeAnalytics",
         "settings": {
           "account": "aaronhardyprod",
           "euCookie": false,
@@ -31,20 +31,20 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
         }
       },
       "efghi": {
-        "type": "AdobeTarget",
+        "type": "adobeTarget",
         "settings": {
           "serverHost": "adobeinternaldtmdemo.tt.omtrdc.net",
           "clientCode": "adobeinternaldtmdemo"
         }
       },
       "jklmno": {
-        "type": "AdobeDebug"
+        "type": "adobeDebug"
       },
       "pqrst": {
-        "type": "AdobeVisitor"
+        "type": "adobeVisitor"
       },
       "uvw": {
-        "type": "FacebookConnect",
+        "type": "facebookConnect",
         "settings": {
           "appId": "8170496322"
         }
@@ -82,14 +82,14 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Dead Header Rule",
         "event": {
-          "type": "click",
+          "type": "dtm.click",
           "settings": {
             "selector": "h1, h2, h3, h4, h5"
           },
         },
         "conditions": [
           {
-            "type":"custom",
+            "type":"dtm.custom",
             "settings": {
               "script": function(event) {
                 return !dtmUtils.isLinked(event.target);
@@ -120,7 +120,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Crazy Test Rule",
         "event": {
-          "type": "click",
+          "type": "dtm.click",
           "settings": {
             "selector": "h1, h2, h3, h4, h5",
             "bubbleFireIfParent": true,
@@ -134,7 +134,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
         },
         "conditions": [
           {
-            "type":"custom",
+            "type":"dtm.custom",
             "settings": {
               "script": function(event) {
                 return !dtmUtils.isLinked(event.target);
@@ -165,7 +165,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Hero Mbox",
         "event": {
-          "type": "click",
+          "type": "dtm.click",
           "settings": {
             "selector": "#hero",
           }
@@ -189,7 +189,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Click Me",
         "event": {
-          "type": "click",
+          "type": "dtm.click",
           "settings": {
             "selector": ".clickme",
             "eventHandlerOnElement": true
@@ -208,7 +208,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Mbox Redirect",
         "event": {
-          "type": "click",
+          "type": "dtm.click",
           "settings": {
             "selector": "#redirectButton"
           }
@@ -232,7 +232,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Dom Ready",
         "event": {
-          "type": "domReady"
+          "type": "dtm.domReady"
         },
         //conditions: [
         //  {
@@ -265,7 +265,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Page Top",
         "event": {
-          "type": "pageTop"
+          "type": "dtm.pageTop"
         },
         "actions": [
           {
@@ -280,7 +280,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Page Bottom",
         "event": {
-          "type": "pageBottom"
+          "type": "dtm.pageBottom"
         },
         "actions": [
           {
@@ -295,7 +295,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "onload",
         "event": {
-          "type": "onload"
+          "type": "dtm.onload"
         },
         "actions": [
           {
@@ -310,7 +310,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "direct call test",
         "event": {
-          "type": "directCall",
+          "type": "dtm.directCall",
           "settings": {
             "name": "dc1"
           }
@@ -328,7 +328,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "Load Visitor ID",
         "event": {
-          "type": "pageTop"
+          "type": "dtm.pageTop"
         },
         "actions": [
           {
@@ -340,7 +340,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "mouseover static",
         "event": {
-          "type": "mouseover",
+          "type": "dtm.mouseover",
           "settings": {
             "selector": "[href='file.zip']"
           }
@@ -358,7 +358,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       {
         "name": "mouseover dynamic",
         "event": {
-          "type": "mouseover",
+          "type": "dtm.mouseover",
           "settings": {
             "selector": ".clickme",
             "eventHandlerOnElement": true
@@ -376,7 +376,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       },{
         "name": "enterViewport stuff",
         "event": {
-          "type": "enterViewport",
+          "type": "dtm.enterViewport",
           "settings": {
             "selector": ".clickme"
           }
@@ -391,7 +391,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       },{
         "name": "elementExists stuff",
         "event": {
-          "type": "elementExists",
+          "type": "dtm.elementExists",
           "settings": {
             "selector": ".clickme"
           }
@@ -406,7 +406,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       },{
         "name": "Facebook Login",
         "event": {
-          "type": "click",
+          "type": "dtm.click",
           "settings": {
             "selector": ".facebook-login"
           }
@@ -418,7 +418,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
       },{
         "name": "Share Purchase on Facebook",
         "event": {
-          "type": "click",
+          "type": "dtm.click",
           "settings": {
             "selector": ".facebook-share"
           }
@@ -438,17 +438,18 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
           //    "redirectURI"
           //  }
           //},
-          //{
-          //  "extensionInstanceIds": ["uvw"],
-          //  "method": "showDialog",
-          //  "settings": {
-          //    "method": "send",
-          //    "link": "http://dtm.aaronhardy.com/shoes.html"
-          //  }
           {
             "extensionInstanceIds": ["uvw"],
-            "method": "parseXFBML"
+            "method": "showDialog",
+            "settings": {
+              "method": "send",
+              "link": "http://dtm.aaronhardy.com/shoes.html"
+            }
           }
+          //{
+          //  "extensionInstanceIds": ["uvw"],
+          //  "method": "parseXFBML"
+          //}
         ]
       }
     ],

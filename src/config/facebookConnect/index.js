@@ -1,5 +1,5 @@
-// Only a single extension instance is supported primarily because only a single Facebook
-// appID is supported per page.
+// Only a single extension instance is supported primarily because the Facebook SDK only supports
+// a single app ID per page.
 return function(extensionSettings) {
   var loadSDKPromise = new dtmUtils.Promise(function(resolve, reject) {
     // TODO: Implement timeout.

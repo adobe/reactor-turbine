@@ -1,3 +1,1 @@
-dtmUtils.each(eventSettingsCollection,function (eventSettings){
-  callback(eventSettings);
-});
+callback(eventSettingsCollection);

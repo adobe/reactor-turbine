@@ -84,7 +84,7 @@ var AdobeTarget = function(extensionSettings) {
   this._mboxPCId = '1428072735333-818489.28_10';
 
   // Demonstrating extension dependency.
-  dependencies.adobeVisitor[0].on('visitorIdLoaded', function(visitorId) {
+  dependencies.adobeVisitor[0].loadIdPromise.then(function(visitorId) {
     console.log('VisitorID received by Target extension: ' + visitorId);
   });
 };

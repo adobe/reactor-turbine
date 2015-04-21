@@ -326,18 +326,6 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
         ]
       },
       {
-        "name": "Load Visitor ID",
-        "event": {
-          "type": "dtm.pageTop"
-        },
-        "actions": [
-          {
-            "extensionInstanceIds": ["pqrst"],
-            "method": "loadVisitorId"
-          }
-        ]
-      },
-      {
         "name": "mouseover static",
         "event": {
           "type": "dtm.mouseover",

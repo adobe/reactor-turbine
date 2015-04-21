@@ -1,6 +1,5 @@
-for (var i = 0; i < eventSettingsCollection.length; i++) {
-  var eventSettings = eventSettingsCollection[i];
+dtmUtils.each(eventSettingsCollection, function(eventSettings) {
   setTimeout(function() {
     callback(eventSettings);
   }, eventSettings.duration);
-}
+});

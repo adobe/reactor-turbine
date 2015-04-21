@@ -10,7 +10,7 @@ var propertyMeta = _satellite.getConfig(data, utils);
 _satellite.pageBottom = function() {}; // Will get replaced if a rule is configured with a page bottom event trigger.
 _satellite.runRule = function() {}; // Will get replaced if a rule is configured with a direct call event trigger.
 _satellite.appVersion = propertyMeta.appVersion;
-_satellite.extensionInstances = createExtensionInstances(propertyMeta);
+createExtensionInstances(propertyMeta);
 
 require('./initRules')(propertyMeta);
 globalPolling.init();

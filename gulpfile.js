@@ -30,7 +30,7 @@ function shallowStringifyWithFunctionValues(obj) {
   return output;
 }
 
-function getExtensionFactories(baseDir) {
+function getExtensionFactories(baseDir, functionWrapArgs) {
   var dependencyMap = {
     'adobeTarget': ['adobeVisitor']
   };
@@ -42,7 +42,8 @@ function getExtensionFactories(baseDir) {
 
     if (fs.existsSync(factoryPath)) {
       extensionsStr += '"' + extensionDir + '": {';
-      extensionsStr += 'script: ' + wrapInFunction(fs.readFileSync(factoryPath));
+      extensionsStr += 'script: ' +
+          wrapInFunction(fs.readFileSync(factoryPath), functionWrapArgs);
 
       var dependencies = dependencyMap[extensionDir];
       if (dependencies) {
@@ -78,9 +79,9 @@ function getExtensionFeatures(baseDir, feature, functionWrapArgs) {
 
 gulp.task('buildConfig', function() {
   var baseDir = './src/config';
-  var events = getExtensionFeatures(baseDir, 'events', ['eventSettingsCollection', 'callback']);
-  var conditions = getExtensionFeatures(baseDir, 'conditions', ['conditionSettings', 'event']);
-  var factories = getExtensionFactories(baseDir);
+  var events = getExtensionFeatures(baseDir, 'events', ['eventSettingsCollection', 'callback', 'extensions']);
+  var conditions = getExtensionFeatures(baseDir, 'conditions', ['conditionSettings', 'event', 'extensions']);
+  var factories = getExtensionFactories(baseDir, ['propertySettings', 'dependencies']);
 
   return gulp.src([path.join(baseDir, 'config.txt')])
     .pipe(replace('{{events}}', events))

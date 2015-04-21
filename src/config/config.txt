@@ -416,7 +416,7 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
           "method": "logIn"
         }]
       },{
-        "name": "Share Purchase on Facebook",
+        "name": "Send Purchase on Facebook",
         "event": {
           "type": "dtm.click",
           "settings": {
@@ -424,20 +424,6 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
           }
         },
         "actions": [
-          //{
-          //  "extensionInstanceIds": ["uvw"],
-          //  "method": "share",
-          //  "settings": {
-          //    "href": "http://dtm.aaronhardy.com/shoes.html"
-          //  }
-          //},
-          //{
-          //  "extensionInstanceIds": ["uvw"],
-          //  "method": "feed",
-          //  "settings": {
-          //    "redirectURI"
-          //  }
-          //},
           {
             "extensionInstanceIds": ["uvw"],
             "method": "showDialog",
@@ -446,10 +432,20 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
               "link": "http://dtm.aaronhardy.com/shoes.html"
             }
           }
-          //{
-          //  "extensionInstanceIds": ["uvw"],
-          //  "method": "parseXFBML"
-          //}
+        ]
+      },{
+        "name": "Purchase Sent on Facebook",
+        "event": {
+          "type": "facebookConnect.message.send"
+        },
+        "actions": [
+          {
+            "extensionInstanceIds": ["jklmno"],
+            "method": "log",
+            "settings": {
+              "text": "Shared with BFFs."
+            }
+          }
         ]
       }
     ],

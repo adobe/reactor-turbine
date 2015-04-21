@@ -1,4 +1,5 @@
 var each = require('./utils/public/each');
+var extensionInstanceRegistry = require('./extensionInstanceRegistry');
 
 /**
  * Retrieves a list of extension types in the order they should be instantiated.
@@ -40,41 +41,24 @@ function getOrderedExtensionTypes(extensionsMeta) {
  * @returns {Object} Object where the key is the instance ID and the value is the instance.
  */
 module.exports = function(propertyMeta) {
-  var instanceById = {};
-  var instancesByExtensionType = {};
-
   // Get the order in which extensions need to be instantiated in order to inject extension
   // instances into other extension instances that depend on them.
   var extensionTypes = getOrderedExtensionTypes(propertyMeta.extensions);
 
   each(extensionTypes, function(extensionType) {
     var extensionMeta = propertyMeta.extensions[extensionType];
-    var extensionFactory = extensionMeta.script();
-    var extensionInstances = [];
+
+    var dependencies = extensionMeta.dependencies ?
+        extensionInstanceRegistry.getMappedByType(extensionMeta.dependencies) : {};
+
+    var extensionFactory = extensionMeta.script(propertyMeta.settings || {}, dependencies);
 
     for (var extensionInstanceId in propertyMeta.extensionInstances) {
       var extensionInstanceMeta = propertyMeta.extensionInstances[extensionInstanceId];
       if (extensionInstanceMeta.type === extensionType) {
-        var dependencyInstances = {};
-
-        if (extensionMeta.dependencies) {
-          each(extensionMeta.dependencies, function(dependencyExtensionType) {
-            dependencyInstances[dependencyExtensionType] = instancesByExtensionType[dependencyExtensionType];
-          });
-        }
-
-        var extensionInstance = extensionFactory(
-            extensionInstanceMeta.settings || {},
-            propertyMeta.settings || {},
-            dependencyInstances);
-
-        instanceById[extensionInstanceId] = extensionInstance;
-        extensionInstances.push(extensionInstance);
+        var extensionInstance = extensionFactory(extensionInstanceMeta.settings || {});
+        extensionInstanceRegistry.register(extensionInstanceId, extensionType, extensionInstance);
       }
     }
-
-    instancesByExtensionType[extensionType] = extensionInstances;
   });
-
-  return instanceById;
 };

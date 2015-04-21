@@ -22,6 +22,7 @@
   "devDependencies": {
     "gulp-concat": "^2.5.2",
     "gulp-replace": "^0.5.3",
-    "gulp-rename": "^1.2.2"
+    "gulp-rename": "^1.2.2",
+    "promiscuous": "^0.6.0"
   }
 }

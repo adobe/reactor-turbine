@@ -111,3 +111,5 @@ gulp.task('watch', function() {
 });
 
 gulp.task('default', ['buildConfig', 'buildEngine', 'watch']);
+
+gulp.task('buildCreateBeacon', require('./standAloneMethods/gulp/createBeaconTask.js'));

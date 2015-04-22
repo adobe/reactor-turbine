@@ -1,13 +1,12 @@
 var each = require('./utils/public/each');
 var isArray = require('./utils/public/isArray');
-var extensionInstanceRegistry = require('./extensionInstanceRegistry');
 var eventGroups = {};
 
-module.exports = function(propertyMeta){
+module.exports = function(propertyMeta, extensionInstanceRegistry){
   each(propertyMeta.newRules,function(rule){
     initRule(rule);
   });
-  initEvents(propertyMeta);
+  initEvents(propertyMeta, extensionInstanceRegistry);
 };
 
 function initRule(rule){
@@ -26,7 +25,7 @@ function initRule(rule){
   }
 }
 
-function initEvents(propertyMeta){
+function initEvents(propertyMeta, extensionInstanceRegistry){
   for(var key in propertyMeta.events){
     if(eventGroups[key] && eventGroups[key].length > 0){
       propertyMeta.events[key](
@@ -37,7 +36,7 @@ function initEvents(propertyMeta){
           }
 
           each(eventSettingsCollection, function(eventSettings) {
-            checkConditions(propertyMeta, eventSettings._rule, event);
+            checkConditions(propertyMeta, eventSettings._rule, event, extensionInstanceRegistry);
           });
         },
         extensionInstanceRegistry.getMappedByType());
@@ -45,7 +44,7 @@ function initEvents(propertyMeta){
   }
 }
 
-function checkConditions(propertyMeta, rule, event) {
+function checkConditions(propertyMeta, rule, event, extensionInstanceRegistry) {
   if (rule.conditions) {
     for (var i = 0; i < rule.conditions.length; i++) {
       var condition = rule.conditions[i];
@@ -60,10 +59,10 @@ function checkConditions(propertyMeta, rule, event) {
     }
   }
 
-  runActions(rule);
+  runActions(rule, extensionInstanceRegistry);
 }
 
-function runActions(rule){
+function runActions(rule, extensionInstanceRegistry){
   each(rule.actions,function(action) {
     action.settings = action.settings || {};
     each(action.extensionInstanceIds,function(instanceId) {

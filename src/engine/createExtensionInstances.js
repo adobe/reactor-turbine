@@ -1,5 +1,4 @@
 var each = require('./utils/public/each');
-var extensionInstanceRegistry = require('./extensionInstanceRegistry');
 
 /**
  * Retrieves a list of extension types in the order they should be instantiated.
@@ -40,7 +39,7 @@ function getOrderedExtensionTypes(extensionsMeta) {
  * @param {Object} propertyMeta Property metadata object.
  * @returns {Object} Object where the key is the instance ID and the value is the instance.
  */
-module.exports = function(propertyMeta) {
+module.exports = function(propertyMeta, extensionInstanceRegistry) {
   // Get the order in which extensions need to be instantiated in order to inject extension
   // instances into other extension instances that depend on them.
   var extensionTypes = getOrderedExtensionTypes(propertyMeta.extensions);

@@ -1,5 +1,5 @@
 dtmUtils.each(eventSettingsCollection, function(eventSettings) {
   setTimeout(function() {
-    callback(eventSettings);
+    next(eventSettings);
   }, eventSettings.duration);
 });

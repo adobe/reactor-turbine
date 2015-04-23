@@ -6,7 +6,7 @@ dtmUtils.globalPolling.add('elementexistsevents', function(){
       var elm = elms[0];
       if (dtmUtils.dataOnElement(elm, 'elementexists.seen')) return;
       dtmUtils.dataOnElement(elm, 'elementexists.seen', true);
-      callback(eventSettings);
+      next(eventSettings);
     }
   });
 });

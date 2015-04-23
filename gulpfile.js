@@ -79,7 +79,7 @@ function getExtensionFeatures(baseDir, feature, functionWrapArgs) {
 
 gulp.task('buildConfig', function() {
   var baseDir = './src/config';
-  var events = getExtensionFeatures(baseDir, 'events', ['eventSettingsCollection', 'callback', 'extensions']);
+  var events = getExtensionFeatures(baseDir, 'events', ['eventSettingsCollection', 'next', 'extensions']);
   var conditions = getExtensionFeatures(baseDir, 'conditions', ['conditionSettings', 'event', 'extensions']);
   var factories = getExtensionFactories(baseDir, ['propertySettings', 'dependencies']);
 

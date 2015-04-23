@@ -1,1 +1,1 @@
-callback(eventSettingsCollection);
+next(eventSettingsCollection);

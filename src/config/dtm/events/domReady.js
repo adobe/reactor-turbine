@@ -60,5 +60,5 @@ var domReady = (function(ready) {
 
 
 dtmUtils.each(eventSettingsCollection,function (eventSettings){
-  domReady(callback.bind(this,eventSettings));
+  domReady(next.bind(this,eventSettings));
 });

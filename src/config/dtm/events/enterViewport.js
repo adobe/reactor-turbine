@@ -67,7 +67,7 @@ var checkForDomChanges = function(eventSettingsCollection) {
       if (elementIsInView(elm)) {
         if(!hasBeenInView){
           dtmUtils.dataOnElement(elm, 'inview', true);
-          callback(eventSettings);
+          next(eventSettings);
         }
       }else if(hasBeenInView){
         dtmUtils.dataOnElement(elm, 'inview', false);

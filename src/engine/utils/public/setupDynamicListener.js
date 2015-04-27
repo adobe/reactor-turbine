@@ -8,6 +8,8 @@ module.exports = function setupDynamicListener(eventSettingsCollection,type,call
       dynamicListener.register(eventSettings,type,function(eventSettings,event){
         callback(eventSettings,event);
       });
+
+      // TODO: Remove this? It's for optimization but it makes things brittle and difficult to understand.
       eventSettingsCollection.splice(i,1);
     }
   }

@@ -1,4 +1,6 @@
-var matcher = function(regexs){
+var extend = require('./extend');
+
+var matchUserAgent = function(regexs){
   return function(userAgent){
     for (var key in regexs){
       var regex = regexs[key];
@@ -9,34 +11,9 @@ var matcher = function(regexs){
   };
 };
 
-// TODO: Can we get rid of this?
-var getTopFrameSet = function() {
-  // Get the top frame set
-  var
-      topFrameSet = window,
-      parent,
-      location;
-  try {
-    parent = topFrameSet.parent;
-    location = topFrameSet.location;
-    while ((parent) &&
-    (parent.location) &&
-    (location) &&
-    ('' + parent.location != '' + location) &&
-    (topFrameSet.location) &&
-    ('' + parent.location != '' + topFrameSet.location) &&
-    (parent.location.host == location.host)) {
-      topFrameSet = parent;
-      parent = topFrameSet.parent;
-    }
-  } catch (e) {}
-
-  return topFrameSet;
-};
-
 var exports = {};
 
-exports.getBrowser = matcher({
+var browser = matchUserAgent({
   OmniWeb: /OmniWeb/,
   "Opera Mini": /Opera Mini/,
   "Opera Mobile": /Opera Mobi/,
@@ -47,9 +24,9 @@ exports.getBrowser = matcher({
   "IE Mobile": /IEMobile/,
   IE: /MSIE|Trident/,
   Safari: /Safari/
-});
+})(navigator.userAgent);
 
-exports.getOS = matcher({
+var os = matchUserAgent({
   iOS: /iPhone|iPad|iPod/,
   Blackberry: /BlackBerry/,
   "Symbian OS": /SymbOS/,
@@ -59,9 +36,9 @@ exports.getOS = matcher({
   Unix: /FreeBSD|OpenBSD|CrOS/,
   Windows: /[\( ]Windows /,
   MacOS: /Macintosh;/
-});
+})(navigator.userAgent);
 
-exports.getDeviceType = matcher({
+var deviceType = matchUserAgent({
   iPhone: /iPhone/,
   iPad: /iPad/,
   iPod: /iPod/,
@@ -70,37 +47,38 @@ exports.getDeviceType = matcher({
   Blackberry: /BlackBerry/,
   Android: /Android [0-9\.]+;/,
   Desktop: /.*/
-});
+})(navigator.userAgent);
 
-exports.getUserAgent = function() {
-  return navigator.userAgent;
-};
+exports.userAgent = navigator.userAgent;
 
-exports.getBrowserWidth = function() {
+// Is a method because it has a likelihood of changing while the user is on the page.
+var getBrowserWidth = function() {
   return window.innerWidth ? window.innerWidth : document.documentElement.offsetWidth;
 };
 
-exports.getBrowserHeight = function() {
+// Is a method because it has a likelihood of changing while the user is on the page.
+var getBrowserHeight = function() {
   return window.innerHeight ? window.innerHeight : document.documentElement.offsetHeight;
 };
 
-exports.getResolution = function() {
+// Is a method because it has a likelihood of changing while the user is on the page.
+var getResolution = function() {
   return window.screen.width + "x" + window.screen.height;
 };
 
-exports.getScreenWidth = function() {
+// Is a method because it has a likelihood of changing while the user is on the page.
+var getScreenWidth = function() {
   return window.screen.width;
 };
 
-exports.getScreenHeight = function() {
+// Is a method because it has a likelihood of changing while the user is on the page.
+var getScreenHeight = function() {
   return window.screen.height;
 }
 
-exports.getColorDepth = function() {
-  return window.screen.pixelDepth ? window.screen.pixelDepth : window.screen.colorDepth;
-};
+var colorDepth = window.screen.pixelDepth ? window.screen.pixelDepth : window.screen.colorDepth;
 
-exports.getJSVersion = function() {
+var jsVersion = (function() {
   var
       tm = new Date,
       a,o,i,
@@ -137,34 +115,90 @@ exports.getJSVersion = function() {
       }
     }
   }
-
   return j;
-};
+})();
 
-exports.getIsJavaEnabled = function() {
-  return navigator.javaEnabled();
-};
+var isJavaEnabled = navigator.javaEnabled();
 
-exports.getIsCookiesEnabled = function() {
-  return window.navigator.cookieEnabled;
-};
+var isCookiesEnabled = window.navigator.cookieEnabled;
 
-// TODO: Can we get rid of this?
-exports.getConnectionType = function() {
+// TODO: Can we get rid of this? It's used by the Analytics extension but is a deprecated browser API.
+var connectionType = (function() {
   try {
     document.body.addBehavior('#default#clientCaps');
     return document.body.connectionType;
   } catch (e) {}
-};
+})();
 
-// TODO: Can we get rid of this?
-exports.getIsHomePage = function() {
+// TODO: Can we get rid of this? It's used by the Analytics extension but is a deprecated browser API.
+var isHomePage = (function() {
+  function getTopFrameSet() {
+    // Get the top frame set
+    var
+      topFrameSet = window,
+      parent,
+      location;
+    try {
+      parent = topFrameSet.parent;
+      location = topFrameSet.location;
+      while ((parent) &&
+      (parent.location) &&
+      (location) &&
+      ('' + parent.location != '' + location) &&
+      (topFrameSet.location) &&
+      ('' + parent.location != '' + topFrameSet.location) &&
+      (parent.location.host == location.host)) {
+        topFrameSet = parent;
+        parent = topFrameSet.parent;
+      }
+    } catch (e) {}
+
+    return topFrameSet;
+  }
+
   try {
     document.body.addBehavior('#default#homePage');
     var isHomePage = document.body.isHomePage;
     return isHomePage ? isHomePage(getTopFrameSet().location) : false;
   } catch (e) {}
+})();
+
+/**
+ * Information that is highly unlikely to change while the user is on the page.
+ */
+var staticInfo = {
+  browser: browser,
+  os: os,
+  deviceType: deviceType,
+  colorDepth: colorDepth,
+  jsVersion: jsVersion,
+  isJavaEnabled: isJavaEnabled,
+  isCookiesEnabled: isCookiesEnabled,
+  isHomePage: isHomePage
 };
 
-module.exports = exports;
+/**
+ * @returns {Object} A snapshot of all client information at this moment.
+ */
+var getSnapshot = function() {
+  return extend({
+    browserWidth: getBrowserWidth(),
+    browserHeight: getBrowserHeight(),
+    resolution: getResolution(),
+    screenWidth: getScreenWidth(),
+    screenHeight: getScreenHeight()
+  }, staticInfo);
+};
 
+/**
+ * Contains information about the client environment including static information that is unlikely
+ * to change while the user is on the page and accessors for more dynamic information.
+ */
+module.exports = extend({
+  getBrowserWidth: getBrowserWidth,
+  getBrowserHeight: getBrowserHeight,
+  getResolution: getResolution,
+  getScreenWidth: getScreenWidth,
+  getScreenHeight: getScreenHeight,
+  getSnapshot: getSnapshot
+}, staticInfo);

@@ -31,16 +31,16 @@ function parseQueryParams(str){
 var caseSensitivityQueryParamsMap;
 function getCaseSensitivityQueryParamsMap(str) {
   if (!caseSensitivityQueryParamsMap) {
-    var sensitive = parseQueryParams(str)
-    var insensitive = {}
+    var mixCase = parseQueryParams(str)
+    var lowerCase = {}
 
-    for (var prop in sensitive)
-      if (sensitive.hasOwnProperty(prop))
-        insensitive[prop.toLowerCase()] = sensitive[prop]
+    for (var prop in mixCase)
+      if (mixCase.hasOwnProperty(prop))
+        lowerCase[prop.toLowerCase()] = mixCase[prop]
 
     caseSensitivityQueryParamsMap = {
-      sensitive: sensitive,
-      insensitive: insensitive
+      mixCase: mixCase,
+      lowerCase: lowerCase
     };
   }
 
@@ -48,11 +48,12 @@ function getCaseSensitivityQueryParamsMap(str) {
 }
 
 
-module.exports = function(key, caseSensitive) {
+// TODO: We're caching query string parameters which could change when using pushState. Remove caching? Re-cache when URL changes?
+module.exports = function(key, ignoreCase) {
   var paramsMap = getCaseSensitivityQueryParamsMap(window.location.search);
-  if (caseSensitive) {
-    return paramsMap.sensitive[key];
+  if (ignoreCase) {
+    return paramsMap.lowerCase[key.toLowerCase()];
   } else {
-    return paramsMap.insensitive[key.toLowerCase()];
+    return paramsMap.mixCase[key];
   }
 };

@@ -223,7 +223,7 @@ dtmUtils.extend(AdobeAnalytics.prototype, {
     var queryString = this._remodelDataToQueryString({
       vars: trackVars,
       events: trackEvents,
-      clientInfo: dtmData.clientInfo
+      clientInfo: dtmUtils.clientInfo.getSnapshot()
     });
 
     var uri = this._getTrackingURI(queryString);

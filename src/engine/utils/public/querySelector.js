@@ -1,4 +1,10 @@
-module.exports = function (selector){
-  // TODO: add logic to polyfill this functionality if its not on the dom
-  return document.querySelector(selector);
-};
+// TODO: Add Sizzle support. Does this need to be async?
+//var querySelectorPromise = require('../private/ensureQuerySelector')();
+//
+//module.exports = function (selector, callback){
+//  querySelectorPromise.then(function() {
+//    callback(document.querySelector(selector));
+//  });
+//};
+
+module.exports = document.querySelector.bind(document);

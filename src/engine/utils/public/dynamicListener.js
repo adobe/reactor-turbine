@@ -23,15 +23,16 @@ module.exports.init = function (){
 
 function attachDynamicEvents(){
   each(eventSettingsCollection, function(event){
-    var elms = querySelectorAll(event.eventSettings.selector);
-    each(elms, function(elm){
-      if (dataOnElement(elm, 'dynamicRules.seen'+event.id)) return;
-      dataOnElement(elm, 'dynamicRules.seen'+event.id, true);
-      // TODO: understand this chunk below
-      // if (SL.propertiesMatch(rule.property, elm)){
-      //   SL.registerEvents(elm, [rule.event])
-      // }
-      addEventListener(elm,event.type,event.callback.bind(this,event.eventSettings));
+    querySelectorAll(event.eventSettings.selector, function(elms) {
+      each(elms, function(elm){
+        if (dataOnElement(elm, 'dynamicRules.seen'+event.id)) return;
+        dataOnElement(elm, 'dynamicRules.seen'+event.id, true);
+        // TODO: understand this chunk below
+        // if (SL.propertiesMatch(rule.property, elm)){
+        //   SL.registerEvents(elm, [rule.event])
+        // }
+        addEventListener(elm,event.type,event.callback.bind(this,event.eventSettings));
+      });
     });
   });
 }

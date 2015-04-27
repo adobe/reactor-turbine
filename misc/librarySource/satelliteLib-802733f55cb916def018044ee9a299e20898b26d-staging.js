@@ -985,9 +985,9 @@
       .replace(/[^\000-\177]*/g, '')
   }
 
-  SL.text = function(obj){
-    return obj.textContent || obj.innerText
-  }
+    SL.text = function(obj){
+      return obj.textContent || obj.innerText
+    }
 
 // Special Properties for DOM elements. You use special properties using
 // the @ prefix. Example:
@@ -4532,9 +4532,13 @@
       }
     },
     "dataElements": {
-      "browserWidth": {"customJS":function(){
-        return _satellite.getBrowserWidth();
-      },"storeLength":"session"}
+      "hasOwnProperty": {"customJS":function(){
+        return 'my custom value from script';
+      },"default":"my default value for script","storeLength":"session","forceLowerCase":true,"cleanText":true},
+      "myCookieDataElement": {"cookie":"myCookie","default":"my default value","storeLength":"pageview"},
+      "myCSSSelectorDataElement": {"selector":"a","property":"href","default":"http://mydefaultvalue.com","storeLength":"session"},
+      "myJSObjectDataElement": {"jsVariable":"my.object.path","default":"my default value","storeLength":"visitor"},
+      "myUrlParameterDataElement": {"queryParam":"myParam","default":"myDefaultValue","storeLength":"pageview","ignoreCase":1}
     },
     "appVersion": "547",
     "buildDate": "2015-04-07 20:11:29 UTC",

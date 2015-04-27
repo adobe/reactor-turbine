@@ -1,5 +1,6 @@
 var each = require('./utils/public/each');
 var isArray = require('./utils/public/isArray');
+var preprocessSettings = require('./utils/private/preprocessSettings');
 var eventGroups = {};
 
 module.exports = function(propertyMeta, extensionInstanceRegistry){
@@ -67,7 +68,8 @@ function runActions(rule, extensionInstanceRegistry){
     action.settings = action.settings || {};
     each(action.extensionInstanceIds,function(instanceId) {
       var instance = extensionInstanceRegistry.getById(instanceId);
-      instance[action.method](action.settings);
+      var preprocessedSettings = preprocessSettings(action.settings);
+      instance[action.method](preprocessedSettings);
     });
   });
 }

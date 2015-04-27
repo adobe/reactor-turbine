@@ -1,5 +1,5 @@
 window._satellite = window._satellite || {};
-window._satellite.getConfig = function(dtmData, dtmUtils) {
+window._satellite.getConfig = function(dtmUtils) {
   return {
     "events": {{events}},
     "conditions": {{conditions}},
@@ -201,6 +201,24 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
             "method": "alert",
             "settings": {
               "text": "Click Me rule fired"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Data Element Test",
+        "event": {
+          "type": "dtm.click",
+          "settings": {
+            "selector": ".dataElementButton"
+          }
+        },
+        "actions": [
+          {
+            "extensionInstanceIds": ["jklmno"],
+            "method": "alert",
+            "settings": {
+              "text": "%myDOM%"
             }
           }
         ]
@@ -463,7 +481,56 @@ window._satellite.getConfig = function(dtmData, dtmUtils) {
         "https": "dtm.aaronhardy.com"
       }
     },
-    "dataElements": {},
+    "dataElements": [
+      {
+        "name": "myBrowserWidth",
+        "type": "custom",
+        "settings": {
+          "script": function() { return 'my custom value from script' },
+          "default": "my default value for script",
+          "storeLength": "session",
+          "cleanText": true
+        }
+      },
+      {
+       "name": "myCookie",
+        "type": "cookie",
+        "settings": {
+          "name": "myCookie",
+          "default": "my default value",
+          "storeLength": "pageview"
+        }
+      },
+      {
+        "name": "myDOM",
+        "type": "dom",
+        "settings": {
+          "selector": "a",
+          "property": "href",
+          "default": "http://mydefaultvalue.com",
+          "storeLength": "session"
+        }
+      },
+      {
+        "name": "myVariable",
+        "type": "variable",
+        "settings": {
+          "path": "my.object.path",
+          "default": "my default value",
+          "storeLength": "visitor"
+        }
+      },
+      {
+        "name": "myQueryParam",
+        "type": "queryParam",
+        "settings": {
+          "name": "myParam",
+          "default": "myDefaultValue",
+          "storeLength": "pageview",
+          "ignoreCase": true
+        }
+      }
+    ],
     "appVersion": "52A",
     "buildDate": "2015-03-16 20:55:42 UTC",
     "publishDate": "2015-03-16 14:43:44 -0600",

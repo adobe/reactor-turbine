@@ -113,12 +113,12 @@ dtmUtils.extend(AdobeTarget.prototype, {
     var args = {
       mboxHost: document.location.hostname,
       mboxPage: this._mboxPageId,
-      screenWidth: dtmData.clientInfo.screenWidth,
-      screenHeight: dtmData.clientInfo.screenHeight,
-      browserWidth: dtmData.clientInfo.browserWidth,
-      browserHeight: dtmData.clientInfo.browserHeight,
+      screenWidth: dtmUtils.clientInfo.getScreenWidth(),
+      screenHeight: dtmUtils.clientInfo.getScreenHeight(),
+      browserWidth: dtmUtils.clientInfo.getBrowserWidth(),
+      browserHeight: dtmUtils.clientInfo.getBrowserHeight(),
       browserTimeOffset: this._browserTimeOffset,
-      colorDepth: dtmData.clientInfo.colorDepth,
+      colorDepth: dtmUtils.clientInfo.colorDepth,
       mboxSession: this._mboxSessionId,
       mboxPC: this._mboxPCId,
       mboxCount: 1, // TODO needs to be incremented for each Mbox I believe.

@@ -430,12 +430,20 @@ window._satellite.getConfig = function(dtmUtils) {
           }
         },
         "actions": [
+          //{
+          //  "extensionInstanceIds": ["uvw"],
+          //  "method": "showDialog",
+          //  "settings": {
+          //    "method": "send",
+          //    "link": "http://dtm.aaronhardy.com/shoes.html"
+          //  }
+          //}
           {
             "extensionInstanceIds": ["uvw"],
             "method": "showDialog",
             "settings": {
-              "method": "send",
-              "link": "http://dtm.aaronhardy.com/shoes.html"
+              "method": "share",
+              "href": "http://dtm.aaronhardy.com/shoes.html"
             }
           }
         ]

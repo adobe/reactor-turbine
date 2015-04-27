@@ -53,7 +53,7 @@ var createBeacon = function(config, successCallback, failCallback) {
     if (config.beaconData) {
       request += '?' + encodeObjectToURI(config.beaconData);
     }
-    if (clientInfo.getBrowser() === 'IE') {
+    if (clientInfo.browser === 'IE') {
       request = request.substring(0, 2047);
     }
     connection = new Image;

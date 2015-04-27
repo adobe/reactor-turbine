@@ -60,15 +60,16 @@ function checkConditions(propertyMeta, rule, event, extensionInstanceRegistry) {
     }
   }
 
-  runActions(rule, extensionInstanceRegistry);
+  runActions(rule, event, extensionInstanceRegistry);
 }
 
-function runActions(rule, extensionInstanceRegistry){
+function runActions(rule, event, extensionInstanceRegistry){
   each(rule.actions,function(action) {
     action.settings = action.settings || {};
     each(action.extensionInstanceIds,function(instanceId) {
       var instance = extensionInstanceRegistry.getById(instanceId);
-      var preprocessedSettings = preprocessSettings(action.settings);
+      // TODO: Pass related element? Pass forceLowerCase?
+      var preprocessedSettings = preprocessSettings(action.settings, null, event, false);
       instance[action.method](preprocessedSettings);
     });
   });

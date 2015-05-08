@@ -1,30 +1,18 @@
 var forEach = require('./utils/forEach');
 var preprocessSettings = require('./utils/preprocessSettings');
-var publicRequire = require('./publicRequire');
-
-var eventDelegatesByType = {};
-var conditionDelegatesByType = {};
 
 // TODO: Add a bunch of checks with error reporting.
 
-module.exports = function(propertyMeta, extensionInstanceRegistry) {
+module.exports = function(rules, extensionInstanceRegistry, eventDelegates, conditionDelegates) {
   function initEventDelegate(rule){
     if (rule.event){
       rule.event.settings = rule.event.settings || {};
-
-      var delegate = eventDelegatesByType[rule.event.type];
-
-      if (!delegate) {
-        var script = propertyMeta.eventDelegates[rule.event.type];
-        var module = {};
-        script(module, publicRequire);
-        delegate = eventDelegatesByType[rule.event.type] = module.exports;
-      }
 
       function trigger(eventDetail) {
         checkConditions(rule, eventDetail);
       }
 
+      var delegate = eventDelegates.get(rule.event.type);
       delegate(trigger, rule.event.settings);
     }
   }
@@ -35,15 +23,7 @@ module.exports = function(propertyMeta, extensionInstanceRegistry) {
         var condition = rule.conditions[i];
         condition.settings = condition.settings || {};
 
-        var delegate = conditionDelegatesByType[condition.type];
-
-        if (!delegate) {
-          var script = propertyMeta.conditionDelegates[condition.type];
-          var module = {};
-          script(module, publicRequire);
-          delegate = conditionDelegatesByType[condition.type] = module.exports;
-        }
-
+        var delegate = conditionDelegates.get(condition.type);
         if (!delegate(condition.settings, eventDetail)) {
           return;
         }
@@ -68,7 +48,7 @@ module.exports = function(propertyMeta, extensionInstanceRegistry) {
     });
   }
 
-  forEach(propertyMeta.rules, function(rule){
+  forEach(rules, function(rule){
     initEventDelegate(rule);
   });
 };

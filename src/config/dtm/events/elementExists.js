@@ -16,19 +16,19 @@ poll('element exists event delegate', function() {
   }
 });
 
-module.exports = function(trigger, eventSettings) {
+module.exports = function(trigger, settings) {
   var config;
 
   for (var i = 0; i < configs.length; i++) {
     var candidate = configs[i];
-    if (candidate.selector === eventSettings.selector) {
+    if (candidate.selector === settings.selector) {
       config = candidate;
     }
   }
 
   if (!config) {
     config = {
-      selector: eventSettings.selector,
+      selector: settings.selector,
       triggers: []
     }
   }

@@ -1,17 +1,16 @@
 var Promise = require('./utils/Promise');
-var publicRequire = require('./publicRequire');
 
 /**
  * Instantiates extensions while injecting dependency extensions instances.
  * @param {Object} propertyMeta Property metadata object.
  * @returns {Object} Object where the key is the instance ID and the value is the instance.
  */
-module.exports = function(propertyMeta, extensionInstanceRegistry) {
+module.exports = function(instanceMetas, extensionInstanceRegistry, extensionDelegates) {
   function createProxies() {
     var proxyByInstanceId = {};
 
-    for (var instanceId in propertyMeta.extensionInstances) {
-      var instanceMeta = propertyMeta.extensionInstances[instanceId];
+    for (var instanceId in instanceMetas) {
+      var instanceMeta = instanceMetas[instanceId];
 
       var proxy = {};
 
@@ -31,19 +30,10 @@ module.exports = function(propertyMeta, extensionInstanceRegistry) {
   // Add proxies to require repo.
   var proxies = createProxies();
 
-  var factoriesByType = {};
-
-  for (var extensionType in propertyMeta.extensions) {
-    var script = propertyMeta.extensions[extensionType];
-    var module = {};
-    script(module, publicRequire);
-    factoriesByType[extensionType] = module.exports;
-  }
-
-  for (var instanceId in propertyMeta.extensionInstances) {
-    var instanceMeta = propertyMeta.extensionInstances[instanceId];
-    var factory = factoriesByType[instanceMeta.type];
-    var result = factory(instanceMeta.settings);
+  for (var instanceId in instanceMetas) {
+    var instanceMeta = instanceMetas[instanceId];
+    var delegate = extensionDelegates.get(instanceMeta.type);
+    var result = delegate(instanceMeta.settings);
 
     if (!(result instanceof Promise)) {
       result = new Promise(function(resolve) {

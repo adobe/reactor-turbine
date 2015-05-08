@@ -55,5 +55,27 @@
       "name": "Test",
       "path": "events/test.js"
     }
+  ],
+  "dataElementDelegates": [
+    {
+      "name": "Cookie",
+      "path": "dataElements/cookie.js"
+    },
+    {
+      "name": "Custom",
+      "path": "dataElements/custom.js"
+    },
+    {
+      "name": "DOM Attribute",
+      "path": "dataElements/dom.js"
+    },
+    {
+      "name": "Querystring Parameter",
+      "path": "dataElements/queryParam.js"
+    },
+    {
+      "name": "Variable",
+      "path": "dataElements/variable.js"
+    }
   ]
 }

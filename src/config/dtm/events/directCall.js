@@ -11,11 +11,11 @@ window._satellite.runRule = function(name) {
   }
 };
 
-module.exports = function(trigger, eventSettings) {
-  var triggers = triggersByCallName[eventSettings.name];
+module.exports = function(trigger, settings) {
+  var triggers = triggersByCallName[settings.name];
 
   if (!triggers) {
-    triggers = triggersByCallName[eventSettings.name] = [];
+    triggers = triggersByCallName[settings.name] = [];
   }
 
   triggers.push(trigger);

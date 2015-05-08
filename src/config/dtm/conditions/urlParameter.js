@@ -1,7 +1,7 @@
 var textMatch = require('textMatch');
 var getQueryParam = require('getQueryParam');
 
-module.exports = function(conditionSettings) {
-  return textMatch(getQueryParam(conditionSettings.name), conditionSettings.value);
-}
+module.exports = function(settings) {
+  return textMatch(getQueryParam(settings.name), settings.value);
+};
 

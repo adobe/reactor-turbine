@@ -1,9 +1,9 @@
 var addSelectorEventListener = require('addSelectorEventListener');
 
-module.exports = function(trigger, eventSettings) {
+module.exports = function(trigger, settings) {
   addSelectorEventListener(
-    eventSettings.selector,
+    settings.selector,
     'mouseover',
-    eventSettings.eventHandlerOnElement,
+    settings.eventHandlerOnElement,
     trigger);
 };

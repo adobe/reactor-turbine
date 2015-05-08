@@ -3,7 +3,8 @@ window._satellite.getConfig = function() {
   return {
     "eventDelegates": {{eventDelegates}},
     "conditionDelegates": {{conditionDelegates}},
-    "extensions": {{extensions}},
+    "dataElementDelegates": {{dataElementDelegates}},
+    "extensionDelegates": {{extensionDelegates}},
     "extensionInstances": {
       "abcdef": {
         "type": "adobeAnalytics",
@@ -448,7 +449,7 @@ window._satellite.getConfig = function() {
     "dataElements": [
       {
         "name": "myBrowserWidth",
-        "type": "custom",
+        "type": "dtm.custom",
         "settings": {
           "script": function() { return 'my custom value from script' },
           "default": "my default value for script",
@@ -458,7 +459,7 @@ window._satellite.getConfig = function() {
       },
       {
        "name": "myCookie",
-        "type": "cookie",
+        "type": "dtm.cookie",
         "settings": {
           "name": "myCookie",
           "default": "my default value",
@@ -467,7 +468,7 @@ window._satellite.getConfig = function() {
       },
       {
         "name": "myDOM",
-        "type": "dom",
+        "type": "dtm.dom",
         "settings": {
           "selector": "a",
           "property": "href",
@@ -477,7 +478,7 @@ window._satellite.getConfig = function() {
       },
       {
         "name": "myVariable",
-        "type": "variable",
+        "type": "dtm.variable",
         "settings": {
           "path": "my.object.path",
           "default": "my default value",

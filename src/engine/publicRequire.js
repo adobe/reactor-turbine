@@ -24,7 +24,10 @@ var resources = {
   'loadScript': require('./utils/loadScript'),
   'textMatch': require('./utils/textMatch'),
   'getQueryParam': require('./utils/getQueryParam'),
-  'isLinked': require('./utils/isLinked')
+  'isLinked': require('./utils/isLinked'),
+  'readCookie': require('./utils/readCookie'),
+  'elementHasAttribute': require('./utils/elementHasAttribute'),
+  'getObjectProperty': require('./utils/getObjectProperty')
 };
 
 module.exports = function(key) {

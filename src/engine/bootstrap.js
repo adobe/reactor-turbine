@@ -3,6 +3,10 @@ var dynamicListener = require('./utils/dynamicListener');
 var createExtensionInstances = require('./createExtensionInstances');
 var initRules = require('./initRules');
 var dataElementDefinitions = require('./stores/dataElementDefinitions');
+var eventDelegates = require('./stores/eventDelegates');
+var dataElementDelegates = require('./stores/dataElementDelegates');
+var conditionDelegates = require('./stores/conditionDelegates');
+var extensionDelegates = require('./stores/extensionDelegates');
 var extensionInstanceRegistry = require('./stores/extensionInstanceRegistry');
 var getVar = require('./utils/getVar');
 var setVar = require('./utils/setVar');
@@ -14,11 +18,14 @@ _satellite.pageBottom = function() {}; // Will get replaced if a rule is configu
 _satellite.runRule = function() {}; // Will get replaced if a rule is configured with a direct call event trigger.
 _satellite.appVersion = propertyMeta.appVersion;
 
-// TODO: Re-assess this when I understand more about data elements.
-dataElementDefinitions.add(propertyMeta.dataElements);
+eventDelegates.init(propertyMeta.eventDelegates);
+dataElementDelegates.init(propertyMeta.dataElementDelegates);
+conditionDelegates.init(propertyMeta.conditionDelegates);
+extensionDelegates.init(propertyMeta.extensionDelegates);
+dataElementDefinitions.init(propertyMeta.dataElements);
 
-createExtensionInstances(propertyMeta, extensionInstanceRegistry);
-initRules(propertyMeta, extensionInstanceRegistry);
+createExtensionInstances(propertyMeta.extensionInstances, extensionInstanceRegistry, extensionDelegates);
+initRules(propertyMeta.rules, extensionInstanceRegistry, eventDelegates, conditionDelegates);
 
 globalPolling.init();
 dynamicListener.init();

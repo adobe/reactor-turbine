@@ -1,9 +1,15 @@
+var extend = require('extend');
+var encodeObjectToURI = require('encodeObjectToURI');
+var isHttps = require('isHttps');
+var clientInfo = require('clientInfo');
+var createBeacon = require('createBeacon');
+
 // TODO: Handle canceling tool initialization. Not sure why this is supported.
 var AdobeAnalytics = function(extensionSettings) {
   this.extensionSettings = extensionSettings;
 };
 
-dtmUtils.extend(AdobeAnalytics.prototype, {
+extend(AdobeAnalytics.prototype, {
   _queryStringParamMap: {
     browserHeight: 'bh',
     browserWidth: 'bw',
@@ -111,20 +117,20 @@ dtmUtils.extend(AdobeAnalytics.prototype, {
       }
     }
 
-    var events = data.events;
+    var events = data.eventDelegates;
 
     if (events) {
       this._translateToQueryStringParam(queryStringParams, 'events', events);
     }
 
-    return dtmUtils.encodeObjectToURI(queryStringParams);
+    return encodeObjectToURI(queryStringParams);
   },
   _getTrackingURI: function(queryString) {
     var tagContainerMarker = 'D' + _satellite.appVersion;
     var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
         Math.floor(Math.random() * 10000000000000);
     // TODO: Is this necessary or should we just leave off the protocol?
-    var protocol = dtmUtils.isHttps() ? 'https://' : 'http://';
+    var protocol = isHttps() ? 'https://' : 'http://';
     var uri = protocol + this._getTrackingServer() + '/b/ss/' + this.extensionSettings.account +
         '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
 
@@ -178,8 +184,8 @@ dtmUtils.extend(AdobeAnalytics.prototype, {
   },
   trackPageView: function(actionSettings) {
     var trackVars = {};
-    dtmUtils.extend(trackVars, this.extensionSettings.trackVars);
-    dtmUtils.extend(trackVars, actionSettings.trackVars);
+    extend(trackVars, this.extensionSettings.trackVars);
+    extend(trackVars, actionSettings.trackVars);
 
     // Referrer is intentionally only tracked on the first page view beacon.
     if (this.initialPageViewTracked) {
@@ -207,7 +213,7 @@ dtmUtils.extend(AdobeAnalytics.prototype, {
       }
     }
 
-    dtmUtils.extend(trackVars, actionSettings.trackVars);
+    extend(trackVars, actionSettings.trackVars);
 
     // Referrer is never sent for link tracking.
     delete trackVars.referrer;
@@ -223,12 +229,12 @@ dtmUtils.extend(AdobeAnalytics.prototype, {
     var queryString = this._remodelDataToQueryString({
       vars: trackVars,
       events: trackEvents,
-      clientInfo: dtmUtils.clientInfo.getSnapshot()
+      clientInfo: clientInfo.getSnapshot()
     });
 
     var uri = this._getTrackingURI(queryString);
 
-    dtmUtils.createBeacon({
+    createBeacon({
       beaconURL: uri,
       type: 'image'
     });
@@ -237,6 +243,6 @@ dtmUtils.extend(AdobeAnalytics.prototype, {
   }
 });
 
-return function(extensionSettings) {
+module.exports = function(extensionSettings) {
   return new AdobeAnalytics(extensionSettings);
 };

@@ -1,0 +1,59 @@
+{
+  "name": "dtm",
+  "conditionDelegates": [
+    {
+      "name": "Custom",
+      "path": "conditions/custom.js"
+    },
+    {
+      "name": "URL Parameter",
+      "path": "conditions/urlParameter.js"
+    }
+  ],
+  "eventDelegates": [
+    {
+      "name": "Click",
+      "path": "events/click.js"
+    },
+    {
+      "name": "Direct Call",
+      "path": "events/directCall.js"
+    },
+    {
+      "name": "DOM Ready",
+      "path": "events/domReady.js"
+    },
+    {
+      "name": "Element Exists",
+      "path": "events/elementExists.js"
+    },
+    {
+      "name": "Enters Viewport",
+      "path": "events/entersViewport.js"
+    },
+    {
+      "name": "Mouseover",
+      "path": "events/mouseover.js"
+    },
+    {
+      "name": "On Load",
+      "path": "events/onload.js"
+    },
+    {
+      "name": "Page Bottom",
+      "path": "events/pageBottom.js"
+    },
+    {
+      "name": "Page Top",
+      "path": "events/pageTop.js"
+    },
+    {
+      "name": "Timeout",
+      "path": "events/timeout.js"
+    },
+    {
+      "name": "Test",
+      "path": "events/test.js"
+    }
+  ]
+}

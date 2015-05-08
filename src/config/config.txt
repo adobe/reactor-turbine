@@ -1,8 +1,8 @@
 window._satellite = window._satellite || {};
-window._satellite.getConfig = function(dtmUtils) {
+window._satellite.getConfig = function() {
   return {
-    "events": {{events}},
-    "conditions": {{conditions}},
+    "eventDelegates": {{eventDelegates}},
+    "conditionDelegates": {{conditionDelegates}},
     "extensions": {{extensions}},
     "extensionInstances": {
       "abcdef": {
@@ -50,7 +50,7 @@ window._satellite.getConfig = function(dtmUtils) {
         }
       }
     },
-    "newRules": [
+    "rules": [
       {
         // TODO Needs event stuff.
         "name": "Test Rule",
@@ -91,8 +91,9 @@ window._satellite.getConfig = function(dtmUtils) {
           {
             "type":"dtm.custom",
             "settings": {
-              "script": function(event) {
-                return !dtmUtils.isLinked(event.target);
+              "script": function(event, require) {
+                var isLinked = require('isLinked');
+                return !isLinked(event.target);
               }
             }
           }
@@ -107,8 +108,7 @@ window._satellite.getConfig = function(dtmUtils) {
                 "linkName": "MyLink",
                 "pageName": "MyPageName",
                 "eVar20": "MyDeadHeaderEvar",
-                "prop20": "D=v20",
-                "campaign": dtmUtils.getQueryParam("dead")
+                "prop20": "D=v20"
               },
               "trackEvents": [
                 "event20:deadevent"
@@ -136,8 +136,9 @@ window._satellite.getConfig = function(dtmUtils) {
           {
             "type":"dtm.custom",
             "settings": {
-              "script": function(event) {
-                return !dtmUtils.isLinked(event.target);
+              "script": function(event, require) {
+                var isLinked = require('isLinked');
+                return !isLinked(event.target);
               }
             }
           }
@@ -152,8 +153,7 @@ window._satellite.getConfig = function(dtmUtils) {
                 "linkName": "MyLink",
                 "pageName": "MyPageName",
                 "eVar20": "MyDeadHeaderEvar",
-                "prop20": "D=v20",
-                "campaign": dtmUtils.getQueryParam("dead")
+                "prop20": "D=v20"
               },
               "trackEvents": [
                 "event20:deadevent"
@@ -206,24 +206,6 @@ window._satellite.getConfig = function(dtmUtils) {
         ]
       },
       {
-        "name": "Data Element Test",
-        "event": {
-          "type": "dtm.click",
-          "settings": {
-            "selector": ".dataElementButton"
-          }
-        },
-        "actions": [
-          {
-            "extensionInstanceIds": ["jklmno"],
-            "method": "alert",
-            "settings": {
-              "text": "%myDOM%"
-            }
-          }
-        ]
-      },
-      {
         "name": "Mbox Redirect",
         "event": {
           "type": "dtm.click",
@@ -252,24 +234,6 @@ window._satellite.getConfig = function(dtmUtils) {
         "event": {
           "type": "dtm.domReady"
         },
-        //conditions: [
-        //  {
-        //    type: "urlParameter",
-        //    settings: {
-        //      name: "myName",
-        //      value: "myValue"
-        //    }
-        //  },
-        //  {
-        //    type: "custom",
-        //    settings: {
-        //      script: function() {
-        //        return dtmUtils.textMatch(
-        //          dtmUtils.getQueryParam("myName"), "myValue");
-        //      }
-        //    }
-        //  }
-        //],
         "actions": [
           {
             "extensionInstanceIds": ["jklmno"],
@@ -380,9 +344,9 @@ window._satellite.getConfig = function(dtmUtils) {
           }
         ]
       },{
-        "name": "enterViewport stuff",
+        "name": "entersViewport stuff",
         "event": {
-          "type": "dtm.enterViewport",
+          "type": "dtm.entersViewport",
           "settings": {
             "selector": ".clickme"
           }
@@ -391,7 +355,7 @@ window._satellite.getConfig = function(dtmUtils) {
           "extensionInstanceIds": ["jklmno"],
           "method": "log",
           "settings": {
-            "text": "enterViewport fired rule fired"
+            "text": "entersViewport fired rule fired"
           }
         }]
       },{
@@ -430,20 +394,12 @@ window._satellite.getConfig = function(dtmUtils) {
           }
         },
         "actions": [
-          //{
-          //  "extensionInstanceIds": ["uvw"],
-          //  "method": "showDialog",
-          //  "settings": {
-          //    "method": "send",
-          //    "link": "http://dtm.aaronhardy.com/shoes.html"
-          //  }
-          //}
           {
             "extensionInstanceIds": ["uvw"],
             "method": "showDialog",
             "settings": {
-              "method": "share",
-              "href": "http://dtm.aaronhardy.com/shoes.html"
+              "method": "send",
+              "link": "http://dtm.aaronhardy.com/shoes.html"
             }
           }
         ]

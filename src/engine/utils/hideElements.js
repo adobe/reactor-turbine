@@ -1,6 +1,6 @@
 var querySelectorAll = require('./querySelectorAll');
 var isString = require('./isString');
-var each = require('./each');
+var forEach = require('./forEach');
 var addClass = require('./addClass');
 var removeClass = require('./removeClass');
 var dataOnElement = require('./dataOnElement');
@@ -24,7 +24,7 @@ module.exports = function(selectorOrElements) {
   var elements = isString(selectorOrElements) ?
       querySelectorAll(selectorOrElements) : selectorOrElements;
 
-  each(elements, function(element) {
+  forEach(elements, function(element) {
     var numLocks = dataOnElement(element, 'numHideLocks');
 
     if (numLocks === undefined) {
@@ -45,7 +45,7 @@ module.exports = function(selectorOrElements) {
       return;
     }
 
-    each(elements, function(element) {
+    forEach(elements, function(element) {
       var numLocks = dataOnElement(element, 'numHideLocks');
       dataOnElement(element, 'numHideLocks', --numLocks);
 

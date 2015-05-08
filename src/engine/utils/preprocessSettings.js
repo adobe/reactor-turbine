@@ -1,6 +1,6 @@
-var isString = require('../public/isString');
-var isObject = require('../public/isObject');
-var isArray = require('../public/isArray');
+var isString = require('./isString');
+var isObject = require('./isObject');
+var isArray = require('./isArray');
 var replaceVarTokens = require('./replaceVarTokens');
 
 function forceLowerCaseIfNeeded(value, forceLowerCase) {

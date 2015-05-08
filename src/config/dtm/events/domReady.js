@@ -58,7 +58,6 @@ var domReady = (function(ready) {
     });
 }());
 
-
-dtmUtils.each(eventSettingsCollection,function (eventSettings){
-  domReady(next.bind(this,eventSettings));
-});
+module.exports = function(trigger) {
+  domReady(trigger);
+};

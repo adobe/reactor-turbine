@@ -1,4 +1,4 @@
-// `each(arr, func, [context])`
+// `forEach(arr, func, [context])`
 // ------------------
 //
 // A handy method for array iteration wo having to write a for-loop.

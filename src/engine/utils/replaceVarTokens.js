@@ -1,4 +1,4 @@
-var getVar = require('../public/getVar');
+var getVar = require('./getVar');
 
 // Perform variable subtitutions substitute to a string where subtitions are
 // specified in the form `"%foo%"`. Variables are lookup either in `SL.data.customVars`, or

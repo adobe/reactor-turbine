@@ -1,1 +1,3 @@
-return conditionSettings.script(event);
+module.exports = function(conditionSettings, eventDetail) {
+  return conditionSettings.script(eventDetail, require);
+};

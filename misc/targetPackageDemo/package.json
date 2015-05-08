@@ -5,7 +5,7 @@
 		"adobeanalytics" // Not sure what identifiers will look like.
 	],
 	"install": {
-		"events": [
+		"eventDelegates": [
 			{
 				"swipe": "swipe.js"
 			}
@@ -18,7 +18,7 @@
 					"selector": ".mytriggerdiv"
 				}
 			},
-			"conditions": [
+			"conditionDelegates": [
 				{
 					"type": "param",
 					"settings": {

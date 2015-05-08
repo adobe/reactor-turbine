@@ -30,63 +30,68 @@ function shallowStringifyWithFunctionValues(obj) {
   return output;
 }
 
-function getExtensionFactories(baseDir, functionWrapArgs) {
-  var dependencyMap = {
-    'adobeTarget': ['adobeVisitor']
-  };
-
-  var extensionsStr = '{';
-
-  getExtensionDirectories(baseDir).forEach(function(extensionDir) {
-    var factoryPath = path.join(baseDir, extensionDir, 'index.js');
-
-    if (fs.existsSync(factoryPath)) {
-      extensionsStr += '"' + extensionDir + '": {';
-      extensionsStr += 'script: ' +
-          wrapInFunction(fs.readFileSync(factoryPath), functionWrapArgs);
-
-      var dependencies = dependencyMap[extensionDir];
-      if (dependencies) {
-        extensionsStr += ', dependencies: ["' + dependencies.join(',') + '"]'
-      }
-      extensionsStr += '},'
-    }
-  });
-
-  extensionsStr += '}';
-
-  return extensionsStr;
-}
-
-function getExtensionFeatures(baseDir, feature, functionWrapArgs) {
-  var functionByType = {};
+function getExtensionFeatures(baseDir) {
   var extensionDirectories = getExtensionDirectories(baseDir);
 
-  extensionDirectories.forEach(function(extensionDir) {
-    var featureDir = path.join(baseDir, extensionDir, feature);
-    if (fs.existsSync(featureDir)) {
-      fs.readdirSync(featureDir).forEach(function(filename) {
-        var type = path.basename(filename, '.js');
-        var eventFile = path.join(featureDir, filename);
-        var functionContent = fs.readFileSync(eventFile, { encoding: 'utf8' });
-        functionByType[extensionDir + '.' + type] = wrapInFunction(functionContent, functionWrapArgs);
+  var features = {
+    eventDelegates: {},
+    conditionDelegates: {},
+    extensions: {}
+  };
+
+  function getScriptContent(baseDir, extensionDir, featurePath) {
+    var featurePath = path.join(baseDir, extensionDir, featurePath);
+
+    if (fs.existsSync(featurePath)) {
+      return fs.readFileSync(featurePath, {encoding: 'utf8'});
+    }
+  }
+
+  function populateDelegates(featureSetType, pkg, extensionDir) {
+    if (pkg.hasOwnProperty(featureSetType)) {
+      var featureSet = pkg[featureSetType];
+      featureSet.forEach(function(feature) {
+        var script = getScriptContent(baseDir, extensionDir, feature.path);
+
+        if (script) {
+          var id = extensionDir + '.' + path.basename(feature.path, '.js');
+          features[featureSetType][id] = wrapInFunction(script, ['module', 'require']);
+        }
       });
+    }
+  }
+
+  function populateExtensions(pkg, extensionDir) {
+    if (pkg.hasOwnProperty('engine')) {
+      var script = getScriptContent(baseDir, extensionDir, pkg.engine);
+      features.extensions[extensionDir] = wrapInFunction(script, ['module', 'require']);
+    }
+  }
+
+  extensionDirectories.forEach(function(extensionDir) {
+    var packagePath = path.join(baseDir, extensionDir, 'package.json');
+
+    if (fs.existsSync(packagePath)) {
+      var pkg = JSON.parse(fs.readFileSync(packagePath, { encoding: 'utf8' }));
+      populateDelegates('eventDelegates', pkg, extensionDir);
+      populateDelegates('conditionDelegates', pkg, extensionDir);
+      populateExtensions(pkg, extensionDir);
     }
   });
 
-  return shallowStringifyWithFunctionValues(functionByType);
+  return features;
+
+  //return shallowStringifyWithFunctionValues(functionByType);
 }
 
 gulp.task('buildConfig', function() {
   var baseDir = './src/config';
-  var events = getExtensionFeatures(baseDir, 'events', ['eventSettingsCollection', 'next', 'extensions']);
-  var conditions = getExtensionFeatures(baseDir, 'conditions', ['conditionSettings', 'event', 'extensions']);
-  var factories = getExtensionFactories(baseDir, ['propertySettings', 'dependencies']);
+  var extensionFeatures = getExtensionFeatures(baseDir);
 
   return gulp.src([path.join(baseDir, 'config.txt')])
-    .pipe(replace('{{events}}', events))
-    .pipe(replace('{{conditions}}', conditions))
-    .pipe(replace('{{extensions}}', factories))
+    .pipe(replace('{{eventDelegates}}', shallowStringifyWithFunctionValues(extensionFeatures.eventDelegates)))
+    .pipe(replace('{{conditionDelegates}}', shallowStringifyWithFunctionValues(extensionFeatures.conditionDelegates)))
+    .pipe(replace('{{extensions}}', shallowStringifyWithFunctionValues(extensionFeatures.extensions)))
     .pipe(rename('config.js'))
     .pipe(gulp.dest('./dist'));
 });

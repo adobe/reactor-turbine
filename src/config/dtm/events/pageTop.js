@@ -1,1 +1,3 @@
-next(eventSettingsCollection);
+module.exports = function(trigger) {
+  trigger();
+};

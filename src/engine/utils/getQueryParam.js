@@ -1,5 +1,5 @@
 var isString = require('./isString');
-var each = require('./each');
+var forEach = require('./forEach');
 var escapeForHTML = require('./escapeForHTML');
 
 function parseQueryParams(str){
@@ -18,7 +18,7 @@ function parseQueryParams(str){
   }
   var ret = {}
     , pairs = str.split('&')
-  each(pairs, function(pair){
+  forEach(pairs, function(pair){
     pair = pair.split('=')
     if (!pair[1]) {
       return

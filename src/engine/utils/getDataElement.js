@@ -1,9 +1,9 @@
-var dataElementDefinitions = require('../../stores/dataElementDefinitions');
-var dataElementSafe = require('../../stores/dataElementSafe');
-var querySelectorAll = require('../public/querySelectorAll');
-var hasAttribute = require('../public/hasAttribute');
-var getQueryParam = require('../public/getQueryParam');
-var readCookie = require('../public/readCookie');
+var dataElementDefinitions = require('../stores/dataElementDefinitions');
+var dataElementSafe = require('../stores/dataElementSafe');
+var querySelectorAll = require('./querySelectorAll');
+var hasAttribute = require('./hasAttribute');
+var getQueryParam = require('./getQueryParam');
+var readCookie = require('./readCookie');
 var getObjectProperty = require('./getObjectProperty');
 var cleanText = require('./cleanText');
 

@@ -1,4 +1,4 @@
-var trim = require('../public/trim');
+var trim = require('./trim');
 
 // `cleanText(str)`
 // ================

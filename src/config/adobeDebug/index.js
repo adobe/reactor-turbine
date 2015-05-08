@@ -8,6 +8,6 @@ AdobeDebug.prototype.log = function(actionSettings) {
   console.log('AdobeLog: '+actionSettings.text);
 };
 
-return function(extensionSettings) {
+module.exports = function(extensionSettings) {
   return new AdobeDebug(extensionSettings);
 };

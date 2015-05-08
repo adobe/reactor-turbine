@@ -1,0 +1,46 @@
+{
+  "name": "facebookConnect",
+  "engine": "index.js",
+  "eventDelegates": [
+    {
+      "name": "Auth Response Changed",
+      "path": "events/auth.authResponseChanged.js"
+    },
+    {
+      "name": "Logged in",
+      "path": "events/auth.login.js"
+    },
+    {
+      "name": "Logged out",
+      "path": "events/auth.logout.js"
+    },
+    {
+      "name": "Status Changed",
+      "path": "events/auth.statusChange.js"
+    },
+    {
+      "name": "Comment Created",
+      "path": "events/comment.create.js"
+    },
+    {
+      "name": "Comment Removed",
+      "path": "events/comment.remove.js"
+    },
+    {
+      "name": "Liked",
+      "path": "events/edge.create.js"
+    },
+    {
+      "name": "Like Removed",
+      "path": "events/edge.remove.js"
+    },
+    {
+      "name": "Message Sent",
+      "path": "events/message.send.js"
+    },
+    {
+      "name": "XFBML Rendered",
+      "path": "events/xfbml.render.js"
+    }
+  ]
+}

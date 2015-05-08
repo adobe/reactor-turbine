@@ -1,0 +1,7 @@
+{
+  "name": "adobeTarget",
+  "engine": "index.js",
+  "dependencies": [
+    "adobeVisitor"
+  ]
+}

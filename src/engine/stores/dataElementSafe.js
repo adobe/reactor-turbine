@@ -1,5 +1,5 @@
-var setCookie = require('../utils/public/setCookie');
-var readCookie = require('../utils/public/readCookie');
+var setCookie = require('../utils/setCookie');
+var readCookie = require('../utils/readCookie');
 
 var pageviewCache = {};
 

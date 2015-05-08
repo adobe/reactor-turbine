@@ -1,5 +1,9 @@
-extensions.facebookConnect[0].loadSDKPromise.then(function() {
-  FB.Event.subscribe('xfbml.render', function() {
-    next(eventSettingsCollection);
-  });
-});
+var connect = require('extensions').getOne('facebookConnect');
+
+module.exports = function(trigger) {
+  connect.then(function() {
+    FB.Event.subscribe('xfbml.render', function() {
+      trigger();
+    });
+  })
+};

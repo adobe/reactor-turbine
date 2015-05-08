@@ -1,76 +1,74 @@
-var each = require('./utils/public/each');
-var isArray = require('./utils/public/isArray');
-var preprocessSettings = require('./utils/private/preprocessSettings');
-var eventGroups = {};
+var forEach = require('./utils/forEach');
+var preprocessSettings = require('./utils/preprocessSettings');
+var publicRequire = require('./publicRequire');
 
-module.exports = function(propertyMeta, extensionInstanceRegistry){
-  each(propertyMeta.newRules,function(rule){
-    initRule(rule);
-  });
-  initEvents(propertyMeta, extensionInstanceRegistry);
-};
+var eventDelegatesByType = {};
+var conditionDelegatesByType = {};
 
-function initRule(rule){
-  if(rule.event){
-    var settings = rule.event.settings;
-    if (!settings) {
-      settings = rule.event.settings = {};
-    }
-    settings._rule = rule;
+// TODO: Add a bunch of checks with error reporting.
 
-    if(eventGroups[rule.event.type]){
-      eventGroups[rule.event.type].push(settings);
-    }else{
-      eventGroups[rule.event.type] = [settings];
-    }
-  }
-}
+module.exports = function(propertyMeta, extensionInstanceRegistry) {
+  function initEventDelegate(rule){
+    if (rule.event){
+      rule.event.settings = rule.event.settings || {};
 
-function initEvents(propertyMeta, extensionInstanceRegistry){
-  for(var key in propertyMeta.events){
-    if(eventGroups[key] && eventGroups[key].length > 0){
-      propertyMeta.events[key](
-        eventGroups[key],
-        function (eventSettingsCollection, event){
-          if (!isArray(eventSettingsCollection)) {
-            eventSettingsCollection = [eventSettingsCollection];
-          }
+      var delegate = eventDelegatesByType[rule.event.type];
 
-          each(eventSettingsCollection, function(eventSettings) {
-            checkConditions(propertyMeta, eventSettings._rule, event, extensionInstanceRegistry);
-          });
-        },
-        extensionInstanceRegistry.getMappedByType());
+      if (!delegate) {
+        var script = propertyMeta.eventDelegates[rule.event.type];
+        var module = {};
+        script(module, publicRequire);
+        delegate = eventDelegatesByType[rule.event.type] = module.exports;
+      }
+
+      function trigger(eventDetail) {
+        checkConditions(rule, eventDetail);
+      }
+
+      delegate(trigger, rule.event.settings);
     }
   }
-}
 
-function checkConditions(propertyMeta, rule, event, extensionInstanceRegistry) {
-  if (rule.conditions) {
-    for (var i = 0; i < rule.conditions.length; i++) {
-      var condition = rule.conditions[i];
-      condition.settings = condition.settings || {};
+  function checkConditions(rule, eventDetail) {
+    if (rule.conditions) {
+      for (var i = 0; i < rule.conditions.length; i++) {
+        var condition = rule.conditions[i];
+        condition.settings = condition.settings || {};
 
-      if (!propertyMeta.conditions[condition.type](
-          condition.settings,
-          event,
-          extensionInstanceRegistry.getMappedByType())) {
-        return;
+        var delegate = conditionDelegatesByType[condition.type];
+
+        if (!delegate) {
+          var script = propertyMeta.conditionDelegates[condition.type];
+          var module = {};
+          script(module, publicRequire);
+          delegate = conditionDelegatesByType[condition.type] = module.exports;
+        }
+
+        if (!delegate(condition.settings, eventDetail)) {
+          return;
+        }
       }
     }
+
+    runActions(rule, eventDetail);
   }
 
-  runActions(rule, event, extensionInstanceRegistry);
-}
-
-function runActions(rule, event, extensionInstanceRegistry){
-  each(rule.actions,function(action) {
-    action.settings = action.settings || {};
-    each(action.extensionInstanceIds,function(instanceId) {
-      var instance = extensionInstanceRegistry.getById(instanceId);
-      // TODO: Pass related element? Pass forceLowerCase?
-      var preprocessedSettings = preprocessSettings(action.settings, null, event, false);
-      instance[action.method](preprocessedSettings);
+  function runActions(rule, eventDetail){
+    forEach(rule.actions, function(action) {
+      action.settings = action.settings || {};
+      forEach(action.extensionInstanceIds, function(instanceId) {
+        // TODO: Pass related element? Pass forceLowerCase?
+        var preprocessedSettings = preprocessSettings(action.settings, null, eventDetail, false);
+        extensionInstanceRegistry
+          .getById(instanceId)
+          .then(function(instance) {
+            instance[action.method](preprocessedSettings);
+          });
+      });
     });
+  }
+
+  forEach(propertyMeta.rules, function(rule){
+    initEventDelegate(rule);
   });
-}
+};

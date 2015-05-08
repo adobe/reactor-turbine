@@ -84,7 +84,7 @@ _satellite.init({
           ]
         }
       ],
-      "conditions":[
+      "conditionDelegates":[
         function(event,target){ return !_satellite.isLinked(target) }
       ],
       "selector": "h1, h2, h3, h4, h5",

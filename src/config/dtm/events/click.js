@@ -1,9 +1,9 @@
-dtmUtils.setupDynamicListener(eventSettingsCollection,'click',function(eventSettings,event){
-  next(eventSettings, event);
-});
+var addSelectorEventListener = require('addSelectorEventListener');
 
-dtmUtils.setupGlobalListener(document,'click',eventSettingsCollection,function(eventSettings,event){
-  if (eventSettings.selector && dtmUtils.matchesCss(eventSettings.selector, event.target)) {
-    next(eventSettings, event);
-  }
-});
+module.exports = function(trigger, eventSettings) {
+  addSelectorEventListener(
+    eventSettings.selector,
+    'click',
+    eventSettings.eventHandlerOnElement,
+    trigger);
+};

@@ -1,5 +1,5 @@
 // TODO: Use this?
-var Promise = require('./../public/Promise');
+var Promise = require('./Promise');
 
 var loadPromise;
 module.exports = function() {

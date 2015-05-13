@@ -33,15 +33,10 @@ function shallowStringifyWithFunctionValues(obj) {
 function getDelegates(baseDir) {
   var extensionDirectories = getExtensionDirectories(baseDir);
 
-  var delegates = {
-    eventDelegates: {},
-    conditionDelegates: {},
-    dataElementDelegates: {},
-    extensionDelegates: {}
-  };
+  var delegates = {};
 
-  function getScriptContent(baseDir, extensionDir, featurePath) {
-    var featurePath = path.join(baseDir, extensionDir, featurePath);
+  function getScriptContent(baseDir, extensionDir, scriptPath) {
+    var featurePath = path.join(baseDir, extensionDir, scriptPath);
 
     if (fs.existsSync(featurePath)) {
       return fs.readFileSync(featurePath, {encoding: 'utf8'});
@@ -56,16 +51,18 @@ function getDelegates(baseDir) {
 
         if (script) {
           var id = extensionDir + '.' + path.basename(feature.path, '.js');
+          delegates[delegateType] = delegates[delegateType] || {};
           delegates[delegateType][id] = wrapInFunction(script, ['module', 'require']);
         }
       });
     }
   }
 
-  function populateExtensionDelegates(pkg, extensionDir) {
-    if (pkg.hasOwnProperty('engine')) {
-      var script = getScriptContent(baseDir, extensionDir, pkg.engine);
-      delegates.extensionDelegates[extensionDir] = wrapInFunction(script, ['module', 'require']);
+  function populateCoreDelegates(pkg, extensionDir) {
+    if (pkg.hasOwnProperty('core')) {
+      var script = getScriptContent(baseDir, extensionDir, pkg.core);
+      delegates.coreDelegates = delegates.coreDelegates || {};
+      delegates.coreDelegates[extensionDir] = wrapInFunction(script, ['module', 'require']);
     }
   }
 
@@ -77,8 +74,7 @@ function getDelegates(baseDir) {
       populateFeatureDelegates('eventDelegates', pkg, extensionDir);
       populateFeatureDelegates('conditionDelegates', pkg, extensionDir);
       populateFeatureDelegates('dataElementDelegates', pkg, extensionDir);
-      populateFeatureDelegates('extensionDelegates', pkg, extensionDir);
-      populateExtensionDelegates(pkg, extensionDir);
+      populateCoreDelegates(pkg, extensionDir);
     }
   });
 
@@ -92,8 +88,8 @@ gulp.task('buildConfig', function() {
   return gulp.src([path.join(baseDir, 'config.txt')])
     .pipe(replace('{{eventDelegates}}', shallowStringifyWithFunctionValues(delegates.eventDelegates)))
     .pipe(replace('{{conditionDelegates}}', shallowStringifyWithFunctionValues(delegates.conditionDelegates)))
-    .pipe(replace('{{extensionDelegates}}', shallowStringifyWithFunctionValues(delegates.extensionDelegates)))
     .pipe(replace('{{dataElementDelegates}}', shallowStringifyWithFunctionValues(delegates.dataElementDelegates)))
+    .pipe(replace('{{coreDelegates}}', shallowStringifyWithFunctionValues(delegates.coreDelegates)))
     .pipe(rename('config.js'))
     .pipe(gulp.dest('./dist'));
 });

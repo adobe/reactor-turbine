@@ -1,4 +1,4 @@
 {
   "name": "facebookConversion",
-  "engine": "index.js"
+  "core": "core.js"
 }

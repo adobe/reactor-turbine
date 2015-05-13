@@ -1,4 +1,4 @@
 {
   "name": "adobeDebug",
-  "engine": "index.js"
+  "core": "core.js"
 }

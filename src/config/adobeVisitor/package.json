@@ -1,4 +1,4 @@
 {
   "name": "adobeVisitor",
-  "engine": "index.js"
+  "core": "core.js"
 }

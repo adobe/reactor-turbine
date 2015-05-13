@@ -3,10 +3,10 @@ var dynamicListener = require('./utils/dynamicListener');
 var createExtensionInstances = require('./createExtensionInstances');
 var initRules = require('./initRules');
 var dataElementDefinitions = require('./stores/dataElementDefinitions');
-var eventDelegates = require('./stores/eventDelegates');
-var dataElementDelegates = require('./stores/dataElementDelegates');
-var conditionDelegates = require('./stores/conditionDelegates');
-var extensionDelegates = require('./stores/extensionDelegates');
+var eventDelegates = require('./stores/extensionDelegates/eventDelegates');
+var dataElementDelegates = require('./stores/extensionDelegates/dataElementDelegates');
+var conditionDelegates = require('./stores/extensionDelegates/conditionDelegates');
+var coreDelegates = require('./stores/extensionDelegates/coreDelegates');
 var extensionInstanceRegistry = require('./stores/extensionInstanceRegistry');
 var getVar = require('./utils/getVar');
 var setVar = require('./utils/setVar');
@@ -21,10 +21,10 @@ _satellite.appVersion = propertyMeta.appVersion;
 eventDelegates.init(propertyMeta.eventDelegates);
 dataElementDelegates.init(propertyMeta.dataElementDelegates);
 conditionDelegates.init(propertyMeta.conditionDelegates);
-extensionDelegates.init(propertyMeta.extensionDelegates);
 dataElementDefinitions.init(propertyMeta.dataElements);
+coreDelegates.init(propertyMeta.coreDelegates);
 
-createExtensionInstances(propertyMeta.extensionInstances, extensionInstanceRegistry, extensionDelegates);
+createExtensionInstances(propertyMeta.extensionInstances, extensionInstanceRegistry, coreDelegates);
 initRules(propertyMeta.rules, extensionInstanceRegistry, eventDelegates, conditionDelegates);
 
 globalPolling.init();

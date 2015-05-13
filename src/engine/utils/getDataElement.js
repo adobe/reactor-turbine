@@ -1,5 +1,5 @@
 var dataElementDefinitions = require('../stores/dataElementDefinitions');
-var dataElementDelegates = require('../stores/dataElementDelegates');
+var dataElementDelegates = require('../stores/extensionDelegates/dataElementDelegates');
 var dataElementSafe = require('../stores/dataElementSafe');
 var querySelectorAll = require('./querySelectorAll');
 var cleanText = require('./cleanText');

@@ -5,7 +5,7 @@ var Promise = require('./utils/Promise');
  * @param {Object} propertyMeta Property metadata object.
  * @returns {Object} Object where the key is the instance ID and the value is the instance.
  */
-module.exports = function(instanceMetas, extensionInstanceRegistry, extensionDelegates) {
+module.exports = function(instanceMetas, extensionInstanceRegistry, coreDelegates) {
   function createProxies() {
     var proxyByInstanceId = {};
 
@@ -33,7 +33,7 @@ module.exports = function(instanceMetas, extensionInstanceRegistry, extensionDel
   for (var instanceId in instanceMetas) {
     var instanceMeta = instanceMetas[instanceId];
     instanceMeta.settings = instanceMeta.settings || {};
-    var delegate = extensionDelegates.get(instanceMeta.type);
+    var delegate = coreDelegates.get(instanceMeta.type);
     var result = delegate(instanceMeta.settings);
 
     if (!(result instanceof Promise)) {

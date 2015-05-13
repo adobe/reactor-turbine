@@ -1,4 +1,4 @@
 {
   "name": "adobeAnalytics",
-  "engine": "index.js"
+  "core": "core.js"
 }

@@ -1,6 +1,6 @@
 {
   "name": "facebookConnect",
-  "engine": "index.js",
+  "core": "core.js",
   "eventDelegates": [
     {
       "name": "Auth Response Changed",

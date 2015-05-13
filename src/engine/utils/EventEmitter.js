@@ -1,4 +1,4 @@
-var extend = require('./extend');
+var assign = require('./assign');
 var isFunction = require('./isFunction');
 
 var EventEmitter = function() {};
@@ -66,7 +66,7 @@ EventEmitter.prototype.off = function(type, listener) {
 };
 
 EventEmitter.mixin = function(obj) {
-  extend(isFunction(obj) ? obj.prototype : obj,  EventEmitter.prototype);
+  assign(isFunction(obj) ? obj.prototype : obj,  EventEmitter.prototype);
 };
 
 module.exports = EventEmitter;

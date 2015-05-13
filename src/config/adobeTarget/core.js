@@ -1,4 +1,4 @@
-var extend = require('extend');
+var assign = require('assign');
 var clientInfo = require('clientInfo');
 var hideElements = require('hideElements');
 var encodeObjectToURI = require('encodeObjectToURI');
@@ -97,7 +97,7 @@ var AdobeTarget = function(extensionSettings) {
   });
 };
 
-extend(AdobeTarget.prototype, {
+assign(AdobeTarget.prototype, {
   // TODO: Can we use an ID generator util provided by DTM?
   _generateId: function() {
     return (new Date()).getTime() + "-" + Math.floor(Math.random() * 999999);
@@ -138,7 +138,7 @@ extend(AdobeTarget.prototype, {
       mboxVersion: 56 // TODO remove when using framework?
     };
 
-    extend(args, actionSettings.arguments);
+    assign(args, actionSettings.arguments);
 
     var showPage;
 

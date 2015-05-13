@@ -1,4 +1,4 @@
-var extend = require('./extend');
+var assign = require('./assign');
 
 var matchUserAgent = function(regexs){
   return function(userAgent){
@@ -181,7 +181,7 @@ var staticInfo = {
  * @returns {Object} A snapshot of all client information at this moment.
  */
 var getSnapshot = function() {
-  return extend({
+  return assign({
     browserWidth: getBrowserWidth(),
     browserHeight: getBrowserHeight(),
     resolution: getResolution(),
@@ -194,7 +194,7 @@ var getSnapshot = function() {
  * Contains information about the client environment including static information that is unlikely
  * to change while the user is on the page and accessors for more dynamic information.
  */
-module.exports = extend({
+module.exports = assign({
   getBrowserWidth: getBrowserWidth,
   getBrowserHeight: getBrowserHeight,
   getResolution: getResolution,

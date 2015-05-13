@@ -1,4 +1,4 @@
-var extend = require('extend');
+var assign = require('assign');
 var encodeObjectToURI = require('encodeObjectToURI');
 var isHttps = require('isHttps');
 var clientInfo = require('clientInfo');
@@ -9,7 +9,7 @@ var AdobeAnalytics = function(extensionSettings) {
   this.extensionSettings = extensionSettings;
 };
 
-extend(AdobeAnalytics.prototype, {
+assign(AdobeAnalytics.prototype, {
   _queryStringParamMap: {
     browserHeight: 'bh',
     browserWidth: 'bw',
@@ -184,8 +184,8 @@ extend(AdobeAnalytics.prototype, {
   },
   trackPageView: function(actionSettings) {
     var trackVars = {};
-    extend(trackVars, this.extensionSettings.trackVars);
-    extend(trackVars, actionSettings.trackVars);
+    assign(trackVars, this.extensionSettings.trackVars);
+    assign(trackVars, actionSettings.trackVars);
 
     // Referrer is intentionally only tracked on the first page view beacon.
     if (this.initialPageViewTracked) {
@@ -213,7 +213,7 @@ extend(AdobeAnalytics.prototype, {
       }
     }
 
-    extend(trackVars, actionSettings.trackVars);
+    assign(trackVars, actionSettings.trackVars);
 
     // Referrer is never sent for link tracking.
     delete trackVars.referrer;

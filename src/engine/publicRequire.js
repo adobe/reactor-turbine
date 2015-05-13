@@ -15,7 +15,7 @@ var resources = {
   'bind': require('./utils/bind'),
   'dataOnElement': require('./utils/dataOnElement'),
   'addEventListener': require('./utils/addEventListener'),
-  'extend': require('./utils/extend'),
+  'assign': require('./utils/assign'),
   'encodeObjectToURI': require('./utils/encodeObjectToURI'),
   'isHttps': require('./utils/isHttps'),
   'clientInfo': require('./utils/clientInfo'),

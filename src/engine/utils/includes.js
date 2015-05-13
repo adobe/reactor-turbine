@@ -1,6 +1,6 @@
 var indexOf = require('./indexOf');
 
-// `contains(arr, obj)`
+// `includes(arr, obj)`
 // -----------------------
 //
 // Tells you whether an array contains an object.

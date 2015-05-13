@@ -1,7 +1,7 @@
 var isObject = require('./isObject');
 var isArray = require('./isArray');
 var isString = require('./isString');
-var contains = require('./contains');
+var includes = require('./includes');
 var map = require('./map');
 
 function stringify(obj, seenValues) {
@@ -10,7 +10,7 @@ function stringify(obj, seenValues) {
   }
   seenValues = seenValues || [];
   if (isObject(obj)) {
-    if (contains(seenValues, obj)) {
+    if (includes(seenValues, obj)) {
       return '<Cycle>';
     } else {
       seenValues.push(obj);

@@ -32,6 +32,7 @@ module.exports = function(instanceMetas, extensionInstanceRegistry, extensionDel
 
   for (var instanceId in instanceMetas) {
     var instanceMeta = instanceMetas[instanceId];
+    instanceMeta.settings = instanceMeta.settings || {};
     var delegate = extensionDelegates.get(instanceMeta.type);
     var result = delegate(instanceMeta.settings);
 

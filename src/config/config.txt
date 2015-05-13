@@ -49,6 +49,9 @@ window._satellite.getConfig = function() {
         "settings": {
           "appId": "8170496322"
         }
+      },
+      "xyz": {
+        "type": "facebookConversion"
       }
     },
     "rules": [
@@ -415,6 +418,25 @@ window._satellite.getConfig = function() {
             "method": "log",
             "settings": {
               "text": "Shared with BFFs."
+            }
+          }
+        ]
+      },{
+        "name": "Track Facebook Conversion",
+        "event": {
+          "type": "dtm.click",
+          "settings": {
+            "selector": ".trackFBConversionButton"
+          }
+        },
+        "actions": [
+          {
+            "extensionInstanceIds": ["xyz"],
+            "method": "track",
+            "settings": {
+              "pixelId": "6032027988706",
+              "value": "0.01",
+              "currency": "USD"
             }
           }
         ]

@@ -434,9 +434,38 @@ window._satellite.getConfig = function() {
             "extensionInstanceIds": ["xyz"],
             "method": "track",
             "settings": {
-              "pixelId": "6032027988706",
-              "value": "0.01",
-              "currency": "USD"
+              "eventName": 6032027988706,
+              "customData": {
+                "value": 0.01,
+                "currency": "USD"
+              }
+            }
+          }
+        ]
+      },{
+        "name": "Track Facebook Custom Event",
+        "event": {
+          "type": "dtm.click",
+          "settings": {
+            "selector": ".trackFBEventButton"
+          }
+        },
+        "actions": [
+          {
+            "extensionInstanceIds": ["xyz"],
+            "method": "addPixelId",
+            "settings": {
+              "pixelId": 6032027988706
+            }
+          },
+          {
+            "extensionInstanceIds": ["xyz"],
+            "method": "track",
+            "settings": {
+              "eventName": "myCustomEvent",
+              "customData": {
+                "something": "important"
+              }
             }
           }
         ]

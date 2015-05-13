@@ -18,14 +18,10 @@ module.exports = function(extensionSettings) {
 
   core = {
     track: function(actionSettings) {
-      window._fbq.push([
-        'track',
-        actionSettings.pixelId,
-        {
-          value: actionSettings.value,
-          currency: actionSettings.currency
-        }
-      ]);
+      _fbq.push(['track', actionSettings.eventName, actionSettings.customData]);
+    },
+    addPixelId: function(actionSettings) {
+      _fbq.push(['addPixelId', actionSettings.pixelId]);
     }
   };
 

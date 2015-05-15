@@ -1,4 +1,4 @@
-var forEach = require('./utils/forEach');
+var forEach = require('./utils/array/forEach');
 var preprocessSettings = require('./utils/preprocessSettings');
 
 // TODO: Add a bunch of checks with error reporting.

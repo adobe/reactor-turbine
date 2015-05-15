@@ -1,8 +1,8 @@
-var dataElementDefinitions = require('../stores/dataElementDefinitions');
-var dataElementDelegates = require('../stores/extensionDelegates/dataElementDelegates');
-var dataElementSafe = require('../stores/dataElementSafe');
-var querySelectorAll = require('./querySelectorAll');
-var cleanText = require('./cleanText');
+var dataElementDefinitions = require('../../stores/dataElementDefinitions');
+var dataElementDelegates = require('../../stores/extensionDelegates/dataElementDelegates');
+var dataElementSafe = require('../../stores/dataElementSafe');
+var querySelectorAll = require('./../dom/querySelectorAll');
+var cleanText = require('./../string/cleanText');
 
 module.exports = function(variable, suppressDefault, dataDef) {
   dataDef = dataDef || dataElementDefinitions.getByName(variable);

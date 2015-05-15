@@ -1,4 +1,4 @@
-var Promise = require('./utils/Promise');
+var Promise = require('./utils/communication/Promise');
 
 /**
  * Instantiates extensions while injecting dependency extensions instances.

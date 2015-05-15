@@ -1,6 +1,6 @@
-var isString = require('./isString');
-var forEach = require('./forEach');
-var escapeForHTML = require('./escapeForHTML');
+var isString = require('./../isType/isString');
+var forEach = require('./../array/forEach');
+var escapeForHTML = require('./../string/escapeForHTML');
 
 function parseQueryParams(str){
   var URIDecode = function (str) {

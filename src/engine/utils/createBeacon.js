@@ -1,5 +1,5 @@
-var stringify = require('./stringify');
-var encodeObjectToURI = require('./encodeObjectToURI');
+var stringify = require('./json/stringify');
+var encodeObjectToURI = require('./uri/encodeObjectToURI');
 var clientInfo = require('./clientInfo');
 
 var getBeaconIframesContainer = function() {

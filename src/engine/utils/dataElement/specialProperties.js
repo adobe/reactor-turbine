@@ -1,5 +1,5 @@
-var getElementText = require('./getElementText');
-var cleanText = require('./cleanText');
+var getElementText = require('./../dom/getElementText');
+var cleanText = require('./../string/cleanText');
 
 // Special Properties for DOM elements. You use special properties using
 // the @ prefix. Example:

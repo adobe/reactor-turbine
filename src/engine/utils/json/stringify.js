@@ -1,8 +1,8 @@
-var isObject = require('./isObject');
-var isArray = require('./isArray');
-var isString = require('./isString');
-var includes = require('./includes');
-var map = require('./map');
+var isObject = require('./../isType/isObject');
+var isArray = require('./../isType/isArray');
+var isString = require('./../isType/isString');
+var includes = require('./../array/includes');
+var map = require('./../array/map');
 
 function stringify(obj, seenValues) {
   if (JSON && JSON.stringify) {

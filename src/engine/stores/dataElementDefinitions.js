@@ -1,4 +1,4 @@
-var forEach = require('../utils/forEach');
+var forEach = require('../utils/array/forEach');
 var definitionsByName = {};
 
 module.exports = {

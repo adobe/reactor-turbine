@@ -1,5 +1,5 @@
-var globalPolling = require('./utils/globalPolling');
-var dynamicListener = require('./utils/dynamicListener');
+var globalPolling = require('./utils/communication/globalPolling');
+var dynamicListener = require('./utils/communication/dynamicListener');
 var createExtensionInstances = require('./createExtensionInstances');
 var initRules = require('./initRules');
 var dataElementDefinitions = require('./stores/dataElementDefinitions');
@@ -8,8 +8,8 @@ var dataElementDelegates = require('./stores/extensionDelegates/dataElementDeleg
 var conditionDelegates = require('./stores/extensionDelegates/conditionDelegates');
 var coreDelegates = require('./stores/extensionDelegates/coreDelegates');
 var extensionInstanceRegistry = require('./stores/extensionInstanceRegistry');
-var getVar = require('./utils/getVar');
-var setVar = require('./utils/setVar');
+var getVar = require('./utils/dataElement/getVar');
+var setVar = require('./utils/dataElement/setVar');
 
 var _satellite = window._satellite;
 var propertyMeta = _satellite.getConfig();

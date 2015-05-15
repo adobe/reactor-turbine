@@ -1,7 +1,7 @@
-var forEach = require('./forEach');
-var dataOnElement = require('./dataOnElement');
-var querySelectorAll = require('./querySelectorAll');
-var addEventListener = require('./addEventListener');
+var forEach = require('./../array/forEach');
+var dataOnElement = require('./../dom/dataOnElement');
+var querySelectorAll = require('./../dom/querySelectorAll');
+var addEventListener = require('./../dom/addEventListener');
 var globalPolling = require('./globalPolling');
 
 var configs = [];

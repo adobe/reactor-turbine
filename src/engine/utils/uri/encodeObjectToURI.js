@@ -1,4 +1,4 @@
-var isObject = require('./isObject');
+var isObject = require('./../isType/isObject');
 
 module.exports = function(obj) {
   if (isObject(obj) === false) {

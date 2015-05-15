@@ -1,7 +1,7 @@
-var isString = require('./isString');
-var isObject = require('./isObject');
-var isArray = require('./isArray');
-var replaceVarTokens = require('./replaceVarTokens');
+var isString = require('./isType/isString');
+var isObject = require('./isType/isObject');
+var isArray = require('./isType/isArray');
+var replaceVarTokens = require('./dataElement/replaceVarTokens');
 
 function forceLowerCaseIfNeeded(value, forceLowerCase) {
   return forceLowerCase && isString(value) ? value.toLowerCase() : value

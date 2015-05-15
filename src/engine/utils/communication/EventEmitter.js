@@ -1,5 +1,5 @@
-var assign = require('./assign');
-var isFunction = require('./isFunction');
+var assign = require('./../object/assign');
+var isFunction = require('./../isType/isFunction');
 
 var EventEmitter = function() {};
 

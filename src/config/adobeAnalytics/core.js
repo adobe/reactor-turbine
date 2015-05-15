@@ -1,6 +1,6 @@
 var assign = require('assign');
 var encodeObjectToURI = require('encodeObjectToURI');
-var isHttps = require('isHttps');
+var isHTTPS = require('isHTTPS');
 var clientInfo = require('clientInfo');
 var createBeacon = require('createBeacon');
 
@@ -130,7 +130,7 @@ assign(AdobeAnalytics.prototype, {
     var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
         Math.floor(Math.random() * 10000000000000);
     // TODO: Is this necessary or should we just leave off the protocol?
-    var protocol = isHttps() ? 'https://' : 'http://';
+    var protocol = isHTTPS() ? 'https://' : 'http://';
     var uri = protocol + this._getTrackingServer() + '/b/ss/' + this.extensionSettings.account +
         '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
 

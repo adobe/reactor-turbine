@@ -1,4 +1,4 @@
-var isNumber = require('./isNumber');
+var isNumber = require('./../isType/isNumber');
 
 // `poll(fn, [freq], [max_retries])`
 // ------------------

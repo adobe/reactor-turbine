@@ -1,4 +1,4 @@
-var assign = require('./assign');
+var assign = require('./object/assign');
 
 var matchUserAgent = function(regexs){
   return function(userAgent){

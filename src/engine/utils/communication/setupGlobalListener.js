@@ -1,5 +1,5 @@
-var addEventListener = require('./addEventListener');
-var forEach = require('./forEach');
+var addEventListener = require('./../dom/addEventListener');
+var forEach = require('./../array/forEach');
 
 module.exports = function setupGlobalListener(node,eventType,eventSettingsCollection,callback){
   addEventListener(node, eventType, function(event) {

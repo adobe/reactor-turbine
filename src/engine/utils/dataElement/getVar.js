@@ -1,9 +1,9 @@
 var getObjectProperty = require('./getObjectProperty');
-var customVars = require('../stores/customVars');
-var dataElementDefinitions = require('../stores/dataElementDefinitions');
+var customVars = require('../../stores/customVars');
+var dataElementDefinitions = require('../../stores/dataElementDefinitions');
 var getDataElement = require('./getDataElement');
-var getURI = require('./getURI');
-var getQueryParam = require('./getQueryParam');
+var getURI = require('./../uri/getURI');
+var getQueryParam = require('./../uri/getQueryParam');
 
 // getVar(variable, elm, evt)
 // ==========================

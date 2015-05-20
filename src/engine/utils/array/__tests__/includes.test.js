@@ -1,10 +1,18 @@
-var includes = require('../includes');
+var rewire = require('rewire');
+var includes = rewire('../includes');
+
+includes.__set__('indexOf', function(arr, obj) {
+  return arr.indexOf(obj);
+});
+
+var letters = ['A', 'B', 'C'];
 
 describe('includes', function() {
-  it('returns true when item is in array', function () {
-    var letters = ['A', 'B', 'C'];
-    var included = includes(letters, 'B');
+  it('returns true when item is in array', function() {
+    expect(includes(letters, 'B')).toBe(true);
+  });
 
-    expect(included).toBe(true);
+  it('returns false when item is not in array', function() {
+    expect(includes(letters, 'D')).toBe(false);
   });
 });

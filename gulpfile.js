@@ -109,7 +109,7 @@ gulp.task("buildEngine", function() {
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('test', function(done) {
+gulp.task('test', function() {
   karma.start({
     configFile: path.join(__dirname, 'karma.conf.js')
   });

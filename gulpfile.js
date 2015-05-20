@@ -3,6 +3,7 @@ var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var fs = require('fs');
 var path = require('path');
+var karma = require('karma').server;
 
 var $ = require('gulp-load-plugins')();
 
@@ -106,6 +107,12 @@ gulp.task("buildEngine", function() {
       }
     }))
     .pipe(gulp.dest('./dist'));
+});
+
+gulp.task('test', function(done) {
+  karma.start({
+    configFile: path.join(__dirname, 'karma.conf.js')
+  });
 });
 
 gulp.task('watch', function() {

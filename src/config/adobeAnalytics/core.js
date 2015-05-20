@@ -117,7 +117,7 @@ assign(AdobeAnalytics.prototype, {
       }
     }
 
-    var events = data.eventDelegates;
+    var events = data.events;
 
     if (events) {
       this._translateToQueryStringParam(queryStringParams, 'events', events);

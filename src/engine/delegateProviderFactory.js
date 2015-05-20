@@ -10,7 +10,7 @@ module.exports = function() {
         throw new Error('Delegate provider not initialized.');
       }
 
-      var exports = exportsByName[scriptsByName];
+      var exports = exportsByName[name];
 
       if (!exports) {
         if (scriptsByName.hasOwnProperty(name)) {

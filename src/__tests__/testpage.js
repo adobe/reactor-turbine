@@ -1,9 +1,3 @@
-var assert = function (yes, msg) {
-  if (!yes) {
-    throw new Error('Assertion failure' + (msg ? ' : ' + msg : ''));
-  }
-};
-
 var domReady = (function (ready) {
 
   var fns = [], fn, f = false
@@ -57,8 +51,8 @@ var TestPage = function () {
 
   var page = {
     queue: [],
-    load: load,
     messages: takeOverConsole(),
+    mergeConfig: mergeConfig,
     waitForPageLoad: waitForPageLoad,
     waitFor: waitFor,
     waitForLog: waitForLog,
@@ -67,20 +61,9 @@ var TestPage = function () {
     evaluate: evaluate,
     execute: evaluate,
     assertLogged: assertLogged,
-    assertNotLogged: assertNotLogged
+    assertNotLogged: assertNotLogged,
+    start: start
   };
-
-  setTimeout(function () {
-    startQueue();
-  }, 0);
-
-  var addListener = window.addEventListener ?
-    function (node, evt, cb) {
-      node.addEventListener(evt, cb, false);
-    } :
-    function (node, evt, cb) {
-      window['on' + evt] = cb;
-    };
 
   function map(arr, func, context) {
     var ret = [];
@@ -226,54 +209,21 @@ var TestPage = function () {
     return page;
   }
 
-  function insertElement(elm) {
-    if (document.body) {
-      document.body.insertBefore(elm, document.body.firstChild);
-    } else {
-      window.onload = function () {
-        document.body.insertBefore(elm, document.body.firstChild);
-      };
+  var queueStarted = false;
+
+  function start() {
+    if (queueStarted) {
+      return;
     }
-  }
 
-  function makePassedBanner() {
-    var h1 = document.createElement('h1');
-    h1.innerHTML = 'It Passed!';
-    h1.style.backgroundColor = 'green';
-    h1.style.color = 'white';
-    insertElement(h1);
-  }
+    queueStarted = true;
 
-  function makeFailedBanner(msg) {
-    var div = document.createElement('div');
-
-    var h1 = document.createElement('h1');
-    h1.innerHTML = 'It Failed!';
-    h1.style.backgroundColor = 'red';
-    h1.style.color = 'white';
-    div.appendChild(h1);
-
-    var pre = document.createElement('pre');
-    pre.innerHTML = msg;
-    pre.style.color = 'red';
-    div.appendChild(pre);
-
-    insertElement(div);
-  }
-
-  function startQueue() {
     var queue = page.queue;
     var idx = 0;
 
-    function finish() {
-      done();
-      console.log('Test passed!');
-      makePassedBanner();
-    }
-
     function next() {
       var cb = queue[idx++];
-      if (!cb) return finish();
+      if (!cb) return done();
       cb(next);
     }
 
@@ -322,29 +272,16 @@ var TestPage = function () {
     return consoleMessages;
   }
 
-  function load(configReplacements) {
-    page.queue.push(function(next) {
-      window.engineLoaded = function() {
-        next();
-      };
-    });
+  function mergeConfig(configReplacements) {
+    var config = window._satellite.getConfig();
 
-    window.mergeConfig = function() {
-      var config = window._satellite.getConfig();
+    for (var key in configReplacements) {
+      config[key] = configReplacements[key];
+    }
 
-      for (var key in configReplacements) {
-        config[key] = configReplacements[key];
-      }
-
-      window._satellite.getConfig = function() {
-        return config;
-      };
+    window._satellite.getConfig = function() {
+      return config;
     };
-
-    document.write('<script src="/base/dist/config.js"></script>');
-    document.write('<script>window.mergeConfig();</script>');
-    document.write('<script src="/base/dist/engine.js"></script>');
-    document.write('<script>window.engineLoaded();</script>');
 
     return page;
   }

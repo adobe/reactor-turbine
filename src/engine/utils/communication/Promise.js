@@ -1,12 +1,6 @@
 // TODO: Promiscuous doesn't match our browser support requirements.
 /**@license MIT-promiscuous library-©2013 Ruben Verborgh*/
 (function (func, obj) {
-  // Begin added by DTM.
-  var setImmediate = typeof window.setImmediate === 'function' ?
-    window.setImmediate : window.setTimeout;
-  // End added by DTM.
-
-
   // Type checking utility function
   function is(type, item) { return (typeof item)[0] == type; }
 
@@ -82,7 +76,10 @@
 
   // Finalizes the promise by resolving/rejecting it with the transformed value
   function finalize(promise, resolve, reject, value, transform) {
-    setImmediate(function () {
+    ///// DTM CHANGE /////
+    // This was changed from setImmediate to setTimeout for ease of testing using mock clocks
+    // and to be consistent across browsers.
+    setTimeout(function () {
       try {
         // Transform the value through and check whether it's a promise
         value = transform(value);
@@ -98,7 +95,7 @@
           transform.call(value, resolve, reject);
       }
       catch (error) { reject(error); }
-    });
+    }, 0);
   }
 
   // Export the main module

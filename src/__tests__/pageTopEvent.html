@@ -1,0 +1,55 @@
+<html>
+<head>
+  <script src="testpage.js"></script>
+  <script src="/base/dist/config.js"></script>
+
+  <script>
+    var spy = jasmine.createSpy();
+    jasmine.clock().install();
+
+    TestPage
+      .mergeConfig({
+        extensionInstances: {
+          'abc': {
+            type: 'testExtension'
+          }
+        },
+        coreDelegates: {
+          testExtension: function(module, require) {
+            module.exports = function() {
+              return {
+                test: spy
+              };
+            };
+          }
+        },
+        rules: [
+          {
+            event: {
+              type: 'dtm.pageTop'
+            },
+            actions: [
+              {
+                extensionInstanceIds: ['abc'],
+                method: 'test'
+              }
+            ]
+          }
+        ]
+      });
+  </script>
+
+  <script src="/base/dist/engine.js"></script>
+
+  <script>
+    // Actions are always run asynchronously, even from a page-top event.
+    jasmine.clock().tick(1);
+    TestPage
+      .execute(function() {
+        expect(spy.calls.count()).toEqual(1);
+        jasmine.clock().uninstall();
+      })
+      .start();
+  </script>
+</head>
+</html>

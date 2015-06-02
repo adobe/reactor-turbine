@@ -7,7 +7,7 @@
     jasmine.clock().install();
 
     TestPage
-      .mergeConfig({
+      .overrideConfig({
         extensionInstances: {
           'abc': {
             type: 'testExtension'

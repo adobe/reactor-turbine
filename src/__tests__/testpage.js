@@ -56,7 +56,7 @@
   var page = {
     queue: [],
     messages: takeOverConsole(),
-    mergeConfig: mergeConfig,
+    overrideConfig: overrideConfig,
     waitForDOMLoaded: waitForDOMLoaded,
     waitForContentLoaded: waitForContentLoaded,
     waitFor: waitFor,
@@ -286,7 +286,7 @@
     return consoleMessages;
   }
 
-  function mergeConfig(configReplacements) {
+  function overrideConfig(configReplacements) {
     var config = window._satellite.getConfig();
 
     for (var key in configReplacements) {

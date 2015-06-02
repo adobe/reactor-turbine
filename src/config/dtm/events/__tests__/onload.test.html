@@ -7,7 +7,7 @@
     jasmine.clock().install();
 
     TestPage
-      .mergeConfig({
+      .overrideConfig({
         extensionInstances: {
           'abc': {
             type: 'testExtension'
@@ -25,7 +25,7 @@
         rules: [
           {
             event: {
-              type: 'dtm.pageBottom'
+              type: 'dtm.onload'
             },
             actions: [
               {

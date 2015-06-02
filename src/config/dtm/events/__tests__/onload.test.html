@@ -1,0 +1,63 @@
+<html>
+<head>
+  <script src="/base/src/__tests__/testpage.js"></script>
+  <script src="/base/dist/config.js"></script>
+  <script>
+    var spy = jasmine.createSpy();
+    jasmine.clock().install();
+
+    TestPage
+      .mergeConfig({
+        extensionInstances: {
+          'abc': {
+            type: 'testExtension'
+          }
+        },
+        coreDelegates: {
+          testExtension: function(module, require) {
+            module.exports = function() {
+              return {
+                test: spy
+              };
+            };
+          }
+        },
+        rules: [
+          {
+            event: {
+              type: 'dtm.pageBottom'
+            },
+            actions: [
+              {
+                extensionInstanceIds: ['abc'],
+                method: 'test'
+              }
+            ]
+          }
+        ]
+      });
+  </script>
+  <script src="/base/dist/engine.js"></script>
+  <script>
+    TestPage
+      .execute(function() {
+        // Actions are always run asynchronously.
+        jasmine.clock().tick(1);
+        expect(spy.calls.count()).toEqual(0);
+      })
+      .waitForContentLoaded()
+      .execute(function() {
+        // Actions are always run asynchronously.
+        jasmine.clock().tick(1);
+        expect(spy.calls.count()).toEqual(1);
+        jasmine.clock().uninstall();
+      })
+      .start();
+  </script>
+</head>
+<body>
+<script>
+  _satellite.pageBottom();
+</script>
+</body>
+</html>

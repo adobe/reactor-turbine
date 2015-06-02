@@ -9,8 +9,8 @@ module.exports = function(config) {
 
     files: [
       { pattern: 'src/__tests__/loadTestpage.js', watched: true, included: true, served: true },
-      { pattern: '**/__tests__/**.test.js', watched: true, included: true, served: true },
-      { pattern: '**/__tests__/**.html', watched: true, included: false, served: true },
+      { pattern: '**/__tests__/**/*.test.js', watched: true, included: true, served: true },
+      { pattern: '**/__tests__/**/*.test.html', watched: true, included: false, served: true },
       { pattern: 'src/__tests__/testpage.js', watched: true, included: false, served: true },
       { pattern: 'dist/config.js', watched: true, included: false, served: true },
       { pattern: 'dist/engine.js', watched: true, included: false, served: true }

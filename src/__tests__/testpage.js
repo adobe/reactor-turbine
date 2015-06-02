@@ -1,59 +1,64 @@
-var domReady = (function (ready) {
+(function() {
 
-  var fns = [], fn, f = false
-    , doc = document
-    , testEl = doc.documentElement
-    , hack = testEl.doScroll
-    , domContentLoaded = 'DOMContentLoaded'
-    , addEventListener = 'addEventListener'
-    , onreadystatechange = 'onreadystatechange'
-    , loaded = /^loade|^c/.test(doc.readyState);
+  var domReady = (function (ready) {
 
-  function flush(f) {
-    loaded = 1;
-    while (f = fns.shift()) f();
-  }
+    var fns = [], fn, f = false
+      , doc = document
+      , testEl = doc.documentElement
+      , hack = testEl.doScroll
+      , domContentLoaded = 'DOMContentLoaded'
+      , addEventListener = 'addEventListener'
+      , onreadystatechange = 'onreadystatechange'
+      , loaded = /^loade|^c/.test(doc.readyState);
 
-  doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
-    doc.removeEventListener(domContentLoaded, fn, f);
-    flush();
-  }, f);
-
-
-  hack && doc.attachEvent(onreadystatechange, (fn = function () {
-    if (/^c/.test(doc.readyState)) {
-      doc.detachEvent(onreadystatechange, fn);
-      flush();
+    function flush(f) {
+      loaded = 1;
+      while (f = fns.shift()) f();
     }
-  }));
 
-  return (ready = hack ?
-    function (fn) {
-      self != top ?
-        loaded ? fn() : fns.push(fn) :
-        function () {
-          try {
-            testEl.doScroll('left');
-          } catch (e) {
-            return setTimeout(function () {
-              ready(fn);
-            }, 50);
-          }
-          fn();
-        }();
-    } :
-    function (fn) {
-      loaded ? fn() : fns.push(fn);
-    });
-}());
+    doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
+      doc.removeEventListener(domContentLoaded, fn, f);
+      flush();
+    }, f);
 
-var TestPage = function () {
+
+    hack && doc.attachEvent(onreadystatechange, (fn = function () {
+      if (/^c/.test(doc.readyState)) {
+        doc.detachEvent(onreadystatechange, fn);
+        flush();
+      }
+    }));
+
+    return (ready = hack ?
+      function (fn) {
+        self != top ?
+          loaded ? fn() : fns.push(fn) :
+          function () {
+            try {
+              testEl.doScroll('left');
+            } catch (e) {
+              return setTimeout(function () {
+                ready(fn);
+              }, 50);
+            }
+            fn();
+          }();
+      } :
+      function (fn) {
+        loaded ? fn() : fns.push(fn);
+      });
+  }());
+
+  var addEventListener = window.addEventListener ?
+    function(node, evt, cb){ node.addEventListener(evt, cb, false); } :
+    function(node, evt, cb){ node.attachEvent('on' + evt, cb); };
 
   var page = {
     queue: [],
     messages: takeOverConsole(),
     mergeConfig: mergeConfig,
-    waitForPageLoad: waitForPageLoad,
+    waitForDOMLoaded: waitForDOMLoaded,
+    waitForContentLoaded: waitForContentLoaded,
     waitFor: waitFor,
     waitForLog: waitForLog,
     waitForCondition: waitForCondition,
@@ -65,6 +70,8 @@ var TestPage = function () {
     start: start
   };
 
+  window.TestPage = page;
+
   function map(arr, func, context) {
     var ret = [];
     for (var i = 0, len = arr.length; i < len; i++)
@@ -72,11 +79,18 @@ var TestPage = function () {
     return ret;
   }
 
-  function waitForPageLoad() {
+  function waitForDOMLoaded() {
     page.queue.push(function (next) {
       domReady(function () {
         next();
       });
+    });
+    return page;
+  }
+
+  function waitForContentLoaded() {
+    page.queue.push(function(next) {
+      addEventListener(window, 'load', next);
     });
     return page;
   }
@@ -400,9 +414,6 @@ var TestPage = function () {
   }
 
   window.onerror = function (err, url, line) {
-    makeFailedBanner(err);
     fail(err + ' at ' + url + ' on line ' + line);
   };
-
-  return page;
-}();
+})();

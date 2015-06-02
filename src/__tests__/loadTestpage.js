@@ -1,6 +1,6 @@
 (function() {
   // We have to deliver a new instance of the jasmine clock because jasmine.clock is already tied
-  // to this window's globals an not the iframe's window's globals. For this we create
+  // to this window's globals and not the iframe's window's globals. For this we create
   // a special jasmine instance that overrides the clock method but inherits the rest of the
   // this window's jasmine object.
   var IFrameJasmine = function(iwin) {
@@ -15,7 +15,18 @@
 
   IFrameJasmine.prototype = jasmine;
 
-  window.testPage = function(filename, focus) {
+  window.testPage = function(path, focus) {
+    var absolutePath;
+
+    if (path.charAt(0) === '/') {
+      absolutePath = '/base' + path;
+    } else {
+      var scripts = document.getElementsByTagName('script');
+      var currentScriptPath = scripts[scripts.length - 1].src;
+      var currentScriptDir = currentScriptPath.substring(0, currentScriptPath.lastIndexOf('/') + 1);
+      absolutePath = currentScriptDir + path;
+    }
+
     function eraseLocalStorageSettings() {
       if (!window.localStorage) {
         return;
@@ -38,11 +49,11 @@
     function runTest(done) {
       eraseLocalStorageSettings();
 
-      var iframe = loadIframe('/base/' + filename);
+      var iframe = loadIframe(absolutePath);
       var iwin = iframe.contentWindow || iframe.contentDocument.defaultView;
 
       iwin.done = function() {
-        document.body.removeChild(iframe);
+        //document.body.removeChild(iframe);
         done();
       };
       iwin.expect = expect;
@@ -51,7 +62,7 @@
     }
 
     describe('test page', function() {
-      var testName = 'validates ' + filename;
+      var testName = 'validates ' + path;
       if (focus) {
         fit(testName, runTest);
       } else {

@@ -1,8 +1,7 @@
 <html>
 <head>
-  <script src="testpage.js"></script>
+  <script src="/base/src/__tests__/testpage.js"></script>
   <script src="/base/dist/config.js"></script>
-
   <script>
     var spy = jasmine.createSpy();
     jasmine.clock().install();
@@ -38,18 +37,21 @@
         ]
       });
   </script>
-
   <script src="/base/dist/engine.js"></script>
-
   <script>
-    // Actions are always run asynchronously, even from a page-top event.
-    jasmine.clock().tick(1);
     TestPage
       .execute(function() {
+        // Actions are always run asynchronously.
+        jasmine.clock().tick(1);
         expect(spy.calls.count()).toEqual(1);
         jasmine.clock().uninstall();
       })
       .start();
   </script>
 </head>
+<body>
+  <script>
+    _satellite.pageBottom();
+  </script>
+</body>
 </html>

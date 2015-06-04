@@ -1,3 +1,3 @@
 module.exports = function(settings, eventDetail) {
-  return settings.script(eventDetail, require);
+  return settings.script(eventDetail);
 };

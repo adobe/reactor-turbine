@@ -8,18 +8,20 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
     files: [
-      { pattern: 'src/__tests__/loadTestpage.js', watched: true, included: true, served: true },
+      { pattern: '**/__tests__/**/loadTestpage.js', watched: true, included: true, served: true },
       { pattern: '**/__tests__/**/*.test.js', watched: true, included: true, served: true },
       { pattern: '**/__tests__/**/*.test.html', watched: true, included: false, served: true },
-      { pattern: 'src/__tests__/testpage.js', watched: true, included: false, served: true },
       { pattern: 'dist/config.js', watched: true, included: false, served: true },
-      { pattern: 'dist/engine.js', watched: true, included: false, served: true }
+      { pattern: 'dist/engine.js', watched: true, included: false, served: true },
+      { pattern: '**/__tests__/**/testpage.js', watched: true, included: false, served: true },
+      { pattern: '**/__tests__/**/*!(.test)*', watched: true, included: false, served: true },
+      { pattern: 'node_modules/simulate/simulate.js', watched: false, included: true, served: true }
     ],
 
     exclude: [],
 
     preprocessors: {
-      '**/__tests__/*.test.js': ['webpack']
+      '**/__tests__/*.test.js': ['webpack', 'sourcemap']
     },
 
     webpack: {
@@ -47,7 +49,8 @@ module.exports = function(config) {
             callback();
           }
         }
-      ]
+      ],
+      devtool: 'inline-source-map'
     },
 
     webpackServer: {
@@ -76,7 +79,8 @@ module.exports = function(config) {
       require("karma-jasmine"),
       require("karma-chrome-launcher"),
       require("karma-firefox-launcher"),
-      require("karma-webpack")
+      require("karma-webpack"),
+      require("karma-sourcemap-loader")
     ]
   });
 };

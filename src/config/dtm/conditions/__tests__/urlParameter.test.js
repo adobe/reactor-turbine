@@ -1,19 +1,19 @@
 var rewire = require('rewire');
-var urlParamCondition = rewire('../urlParameter');
+var conditionDelegate = rewire('../urlParameter');
 
-urlParamCondition.__set__('textMatch', require('../../../../engine/utils/string/textMatch'));
-urlParamCondition.__set__('getQueryParam', function() {
+conditionDelegate.__set__('textMatch', require('../../../../engine/utils/string/textMatch'));
+conditionDelegate.__set__('getQueryParam', function() {
   return 'foo';
 });
 
-describe('url parameter condition', function() {
+describe('url parameter condition delegate', function() {
   it('returns true when value matches using regular string', function() {
     var settings = {
       name: 'testParam',
       value: 'foo'
     };
 
-    expect(urlParamCondition(settings)).toBe(true);
+    expect(conditionDelegate(settings)).toBe(true);
   });
 
   it('returns true when value matches using regex', function() {
@@ -22,7 +22,7 @@ describe('url parameter condition', function() {
       value: /^f[ojd]o$/
     };
 
-    expect(urlParamCondition(settings)).toBe(true);
+    expect(conditionDelegate(settings)).toBe(true);
   });
 
   it('returns false when value does not match using regular string', function() {
@@ -31,7 +31,7 @@ describe('url parameter condition', function() {
       value: 'goo'
     };
 
-    expect(urlParamCondition(settings)).toBe(false);
+    expect(conditionDelegate(settings)).toBe(false);
   });
 
   it('returns false when value does not match using regex', function() {
@@ -40,6 +40,6 @@ describe('url parameter condition', function() {
       value: /^g[ojd]o$/
     };
 
-    expect(urlParamCondition(settings)).toBe(false);
+    expect(conditionDelegate(settings)).toBe(false);
   });
 });

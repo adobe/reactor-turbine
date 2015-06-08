@@ -1,5 +1,3 @@
-var globalPolling = require('./utils/communication/globalPolling');
-var dynamicListener = require('./utils/communication/dynamicListener');
 var createExtensionInstances = require('./createExtensionInstances');
 var initRules = require('./initRules');
 var dataElementDefinitions = require('./stores/dataElementDefinitions');
@@ -27,9 +25,5 @@ coreDelegates.init(propertyMeta.coreDelegates);
 createExtensionInstances(propertyMeta.extensionInstances, extensionInstanceRegistry, coreDelegates);
 initRules(propertyMeta.rules, extensionInstanceRegistry, eventDelegates, conditionDelegates);
 
-globalPolling.init();
-dynamicListener.init();
-
-// TODO: Do we want these exposed?
 _satellite.getVar = getVar;
 _satellite.setVar = setVar;

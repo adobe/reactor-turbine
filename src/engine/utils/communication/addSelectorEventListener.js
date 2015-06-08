@@ -1,10 +1,10 @@
 var addEventListener = require('./../dom/addEventListener');
-var dynamicListener = require('./dynamicListener');
+var addDynamicListener = require('./addDynamicEventListener');
 var matchesCSS = require('./../dom/matchesCSS');
 
 module.exports = function(selector, type, eventHandlerOnElement, callback) {
   if (eventHandlerOnElement) {
-    dynamicListener.register(selector, type, callback);
+    addDynamicListener(selector, type, callback);
   } else {
     addEventListener(document, type, function(event) {
       if (matchesCSS(selector, event.target)) {

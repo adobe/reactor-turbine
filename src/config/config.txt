@@ -84,12 +84,14 @@
       },
       {
         "name": "Dead Header Rule",
-        "event": {
-          "type": "dtm.click",
-          "settings": {
-            "selector": "h1, h2, h3, h4, h5"
-          },
-        },
+        "events": [
+          {
+            "type": "dtm.click",
+            "settings": {
+              "selector": "h1, h2, h3, h4, h5"
+            }
+          }
+        ],
         "conditions": [
           {
             "type":"dtm.custom",
@@ -122,19 +124,21 @@
       },
       {
         "name": "Crazy Test Rule",
-        "event": {
-          "type": "dtm.click",
-          "settings": {
-            "selector": "h1, h2, h3, h4, h5",
-            "bubbleFireIfParent": true,
-            "bubbleFireIfChildFired": false,
-            "bubbleStop": true,
-            "property": {
-              "className": "test"
-            },
-           "eventHandlerOnElement": true
-          },
-        },
+        "events": [
+          {
+            "type": "dtm.click",
+            "settings": {
+              "selector": "h1, h2, h3, h4, h5",
+              "bubbleFireIfParent": true,
+              "bubbleFireIfChildFired": false,
+              "bubbleStop": true,
+              "property": {
+                "className": "test"
+              },
+             "eventHandlerOnElement": true
+            }
+          }
+        ],
         "conditions": [
           {
             "type":"dtm.custom",
@@ -167,12 +171,14 @@
       },
       {
         "name": "Hero Mbox",
-        "event": {
-          "type": "dtm.click",
-          "settings": {
-            "selector": "#hero",
+        "events": [
+          {
+            "type": "dtm.click",
+            "settings": {
+              "selector": "#hero"
+            }
           }
-        },
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["efghi"],
@@ -191,13 +197,15 @@
       },
       {
         "name": "Click Me",
-        "event": {
-          "type": "dtm.click",
-          "settings": {
-            "selector": ".clickme",
-            "eventHandlerOnElement": true
+        "events": [
+          {
+            "type": "dtm.click",
+            "settings": {
+              "selector": ".clickme",
+              "eventHandlerOnElement": true
+            }
           }
-        },
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["jklmno"],
@@ -210,12 +218,14 @@
       },
       {
         "name": "Mbox Redirect",
-        "event": {
-          "type": "dtm.click",
-          "settings": {
-            "selector": "#redirectButton"
+        "events": [
+          {
+            "type": "dtm.click",
+            "settings": {
+              "selector": "#redirectButton"
+            }
           }
-        },
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["efghi"],
@@ -234,9 +244,11 @@
       },
       {
         "name": "Dom Ready",
-        "event": {
-          "type": "dtm.domReady"
-        },
+        "events": [
+          {
+            "type": "dtm.domReady"
+          }
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["jklmno"],
@@ -249,9 +261,11 @@
       },
       {
         "name": "Page Top",
-        "event": {
-          "type": "dtm.pageTop"
-        },
+        "events": [
+          {
+            "type": "dtm.pageTop"
+          }
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["jklmno"],
@@ -264,9 +278,11 @@
       },
       {
         "name": "Page Bottom",
-        "event": {
-          "type": "dtm.pageBottom"
-        },
+        "events": [
+          {
+            "type": "dtm.pageBottom"
+          }
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["jklmno"],
@@ -279,9 +295,11 @@
       },
       {
         "name": "onload",
-        "event": {
-          "type": "dtm.onload"
-        },
+        "events": [
+          {
+            "type": "dtm.onload"
+          }
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["jklmno"],
@@ -294,12 +312,14 @@
       },
       {
         "name": "direct call test",
-        "event": {
-          "type": "dtm.directCall",
-          "settings": {
-            "name": "dc1"
+        "events": [
+          {
+            "type": "dtm.directCall",
+            "settings": {
+              "name": "dc1"
+            }
           }
-        },
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["jklmno"],
@@ -312,12 +332,14 @@
       },
       {
         "name": "mouseover static",
-        "event": {
-          "type": "dtm.mouseover",
-          "settings": {
-            "selector": "[href='file.zip']"
+        "events": [
+          {
+            "type": "dtm.mouseover",
+            "settings": {
+              "selector": "[href='file.zip']"
+            }
           }
-        },
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["jklmno"],
@@ -330,13 +352,15 @@
       },
       {
         "name": "mouseover dynamic",
-        "event": {
-          "type": "dtm.mouseover",
-          "settings": {
-            "selector": ".clickme",
-            "eventHandlerOnElement": true
+        "events": [
+          {
+            "type": "dtm.mouseover",
+            "settings": {
+              "selector": ".clickme",
+              "eventHandlerOnElement": true
+            }
           }
-        },
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["jklmno"],
@@ -348,12 +372,14 @@
         ]
       },{
         "name": "entersViewport stuff",
-        "event": {
-          "type": "dtm.entersViewport",
-          "settings": {
-            "selector": ".clickme"
+        "events": [
+          {
+            "type": "dtm.entersViewport",
+            "settings": {
+              "selector": ".clickme"
+            }
           }
-        },
+        ],
         "actions": [{
           "extensionInstanceIds": ["jklmno"],
           "method": "log",
@@ -363,12 +389,14 @@
         }]
       },{
         "name": "elementExists stuff",
-        "event": {
-          "type": "dtm.elementExists",
-          "settings": {
-            "selector": ".clickme"
+        "events": [
+          {
+            "type": "dtm.elementExists",
+            "settings": {
+              "selector": ".clickme"
+            }
           }
-        },
+        ],
         "actions": [{
           "extensionInstanceIds": ["jklmno"],
           "method": "log",
@@ -378,24 +406,28 @@
         }]
       },{
         "name": "Facebook Login",
-        "event": {
-          "type": "dtm.click",
-          "settings": {
-            "selector": ".facebook-login"
+        "events": [
+          {
+            "type": "dtm.click",
+            "settings": {
+              "selector": ".facebook-login"
+            }
           }
-        },
+        ],
         "actions": [{
           "extensionInstanceIds": ["uvw"],
           "method": "logIn"
         }]
       },{
         "name": "Send Purchase on Facebook",
-        "event": {
-          "type": "dtm.click",
-          "settings": {
-            "selector": ".facebook-share"
+        "events": [
+          {
+            "type": "dtm.click",
+            "settings": {
+              "selector": ".facebook-share"
+            }
           }
-        },
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["uvw"],
@@ -408,9 +440,11 @@
         ]
       },{
         "name": "Purchase Sent on Facebook",
-        "event": {
-          "type": "facebookConnect.message.send"
-        },
+        "events": [
+          {
+            "type": "facebookConnect.message.send"
+          }
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["jklmno"],
@@ -422,12 +456,14 @@
         ]
       },{
         "name": "Track Facebook Conversion",
-        "event": {
-          "type": "dtm.click",
-          "settings": {
-            "selector": ".trackFBConversionButton"
+        "events": [
+          {
+            "type": "dtm.click",
+            "settings": {
+              "selector": ".trackFBConversionButton"
+            }
           }
-        },
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["xyz"],
@@ -443,12 +479,14 @@
         ]
       },{
         "name": "Track Facebook Custom Event",
-        "event": {
-          "type": "dtm.click",
-          "settings": {
-            "selector": ".trackFBEventButton"
+        "events": [
+          {
+            "type": "dtm.click",
+            "settings": {
+              "selector": ".trackFBEventButton"
+            }
           }
-        },
+        ],
         "actions": [
           {
             "extensionInstanceIds": ["xyz"],
@@ -548,7 +586,7 @@
     ],
     "appVersion": "52A",
     "buildDate": "2015-03-16 20:55:42 UTC",
-    "publishDate": "2015-03-16 14:43:44 -0600",
+    "publishDate": "2015-03-16 14:43:44 -0600"
   };
 
   window._satellite = window._satellite || {};

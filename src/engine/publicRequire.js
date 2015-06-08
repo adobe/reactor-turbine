@@ -11,7 +11,7 @@ var resources = {
   'Promise': require('./utils/communication/Promise'),
   'addSelectorEventListener': require('./utils/communication/addSelectorEventListener'),
   'forEach': require('./utils/array/forEach'),
-  'poll': require('./utils/communication/globalPolling').add,
+  'poll': require('./utils/communication/globalPoller').add,
   'bind': require('./utils/dom/bind'),
   'dataOnElement': require('./utils/dom/dataOnElement'),
   'addEventListener': require('./utils/dom/addEventListener'),

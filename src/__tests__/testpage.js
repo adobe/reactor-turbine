@@ -56,7 +56,6 @@
   var page = {
     queue: [],
     messages: takeOverConsole(),
-    overrideConfig: overrideConfig,
     waitForDOMLoaded: waitForDOMLoaded,
     waitForContentLoaded: waitForContentLoaded,
     waitFor: waitFor,
@@ -284,20 +283,6 @@
       intercept(methods[i])
 
     return consoleMessages;
-  }
-
-  function overrideConfig(configReplacements) {
-    var config = window._satellite.getConfig();
-
-    for (var key in configReplacements) {
-      config[key] = configReplacements[key];
-    }
-
-    window._satellite.getConfig = function() {
-      return config;
-    };
-
-    return page;
   }
 
   setupFakeImageObject();

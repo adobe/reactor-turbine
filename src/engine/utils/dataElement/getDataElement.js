@@ -21,7 +21,8 @@ module.exports = function(variable, suppressDefault, dataDef) {
     dataElementSafe(variable, storeLength, value)
   }
   if (value === undefined && !suppressDefault) {
-    value = dataDef.settings.default || ''
+    // Have to wrap "default" in quotes since it is a keyword.
+    value = dataDef.settings['default'] || ''
   }
 
   if (dataDef.forceLowerCase) {

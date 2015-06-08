@@ -15,7 +15,7 @@
 
   IFrameJasmine.prototype = jasmine;
 
-  window.testPage = function(path, focus) {
+  window.runTestPage = function(path, focus) {
     var absolutePath;
 
     if (path.charAt(0) === '/') {
@@ -71,7 +71,7 @@
     });
   };
 
-  window.ftestPage = function(filename) {
-    window.testPage(filename, true);
+  window.frunTestPage = function(filename) {
+    window.runTestPage(filename, true);
   };
 })();

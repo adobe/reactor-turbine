@@ -5,15 +5,18 @@ var preprocessSettings = require('./utils/preprocessSettings');
 
 module.exports = function(rules, extensionInstanceRegistry, eventDelegates, conditionDelegates) {
   function initEventDelegate(rule){
-    if (rule.event){
-      rule.event.settings = rule.event.settings || {};
+    if (rule.events){
 
       function trigger(eventDetail) {
         checkConditions(rule, eventDetail);
       }
 
-      var delegate = eventDelegates.get(rule.event.type);
-      delegate(trigger, rule.event.settings);
+      forEach(rule.events, function(event) {
+        event.settings = event.settings || {};
+
+        var delegate = eventDelegates.get(event.type);
+        delegate(trigger, event.settings);
+      });
     }
   }
 

@@ -1,6 +1,8 @@
 describe('Page Tests', function() {
-  testPage('pageTop.test.html');
-  testPage('pageBottom.test.html');
-  testPage('domReady.test.html');
-  testPage('onload.test.html');
+  runTestPage('pageTop.test.html');
+  runTestPage('pageBottom.test.html');
+  runTestPage('domReady.test.html');
+  runTestPage('onload.test.html');
+  runTestPage('mouse/targetOnPageHandlerOnDocument.html');
+  runTestPage('mouse/targetOnPageHandlerOnTarget.html');
 });

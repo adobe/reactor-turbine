@@ -26,6 +26,8 @@ function shallowStringifyWithFunctionValues(obj) {
     output += '\n"' + key + '": ' + value + ',';
   }
 
+  output = output.slice(0, -1);
+
   output += '}';
 
   return output;
@@ -109,15 +111,18 @@ gulp.task("buildEngine", function() {
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('test', function() {
+// Typically we wouldn't be dependent upon building the full engine and config since Karma
+// would dynamically compile the pieces under test, but because we have functional tests
+// that work within iframes and are dependent upon the full engine and config, this is necessary.
+gulp.task('test', ['default'], function() {
   karma.start({
     configFile: path.join(__dirname, 'karma.conf.js')
   });
 });
 
 gulp.task('watch', function() {
-  gulp.watch(['./src/config/**/*'], ['buildConfig']);
-  gulp.watch(['./src/engine/**/*.js'], ['buildEngine']);
+  gulp.watch(['./src/config/**/!(__tests__)/*'], ['buildConfig']);
+  gulp.watch(['./src/engine/**/!(__tests__)/*.js'], ['buildEngine']);
 });
 
 gulp.task('default', ['buildConfig', 'buildEngine', 'watch']);

@@ -1,6 +1,6 @@
-var custom = require('../custom');
+var conditionDelegate = require('../custom');
 
-describe('custom condition', function() {
+describe('custom condition delegate', function() {
   it('should run a user-defined function', function() {
     var settings = {
       script: function() {
@@ -11,7 +11,7 @@ describe('custom condition', function() {
     var eventDetail = {};
 
     spyOn(settings, 'script').and.callThrough();
-    custom(settings, eventDetail);
+    conditionDelegate(settings, eventDetail);
 
     expect(settings.script.calls.first()).toEqual({
       object: settings,

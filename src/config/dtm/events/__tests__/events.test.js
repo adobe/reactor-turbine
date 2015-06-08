@@ -3,6 +3,8 @@ describe('Page Tests', function() {
   runTestPage('pageBottom.test.html');
   runTestPage('domReady.test.html');
   runTestPage('onload.test.html');
-  runTestPage('mouse/targetOnPageHandlerOnDocument.html');
-  runTestPage('mouse/targetOnPageHandlerOnTarget.html');
+  runTestPage('mouse/preAddedTargetWithHandlerOnDocument.html');
+  runTestPage('mouse/preAddedTargetWithHandlerOnTarget.html');
+  runTestPage('mouse/postAddedTargetWithHandlerOnDocument.html');
+  runTestPage('mouse/postAddedTargetWithHandlerOnTarget.html');
 });

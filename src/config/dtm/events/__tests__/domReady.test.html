@@ -1,11 +1,11 @@
 <html>
 <head>
   <script src="/base/dist/config.js"></script>
-  <script src="eventEngineConfig.js"></script>
+  <script src="configureEngineForEventTests.js"></script>
   <script>
     var actionSpy = jasmine.createSpy();
     jasmine.clock().install();
-    initEventEngineConfig([{ type: 'dtm.domReady' }], actionSpy);
+    configureEngineForEventTests([{ type: 'dtm.domReady' }], actionSpy);
   </script>
   <script src="/base/dist/engine.js"></script>
   <script src="/base/src/__tests__/testpage.js"></script>

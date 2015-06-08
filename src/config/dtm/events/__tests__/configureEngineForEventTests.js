@@ -1,4 +1,4 @@
-window.initEventEngineConfig = function(ruleEvents, actionSpy, conditionSpy) {
+window.configureEngineForEventTests = function(ruleEvents, actionSpy, conditionSpy) {
   var config = _satellite.getConfig();
 
   config.extensionInstances = {

@@ -1,0 +1,22 @@
+<html>
+<head>
+  <script src="/base/dist/config.js"></script>
+  <script src="../configureEngineForEventTests.js"></script>
+  <script src="/base/src/__tests__/testpage.js"></script>
+  <script src="testMouseEvents.js"></script>
+  <script>
+    testMouseEvents({
+      createTarget: true,
+      addHandlerToTarget: false
+    });
+  </script>
+  <script src="/base/dist/engine.js"></script>
+  <script src="/base/node_modules/simulate/simulate.js"></script>
+</head>
+<body>
+<div id="testContainer">Test</div>
+<script>
+  _satellite.pageBottom();
+</script>
+</body>
+</html>

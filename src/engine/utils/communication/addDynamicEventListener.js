@@ -2,7 +2,7 @@ var forEach = require('./../array/forEach');
 var dataOnElement = require('./../dom/dataOnElement');
 var querySelectorAll = require('./../dom/querySelectorAll');
 var addEventListener = require('./../dom/addEventListener');
-var globalPoller = require('./globalPoller');
+var globalPoll = require('./globalPoll');
 
 var configs = [];
 var nextuid = -1;
@@ -23,7 +23,7 @@ module.exports = function(selector, type, callback) {
   addListenersToNewElements(config);
 
   if (!registeredWithPoller) {
-    globalPoller.add('dynamicEvents', function() {
+    globalPoll('dynamicEvents', function() {
       forEach(configs, addListenersToNewElements);
     });
     registeredWithPoller = true;

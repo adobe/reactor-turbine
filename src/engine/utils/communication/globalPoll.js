@@ -16,18 +16,16 @@ function startPolling() {
   }
 }
 
-module.exports = {
-  add: function(name, callback){
-    var config = { name: name, callback: callback };
-    configs.push(config);
+module.exports = function(name, callback){
+  var config = { name: name, callback: callback };
+  configs.push(config);
 
-    startPolling();
+  startPolling();
 
-    return function() {
-      var index = configs.indexOf(callback);
-      if (index > -1) {
-        configs.splice(index, 1);
-      }
-    };
-  }
+  return function() {
+    var index = configs.indexOf(callback);
+    if (index > -1) {
+      configs.splice(index, 1);
+    }
+  };
 };

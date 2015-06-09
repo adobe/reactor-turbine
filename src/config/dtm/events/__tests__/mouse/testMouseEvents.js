@@ -18,14 +18,14 @@ window.testMouseEvents = function(options) {
       type: 'dtm.click',
       settings: {
         selector: '#testContainer',
-        eventHandlerOnElement: options.addHandlerToTarget
+        eventHandlerOnElement: options.eventHandlerOnElement
       }
     },
     {
       type: 'dtm.mouseover',
       settings: {
         selector: '#testContainer',
-        eventHandlerOnElement: options.addHandlerToTarget
+        eventHandlerOnElement: options.eventHandlerOnElement
       }
     }
   ];
@@ -35,14 +35,12 @@ window.testMouseEvents = function(options) {
   TestPage
     .waitForContentLoaded()
     .execute(function() {
-      var testContainer;
+      var testContainer = document.getElementById('testContainer');
 
-      if (options.createTarget) {
+      if (!testContainer) {
         testContainer = document.createElement('div');
         testContainer.id = 'testContainer';
         document.body.appendChild(testContainer);
-      } else {
-        testContainer = document.getElementById('testContainer');
       }
 
       function testEventType(eventType) {
@@ -52,14 +50,14 @@ window.testMouseEvents = function(options) {
         expect(actionSpy.calls.count()).toEqual(1);
         expect(conditionSpy.calls.count()).toEqual(1);
         expect(conditionSpy.calls.argsFor(0)[0].type).toEqual(eventType);
-        expect(currentTarget).toBe(options.addHandlerToTarget ? testContainer : document);
+        expect(currentTarget).toBe(options.eventHandlerOnElement ? testContainer : document);
         actionSpy.calls.reset();
         conditionSpy.calls.reset();
       }
 
       // When adding the event handler directly to the element, the global poller has to first
       // detect that the element has been added to the DOM before the event listener is added.
-      if (options.addHandlerToTarget) {
+      if (options.eventHandlerOnElement) {
         jasmine.clock().tick(10000);
       }
 

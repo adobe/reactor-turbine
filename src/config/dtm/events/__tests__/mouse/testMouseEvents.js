@@ -17,40 +17,41 @@ window.testMouseEvents = function(options) {
     {
       type: 'dtm.click',
       settings: {
-        selector: '#testContainer',
+        selector: '#test',
         eventHandlerOnElement: options.eventHandlerOnElement
       }
     },
     {
       type: 'dtm.mouseover',
       settings: {
-        selector: '#testContainer',
+        selector: '#test',
         eventHandlerOnElement: options.eventHandlerOnElement
       }
     }
   ];
 
-  configureEngineForEventTests(ruleEvents, actionSpy, conditionSpy);
+  configureExtensionForEventTests(actionSpy);
+  configureRuleForEventTests(ruleEvents, conditionSpy);
 
   TestPage
     .waitForContentLoaded()
     .execute(function() {
-      var testContainer = document.getElementById('testContainer');
+      var testElement = document.getElementById('test');
 
-      if (!testContainer) {
-        testContainer = document.createElement('div');
-        testContainer.id = 'testContainer';
-        document.body.appendChild(testContainer);
+      if (!testElement) {
+        testElement = document.createElement('div');
+        testElement.id = 'test';
+        document.body.appendChild(testElement);
       }
 
       function testEventType(eventType) {
-        Simulate[eventType](testContainer);
+        Simulate[eventType](testElement);
         // Actions are always run asynchronously.
         jasmine.clock().tick(1);
         expect(actionSpy.calls.count()).toEqual(1);
         expect(conditionSpy.calls.count()).toEqual(1);
         expect(conditionSpy.calls.argsFor(0)[0].type).toEqual(eventType);
-        expect(currentTarget).toBe(options.eventHandlerOnElement ? testContainer : document);
+        expect(currentTarget).toBe(options.eventHandlerOnElement ? testElement : document);
         actionSpy.calls.reset();
         conditionSpy.calls.reset();
       }

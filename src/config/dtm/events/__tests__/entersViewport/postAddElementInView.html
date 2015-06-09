@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <script src="/base/dist/config.js"></script>
+    <script src="../configureEngineForEventTests.js"></script>
+    <script src="/base/src/__tests__/testpage.js"></script>
+    <script>
+      var ruleEvents = [
+        {
+          type: 'dtm.entersViewport',
+          settings: {
+            selector: '#test'
+          }
+        }
+      ];
+
+      var actionSpy = jasmine.createSpy();
+
+      configureExtensionForEventTests(actionSpy);
+      configureRuleForEventTests(ruleEvents);
+
+      jasmine.clock().install();
+
+      TestPage
+        .waitForContentLoaded()
+        .execute(function() {
+          // Give time for the poller to cycle.
+          jasmine.clock().tick(10000);
+          expect(actionSpy.calls.count()).toEqual(0);
+
+          var testElement = document.createElement('div');
+          testElement.id = 'test';
+          testElement.innerHTML = 'Test';
+          document.body.appendChild(testElement);
+
+          // Give time for the poller to cycle.
+          jasmine.clock().tick(10000);
+          expect(actionSpy.calls.count()).toEqual(1);
+        })
+        .start();
+    </script>
+    <script src="/base/dist/engine.js"></script>
+  </head>
+  <body>
+    <script>
+      _satellite.pageBottom();
+    </script>
+  </body>
+</html>

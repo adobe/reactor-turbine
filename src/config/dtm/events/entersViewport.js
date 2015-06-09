@@ -3,6 +3,7 @@ var poll = require('poll');
 var forEach = require('forEach');
 var dataOnElement = require('dataOnElement');
 
+var configId = 0;
 var configs = [];
 
 var offset = function(elem) {
@@ -49,56 +50,74 @@ var getScrollTop = function() {
     document.body.scrollTop;
 };
 
-var elementIsInView = function(el) {
-  var vpH = getViewportHeight();
-  var scrollTop = getScrollTop();
-  var top = offset(el).top;
-  var height = el.offsetHeight;
-  return !(scrollTop > (top + height) || scrollTop + vpH < top);
+var elementIsInView = function(element, viewportHeight, scrollTop) {
+  var top = offset(element).top;
+  var height = element.offsetHeight;
+  return !(scrollTop > (top + height) || scrollTop + viewportHeight < top);
 };
 
-var checkForDomChanges = function() {
+function markAsViewed(config, element) {
+  // TODO: What needs to get passed to trigger?
+  config.trigger();
+  dataOnElement(element, config.completeDataKey, true);
+}
+
+/**
+ * Checks to see if a rule's target selector matches an element in the viewport. If that element
+ * has not been in the viewport prior, either (a) trigger the rule immediately if the user has not
+ * elected to delay for a period of time or (b) start the delay period of the user has elected
+ * to delay for a period of time. After an element being in the viewport triggers a rule, it
+ * can't trigger the same rule again. If another element matching the same selector comes into
+ * the viewport, it may trigger the same rule again.
+ */
+var checkIfElementsInViewport = function() {
+  // Cached and re-used for optimization.
+  var viewportHeight = getViewportHeight();
+  var scrollTop = getScrollTop();
+  var timeoutId;
+
   forEach(configs, function(config) {
-    var elements = document.querySelectorAll(config.selector);
+    var elements = document.querySelectorAll(config.settings.selector);
     forEach(elements, function(element) {
-      var hasBeenInView = dataOnElement(element, 'inview');
-      if (elementIsInView(element)) {
-        if (!hasBeenInView) {
-          dataOnElement(element, 'inview', true);
-          // TODO: If multiple elements match the selector and they both come into view should the rule fire multiple times?
-          forEach(config.triggers, function(trigger) {
-            trigger();
-          });
+      if (dataOnElement(element, config.completeDataKey)) {
+        return;
+      }
+
+      if (elementIsInView(element, viewportHeight, scrollTop)) {
+        if (config.settings.inviewDelay) {
+          if (!dataOnElement(element, config.timeoutDataKey)) {
+            timeoutId = setTimeout(function() {
+              if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
+                markAsViewed(config, element);
+              }
+            }, config.settings.inviewDelay);
+
+            dataOnElement(element, config.timeoutDataKey, timeoutId);
+          }
+        } else {
+          markAsViewed(config, element);
         }
-      } else if (hasBeenInView) {
-        dataOnElement(element, 'inview', false);
+      } else if (config.settings.inviewDelay) {
+        timeoutId = dataOnElement(element, config.timeoutDataKey);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          dataOnElement(element, config.timeoutDataKey, null);
+        }
       }
     });
   });
 };
 
-addEventListener(window, 'scroll', checkForDomChanges);
-addEventListener(window, 'load', checkForDomChanges);
-poll('enters viewport event delegate', checkForDomChanges);
+addEventListener(window, 'scroll', checkIfElementsInViewport);
+addEventListener(window, 'load', checkIfElementsInViewport);
+poll('enters viewport event delegate', checkIfElementsInViewport);
 
-// TODO: Add support for a delay option (how long the element must be in view)
 module.exports = function(trigger, settings) {
-  var config;
-
-  for (var i = 0; i < configs.length; i++) {
-    var candidate = configs[i];
-    if (candidate.selector === settings.selector) {
-      config = candidate;
-    }
-  }
-
-  if (!config) {
-    config = {
-      selector: settings.selector,
-      triggers: []
-    }
-  }
-
-  config.triggers.push(trigger);
-  configs.push(config);
+  configs.push({
+    timeoutDataKey: 'entersViewportTimeout-' + configId,
+    completeDataKey: 'entersViewportComplete-' + configId,
+    settings: settings,
+    trigger: trigger
+  });
+  configId++;
 };

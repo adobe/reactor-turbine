@@ -3,8 +3,12 @@ describe('Page Tests', function() {
   runTestPage('pageBottom.test.html');
   runTestPage('domReady.test.html');
   runTestPage('onload.test.html');
-  runTestPage('mouse/preAddedTargetWithHandlerOnDocument.html');
-  runTestPage('mouse/preAddedTargetWithHandlerOnTarget.html');
-  runTestPage('mouse/postAddedTargetWithHandlerOnDocument.html');
-  runTestPage('mouse/postAddedTargetWithHandlerOnTarget.html');
+  runTestPage('mouse/preAddElementWithHandlerOnDocument.html');
+  runTestPage('mouse/preAddElementWithHandlerOnElement.html');
+  runTestPage('mouse/postAddElementWithHandlerOnDocument.html');
+  runTestPage('mouse/postAddElementWithHandlerOnElement.html');
+  runTestPage('entersViewport/preAddElementInView.html');
+  runTestPage('entersViewport/preAddElementScrollingComplex.html');
+  runTestPage('entersViewport/postAddElementInView.html');
+  runTestPage('entersViewport/postAddElementScrolling.html');
 });

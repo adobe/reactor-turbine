@@ -1,31 +1,32 @@
 <html>
-<head>
-  <script src="/base/dist/config.js"></script>
-  <script src="configureEngineForEventTests.js"></script>
-  <script>
-    var actionSpy = jasmine.createSpy();
-    jasmine.clock().install();
-    configureEngineForEventTests([{ type: 'dtm.pageBottom' }], actionSpy);
-  </script>
-  <script src="/base/dist/engine.js"></script>
-  <script src="/base/src/__tests__/testpage.js"></script>
-</head>
-<body>
-  <script>
-    TestPage
-      .execute(function() {
-        // Actions are always run asynchronously.
-        jasmine.clock().tick(1);
-        expect(actionSpy.calls.count()).toEqual(0);
+  <head>
+    <script src="/base/dist/config.js"></script>
+    <script src="configureEngineForEventTests.js"></script>
+    <script>
+      var actionSpy = jasmine.createSpy();
+      jasmine.clock().install();
+      configureExtensionForEventTests(actionSpy);
+      configureRuleForEventTests([{ type: 'dtm.pageBottom' }]);
+    </script>
+    <script src="/base/dist/engine.js"></script>
+    <script src="/base/src/__tests__/testpage.js"></script>
+  </head>
+  <body>
+    <script>
+      TestPage
+        .execute(function() {
+          // Actions are always run asynchronously.
+          jasmine.clock().tick(1);
+          expect(actionSpy.calls.count()).toEqual(0);
 
-        _satellite.pageBottom();
+          _satellite.pageBottom();
 
-        jasmine.clock().tick(1);
-        expect(actionSpy.calls.count()).toEqual(1);
+          jasmine.clock().tick(1);
+          expect(actionSpy.calls.count()).toEqual(1);
 
-        jasmine.clock().uninstall();
-      })
-      .start();
-  </script>
-</body>
+          jasmine.clock().uninstall();
+        })
+        .start();
+    </script>
+  </body>
 </html>

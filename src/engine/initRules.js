@@ -3,7 +3,7 @@ var preprocessSettings = require('./utils/preprocessSettings');
 
 // TODO: Add a bunch of checks with error reporting.
 
-module.exports = function(rules, extensionInstanceRegistry, eventDelegates, conditionDelegates) {
+module.exports = function(rules, integrationRegistry, eventDelegates, conditionDelegates) {
   function initEventDelegate(rule){
     if (rule.events){
 
@@ -39,11 +39,11 @@ module.exports = function(rules, extensionInstanceRegistry, eventDelegates, cond
   function runActions(rule, eventDetail){
     forEach(rule.actions, function(action) {
       action.settings = action.settings || {};
-      forEach(action.integrationIds, function(instanceId) {
+      forEach(action.integrationIds, function(integrationId) {
         // TODO: Pass related element? Pass forceLowerCase?
         var preprocessedSettings = preprocessSettings(action.settings, null, eventDetail, false);
-        extensionInstanceRegistry
-          .getById(instanceId)
+        integrationRegistry
+          .getById(integrationId)
           .then(function(instance) {
             instance[action.method](preprocessedSettings);
           });

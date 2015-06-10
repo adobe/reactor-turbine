@@ -1,7 +1,7 @@
 var resources = {
   'extensions': {
     get: function(extensionType) {
-      return require('./stores/extensionInstanceRegistry').getByType(extensionType);
+      return require('./stores/integrationRegistry').getByType(extensionType);
     },
     getOne: function(extensionType) {
       var instances = this.get(extensionType);

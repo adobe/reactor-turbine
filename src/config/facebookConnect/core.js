@@ -1,6 +1,6 @@
 var loadScript = require('loadScript');
 
-// Only a single extension instance is supported primarily because the Facebook SDK only supports
+// Only a single integration is supported primarily because the Facebook SDK only supports
 // a single app ID per page.
 
 var Promise = require('Promise');

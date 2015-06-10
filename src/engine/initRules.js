@@ -39,7 +39,7 @@ module.exports = function(rules, extensionInstanceRegistry, eventDelegates, cond
   function runActions(rule, eventDetail){
     forEach(rule.actions, function(action) {
       action.settings = action.settings || {};
-      forEach(action.extensionInstanceIds, function(instanceId) {
+      forEach(action.integrationIds, function(instanceId) {
         // TODO: Pass related element? Pass forceLowerCase?
         var preprocessedSettings = preprocessSettings(action.settings, null, eventDetail, false);
         extensionInstanceRegistry

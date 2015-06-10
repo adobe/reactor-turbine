@@ -1,16 +1,15 @@
 var Promise = require('./utils/communication/Promise');
 
 /**
- * Instantiates extensions while injecting dependency extensions instances.
- * @param {Object} propertyMeta Property metadata object.
+ * Instantiates integrations.
  * @returns {Object} Object where the key is the instance ID and the value is the instance.
  */
-module.exports = function(instanceMetas, extensionInstanceRegistry, coreDelegates) {
+module.exports = function(integrationsMetas, integrationRegistry, coreDelegates) {
   function createProxies() {
     var proxyByInstanceId = {};
 
-    for (var instanceId in instanceMetas) {
-      var instanceMeta = instanceMetas[instanceId];
+    for (var instanceId in integrationsMetas) {
+      var instanceMeta = integrationsMetas[instanceId];
 
       var proxy = {};
 
@@ -21,7 +20,7 @@ module.exports = function(instanceMetas, extensionInstanceRegistry, coreDelegate
 
       proxyByInstanceId[instanceId] = proxy;
 
-      extensionInstanceRegistry.register(instanceId, instanceMeta.type, promise);
+      integrationRegistry.register(instanceId, instanceMeta.type, promise);
     }
 
     return proxyByInstanceId;
@@ -30,8 +29,8 @@ module.exports = function(instanceMetas, extensionInstanceRegistry, coreDelegate
   // Add proxies to require repo.
   var proxies = createProxies();
 
-  for (var instanceId in instanceMetas) {
-    var instanceMeta = instanceMetas[instanceId];
+  for (var instanceId in integrationsMetas) {
+    var instanceMeta = integrationsMetas[instanceId];
     instanceMeta.settings = instanceMeta.settings || {};
     var delegate = coreDelegates.get(instanceMeta.type);
     var result = delegate(instanceMeta.settings);

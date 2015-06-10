@@ -1,11 +1,11 @@
-var createExtensionInstances = require('./createExtensionInstances');
+var createIntegrations = require('./createIntegrations');
 var initRules = require('./initRules');
 var dataElementDefinitions = require('./stores/dataElementDefinitions');
 var eventDelegates = require('./stores/extensionDelegates/eventDelegates');
 var dataElementDelegates = require('./stores/extensionDelegates/dataElementDelegates');
 var conditionDelegates = require('./stores/extensionDelegates/conditionDelegates');
 var coreDelegates = require('./stores/extensionDelegates/coreDelegates');
-var extensionInstanceRegistry = require('./stores/extensionInstanceRegistry');
+var integrationRegistry = require('./stores/integrationRegistry');
 var getVar = require('./utils/dataElement/getVar');
 var setVar = require('./utils/dataElement/setVar');
 
@@ -22,8 +22,8 @@ conditionDelegates.init(propertyMeta.conditionDelegates);
 dataElementDefinitions.init(propertyMeta.dataElements);
 coreDelegates.init(propertyMeta.coreDelegates);
 
-createExtensionInstances(propertyMeta.extensionInstances, extensionInstanceRegistry, coreDelegates);
-initRules(propertyMeta.rules, extensionInstanceRegistry, eventDelegates, conditionDelegates);
+createIntegrations(propertyMeta.integrations, integrationRegistry, coreDelegates);
+initRules(propertyMeta.rules, integrationRegistry, eventDelegates, conditionDelegates);
 
 _satellite.getVar = getVar;
 _satellite.setVar = setVar;

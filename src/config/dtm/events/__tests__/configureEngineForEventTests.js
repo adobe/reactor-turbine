@@ -1,6 +1,6 @@
 var config = _satellite.getConfig();
 
-config.extensionInstances = {
+config.integrations = {
   'abc': {
     type: 'testExtension'
   }
@@ -53,7 +53,7 @@ window.configureRuleForEventTests = function(events, conditionSpy) {
     ],
     actions: [
       {
-        extensionInstanceIds: ['abc'],
+        integrationIds: ['abc'],
         method: 'test'
       }
     ]

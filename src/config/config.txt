@@ -4,7 +4,7 @@
     "conditionDelegates": {{conditionDelegates}},
     "dataElementDelegates": {{dataElementDelegates}},
     "coreDelegates": {{coreDelegates}},
-    "extensionInstances": {
+    "integrations": {
       "abcdef": {
         "type": "adobeAnalytics",
         "settings": {
@@ -59,7 +59,7 @@
         "name": "Test Rule",
         "actions": [
           {
-            "extensionInstanceIds": ["abcdef"],
+            "integrationIds": ["abcdef"],
             "method": "trackPageView",
             "settings": {
               "trackVars": {
@@ -105,7 +105,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["abcdef"],
+            "integrationIds": ["abcdef"],
             "method": "trackLink",
             "settings": {
               "trackVars": {
@@ -152,7 +152,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["abcdef"],
+            "integrationIds": ["abcdef"],
             "method": "trackLink",
             "settings": {
               "trackVars": {
@@ -181,7 +181,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["efghi"],
+            "integrationIds": ["efghi"],
             "method": "addMbox",
             "settings": {
               "name": "frameworkdemo",
@@ -208,7 +208,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["jklmno"],
+            "integrationIds": ["jklmno"],
             "method": "alert",
             "settings": {
               "text": "Click Me rule fired"
@@ -228,7 +228,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["efghi"],
+            "integrationIds": ["efghi"],
             "method": "addMbox",
             "settings": {
               "name": "frameworkredirectdemo",
@@ -251,7 +251,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["jklmno"],
+            "integrationIds": ["jklmno"],
             "method": "log",
             "settings": {
               "text": "Dom Ready rule fired"
@@ -268,7 +268,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["jklmno"],
+            "integrationIds": ["jklmno"],
             "method": "log",
             "settings": {
               "text": "Page Top rule fired"
@@ -285,7 +285,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["jklmno"],
+            "integrationIds": ["jklmno"],
             "method": "log",
             "settings": {
               "text": "Page Bottom rule fired"
@@ -302,7 +302,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["jklmno"],
+            "integrationIds": ["jklmno"],
             "method": "log",
             "settings": {
               "text": "onload rule fired"
@@ -322,7 +322,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["jklmno"],
+            "integrationIds": ["jklmno"],
             "method": "log",
             "settings": {
               "text": "direct call rule fired"
@@ -342,7 +342,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["jklmno"],
+            "integrationIds": ["jklmno"],
             "method": "log",
             "settings": {
               "text": "mouseover download link rule fired"
@@ -363,7 +363,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["jklmno"],
+            "integrationIds": ["jklmno"],
             "method": "log",
             "settings": {
               "text": "mouseover Click Me fired"
@@ -381,7 +381,7 @@
           }
         ],
         "actions": [{
-          "extensionInstanceIds": ["jklmno"],
+          "integrationIds": ["jklmno"],
           "method": "log",
           "settings": {
             "text": "entersViewport fired rule fired"
@@ -398,7 +398,7 @@
           }
         ],
         "actions": [{
-          "extensionInstanceIds": ["jklmno"],
+          "integrationIds": ["jklmno"],
           "method": "log",
           "settings": {
             "text": "elementExists fired rule fired"
@@ -415,7 +415,7 @@
           }
         ],
         "actions": [{
-          "extensionInstanceIds": ["uvw"],
+          "integrationIds": ["uvw"],
           "method": "logIn"
         }]
       },{
@@ -430,7 +430,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["uvw"],
+            "integrationIds": ["uvw"],
             "method": "showDialog",
             "settings": {
               "method": "send",
@@ -447,7 +447,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["jklmno"],
+            "integrationIds": ["jklmno"],
             "method": "log",
             "settings": {
               "text": "Shared with BFFs."
@@ -466,7 +466,7 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["xyz"],
+            "integrationIds": ["xyz"],
             "method": "track",
             "settings": {
               "eventName": 6032027988706,
@@ -489,14 +489,14 @@
         ],
         "actions": [
           {
-            "extensionInstanceIds": ["xyz"],
+            "integrationIds": ["xyz"],
             "method": "addPixelId",
             "settings": {
               "pixelId": 6032027988706
             }
           },
           {
-            "extensionInstanceIds": ["xyz"],
+            "integrationIds": ["xyz"],
             "method": "track",
             "settings": {
               "eventName": "myCustomEvent",

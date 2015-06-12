@@ -84,20 +84,20 @@ var checkIfElementsInViewport = function() {
       }
 
       if (elementIsInView(element, viewportHeight, scrollTop)) {
-        if (config.settings.inviewDelay) {
+        if (config.settings.delay) {
           if (!dataOnElement(element, config.timeoutDataKey)) {
             timeoutId = setTimeout(function() {
               if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
                 markAsViewed(config, element);
               }
-            }, config.settings.inviewDelay);
+            }, config.settings.delay);
 
             dataOnElement(element, config.timeoutDataKey, timeoutId);
           }
         } else {
           markAsViewed(config, element);
         }
-      } else if (config.settings.inviewDelay) {
+      } else if (config.settings.delay) {
         timeoutId = dataOnElement(element, config.timeoutDataKey);
         if (timeoutId) {
           clearTimeout(timeoutId);
@@ -114,8 +114,8 @@ poll('enters viewport event delegate', checkIfElementsInViewport);
 
 module.exports = function(trigger, settings) {
   configs.push({
-    timeoutDataKey: 'entersViewportTimeout-' + configId,
-    completeDataKey: 'entersViewportComplete-' + configId,
+    timeoutDataKey: 'entersViewport.timeoutId-' + configId,
+    completeDataKey: 'entersViewport.complete-' + configId,
     settings: settings,
     trigger: trigger
   });

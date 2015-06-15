@@ -9,11 +9,10 @@ var resources = {
     }
   },
   'Promise': require('./utils/communication/Promise'),
-  'addSelectorEventListener': require('./utils/communication/addSelectorEventListener'),
   'forEach': require('./utils/array/forEach'),
   'poll': require('./utils/communication/globalPoll'),
   'bind': require('./utils/dom/bind'),
-  'dataOnElement': require('./utils/dom/dataOnElement'),
+  'covertData': require('./utils/covertData'),
   'addEventListener': require('./utils/dom/addEventListener'),
   'assign': require('./utils/object/assign'),
   'encodeObjectToURI': require('./utils/uri/encodeObjectToURI'),
@@ -29,7 +28,9 @@ var resources = {
   },
   'readCookie': require('./utils/cookie/readCookie'),
   'elementHasAttribute': require('./utils/dom/hasAttribute'),
-  'getObjectProperty': require('./utils/dataElement/getObjectProperty')
+  'getObjectProperty': require('./utils/dataElement/getObjectProperty'),
+  'bubbly': require('./utils/bubbly'),
+  'addDynamicEventListener': require('./utils/communication/addDynamicEventListener')
 };
 
 module.exports = function(key) {

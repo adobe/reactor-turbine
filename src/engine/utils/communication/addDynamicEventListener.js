@@ -1,5 +1,5 @@
 var forEach = require('./../array/forEach');
-var dataOnElement = require('./../dom/dataOnElement');
+var covertData = require('./../covertData');
 var querySelectorAll = require('./../dom/querySelectorAll');
 var addEventListener = require('./../dom/addEventListener');
 var globalPoll = require('./globalPoll');
@@ -33,11 +33,11 @@ module.exports = function(selector, type, callback) {
 function addListenersToNewElements(config){
   var elements = querySelectorAll(config.selector);
   forEach(elements, function(element){
-    if (dataOnElement(element, 'dynamicRules.seen' + config.id)) {
+    if (covertData(element, 'dynamicRules.seen' + config.id)) {
       return;
     }
 
-    dataOnElement(element, 'dynamicRules.seen' + config.id, true);
+    covertData(element, 'dynamicRules.seen' + config.id, true);
 
     // TODO: understand this chunk below
     // if (SL.propertiesMatch(rule.property, elm)){

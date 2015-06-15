@@ -1,7 +1,7 @@
 var addEventListener = require('addEventListener');
 var poll = require('poll');
 var forEach = require('forEach');
-var dataOnElement = require('dataOnElement');
+var covertData = require('covertData');
 
 var configId = 0;
 var configs = [];
@@ -59,7 +59,7 @@ var elementIsInView = function(element, viewportHeight, scrollTop) {
 function markAsViewed(config, element) {
   // TODO: What needs to get passed to trigger?
   config.trigger();
-  dataOnElement(element, config.completeDataKey, true);
+  covertData(element, config.completeDataKey, true);
 }
 
 /**
@@ -79,29 +79,29 @@ var checkIfElementsInViewport = function() {
   forEach(configs, function(config) {
     var elements = document.querySelectorAll(config.settings.selector);
     forEach(elements, function(element) {
-      if (dataOnElement(element, config.completeDataKey)) {
+      if (covertData(element, config.completeDataKey)) {
         return;
       }
 
       if (elementIsInView(element, viewportHeight, scrollTop)) {
         if (config.settings.delay) {
-          if (!dataOnElement(element, config.timeoutDataKey)) {
+          if (!covertData(element, config.timeoutDataKey)) {
             timeoutId = setTimeout(function() {
               if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
                 markAsViewed(config, element);
               }
             }, config.settings.delay);
 
-            dataOnElement(element, config.timeoutDataKey, timeoutId);
+            covertData(element, config.timeoutDataKey, timeoutId);
           }
         } else {
           markAsViewed(config, element);
         }
       } else if (config.settings.delay) {
-        timeoutId = dataOnElement(element, config.timeoutDataKey);
+        timeoutId = covertData(element, config.timeoutDataKey);
         if (timeoutId) {
           clearTimeout(timeoutId);
-          dataOnElement(element, config.timeoutDataKey, null);
+          covertData(element, config.timeoutDataKey, null);
         }
       }
     });

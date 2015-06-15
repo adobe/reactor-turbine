@@ -1,10 +1,10 @@
-// `dataOnElement(elm, prop, [val])`
+// `covertData(elm, prop, [val])`
 // ----------------------------
 //
-// Our own `dataOnElement()` method, [a la jQuery](http://api.jquery.com/jQuery.data/)
+// Our own `covertData()` method, [a la jQuery](http://api.jquery.com/jQuery.data/)
 // , used to get or set
 // properties on DOM elements without going insane.
-// `uuid` and `dataCache` are used by `dataOnElement()`
+// `uuid` and `dataCache` are used by `covertData()`
 //
 // Parameters:
 //

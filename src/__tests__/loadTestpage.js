@@ -15,7 +15,7 @@
 
   IFrameJasmine.prototype = jasmine;
 
-  window.runTestPage = function(path, focus) {
+  window.runTestPage = function(path, testSettings, focus) {
     var absolutePath;
 
     if (path.charAt(0) === '/') {
@@ -59,6 +59,7 @@
       iwin.expect = expect;
       iwin.fail = fail;
       iwin.jasmine = new IFrameJasmine(iwin);
+      iwin.testSettings = testSettings;
     }
 
     describe('test page', function() {
@@ -71,7 +72,7 @@
     });
   };
 
-  window.frunTestPage = function(filename) {
-    window.runTestPage(filename, true);
+  window.frunTestPage = function(filename, testSettings) {
+    window.runTestPage(filename, testSettings, true);
   };
 })();

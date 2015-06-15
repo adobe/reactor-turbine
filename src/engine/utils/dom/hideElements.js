@@ -3,7 +3,7 @@ var isString = require('./../isType/isString');
 var forEach = require('./../array/forEach');
 var addClass = require('./addClass');
 var removeClass = require('./removeClass');
-var dataOnElement = require('./dataOnElement');
+var covertData = require('./../covertData');
 var hideStyleAdded = false;
 
 /**
@@ -25,7 +25,7 @@ module.exports = function(selectorOrElements) {
       querySelectorAll(selectorOrElements) : selectorOrElements;
 
   forEach(elements, function(element) {
-    var numLocks = dataOnElement(element, 'numHideLocks');
+    var numLocks = covertData(element, 'numHideLocks');
 
     if (numLocks === undefined) {
       numLocks = 1;
@@ -33,7 +33,7 @@ module.exports = function(selectorOrElements) {
       numLocks++;
     }
 
-    dataOnElement(element, 'numHideLocks', numLocks);
+    covertData(element, 'numHideLocks', numLocks);
 
     addClass(element, 'dtm-hidden');
   });
@@ -46,8 +46,8 @@ module.exports = function(selectorOrElements) {
     }
 
     forEach(elements, function(element) {
-      var numLocks = dataOnElement(element, 'numHideLocks');
-      dataOnElement(element, 'numHideLocks', --numLocks);
+      var numLocks = covertData(element, 'numHideLocks');
+      covertData(element, 'numHideLocks', --numLocks);
 
       if (numLocks === 0) {
         removeClass(element, 'dtm-hidden');

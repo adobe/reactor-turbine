@@ -30,7 +30,7 @@ module.exports = function(trigger, settings) {
     config = {
       selector: settings.selector,
       triggers: []
-    }
+    };
   }
 
   config.triggers.push(trigger);

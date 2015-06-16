@@ -1,19 +1,14 @@
 var bubbly = require('bubbly');
 var addDynamicEventListener = require('addDynamicEventListener');
-var pairings = [];
-var evaluateEvent = bubbly(pairings);
+
+var clickBubbly = bubbly();
 
 module.exports = function(trigger, settings) {
-  var pairing = {
-    settings: settings,
-    trigger: trigger
-  };
-
-  pairings.push(pairing);
+  clickBubbly.addListener(trigger, settings);
 
   if (settings.eventHandlerOnElement) {
-    addDynamicEventListener(settings.selector, 'click', evaluateEvent);
+    addDynamicEventListener(settings.selector, 'click', clickBubbly.evaluateEvent);
   } else {
-    document.addEventListener('click', evaluateEvent);
+    document.addEventListener('click', clickBubbly.evaluateEvent);
   }
 };

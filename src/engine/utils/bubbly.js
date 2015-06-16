@@ -1,53 +1,69 @@
 var covertData = require('./covertData');
 var matchesCSS = require('./dom/matchesCSS');
 
-module.exports = function(pairings) {
-  return function(event) {
-    if (covertData(event, 'bubbly.eventProcessed')) {
-      return;
-    }
+module.exports = function() {
+  var rulePairings = [];
 
-    var node = event.target;
-    var childHasTriggeredRule = false;
+  return {
+    addListener: function(trigger, settings) {
+      rulePairings.push({
+        trigger: trigger,
+        settings: settings
+      });
+    },
+    evaluateEvent: function(event) {
+      // When an event is handled it is evaluated a single time but checks out which rules are
+      // targeting elements starting at the target node and looking all the way up the element
+      // hierarchy. This should only happen once regardless of how many listeners exist for the
+      // event.
+      if (covertData(event, 'bubbly.eventProcessed')) {
+        return;
+      }
 
-    while (node) {
-      var preventEvaluationOnAncestors = false;
+      var node = event.target;
+      var childHasTriggeredRule = false;
 
-      var nodeTriggeredRule = false;
+      // Loop through from the event target up through the hierarchy evaluating each node
+      // to see if it matches any rules.
+      while (node) {
+        var preventEvaluationOnAncestors = false;
 
-      // Just because this could be processed a lot, we'll use a for loop instead of forEach.
-      // Yay micro-optimizations!
-      for (var i = 0; i < pairings.length; i++) {
-        var pairing = pairings[i];
+        var nodeTriggeredRule = false;
 
-        if (!pairing.settings.bubbleFireIfChildFired && childHasTriggeredRule) {
-          continue;
-        }
+        // Just because this could be processed a lot, we'll use a for loop instead of forEach.
+        for (var i = 0; i < rulePairings.length; i++) {
+          var rulePairing = rulePairings[i];
 
-        if ((node === event.target || pairing.settings.bubbleFireIfParent) &&
-            matchesCSS(pairing.settings.selector, node)) {
-          nodeTriggeredRule = true;
-          pairing.trigger(event);
+          if (!rulePairing.settings.bubbleFireIfChildFired && childHasTriggeredRule) {
+            continue;
+          }
 
-          // Note that bubbling is only stopped if the rule actually triggered!
-          if (pairing.settings.bubbleStop) {
-            preventEvaluationOnAncestors = true;
+          if ((node === event.target || rulePairing.settings.bubbleFireIfParent) &&
+              matchesCSS(rulePairing.settings.selector, node)) {
+
+            rulePairing.trigger(event);
+
+            nodeTriggeredRule = true;
+
+            // Note that bubbling is only stopped if the rule actually triggered!
+            if (rulePairing.settings.bubbleStop) {
+              preventEvaluationOnAncestors = true;
+            }
           }
         }
 
-      };
+        if (preventEvaluationOnAncestors) {
+          break;
+        }
 
-      if (preventEvaluationOnAncestors) {
-        break;
+        if (nodeTriggeredRule) {
+          childHasTriggeredRule = true;
+        }
+
+        node = node.parentNode;
       }
 
-      if (nodeTriggeredRule) {
-        childHasTriggeredRule = true;
-      }
-
-      node = node.parentNode;
+      covertData(event, 'bubbly.eventProcessed', true);
     }
-
-    covertData(event, 'bubbly.eventProcessed', true);
   };
 };

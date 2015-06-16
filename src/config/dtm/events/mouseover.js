@@ -1,19 +1,14 @@
 var bubbly = require('bubbly');
 var addDynamicEventListener = require('addDynamicEventListener');
-var pairings = [];
-var evaluateEvent = bubbly(pairings);
+
+var mouseoverBubbly = bubbly();
 
 module.exports = function(trigger, settings) {
-  var pairing = {
-    settings: settings,
-    trigger: trigger
-  };
-
-  pairings.push(pairing);
+  mouseoverBubbly.addListener(trigger, settings);
 
   if (settings.eventHandlerOnElement) {
-    addDynamicEventListener(settings.selector, 'mouseover', evaluateEvent);
+    addDynamicEventListener(settings.selector, 'mouseover', mouseoverBubbly.evaluateEvent);
   } else {
-    document.addEventListener('mouseover', evaluateEvent);
+    document.addEventListener('mouseover', mouseoverBubbly.evaluateEvent);
   }
 };

@@ -8,7 +8,7 @@ var id = 0;
  * @returns {{addListener: Function, evaluateEvent: Function}}
  */
 module.exports = function() {
-  var rulePairings = [];
+  var listeners = [];
 
   var eventProcessedDataKey = 'dtm.bubbly.eventProcessed.' + id++;
 
@@ -16,19 +16,19 @@ module.exports = function() {
     /**
      * Register a settings object that should be evaluated for an event to determine if a rule
      * should be executed. If it should be executed, the trigger function will be called.
-     * @param {Function} trigger The trigger function that will execute the rule.
      * @param {Object} settings The event settings object.
      * @param {Boolean} [settings.bubbleFireIfParent=false] Whether the rule should fire if the event
      * originated from a descendant element.
      * @param {Boolean} [settings.bubbleFireIfChildFired=false] Whether the rule should fire if the
      * same event has already triggered a rule targeting a descendant element.
      * @param {Boolean} [settings.bubbleStop=false] Whether the event should not trigger rules on
+     * @param {Function} callback The function to be called when a matching event is seen.
      * ancestor elements.
      */
-    addListener: function(trigger, settings) {
-      rulePairings.push({
-        trigger: trigger,
-        settings: settings
+    addListener: function(settings, callback) {
+      listeners.push({
+        settings: settings,
+        callback: callback
       });
     },
     /**
@@ -57,22 +57,22 @@ module.exports = function() {
         var nodeTriggeredRule = false;
 
         // Just because this could be processed a lot, we'll use a for loop instead of forEach.
-        for (var i = 0; i < rulePairings.length; i++) {
-          var rulePairing = rulePairings[i];
+        for (var i = 0; i < listeners.length; i++) {
+          var listener = listeners[i];
 
-          if (!rulePairing.settings.bubbleFireIfChildFired && childHasTriggeredRule) {
+          if (!listener.settings.bubbleFireIfChildFired && childHasTriggeredRule) {
             continue;
           }
 
-          if ((node === event.target || rulePairing.settings.bubbleFireIfParent) &&
-              matchesCSS(rulePairing.settings.selector, node)) {
+          if ((node === event.target || listener.settings.bubbleFireIfParent) &&
+              matchesCSS(listener.settings.selector, node)) {
 
-            rulePairing.trigger(event, node);
+            listener.callback(event, node);
 
             nodeTriggeredRule = true;
 
             // Note that bubbling is only stopped if the rule actually triggered!
-            if (rulePairing.settings.bubbleStop) {
+            if (listener.settings.bubbleStop) {
               preventEvaluationOnAncestors = true;
             }
           }

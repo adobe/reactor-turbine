@@ -5,7 +5,7 @@
     <script>
       jasmine.clock().install();
 
-      var aSpy = jasmine.createSpy();
+      var aConditionSpy = jasmine.createSpy().and.returnValue(true);
       configureRuleForEventTests([
         {
           type: 'dtm.hover',
@@ -17,9 +17,9 @@
             delay: 2000
           }
         }
-      ], aSpy);
+      ], aConditionSpy);
 
-      var bSpy = jasmine.createSpy();
+      var bConditionSpy = jasmine.createSpy().and.returnValue(true);
       configureRuleForEventTests([
         {
           type: 'dtm.hover',
@@ -31,7 +31,7 @@
             delay: 1000
           }
         }
-      ], bSpy);
+      ], bConditionSpy);
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/src/__tests__/helpers/testpage.js"></script>
@@ -51,23 +51,33 @@
           Simulate.mouseleave(document.getElementById('a'));
           Simulate.mouseleave(document.getElementById('b'));
 
-          expect(aSpy.calls.count()).toEqual(0);
-          expect(bSpy.calls.count()).toEqual(0);
+          expect(aConditionSpy.calls.count()).toEqual(0);
+          expect(bConditionSpy.calls.count()).toEqual(0);
 
           Simulate.mouseenter(document.getElementById('a'));
           Simulate.mouseenter(document.getElementById('b'));
 
           jasmine.clock().tick(1200);
 
-          expect(aSpy.calls.count()).toEqual(0);
-          expect(bSpy.calls.count()).toEqual(1);
+          expect(aConditionSpy.calls.count()).toEqual(0);
+          expect(bConditionSpy.calls.count()).toEqual(1);
+          expect(bConditionSpy.calls.mostRecent()).toEqual({
+            object: b,
+            args: [{ type: 'hover(1000)', target: b }, b],
+            returnValue: true
+          });
 
           jasmine.clock().tick(1000);
 
           // Because the rules are on different delays, the hover event from element B doesn't
           // execute rule A when it "bubbles up".
-          expect(aSpy.calls.count()).toEqual(1);
-          expect(bSpy.calls.count()).toEqual(1);
+          expect(aConditionSpy.calls.count()).toEqual(1);
+          expect(aConditionSpy.calls.mostRecent()).toEqual({
+            object: a,
+            args: [{ type: 'hover(2000)', target: a }, a],
+            returnValue: true
+          });
+          expect(bConditionSpy.calls.count()).toEqual(1);
         })
         .start();
     </script>

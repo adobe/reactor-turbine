@@ -61,7 +61,13 @@ module.exports = function(trigger, settings) {
     delayBubbly = bubblyByDelay[delay] = bubbly();
   }
 
-  delayBubbly.addListener(trigger, settings);
+  delayBubbly.addListener(settings, function(event, relatedElement) {
+    var pseudoEvent = {
+      type: 'hover(' + delay + ')',
+      target: event.target
+    };
+    trigger(pseudoEvent, relatedElement);
+  });
 
   addLiveEventListener(settings.selector, 'mouseenter', function(event) {
     delayHover(event, delay, delayBubbly.evaluateEvent);

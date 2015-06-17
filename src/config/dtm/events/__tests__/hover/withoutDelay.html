@@ -5,7 +5,7 @@
     <script>
       jasmine.clock().install();
 
-      var aSpy = jasmine.createSpy();
+      var aConditionSpy = jasmine.createSpy().and.returnValue(true);
       configureRuleForEventTests([
         {
           type: 'dtm.hover',
@@ -16,9 +16,9 @@
             bubbleStop: false
           }
         }
-      ], aSpy);
+      ], aConditionSpy);
 
-      var bSpy = jasmine.createSpy();
+      var bConditionSpy = jasmine.createSpy().and.returnValue(true);
       configureRuleForEventTests([
         {
           type: 'dtm.hover',
@@ -29,7 +29,7 @@
             bubbleStop: false
           }
         }
-      ], bSpy);
+      ], bConditionSpy);
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/src/__tests__/helpers/testpage.js"></script>
@@ -38,18 +38,37 @@
       TestPage
         .waitForContentLoaded()
         .execute(function() {
+          var a = document.getElementById('a');
+          var b = document.getElementById('b');
+
           // Give the poller time to pick up on the target elements.
           jasmine.clock().tick(10000);
 
           Simulate.mouseenter(document.getElementById('a'));
 
-          expect(aSpy.calls.count()).toEqual(1);
+          expect(aConditionSpy.calls.count()).toEqual(1);
+          expect(aConditionSpy.calls.mostRecent()).toEqual({
+            object: a,
+            args: [{ type: 'hover(0)', target: a }, a],
+            returnValue: true
+          });
 
           Simulate.mouseenter(document.getElementById('b'));
 
           // Rule A ran again because the hover from element B also "bubbled up" to element A.
-          expect(aSpy.calls.count()).toEqual(2);
-          expect(bSpy.calls.count()).toEqual(1);
+          expect(aConditionSpy.calls.count()).toEqual(2);
+          expect(aConditionSpy.calls.mostRecent()).toEqual({
+            object: a,
+            args: [{ type: 'hover(0)', target: b }, b],
+            returnValue: true
+          });
+
+          expect(bConditionSpy.calls.count()).toEqual(1);
+          expect(bConditionSpy.calls.mostRecent()).toEqual({
+            object: b,
+            args: [{ type: 'hover(0)', target: b }, b],
+            returnValue: true
+          });
         })
         .start();
     </script>

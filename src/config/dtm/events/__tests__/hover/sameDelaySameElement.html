@@ -5,7 +5,7 @@
     <script>
       jasmine.clock().install();
 
-      var aSpy = jasmine.createSpy();
+      var aConditionSpy = jasmine.createSpy().and.returnValue(true);
       configureRuleForEventTests([
         {
           type: 'dtm.hover',
@@ -17,9 +17,9 @@
             delay: 1000
           }
         }
-      ], aSpy);
+      ], aConditionSpy);
 
-      var bSpy = jasmine.createSpy();
+      var a2ConditionSpy = jasmine.createSpy().and.returnValue(true);
       configureRuleForEventTests([
         {
           type: 'dtm.hover',
@@ -31,7 +31,7 @@
             delay: 1000
           }
         }
-      ], bSpy);
+      ], a2ConditionSpy);
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/src/__tests__/helpers/testpage.js"></script>
@@ -51,16 +51,26 @@
           Simulate.mouseleave(document.getElementById('a'));
           Simulate.mouseleave(document.getElementById('b'));
 
-          expect(aSpy.calls.count()).toEqual(0);
-          expect(bSpy.calls.count()).toEqual(0);
+          expect(aConditionSpy.calls.count()).toEqual(0);
+          expect(a2ConditionSpy.calls.count()).toEqual(0);
 
           Simulate.mouseenter(document.getElementById('a'));
           Simulate.mouseenter(document.getElementById('b'));
 
           jasmine.clock().tick(1200);
 
-          expect(aSpy.calls.count()).toEqual(1);
-          expect(bSpy.calls.count()).toEqual(1);
+          expect(aConditionSpy.calls.count()).toEqual(1);
+          expect(aConditionSpy.calls.mostRecent()).toEqual({
+            object: a,
+            args: [{ type: 'hover(1000)', target: a }, a],
+            returnValue: true
+          });
+          expect(a2ConditionSpy.calls.count()).toEqual(1);
+          expect(a2ConditionSpy.calls.mostRecent()).toEqual({
+            object: a,
+            args: [{ type: 'hover(1000)', target: a }, a],
+            returnValue: true
+          });
         })
         .start();
     </script>

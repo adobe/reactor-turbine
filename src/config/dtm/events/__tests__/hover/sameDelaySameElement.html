@@ -8,12 +8,13 @@
       var aSpy = jasmine.createSpy();
       configureRuleForEventTests([
         {
-          type: 'dtm.click',
+          type: 'dtm.hover',
           settings: {
             selector: '#a',
             bubbleFireIfParent: true,
             bubbleFireIfChildFired: true,
-            bubbleStop: false
+            bubbleStop: false,
+            delay: 1000
           }
         }
       ], aSpy);
@@ -21,29 +22,16 @@
       var bSpy = jasmine.createSpy();
       configureRuleForEventTests([
         {
-          type: 'dtm.click',
+          type: 'dtm.hover',
           settings: {
-            selector: '#b',
-            bubbleFireIfParent: window.testSettings.bubbleFireIfParent,
-            bubbleFireIfChildFired: window.testSettings.bubbleFireIfChildFired,
-            bubbleStop: window.testSettings.bubbleStop,
-            handlerOnElement: window.testSettings.eventHandlerOnElement
+            selector: '#a',
+            bubbleFireIfParent: true,
+            bubbleFireIfChildFired: true,
+            bubbleStop: false,
+            delay: 1000
           }
         }
       ], bSpy);
-
-      var cSpy = jasmine.createSpy();
-      configureRuleForEventTests([
-        {
-          type: 'dtm.click',
-          settings: {
-            selector: '#c',
-            bubbleFireIfParent: true,
-            bubbleFireIfChildFired: true,
-            bubbleStop: false
-          }
-        }
-      ], cSpy);
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/src/__tests__/testpage.js"></script>
@@ -52,11 +40,27 @@
       TestPage
         .waitForContentLoaded()
         .execute(function() {
-          Simulate.click(document.getElementById('c'));
+          // Give the poller time to pick up on the target elements.
+          jasmine.clock().tick(10000);
 
-          expect(aSpy.calls.count()).toEqual(window.testSettings.aExecuted ? 1 : 0);
-          expect(bSpy.calls.count()).toEqual(window.testSettings.bExecuted ? 1 : 0);
-          expect(cSpy.calls.count()).toEqual(window.testSettings.cExecuted ? 1 : 0);
+          Simulate.mouseenter(document.getElementById('a'));
+          Simulate.mouseenter(document.getElementById('b'));
+
+          jasmine.clock().tick(800);
+
+          Simulate.mouseleave(document.getElementById('a'));
+          Simulate.mouseleave(document.getElementById('b'));
+
+          expect(aSpy.calls.count()).toEqual(0);
+          expect(bSpy.calls.count()).toEqual(0);
+
+          Simulate.mouseenter(document.getElementById('a'));
+          Simulate.mouseenter(document.getElementById('b'));
+
+          jasmine.clock().tick(1200);
+
+          expect(aSpy.calls.count()).toEqual(1);
+          expect(bSpy.calls.count()).toEqual(1);
         })
         .start();
     </script>
@@ -66,9 +70,6 @@
       A
       <div id="b">
         B
-        <div id="c">
-          C
-        </div>
       </div>
     </div>
 

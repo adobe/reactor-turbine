@@ -114,8 +114,8 @@ poll('enters viewport event delegate', checkIfElementsInViewport);
 
 module.exports = function(trigger, settings) {
   configs.push({
-    timeoutDataKey: 'entersViewport.timeoutId-' + configId,
-    completeDataKey: 'entersViewport.complete-' + configId,
+    timeoutDataKey: 'dtm.entersViewport.timeoutId.' + configId,
+    completeDataKey: 'dtm.entersViewport.complete.' + configId,
     settings: settings,
     trigger: trigger
   });

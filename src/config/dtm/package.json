@@ -32,8 +32,8 @@
       "path": "events/entersViewport.js"
     },
     {
-      "name": "Mouseover",
-      "path": "events/mouseover.js"
+      "name": "Hover",
+      "path": "events/hover.js"
     },
     {
       "name": "On Load",

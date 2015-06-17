@@ -11,6 +11,11 @@ describe('Page Tests', function() {
   runTestPage('entersViewport/preAddElementScrollingComplex.html');
   runTestPage('entersViewport/postAddElementInView.html');
   runTestPage('entersViewport/postAddElementScrolling.html');
+  runTestPage('hover/withoutDelay.html');
+  runTestPage('hover/sameDelayDifferentElements.html');
+  runTestPage('hover/differentDelayDifferentElements.html');
+  runTestPage('hover/sameDelaySameElement.html');
+  runTestPage('hover/differentDelaySameElement.html');
 
   describe('bubbling', function() {
     // Test each scenario with eventHandlerOnElement toggled. The behavior should be consistent.

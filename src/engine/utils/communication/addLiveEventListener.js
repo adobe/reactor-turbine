@@ -31,13 +31,15 @@ module.exports = function(selector, type, callback) {
 };
 
 function addListenersToNewElements(config){
+  var dataKey = 'dtm.liveListener.seen.' + config.id;
+
   var elements = querySelectorAll(config.selector);
   forEach(elements, function(element){
-    if (covertData(element, 'dynamicRules.seen' + config.id)) {
+    if (covertData(element, dataKey)) {
       return;
     }
 
-    covertData(element, 'dynamicRules.seen' + config.id, true);
+    covertData(element, dataKey, true);
 
     // TODO: understand this chunk below
     // if (SL.propertiesMatch(rule.property, elm)){

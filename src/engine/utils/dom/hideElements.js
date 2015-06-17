@@ -5,6 +5,7 @@ var addClass = require('./addClass');
 var removeClass = require('./removeClass');
 var covertData = require('./../covertData');
 var hideStyleAdded = false;
+var dataKey = 'dtm.hideElements.numLocks';
 
 /**
  * Hides one or more elements and returns a show function. The elements will not be shown
@@ -25,7 +26,7 @@ module.exports = function(selectorOrElements) {
       querySelectorAll(selectorOrElements) : selectorOrElements;
 
   forEach(elements, function(element) {
-    var numLocks = covertData(element, 'numHideLocks');
+    var numLocks = covertData(element, dataKey);
 
     if (numLocks === undefined) {
       numLocks = 1;
@@ -33,7 +34,7 @@ module.exports = function(selectorOrElements) {
       numLocks++;
     }
 
-    covertData(element, 'numHideLocks', numLocks);
+    covertData(element, dataKey, numLocks);
 
     addClass(element, 'dtm-hidden');
   });
@@ -46,8 +47,8 @@ module.exports = function(selectorOrElements) {
     }
 
     forEach(elements, function(element) {
-      var numLocks = covertData(element, 'numHideLocks');
-      covertData(element, 'numHideLocks', --numLocks);
+      var numLocks = covertData(element, dataKey);
+      covertData(element, dataKey, --numLocks);
 
       if (numLocks === 0) {
         removeClass(element, 'dtm-hidden');

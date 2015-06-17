@@ -30,7 +30,7 @@ var resources = {
   'elementHasAttribute': require('./utils/dom/hasAttribute'),
   'getObjectProperty': require('./utils/dataElement/getObjectProperty'),
   'bubbly': require('./utils/bubbly'),
-  'addDynamicEventListener': require('./utils/communication/addDynamicEventListener')
+  'addLiveEventListener': require('./utils/communication/addLiveEventListener')
 };
 
 module.exports = function(key) {

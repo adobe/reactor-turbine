@@ -1,5 +1,5 @@
 window.testMouseEvents = function(options) {
-  var EVENT_TYPES = ['click', 'mouseover'];
+  var EVENT_TYPES = ['click'];
 
   var currentTarget;
   var actionSpy = jasmine.createSpy();
@@ -16,13 +16,6 @@ window.testMouseEvents = function(options) {
   var ruleEvents = [
     {
       type: 'dtm.click',
-      settings: {
-        selector: '#test',
-        eventHandlerOnElement: options.eventHandlerOnElement
-      }
-    },
-    {
-      type: 'dtm.mouseover',
       settings: {
         selector: '#test',
         eventHandlerOnElement: options.eventHandlerOnElement

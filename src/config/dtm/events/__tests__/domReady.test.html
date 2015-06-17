@@ -1,7 +1,7 @@
 <html>
   <head>
     <script src="/base/dist/config.js"></script>
-    <script src="configureEngineForEventTests.js"></script>
+    <script src="helpers/configureEngineForEventTests.js"></script>
     <script>
       var actionSpy = jasmine.createSpy();
       jasmine.clock().install();
@@ -9,7 +9,7 @@
       configureRuleForEventTests([{ type: 'dtm.domReady' }]);
     </script>
     <script src="/base/dist/engine.js"></script>
-    <script src="/base/src/__tests__/testpage.js"></script>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
     <script>
       TestPage
         .execute(function() {

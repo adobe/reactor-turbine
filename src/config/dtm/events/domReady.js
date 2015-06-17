@@ -60,11 +60,11 @@ var domReady = (function(ready) {
 
 module.exports = function(trigger) {
   domReady(function() {
-    var event = {
+    var pseudoEvent = {
       type: 'domready',
       target: document.location
     };
 
-    trigger(event, document.location);
+    trigger(pseudoEvent, document.location);
   });
 };

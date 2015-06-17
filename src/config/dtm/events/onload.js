@@ -4,8 +4,13 @@ var forEach = require('forEach');
 var triggers = [];
 
 addEventListener(window, 'load', function(){
+  var pseudoEvent = {
+    type: 'windowload',
+    target: document.location
+  };
+
   forEach(triggers, function(trigger) {
-    trigger();
+    trigger(pseudoEvent, document.location);
   });
 });
 

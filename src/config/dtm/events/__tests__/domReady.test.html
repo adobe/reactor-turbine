@@ -23,7 +23,7 @@
           // Actions are always run asynchronously.
           jasmine.clock().tick(1);
           expect(actionSpy.calls.count()).toEqual(1);
-          expect(conditionSpy.calls.first()).toEqual({
+          expect(conditionSpy.calls.mostRecent()).toEqual({
             object: document.location,
             args: [{type: 'domready', target: document.location}, document.location],
             returnValue: true

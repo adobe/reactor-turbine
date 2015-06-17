@@ -5,8 +5,13 @@ var called = false;
 
 window._satellite.pageBottom = function() {
   if (!called) {
+    var pseudoEvent = {
+      type: 'pagebottom',
+      target: document.location
+    };
+
     forEach(triggers, function(trigger){
-      trigger();
+      trigger(pseudoEvent, document.location);
     });
   }
   called = true;

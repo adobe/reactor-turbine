@@ -1,13 +1,17 @@
 (function() {
-  // We have to deliver a new instance of the jasmine clock because jasmine.clock is already tied
-  // to this window's globals and not the iframe's window's globals. For this we create
-  // a special jasmine instance that overrides the clock method but inherits the rest of the
-  // this window's jasmine object.
-  var IFrameJasmine = function(iwin) {
+  /**
+   * We have to deliver a new instance of the jasmine clock because jasmine.clock is already tied
+   * to this window's globals and not the iframe's window's globals. For this we create
+   * a special jasmine instance that overrides the clock method but inherits the rest of the
+   * this window's jasmine object.
+   * @param iframeWindow The iframe's window object.
+   * @constructor
+   */
+  var IFrameJasmine = function(iframeWindow) {
     var _clock = new jasmine.Clock(
-      iwin,
+      iframeWindow,
       function () { return new jasmine.DelayedFunctionScheduler(); },
-      new jasmine.MockDate(iwin));
+      new jasmine.MockDate(iframeWindow));
     this.clock = function() {
       return _clock;
     };
@@ -15,6 +19,13 @@
 
   IFrameJasmine.prototype = jasmine;
 
+  /**
+   * Run a test page within an iframe.
+   * @param {String} path The path of the test page. May be absolute or relative.
+   * @param {Object} [testSettings] An object to set on the iframe window object. This can
+   * be used to configure a test in the iframe.
+   * @param {Boolean} [focus] If true, only this test will run and no other tests.
+   */
   window.runTestPage = function(path, testSettings, focus) {
     var absolutePath;
 
@@ -72,7 +83,13 @@
     });
   };
 
-  window.frunTestPage = function(filename, testSettings) {
-    window.runTestPage(filename, testSettings, true);
+  /**
+   * Run a single test page and ignore all other tests.
+   * @param {String} path The path of the test page. May be absolute or relative.
+   * @param {Object} [testSettings] An object to set on the iframe window object. This can
+   * be used to configure a test in the iframe.
+   */
+  window.frunTestPage = function(path, testSettings) {
+    window.runTestPage(path, testSettings, true);
   };
 })();

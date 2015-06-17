@@ -59,5 +59,12 @@ var domReady = (function(ready) {
 }());
 
 module.exports = function(trigger) {
-  domReady(trigger);
+  domReady(function() {
+    var event = {
+      type: 'domready',
+      target: document.location
+    };
+
+    trigger(event, document.location);
+  });
 };

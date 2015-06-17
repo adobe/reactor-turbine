@@ -4,9 +4,10 @@
     <script src="helpers/configureEngineForEventTests.js"></script>
     <script>
       var actionSpy = jasmine.createSpy();
+      var conditionSpy = jasmine.createSpy().and.callFake(function() { return true; });
       jasmine.clock().install();
       configureExtensionForEventTests(actionSpy);
-      configureRuleForEventTests([{ type: 'dtm.domReady' }]);
+      configureRuleForEventTests([{ type: 'dtm.domReady' }], conditionSpy);
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/src/__tests__/helpers/testpage.js"></script>
@@ -22,6 +23,11 @@
           // Actions are always run asynchronously.
           jasmine.clock().tick(1);
           expect(actionSpy.calls.count()).toEqual(1);
+          expect(conditionSpy.calls.first()).toEqual({
+            object: document.location,
+            args: [{type: 'domready', target: document.location}, document.location],
+            returnValue: true
+          });
           jasmine.clock().uninstall();
         })
         .start();

@@ -96,9 +96,8 @@
           {
             "type":"dtm.custom",
             "settings": {
-              "script": function(event, require) {
-                var isLinked = require('isLinked');
-                return !isLinked(event.target);
+              "script": function(event, target) {
+                return !_satellite.isLinked(target);
               }
             }
           }
@@ -143,9 +142,8 @@
           {
             "type":"dtm.custom",
             "settings": {
-              "script": function(event, require) {
-                var isLinked = require('isLinked');
-                return !isLinked(event.target);
+              "script": function(event, target) {
+                return !_satellite.isLinked(target);
               }
             }
           }

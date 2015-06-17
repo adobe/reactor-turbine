@@ -8,14 +8,19 @@ describe('custom condition delegate', function() {
       }
     };
 
-    var eventDetail = {};
+    var event = {
+      currentTarget: {},
+      target: {}
+    };
+
+    var relatedElement = {};
 
     spyOn(settings, 'script').and.callThrough();
-    conditionDelegate(settings, eventDetail);
+    conditionDelegate(settings, event, relatedElement);
 
     expect(settings.script.calls.first()).toEqual({
-      object: settings,
-      args: [eventDetail],
+      object: relatedElement,
+      args: [event, event.target],
       returnValue: true
     });
   });

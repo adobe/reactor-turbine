@@ -67,7 +67,7 @@ module.exports = function() {
           if ((node === event.target || rulePairing.settings.bubbleFireIfParent) &&
               matchesCSS(rulePairing.settings.selector, node)) {
 
-            rulePairing.trigger(event);
+            rulePairing.trigger(event, node);
 
             nodeTriggeredRule = true;
 

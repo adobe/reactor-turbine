@@ -7,8 +7,8 @@ module.exports = function(rules, integrationRegistry, eventDelegates, conditionD
   function initEventDelegate(rule){
     if (rule.events){
 
-      function trigger(eventDetail) {
-        checkConditions(rule, eventDetail);
+      function trigger(event, relatedElement) {
+        checkConditions(rule, event, relatedElement);
       }
 
       forEach(rule.events, function(event) {
@@ -20,28 +20,28 @@ module.exports = function(rules, integrationRegistry, eventDelegates, conditionD
     }
   }
 
-  function checkConditions(rule, eventDetail) {
+  function checkConditions(rule, event, relatedElement) {
     if (rule.conditions) {
       for (var i = 0; i < rule.conditions.length; i++) {
         var condition = rule.conditions[i];
         condition.settings = condition.settings || {};
 
         var delegate = conditionDelegates.get(condition.type);
-        if (!delegate(condition.settings, eventDetail)) {
+        if (!delegate(condition.settings, event, relatedElement)) {
           return;
         }
       }
     }
 
-    runActions(rule, eventDetail);
+    runActions(rule, event, relatedElement);
   }
 
-  function runActions(rule, eventDetail){
+  function runActions(rule, event, relatedElement){
     forEach(rule.actions, function(action) {
       action.settings = action.settings || {};
       forEach(action.integrationIds, function(integrationId) {
         // TODO: Pass related element? Pass forceLowerCase?
-        var preprocessedSettings = preprocessSettings(action.settings, null, eventDetail, false);
+        var preprocessedSettings = preprocessSettings(action.settings, relatedElement, event, false);
         integrationRegistry
           .getById(integrationId)
           .then(function(instance) {

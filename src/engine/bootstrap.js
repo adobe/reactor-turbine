@@ -8,6 +8,10 @@ var coreDelegates = require('./stores/extensionDelegates/coreDelegates');
 var integrationRegistry = require('./stores/integrationRegistry');
 var getVar = require('./utils/dataElement/getVar');
 var setVar = require('./utils/dataElement/setVar');
+var isAnchor = require('./utils/dom/isAnchor');
+var setCookie = require('./utils/cookie/setCookie');
+var readCookie = require('./utils/cookie/readCookie');
+var removeCookie = require('./utils/cookie/removeCookie');
 
 var _satellite = window._satellite;
 var propertyMeta = _satellite.getConfig();
@@ -25,5 +29,14 @@ coreDelegates.init(propertyMeta.coreDelegates);
 createIntegrations(propertyMeta.integrations, integrationRegistry, coreDelegates);
 initRules(propertyMeta.rules, integrationRegistry, eventDelegates, conditionDelegates);
 
+// TODO: _satellite.notify
+_satellite.track = _satellite.runRule;
 _satellite.getVar = getVar;
 _satellite.setVar = setVar;
+// TODO: _satellite.getVisitorId
+_satellite.setCookie = setCookie;
+_satellite.readCookie = readCookie;
+_satellite.removeCookie = removeCookie;
+_satellite.isLinked = function(element) {
+  return isAnchor(element, true);
+};

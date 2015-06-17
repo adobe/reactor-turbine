@@ -4,10 +4,10 @@ window.testMouseEvents = function(options) {
   var currentTarget;
   var actionSpy = jasmine.createSpy();
 
-  var conditionSpy = jasmine.createSpy().and.callFake(function(eventDetail) {
+  var conditionSpy = jasmine.createSpy().and.callFake(function(event) {
     // Current target must be captured here instead of inspecting the spy call because
     // currentTarget will change over time.
-    currentTarget = eventDetail.currentTarget;
+    currentTarget = event.currentTarget;
     return true;
   });
 
@@ -18,6 +18,7 @@ window.testMouseEvents = function(options) {
       type: 'dtm.click',
       settings: {
         selector: '#test',
+        bubbleFireIfParent: true,
         eventHandlerOnElement: options.eventHandlerOnElement
       }
     }
@@ -30,20 +31,28 @@ window.testMouseEvents = function(options) {
     .waitForContentLoaded()
     .execute(function() {
       var testElement = document.getElementById('test');
+      var nestedElement = document.getElementById('nested');
 
       if (!testElement) {
         testElement = document.createElement('div');
         testElement.id = 'test';
+
+        nestedElement = document.createElement('div');
+        nestedElement.id = 'nested';
+        testElement.appendChild(nestedElement);
+
         document.body.appendChild(testElement);
       }
 
       function testEventType(eventType) {
-        Simulate[eventType](testElement);
+        Simulate[eventType](nestedElement);
         // Actions are always run asynchronously.
         jasmine.clock().tick(1);
         expect(actionSpy.calls.count()).toEqual(1);
         expect(conditionSpy.calls.count()).toEqual(1);
-        expect(conditionSpy.calls.argsFor(0)[0].type).toEqual(eventType);
+        expect(conditionSpy.calls.first().object).toBe(testElement);
+        expect(conditionSpy.calls.first().args[0].type).toEqual(eventType);
+        expect(conditionSpy.calls.first().args[1]).toBe(nestedElement);
         expect(currentTarget).toBe(options.eventHandlerOnElement ? testElement : document);
         actionSpy.calls.reset();
         conditionSpy.calls.reset();

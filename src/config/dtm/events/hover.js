@@ -1,46 +1,36 @@
 var bubbly = require('bubbly');
 var addLiveEventListener = require('addLiveEventListener');
-var covertData = require('covertData');
-
-var TIMEOUT_DATA_KEY = 'dtm.hover.timeoutIds';
 
 /**
  * After a mouseenter has occurred, waits a given amount of time before declaring that a hover
  * has occurred.
  * @param {Event} event The mouseenter event.
- * @param {Number} delay The amount of delay in milliseconds.
+ * @param {Number} delay The amount of delay in milliseconds. If delay = 0, the handler will be
+ * called immediately.
  * @param {Function} handler The function that should be called
  */
 function delayHover(event, delay, handler) {
-  var timeoutIds = covertData(event.target, TIMEOUT_DATA_KEY);
-
-  if (!timeoutIds) {
-    timeoutIds = [];
-    covertData(event.target, TIMEOUT_DATA_KEY, timeoutIds);
+  if (delay === 0) {
+    handler(event);
   }
 
-  var timeoutId = setTimeout(function() {
+  var timeoutId;
+
+  function removeMouseLeaveListener() {
+    event.target.removeEventListener('mouseleave', handleMouseLeave);
+  }
+
+  function handleMouseLeave() {
+    clearTimeout(timeoutId);
+    removeMouseLeaveListener();
+  }
+
+  timeoutId = setTimeout(function() {
     handler(event);
+    removeMouseLeaveListener();
   }, delay);
 
-  timeoutIds.push(timeoutId);
-}
-
-/**
- * Clears setTimeouts that may be running for a mouseleave event target. This will prevent
- * rules from running when they have not yet had their configured delay met.
- * @param {Event} event The mouseleave event.
- */
-function clearHoverDelay(event) {
-  var timeoutIds = covertData(event.target, TIMEOUT_DATA_KEY);
-
-  if (timeoutIds && timeoutIds.length) {
-    timeoutIds.forEach(function(timeoutId) {
-      clearTimeout(timeoutId);
-    });
-
-    covertData(event.target, TIMEOUT_DATA_KEY, null);
-  }
+  event.target.addEventListener('mouseleave', handleMouseLeave);
 }
 
 var bubblyByDelay = {};
@@ -74,14 +64,6 @@ module.exports = function(trigger, settings) {
   delayBubbly.addListener(trigger, settings);
 
   addLiveEventListener(settings.selector, 'mouseenter', function(event) {
-    if (settings.delay) {
-      delayHover(event, settings.delay, delayBubbly.evaluateEvent);
-    } else {
-      delayBubbly.evaluateEvent(event);
-    }
+    delayHover(event, delay, delayBubbly.evaluateEvent);
   });
-
-  if (settings.delay) {
-    addLiveEventListener(settings.selector, 'mouseleave', clearHoverDelay);
-  }
 };

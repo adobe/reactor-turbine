@@ -3,8 +3,8 @@ var poll = require('poll');
 var forEach = require('forEach');
 var covertData = require('covertData');
 
-var configId = 0;
-var configs = [];
+var listenerId = 0;
+var listeners = [];
 
 var offset = function(elem) {
   var box;
@@ -76,32 +76,32 @@ var checkIfElementsInViewport = function() {
   var scrollTop = getScrollTop();
   var timeoutId;
 
-  forEach(configs, function(config) {
-    var elements = document.querySelectorAll(config.settings.selector);
+  forEach(listeners, function(listener) {
+    var elements = document.querySelectorAll(listener.settings.selector);
     forEach(elements, function(element) {
-      if (covertData(element, config.completeDataKey)) {
+      if (covertData(element, listener.completeDataKey)) {
         return;
       }
 
       if (elementIsInView(element, viewportHeight, scrollTop)) {
-        if (config.settings.delay) {
-          if (!covertData(element, config.timeoutDataKey)) {
+        if (listener.settings.delay) {
+          if (!covertData(element, listener.timeoutDataKey)) {
             timeoutId = setTimeout(function() {
               if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
-                markAsViewed(config, element);
+                markAsViewed(listener, element);
               }
-            }, config.settings.delay);
+            }, listener.settings.delay);
 
-            covertData(element, config.timeoutDataKey, timeoutId);
+            covertData(element, listener.timeoutDataKey, timeoutId);
           }
         } else {
-          markAsViewed(config, element);
+          markAsViewed(listener, element);
         }
-      } else if (config.settings.delay) {
-        timeoutId = covertData(element, config.timeoutDataKey);
+      } else if (listener.settings.delay) {
+        timeoutId = covertData(element, listener.timeoutDataKey);
         if (timeoutId) {
           clearTimeout(timeoutId);
-          covertData(element, config.timeoutDataKey, null);
+          covertData(element, listener.timeoutDataKey, null);
         }
       }
     });
@@ -113,11 +113,11 @@ addEventListener(window, 'load', checkIfElementsInViewport);
 poll('enters viewport event delegate', checkIfElementsInViewport);
 
 module.exports = function(trigger, settings) {
-  configs.push({
-    timeoutDataKey: 'dtm.entersViewport.timeoutId.' + configId,
-    completeDataKey: 'dtm.entersViewport.complete.' + configId,
+  listeners.push({
+    timeoutDataKey: 'dtm.entersViewport.timeoutId.' + listenerId,
+    completeDataKey: 'dtm.entersViewport.complete.' + listenerId,
     settings: settings,
     trigger: trigger
   });
-  configId++;
+  listenerId++;
 };

@@ -4,8 +4,8 @@ var querySelectorAll = require('./../dom/querySelectorAll');
 var addEventListener = require('./../dom/addEventListener');
 var globalPoll = require('./globalPoll');
 
-var configs = [];
-var nextuid = -1;
+var listeners = [];
+var listenerId = 0;
 
 var registeredWithPoller = false;
 module.exports = function(selector, type, callback) {
@@ -13,10 +13,10 @@ module.exports = function(selector, type, callback) {
     selector: selector,
     type: type,
     callback: callback,
-    id: nextuid++
+    id: listenerId++
   };
 
-  configs.push(config);
+  listeners.push(config);
 
   // While we could just wait for the global poller's next tick, let's try to
   // add the event listener to the target element immediately.
@@ -24,7 +24,7 @@ module.exports = function(selector, type, callback) {
 
   if (!registeredWithPoller) {
     globalPoll('dynamicEvents', function() {
-      forEach(configs, addListenersToNewElements);
+      forEach(listeners, addListenersToNewElements);
     });
     registeredWithPoller = true;
   }

@@ -1,38 +1,38 @@
 var poll = require('poll');
 var forEach = require('forEach');
 
-var configs = [];
+var listeners = [];
 
 poll('element exists event delegate', function() {
-  for (var i = configs.length - 1; i >= 0; i--) {
-    var config = configs[i];
-    if (document.querySelector(config.selector)) {
-      forEach(config.triggers, function(trigger) {
+  for (var i = listeners.length - 1; i >= 0; i--) {
+    var listener = listeners[i];
+    if (document.querySelector(listener.selector)) {
+      forEach(listener.triggers, function(trigger) {
         trigger();
       });
       // Triggers should only be called once so no need to keep watching for the selector.
-      configs.splice(i, 1);
+      listeners.splice(i, 1);
     }
   }
 });
 
 module.exports = function(trigger, settings) {
-  var config;
+  var listener;
 
-  for (var i = 0; i < configs.length; i++) {
-    var candidate = configs[i];
+  for (var i = 0; i < listeners.length; i++) {
+    var candidate = listeners[i];
     if (candidate.selector === settings.selector) {
-      config = candidate;
+      listener = candidate;
     }
   }
 
-  if (!config) {
-    config = {
+  if (!listener) {
+    listener = {
       selector: settings.selector,
       triggers: []
     };
   }
 
-  config.triggers.push(trigger);
-  configs.push(config);
+  listener.triggers.push(trigger);
+  listeners.push(listener);
 };

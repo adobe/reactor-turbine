@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <script src="/base/dist/config.js"></script>
+    <script src="../helpers/configureEngineForEventTests.js"></script>
+    <script>
+      jasmine.clock().install();
+
+      var aConditionSpy = jasmine.createSpy().and.returnValue(true);
+      configureRuleForEventTests([
+        {
+          type: 'dtm.hover',
+          settings: {
+            selector: '#a',
+            bubbleFireIfParent: true,
+            bubbleFireIfChildFired: true,
+            bubbleStop: false
+          }
+        }
+      ], aConditionSpy);
+
+      var a2ConditionSpy = jasmine.createSpy().and.returnValue(true);
+      configureRuleForEventTests([
+        {
+          type: 'dtm.hover',
+          settings: {
+            selector: '#a',
+            bubbleFireIfParent: true,
+            bubbleFireIfChildFired: true,
+            bubbleStop: false
+          }
+        }
+      ], a2ConditionSpy);
+    </script>
+    <script src="/base/dist/engine.js"></script>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script src="/base/node_modules/simulate/simulate.js"></script>
+    <script>
+      TestPage
+        .waitForContentLoaded()
+        .execute(function() {
+          var a = document.getElementById('a');
+
+          // Give the poller time to pick up on the target elements.
+          jasmine.clock().tick(10000);
+
+          Simulate.mouseenter(document.getElementById('a'));
+
+          expect(aConditionSpy.calls.count()).toEqual(1);
+          expect(aConditionSpy.calls.mostRecent()).toEqual({
+            object: a,
+            args: [{ type: 'hover(0)', target: a }, a],
+            returnValue: true
+          });
+
+          expect(a2ConditionSpy.calls.count()).toEqual(1);
+          expect(a2ConditionSpy.calls.mostRecent()).toEqual({
+            object: a,
+            args: [{ type: 'hover(0)', target: a }, a],
+            returnValue: true
+          });
+        })
+        .start();
+    </script>
+  </head>
+  <body>
+    <div id="a">
+      A
+    </div>
+
+    <script>
+      _satellite.pageBottom();
+    </script>
+  </body>
+</html>

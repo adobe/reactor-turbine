@@ -13,10 +13,9 @@
         }
       ];
 
-      var actionSpy = jasmine.createSpy();
+      var conditionSpy = jasmine.createSpy().and.returnValue(true);
 
-      configureExtensionForEventTests(actionSpy);
-      configureRuleForEventTests(ruleEvents);
+      configureRuleForEventTests(ruleEvents, conditionSpy);
 
       jasmine.clock().install();
 
@@ -25,7 +24,7 @@
         .execute(function() {
           // Give time for the poller to cycle.
           jasmine.clock().tick(10000);
-          expect(actionSpy.calls.count()).toEqual(0);
+          expect(conditionSpy.calls.count()).toEqual(0);
 
           var testElement = document.createElement('div');
           testElement.id = 'test';
@@ -35,13 +34,13 @@
           // Give time for the poller to cycle. The rule shouldn't be triggered because
           // the element isn't in view.
           jasmine.clock().tick(10000);
-          expect(actionSpy.calls.count()).toEqual(0);
+          expect(conditionSpy.calls.count()).toEqual(0);
 
           window.scrollTo(0, 3000);
 
           // Give time for the poller to cycle.
           jasmine.clock().tick(10000);
-          expect(actionSpy.calls.count()).toEqual(1);
+          expect(conditionSpy.calls.count()).toEqual(1);
         })
         .start();
     </script>

@@ -7,13 +7,20 @@ describe('Page Tests', function() {
   runTestPage('mouse/preAddElementWithHandlerOnElement.html');
   runTestPage('mouse/postAddElementWithHandlerOnDocument.html');
   runTestPage('mouse/postAddElementWithHandlerOnElement.html');
+  runTestPage('entersViewport/noDelayNestedElements.html');
   runTestPage('entersViewport/preAddElementInView.html');
-  runTestPage('entersViewport/preAddElementScrollingComplex.html');
+  runTestPage('entersViewport/preAddElementScrollingWithDelays.html');
   runTestPage('entersViewport/postAddElementInView.html');
   runTestPage('entersViewport/postAddElementScrolling.html');
-  runTestPage('hover/withoutDelay.html');
-  runTestPage('hover/sameDelayDifferentElements.html');
-  runTestPage('hover/differentDelayDifferentElements.html');
+  runTestPage('entersViewport/sameDelaySameElement.html');
+  runTestPage('entersViewport/noDelaySameElement.html');
+  runTestPage('entersViewport/differentDelaySameElement.html');
+  runTestPage('entersViewport/sameDelayNestedElements.html');
+  runTestPage('entersViewport/differentDelayNestedElements.html');
+  runTestPage('hover/noDelayNestedElements.html');
+  runTestPage('hover/noDelaySameElement.html');
+  runTestPage('hover/sameDelayNestedElements.html');
+  runTestPage('hover/differentDelayNestedElements.html');
   runTestPage('hover/sameDelaySameElement.html');
   runTestPage('hover/differentDelaySameElement.html');
 

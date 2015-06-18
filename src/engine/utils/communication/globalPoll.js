@@ -1,3 +1,5 @@
+var POLL_INTERVAL = 3000;
+
 var listeners = [];
 
 var pollingStarted = false;
@@ -11,7 +13,7 @@ function executeListeners() {
 
 function startPolling() {
   if (!pollingStarted) {
-    setInterval(executeListeners, 3000);
+    setInterval(executeListeners, POLL_INTERVAL);
     pollingStarted = true;
   }
 }

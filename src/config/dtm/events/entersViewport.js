@@ -2,8 +2,8 @@ var addEventListener = require('addEventListener');
 var poll = require('poll');
 var forEach = require('forEach');
 var covertData = require('covertData');
+var bubbly = require('bubbly');
 
-var listenerId = 0;
 var listeners = [];
 
 var offset = function(elem) {
@@ -56,12 +56,6 @@ var elementIsInView = function(element, viewportHeight, scrollTop) {
   return !(scrollTop > (top + height) || scrollTop + viewportHeight < top);
 };
 
-function markAsViewed(config, element) {
-  // TODO: What needs to get passed to trigger?
-  config.trigger();
-  covertData(element, config.completeDataKey, true);
-}
-
 /**
  * Checks to see if a rule's target selector matches an element in the viewport. If that element
  * has not been in the viewport prior, either (a) trigger the rule immediately if the user has not
@@ -77,6 +71,10 @@ var checkIfElementsInViewport = function() {
   var timeoutId;
 
   forEach(listeners, function(listener) {
+    // Notice that if there are multiple listeners configured with the same delay (or no delay)
+    // targeting the same element that the callback from only first listener will be called.
+    // This is actually desired.
+
     var elements = document.querySelectorAll(listener.settings.selector);
     forEach(elements, function(element) {
       if (covertData(element, listener.completeDataKey)) {
@@ -84,20 +82,22 @@ var checkIfElementsInViewport = function() {
       }
 
       if (elementIsInView(element, viewportHeight, scrollTop)) {
-        if (listener.settings.delay) {
+        if (listener.settings.delay) { // Element is in view, has delay
           if (!covertData(element, listener.timeoutDataKey)) {
             timeoutId = setTimeout(function() {
               if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
-                markAsViewed(listener, element);
+                listener.callback(element);
+                covertData(element, listener.completeDataKey, true);
               }
             }, listener.settings.delay);
 
             covertData(element, listener.timeoutDataKey, timeoutId);
           }
-        } else {
-          markAsViewed(listener, element);
+        } else { // Element is in view, has no delay
+          listener.callback(element);
+          covertData(element, listener.completeDataKey, true);
         }
-      } else if (listener.settings.delay) {
+      } else if (listener.settings.delay) { // Element is not in view, has delay
         timeoutId = covertData(element, listener.timeoutDataKey);
         if (timeoutId) {
           clearTimeout(timeoutId);
@@ -112,12 +112,33 @@ addEventListener(window, 'scroll', checkIfElementsInViewport);
 addEventListener(window, 'load', checkIfElementsInViewport);
 poll('enters viewport event delegate', checkIfElementsInViewport);
 
+var bubblyByDelay = {};
+
 module.exports = function(trigger, settings) {
+  // Bubbling for this event is dependent upon the delay configured for rules.
+  // An event can "bubble up" to other rules with the same delay but not to rules with
+  // different delays. See the tests for how this plays out.
+  var delay = settings.hasOwnProperty('delay') ? settings.delay : 0;
+
+  var delayBubbly = bubblyByDelay[delay];
+
+  if (!delayBubbly) {
+    delayBubbly = bubblyByDelay[delay] = bubbly();
+  }
+
+  delayBubbly.addListener(settings, trigger);
+
   listeners.push({
-    timeoutDataKey: 'dtm.entersViewport.timeoutId.' + listenerId,
-    completeDataKey: 'dtm.entersViewport.complete.' + listenerId,
+    timeoutDataKey: 'dtm.entersViewport.timeoutId.' + settings.delay,
+    completeDataKey: 'dtm.entersViewport.complete.' + settings.delay,
     settings: settings,
-    trigger: trigger
+    callback: function(element) {
+      delayBubbly.evaluateEvent({
+        type: 'inview',
+        target: element,
+        // If the user did not configure a delay, inviewDelay should be undefined.
+        inviewDelay: settings.delay
+      });
+    }
   });
-  listenerId++;
 };

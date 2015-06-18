@@ -50,9 +50,9 @@ var bubblyByDelay = {};
  * ancestor elements.
  */
 module.exports = function(trigger, settings) {
-  // Bubbling for the hover event is dependent upon the hover delay configured for rules.
-  // A hover event can "bubble up" to other rules with the same hover delay but not to rules with
-  // different hover delays. See the tests for how this plays out.
+  // Bubbling for this event is dependent upon the delay configured for rules.
+  // An event can "bubble up" to other rules with the same delay but not to rules with
+  // different delays. See the tests for how this plays out.
   var delay = settings.hasOwnProperty('delay') ? settings.delay : 0;
 
   var delayBubbly = bubblyByDelay[delay];
@@ -63,6 +63,9 @@ module.exports = function(trigger, settings) {
 
   delayBubbly.addListener(settings, function(event, relatedElement) {
     var pseudoEvent = {
+      // The parenthesis is a bit odd and inconsistent with the enters viewport event
+      // but is maintained for backward-compatibility since custom conditions may be expecting it.
+      // Note that if the user did not configure a delay, it should be hover(0)
       type: 'hover(' + delay + ')',
       target: event.target
     };

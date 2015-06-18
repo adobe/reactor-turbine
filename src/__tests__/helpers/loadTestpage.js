@@ -67,6 +67,7 @@
         //document.body.removeChild(iframe);
         done();
       };
+
       iwin.expect = expect;
       iwin.fail = fail;
       iwin.jasmine = new IFrameJasmine(iwin);

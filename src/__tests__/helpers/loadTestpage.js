@@ -21,10 +21,10 @@
 
   /**
    * Run a test page within an iframe.
-   * @param {String} path The path of the test page. May be absolute or relative.
+   * @param {string} path The path of the test page. May be absolute or relative.
    * @param {Object} [testSettings] An object to set on the iframe window object. This can
    * be used to configure a test in the iframe.
-   * @param {Boolean} [focus] If true, only this test will run and no other tests.
+   * @param {boolean} [focus] If true, only this test will run and no other tests.
    */
   window.runTestPage = function(path, testSettings, focus) {
     var absolutePath;
@@ -86,7 +86,7 @@
 
   /**
    * Run a single test page and ignore all other tests.
-   * @param {String} path The path of the test page. May be absolute or relative.
+   * @param {string} path The path of the test page. May be absolute or relative.
    * @param {Object} [testSettings] An object to set on the iframe window object. This can
    * be used to configure a test in the iframe.
    */

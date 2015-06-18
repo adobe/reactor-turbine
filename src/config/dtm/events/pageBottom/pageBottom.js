@@ -1,8 +1,20 @@
 var forEach = require('forEach');
 
+/**
+ * All trigger methods registered for this event type.
+ * @type {ruleTrigger[]}
+ */
 var triggers = [];
+
+/**
+ * Whether _satellite.pageBottom has been called.
+ * @type {boolean}
+ */
 var called = false;
 
+/**
+ * Public function intended to be called by the user at the bottom of the page.
+ */
 window._satellite.pageBottom = function() {
   if (!called) {
     var pseudoEvent = {
@@ -17,6 +29,11 @@ window._satellite.pageBottom = function() {
   called = true;
 };
 
+/**
+ * Page top event. This event occurs as soon as the user calls _satellite.pageBottom() (which is
+ * supposed to be at the bottom of the page).
+ * @param {ruleTrigger} trigger The trigger callback.
+ */
 module.exports = function(trigger) {
   triggers.push(trigger);
 };

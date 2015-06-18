@@ -37,16 +37,16 @@ var bubblyByDelay = {};
 
 /**
  * Hover event. This event occurs when a user has moved the pointer to be on top of an element.
- * @param {Function} trigger The trigger callback.
+ * @param {ruleTrigger} trigger The trigger callback.
  * @param {Object} settings The event settings object.
- * @param {String} settings.selector The CSS selector for elements the rule is targeting.
+ * @param {string} settings.selector The CSS selector for elements the rule is targeting.
  * @param {Number} [settings.delay] The number of milliseconds the pointer must be on top of the
  * element before declaring that a hover has occurred.
- * @param {Boolean} [settings.bubbleFireIfParent=false] Whether the rule should fire if the event
+ * @param {boolean} [settings.bubbleFireIfParent=false] Whether the rule should fire if the event
  * originated from a descendant element.
- * @param {Boolean} [settings.bubbleFireIfChildFired=false] Whether the rule should fire if the
+ * @param {boolean} [settings.bubbleFireIfChildFired=false] Whether the rule should fire if the
  * same event has already triggered a rule targeting a descendant element.
- * @param {Boolean} [settings.bubbleStop=false] Whether the event should not trigger rules on
+ * @param {boolean} [settings.bubbleStop=false] Whether the event should not trigger rules on
  * ancestor elements.
  */
 module.exports = function(trigger, settings) {

@@ -6,6 +6,10 @@ var covertData = require('covertData');
 var elementExistsBubbly = bubbly();
 var completeDataKey = 'dtm.elementExists.complete';
 
+/**
+ *
+ * @type {string[]} Selectors from all the rules.
+ */
 var selectors = [];
 
 poll('element exists event delegate', function() {
@@ -33,6 +37,19 @@ poll('element exists event delegate', function() {
   }
 });
 
+/**
+ * Element exists event. This event occurs when an element has been added to the DOM. The rule
+ * should only run once per targeted element.
+ * @param {ruleTrigger} trigger The trigger callback.
+ * @param {Object} settings The event settings object.
+ * @param {string} settings.selector The CSS selector for elements the rule is targeting.
+ * @param {boolean} [settings.bubbleFireIfParent=false] Whether the rule should fire if the event
+ * originated from a descendant element.
+ * @param {boolean} [settings.bubbleFireIfChildFired=false] Whether the rule should fire if the
+ * same event has already triggered a rule targeting a descendant element.
+ * @param {boolean} [settings.bubbleStop=false] Whether the event should not trigger rules on
+ * ancestor elements.
+ */
 module.exports = function(trigger, settings) {
   elementExistsBubbly.addListener(settings, trigger);
 

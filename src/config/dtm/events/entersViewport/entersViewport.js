@@ -3,9 +3,20 @@ var poll = require('poll');
 var forEach = require('forEach');
 var covertData = require('covertData');
 var bubbly = require('bubbly');
+
+/**
+ * Object where the key is the delay and the value is the bubbly instance used for that delay.
+ * @type {Object}
+ */
 var bubblyByDelay = {};
+
 var listeners = [];
 
+/**
+ * Gets the offset of the element.
+ * @param elem
+ * @returns {{top: number, left: number}}
+ */
 var offset = function(elem) {
   var box;
 
@@ -31,6 +42,10 @@ var offset = function(elem) {
   };
 };
 
+/**
+ * Viewport height.
+ * @returns {Number}
+ */
 var getViewportHeight = function() {
   var height = window.innerHeight; // Safari, Opera
   var mode = document.compatMode;
@@ -44,12 +59,23 @@ var getViewportHeight = function() {
   return height;
 };
 
+/**
+ * Scroll top.
+ * @returns {number}
+ */
 var getScrollTop = function() {
   return document.documentElement.scrollTop ?
     document.documentElement.scrollTop :
     document.body.scrollTop;
 };
 
+/**
+ * Whether an element is in the viewport.
+ * @param element The element to evaluate.
+ * @param viewportHeight The viewport height. Passed in for optimization purposes.
+ * @param scrollTop The scroll top. Passed in for optimization purposes.
+ * @returns {boolean}
+ */
 var elementIsInView = function(element, viewportHeight, scrollTop) {
   var top = offset(element).top;
   var height = element.offsetHeight;
@@ -61,7 +87,7 @@ var elementIsInView = function(element, viewportHeight, scrollTop) {
  * @param {HTMLElement} element The element that is in the viewport.
  * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
  * the viewport.
- * @param {String} completeDataKey Identifier string to use for storing completion information on
+ * @param {string} completeDataKey Identifier string to use for storing completion information on
  * the element.
  */
 function markEntersViewportComplete(element, delay, completeDataKey) {
@@ -128,6 +154,21 @@ addEventListener(window, 'scroll', checkIfElementsInViewport);
 addEventListener(window, 'load', checkIfElementsInViewport);
 poll('enters viewport event delegate', checkIfElementsInViewport);
 
+/**
+ * Enters viewport event. This event occurs when an element has entered the viewport. The rule
+ * should only run once per targeted element.
+ * @param {ruleTrigger} trigger The trigger callback.
+ * @param {Object} settings The event settings object.
+ * @param {string} settings.selector The CSS selector for elements the rule is targeting.
+ * @param {Number} [settings.delay] The number of milliseconds the element must be within the
+ * viewport before declaring that the event has occurred.
+ * @param {boolean} [settings.bubbleFireIfParent=false] Whether the rule should fire if the event
+ * originated from a descendant element.
+ * @param {boolean} [settings.bubbleFireIfChildFired=false] Whether the rule should fire if the
+ * same event has already triggered a rule targeting a descendant element.
+ * @param {boolean} [settings.bubbleStop=false] Whether the event should not trigger rules on
+ * ancestor elements.
+ */
 module.exports = function(trigger, settings) {
   // Bubbling for this event is dependent upon the delay configured for rules.
   // An event can "bubble up" to other rules with the same delay but not to rules with

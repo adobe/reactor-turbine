@@ -17,11 +17,11 @@ module.exports = function() {
      * Register a settings object that should be evaluated for an event to determine if a rule
      * should be executed. If it should be executed, the trigger function will be called.
      * @param {Object} settings The event settings object.
-     * @param {Boolean} [settings.bubbleFireIfParent=false] Whether the rule should fire if the event
+     * @param {boolean} [settings.bubbleFireIfParent=false] Whether the rule should fire if the event
      * originated from a descendant element.
-     * @param {Boolean} [settings.bubbleFireIfChildFired=false] Whether the rule should fire if the
+     * @param {boolean} [settings.bubbleFireIfChildFired=false] Whether the rule should fire if the
      * same event has already triggered a rule targeting a descendant element.
-     * @param {Boolean} [settings.bubbleStop=false] Whether the event should not trigger rules on
+     * @param {boolean} [settings.bubbleStop=false] Whether the event should not trigger rules on
      * @param {Function} callback The function to be called when a matching event is seen.
      * ancestor elements.
      */

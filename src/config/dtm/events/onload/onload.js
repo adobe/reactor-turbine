@@ -1,6 +1,10 @@
 var addEventListener = require('addEventListener');
 var forEach = require('forEach');
 
+/**
+ * All trigger methods registered for this event type.
+ * @type {ruleTrigger[]}
+ */
 var triggers = [];
 
 addEventListener(window, 'load', function(){

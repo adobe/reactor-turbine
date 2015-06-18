@@ -1,19 +1,16 @@
 <html>
   <head>
     <script src="/base/dist/config.js"></script>
-    <script src="../helpers/configureEngineForEventTests.js"></script>
-    <script src="/base/src/__tests__/helpers/testpage.js"></script>
-    <script src="helpers/entersViewportHelper.js"></script>
+    <script src="../../__tests__/helpers/configureEngineForEventTests.js"></script>
     <script>
       jasmine.clock().install();
 
       var aConditionSpy = jasmine.createSpy().and.returnValue(true);
       configureRuleForEventTests([
         {
-          type: 'dtm.entersViewport',
+          type: 'dtm.hover',
           settings: {
             selector: '#a',
-            delay: 1000,
             bubbleFireIfParent: true,
             bubbleFireIfChildFired: true,
             bubbleStop: false
@@ -24,56 +21,57 @@
       var bConditionSpy = jasmine.createSpy().and.returnValue(true);
       configureRuleForEventTests([
         {
-          type: 'dtm.entersViewport',
+          type: 'dtm.hover',
           settings: {
             selector: '#b',
-            delay: 2000,
             bubbleFireIfParent: true,
             bubbleFireIfChildFired: true,
             bubbleStop: false
           }
         }
       ], bConditionSpy);
-
+    </script>
+    <script src="/base/dist/engine.js"></script>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script src="/base/node_modules/simulate/simulate.js"></script>
+    <script>
       TestPage
         .waitForContentLoaded()
         .execute(function() {
           var a = document.getElementById('a');
           var b = document.getElementById('b');
 
-          // Give time for the poller to cycle.
-          jasmine.clock().tick(3000);
+          // Give the poller time to pick up on the target elements.
+          jasmine.clock().tick(10000);
 
-          expect(aConditionSpy.calls.count()).toEqual(0);
-          expect(bConditionSpy.calls.count()).toEqual(0);
-
-          jasmine.clock().tick(1200);
+          Simulate.mouseenter(document.getElementById('a'));
 
           expect(aConditionSpy.calls.count()).toEqual(1);
-          expect(bConditionSpy.calls.count()).toEqual(0);
-
-          assertEntersViewportConditionCall({
-            call: aConditionSpy.calls.first(),
-            delay: 1000,
-            relatedElement: a,
-            target: a
+          expect(aConditionSpy.calls.mostRecent()).toEqual({
+            object: a,
+            args: [{ type: 'hover(0)', target: a }, a],
+            returnValue: true
           });
 
-          jasmine.clock().tick(1000);
+          Simulate.mouseenter(document.getElementById('b'));
 
-          expect(aConditionSpy.calls.count()).toEqual(1);
+          // Rule A ran again because the hover from element B also "bubbled up" to element A.
+          expect(aConditionSpy.calls.count()).toEqual(2);
+          expect(aConditionSpy.calls.mostRecent()).toEqual({
+            object: a,
+            args: [{ type: 'hover(0)', target: b }, b],
+            returnValue: true
+          });
+
           expect(bConditionSpy.calls.count()).toEqual(1);
-
-          assertEntersViewportConditionCall({
-            call: bConditionSpy.calls.mostRecent(),
-            delay: 2000,
-            relatedElement: b,
-            target: b
+          expect(bConditionSpy.calls.mostRecent()).toEqual({
+            object: b,
+            args: [{ type: 'hover(0)', target: b }, b],
+            returnValue: true
           });
         })
         .start();
     </script>
-    <script src="/base/dist/engine.js"></script>
   </head>
   <body>
     <div id="a">
@@ -82,6 +80,7 @@
         B
       </div>
     </div>
+
     <script>
       _satellite.pageBottom();
     </script>

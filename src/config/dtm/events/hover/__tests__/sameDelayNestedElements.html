@@ -1,7 +1,7 @@
 <html>
   <head>
     <script src="/base/dist/config.js"></script>
-    <script src="../helpers/configureEngineForEventTests.js"></script>
+    <script src="../../__tests__/helpers/configureEngineForEventTests.js"></script>
     <script>
       jasmine.clock().install();
 
@@ -14,7 +14,7 @@
             bubbleFireIfParent: true,
             bubbleFireIfChildFired: true,
             bubbleStop: false,
-            delay: 2000
+            delay: 1000
           }
         }
       ], aConditionSpy);
@@ -59,25 +59,25 @@
 
           jasmine.clock().tick(1200);
 
-          expect(aConditionSpy.calls.count()).toEqual(0);
+          // Because the rules are on the same delay, the hover event from element B also executes
+          // rule A when it "bubbles up".
+          expect(aConditionSpy.calls.count()).toEqual(2);
+          expect(aConditionSpy.calls.first()).toEqual({
+            object: a,
+            args: [{ type: 'hover(1000)', target: a }, a],
+            returnValue: true
+          });
+          expect(aConditionSpy.calls.mostRecent()).toEqual({
+            object: a,
+            args: [{ type: 'hover(1000)', target: b }, b],
+            returnValue: true
+          });
           expect(bConditionSpy.calls.count()).toEqual(1);
           expect(bConditionSpy.calls.mostRecent()).toEqual({
             object: b,
             args: [{ type: 'hover(1000)', target: b }, b],
             returnValue: true
           });
-
-          jasmine.clock().tick(1000);
-
-          // Because the rules are on different delays, the hover event from element B doesn't
-          // execute rule A when it "bubbles up".
-          expect(aConditionSpy.calls.count()).toEqual(1);
-          expect(aConditionSpy.calls.mostRecent()).toEqual({
-            object: a,
-            args: [{ type: 'hover(2000)', target: a }, a],
-            returnValue: true
-          });
-          expect(bConditionSpy.calls.count()).toEqual(1);
         })
         .start();
     </script>

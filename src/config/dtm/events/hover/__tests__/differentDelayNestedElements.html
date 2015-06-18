@@ -1,7 +1,7 @@
 <html>
   <head>
     <script src="/base/dist/config.js"></script>
-    <script src="../helpers/configureEngineForEventTests.js"></script>
+    <script src="../../__tests__/helpers/configureEngineForEventTests.js"></script>
     <script>
       jasmine.clock().install();
 
@@ -14,24 +14,24 @@
             bubbleFireIfParent: true,
             bubbleFireIfChildFired: true,
             bubbleStop: false,
-            delay: 1000
+            delay: 2000
           }
         }
       ], aConditionSpy);
 
-      var a2ConditionSpy = jasmine.createSpy().and.returnValue(true);
+      var bConditionSpy = jasmine.createSpy().and.returnValue(true);
       configureRuleForEventTests([
         {
           type: 'dtm.hover',
           settings: {
-            selector: '#a',
+            selector: '#b',
             bubbleFireIfParent: true,
             bubbleFireIfChildFired: true,
             bubbleStop: false,
             delay: 1000
           }
         }
-      ], a2ConditionSpy);
+      ], bConditionSpy);
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/src/__tests__/helpers/testpage.js"></script>
@@ -52,25 +52,32 @@
           Simulate.mouseleave(document.getElementById('b'));
 
           expect(aConditionSpy.calls.count()).toEqual(0);
-          expect(a2ConditionSpy.calls.count()).toEqual(0);
+          expect(bConditionSpy.calls.count()).toEqual(0);
 
           Simulate.mouseenter(document.getElementById('a'));
           Simulate.mouseenter(document.getElementById('b'));
 
           jasmine.clock().tick(1200);
 
+          expect(aConditionSpy.calls.count()).toEqual(0);
+          expect(bConditionSpy.calls.count()).toEqual(1);
+          expect(bConditionSpy.calls.mostRecent()).toEqual({
+            object: b,
+            args: [{ type: 'hover(1000)', target: b }, b],
+            returnValue: true
+          });
+
+          jasmine.clock().tick(1000);
+
+          // Because the rules are on different delays, the hover event from element B doesn't
+          // execute rule A when it "bubbles up".
           expect(aConditionSpy.calls.count()).toEqual(1);
           expect(aConditionSpy.calls.mostRecent()).toEqual({
             object: a,
-            args: [{ type: 'hover(1000)', target: a }, a],
+            args: [{ type: 'hover(2000)', target: a }, a],
             returnValue: true
           });
-          expect(a2ConditionSpy.calls.count()).toEqual(1);
-          expect(a2ConditionSpy.calls.mostRecent()).toEqual({
-            object: a,
-            args: [{ type: 'hover(1000)', target: a }, a],
-            returnValue: true
-          });
+          expect(bConditionSpy.calls.count()).toEqual(1);
         })
         .start();
     </script>

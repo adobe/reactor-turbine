@@ -13,47 +13,43 @@
   "eventDelegates": [
     {
       "name": "Click",
-      "path": "events/click.js"
+      "path": "events/click/click.js"
     },
     {
       "name": "Direct Call",
-      "path": "events/directCall.js"
+      "path": "events/directCall/directCall.js"
     },
     {
       "name": "DOM Ready",
-      "path": "events/domReady.js"
+      "path": "events/domReady/domReady.js"
     },
     {
       "name": "Element Exists",
-      "path": "events/elementExists.js"
+      "path": "events/elementExists/elementExists.js"
     },
     {
       "name": "Enters Viewport",
-      "path": "events/entersViewport.js"
+      "path": "events/entersViewport/entersViewport.js"
     },
     {
       "name": "Hover",
-      "path": "events/hover.js"
+      "path": "events/hover/hover.js"
     },
     {
       "name": "On Load",
-      "path": "events/onload.js"
+      "path": "events/onload/onload.js"
     },
     {
       "name": "Page Bottom",
-      "path": "events/pageBottom.js"
+      "path": "events/pageBottom/pageBottom.js"
     },
     {
       "name": "Page Top",
-      "path": "events/pageTop.js"
+      "path": "events/pageTop/pageTop.js"
     },
     {
       "name": "Timeout",
-      "path": "events/timeout.js"
-    },
-    {
-      "name": "Test",
-      "path": "events/test.js"
+      "path": "events/timeout/timeout.js"
     }
   ],
   "dataElementDelegates": [

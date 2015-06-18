@@ -1,28 +1,8 @@
 describe('Page Tests', function() {
-  runTestPage('pageTop.test.html');
-  runTestPage('pageBottom.test.html');
-  runTestPage('domReady.test.html');
-  runTestPage('onload.test.html');
   runTestPage('mouse/preAddElementWithHandlerOnDocument.html');
   runTestPage('mouse/preAddElementWithHandlerOnElement.html');
   runTestPage('mouse/postAddElementWithHandlerOnDocument.html');
   runTestPage('mouse/postAddElementWithHandlerOnElement.html');
-  runTestPage('entersViewport/noDelayNestedElements.html');
-  runTestPage('entersViewport/preAddElementInView.html');
-  runTestPage('entersViewport/preAddElementScrollingWithDelays.html');
-  runTestPage('entersViewport/postAddElementInView.html');
-  runTestPage('entersViewport/postAddElementScrolling.html');
-  runTestPage('entersViewport/sameDelaySameElement.html');
-  runTestPage('entersViewport/noDelaySameElement.html');
-  runTestPage('entersViewport/differentDelaySameElement.html');
-  runTestPage('entersViewport/sameDelayNestedElements.html');
-  runTestPage('entersViewport/differentDelayNestedElements.html');
-  runTestPage('hover/noDelayNestedElements.html');
-  runTestPage('hover/noDelaySameElement.html');
-  runTestPage('hover/sameDelayNestedElements.html');
-  runTestPage('hover/differentDelayNestedElements.html');
-  runTestPage('hover/sameDelaySameElement.html');
-  runTestPage('hover/differentDelaySameElement.html');
 
   describe('bubbling', function() {
     // Test each scenario with eventHandlerOnElement toggled. The behavior should be consistent.

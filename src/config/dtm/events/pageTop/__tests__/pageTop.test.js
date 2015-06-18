@@ -1,3 +1,3 @@
 describe('pageTop Event Tests', function() {
-  runTestPage('pageTop.test.html');
+  runTestPage('pageTop.html');
 });

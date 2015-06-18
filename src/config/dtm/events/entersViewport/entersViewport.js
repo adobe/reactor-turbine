@@ -4,7 +4,7 @@ var forEach = require('forEach');
 var covertData = require('covertData');
 var bubbly = require('bubbly');
 var bubblyByDelay = {};
-var configs = [];
+var listeners = [];
 
 var offset = function(elem) {
   var box;
@@ -91,32 +91,32 @@ var checkIfElementsInViewport = function() {
   var scrollTop = getScrollTop();
   var timeoutId;
 
-  forEach(configs, function(config) {
-    var elements = document.querySelectorAll(config.settings.selector);
+  forEach(listeners, function(listener) {
+    var elements = document.querySelectorAll(listener.settings.selector);
     forEach(elements, function(element) {
-      if (covertData(element, config.completeDataKey)) {
+      if (covertData(element, listener.completeDataKey)) {
         return;
       }
 
       if (elementIsInView(element, viewportHeight, scrollTop)) {
-        if (config.settings.delay) { // Element is in view, has delay
-          if (!covertData(element, config.timeoutDataKey)) {
+        if (listener.settings.delay) { // Element is in view, has delay
+          if (!covertData(element, listener.timeoutDataKey)) {
             timeoutId = setTimeout(function() {
               if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
-                markEntersViewportComplete(element, config.settings.delay, config.completeDataKey);
+                markEntersViewportComplete(element, listener.settings.delay, listener.completeDataKey);
               }
-            }, config.settings.delay);
+            }, listener.settings.delay);
 
-            covertData(element, config.timeoutDataKey, timeoutId);
+            covertData(element, listener.timeoutDataKey, timeoutId);
           }
         } else { // Element is in view, has no delay
-          markEntersViewportComplete(element, config.settings.delay, config.completeDataKey);
+          markEntersViewportComplete(element, listener.settings.delay, listener.completeDataKey);
         }
-      } else if (config.settings.delay) { // Element is not in view, has delay
-        timeoutId = covertData(element, config.timeoutDataKey);
+      } else if (listener.settings.delay) { // Element is not in view, has delay
+        timeoutId = covertData(element, listener.timeoutDataKey);
         if (timeoutId) {
           clearTimeout(timeoutId);
-          covertData(element, config.timeoutDataKey, null);
+          covertData(element, listener.timeoutDataKey, null);
         }
       }
     });
@@ -142,7 +142,7 @@ module.exports = function(trigger, settings) {
 
   delayBubbly.addListener(settings, trigger);
 
-  configs.push({
+  listeners.push({
     // These strings are created and stored here for optimization purposes only. It avoids
     // having to recreate the strings a bunch of times in the above functions as they are
     // polled repeatedly.

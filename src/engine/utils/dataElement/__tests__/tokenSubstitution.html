@@ -1,0 +1,147 @@
+<html>
+  <head>
+    <script src="/base/dist/config.js"></script>
+    <script>
+      jasmine.clock().install();
+
+      var config = _satellite.getConfig();
+      var actionSpy = jasmine.createSpy();
+
+      config.integrations = {
+        'abc': {
+          type: 'testExtension'
+        }
+      };
+
+      config.coreDelegates = {
+        testExtension: function(module, require) {
+          module.exports = function() {
+            return {
+              test: actionSpy
+            };
+          };
+        }
+      };
+
+      config.eventDelegates = {
+        testEvent: function(module, require){
+          var allTriggers = [];
+
+          _satellite.triggerTestEvent = function() {
+            allTriggers.forEach(function(trigger) {
+              var targetElement = document.createElement('div');
+              targetElement.id = 'fruitPartyBowl';
+
+              var pseudoEvent = {
+                type: 'fruitParty',
+                target: targetElement,
+                fruit: 'apple'
+              };
+
+              var relatedElement = document.createElement('span');
+              relatedElement.id = 'kazoo';
+
+              trigger(pseudoEvent, relatedElement);
+            });
+          };
+
+          module.exports = function(trigger, settings) {
+            allTriggers.push(trigger);
+          };
+        }
+      }
+
+      config.rules = [
+        {
+          events: [{
+            type: 'testEvent',
+            settings: {
+              name: 'foo'
+            }
+          }],
+//          conditions: [
+//            {
+//              type: 'dtm.custom',
+//              settings: {
+//                script: conditionSpy || function() { return true; }
+//              }
+//            }
+//          ],
+          actions: [
+            {
+              integrationIds: ['abc'],
+              method: 'test',
+              settings: {
+                dataElementBased: '%staticValue%',
+                URIBased: '%URI%',
+                uriBased: '%uri%',
+                protocolBased: '%protocol%',
+                hostnameBased: '%hostname%',
+                thisBased: '%this.id%',
+                eventBased: '%event.fruit%',
+                targetBased: '%target.id%',
+                windowBased: '%window.location.protocol%',
+                paramBased: '%param.fooParam%',
+                randBased: '%rand3%',
+                customBased: '%instrument%'
+              }
+            }
+          ]
+        }
+      ];
+
+      config.dataElementDelegates = {
+        'testExtension.static': function(module, require) {
+          module.exports = function(settings) {
+            return settings.staticValue;
+          };
+        }
+      };
+
+      config.dataElements = [
+        {
+          "name": "staticValue",
+          "type": "testExtension.static",
+          "settings": {
+            "staticValue": "myStaticValue"
+          }
+        }
+      ];
+    </script>
+    <script src="/base/dist/engine.js"></script>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script>
+      TestPage
+        .execute(function() {
+          _satellite.setVar('instrument', 'piccolo');
+
+          _satellite.triggerTestEvent();
+
+          // Actions are always run asynchronously.
+          jasmine.clock().tick(1);
+
+          expect(actionSpy.calls.count()).toBe(1);
+          var actionSettings = actionSpy.calls.argsFor(0)[0];
+          expect(actionSettings.dataElementBased).toBe('myStaticValue');
+          expect(actionSettings.URIBased).toBe(document.location.pathname + document.location.search);
+          expect(actionSettings.uriBased).toBe(document.location.pathname + document.location.search);
+          expect(actionSettings.protocolBased).toBe(window.location.protocol);
+          expect(actionSettings.hostnameBased).toBe(document.location.hostname);
+          expect(actionSettings.thisBased).toBe('kazoo');
+          expect(actionSettings.eventBased).toBe('apple');
+          expect(actionSettings.targetBased).toBe('fruitPartyBowl');
+          expect(actionSettings.windowBased).toBe(window.location.protocol);
+          expect(actionSettings.paramBased).toBe('barValue');
+          expect(typeof actionSettings.randBased).toBe('string');
+          expect(actionSettings.randBased.length).toBe(3);
+          expect(actionSettings.customBased).toBe('piccolo');
+        })
+        .start();
+    </script>
+  </head>
+  <body>
+    <script>
+      _satellite.pageBottom();
+    </script>
+  </body>
+</html>

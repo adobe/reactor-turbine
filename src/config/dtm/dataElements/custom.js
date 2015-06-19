@@ -1,3 +1,3 @@
 module.exports = function(settings) {
-  return settings.script(require);
+  return settings.script();
 };

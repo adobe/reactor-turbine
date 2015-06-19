@@ -19,6 +19,30 @@
 
   IFrameJasmine.prototype = jasmine;
 
+  function cacheBust(url) {
+    var cacheBustSeparator = url.indexOf('?') !== -1 ? '&' : '?';
+    return url + cacheBustSeparator + 'cachebust=' + Date.now();
+  }
+
+  function loadIframe(url) {
+    var iframe = document.createElement('iframe');
+    iframe.style.width = '600px';
+    iframe.style.height = '400px';
+    iframe.style.border = '1px solid #888';
+    iframe.src = cacheBust(url);
+    document.body.appendChild(iframe);
+    return iframe;
+  }
+
+  function eraseLocalStorageSettings() {
+    if (!window.localStorage) {
+      return;
+    }
+
+    localStorage.removeItem('sdsat_debug');
+    localStorage.removeItem('sdsat_hide_activity');
+  }
+
   /**
    * Run a test page within an iframe.
    * @param {string} path The path of the test page. May be absolute or relative.
@@ -36,25 +60,6 @@
       var currentScriptPath = scripts[scripts.length - 1].src;
       var currentScriptDir = currentScriptPath.substring(0, currentScriptPath.lastIndexOf('/') + 1);
       absolutePath = currentScriptDir + path;
-    }
-
-    function eraseLocalStorageSettings() {
-      if (!window.localStorage) {
-        return;
-      }
-
-      localStorage.removeItem('sdsat_debug');
-      localStorage.removeItem('sdsat_hide_activity');
-    }
-
-    function loadIframe(url) {
-      var iframe = document.createElement('iframe');
-      iframe.style.width = '600px';
-      iframe.style.height = '400px';
-      iframe.style.border = '1px solid #888';
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      return iframe;
     }
 
     function runTest(done) {

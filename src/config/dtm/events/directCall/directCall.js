@@ -11,7 +11,7 @@ var triggersByCallName = {};
  * Public function intended to be called by the user.
  * @param {string} name The string matching a string configured for a rule.
  */
-window._satellite.runRule = function(name) {
+window._satellite.track = function(name) {
   var triggers = triggersByCallName[name];
   if (triggers) {
     forEach(triggers, function(trigger) {
@@ -21,7 +21,7 @@ window._satellite.runRule = function(name) {
 };
 
 /**
- * Direct call event. This event occurs as soon as the user calls _satellite.runRule().
+ * Direct call event. This event occurs as soon as the user calls _satellite.track().
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(trigger, settings) {

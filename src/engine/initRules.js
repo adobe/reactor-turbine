@@ -40,8 +40,7 @@ module.exports = function(rules, integrationRegistry, eventDelegates, conditionD
     forEach(rule.actions, function(action) {
       action.settings = action.settings || {};
       forEach(action.integrationIds, function(integrationId) {
-        // TODO: Pass related element? Pass forceLowerCase?
-        var preprocessedSettings = preprocessSettings(action.settings, relatedElement, event, false);
+        var preprocessedSettings = preprocessSettings(action.settings, relatedElement, event);
         integrationRegistry
           .getById(integrationId)
           .then(function(instance) {

@@ -216,11 +216,7 @@
 
   function execute(cb) {
     page.queue.push(function (next) {
-      try {
-        cb(page);
-      } catch (e) {
-        done();
-      }
+      cb(page);
       next();
     });
     return page;

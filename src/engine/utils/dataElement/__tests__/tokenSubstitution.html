@@ -72,7 +72,8 @@
               integrationIds: ['abc'],
               method: 'test',
               settings: {
-                dataElementBased: '%staticValue%',
+                dataElementBased: '%treat%',
+                dataElementPriorityBased: '%vegetable%',
                 URIBased: '%URI%',
                 uriBased: '%uri%',
                 protocolBased: '%protocol%',
@@ -83,7 +84,7 @@
                 windowBased: '%window.location.protocol%',
                 paramBased: '%param.fooParam%',
                 randBased: '%rand3%',
-                customBased: '%instrument%'
+                customBased: '%instrument%',
               }
             }
           ]
@@ -100,10 +101,17 @@
 
       config.dataElements = [
         {
-          "name": "staticValue",
+          "name": "treat",
           "type": "testExtension.static",
           "settings": {
-            "staticValue": "myStaticValue"
+            "staticValue": "ice cream"
+          }
+        },
+        {
+          "name": "vegetable",
+          "type": "testExtension.static",
+          "settings": {
+            "staticValue": "carrot"
           }
         }
       ];
@@ -114,6 +122,7 @@
       TestPage
         .execute(function() {
           _satellite.setVar('instrument', 'piccolo');
+          _satellite.setVar('vegetable', 'onion');
 
           _satellite.triggerTestEvent();
 
@@ -122,7 +131,10 @@
 
           expect(actionSpy.calls.count()).toBe(1);
           var actionSettings = actionSpy.calls.argsFor(0)[0];
-          expect(actionSettings.dataElementBased).toBe('myStaticValue');
+          expect(actionSettings.dataElementBased).toBe('ice cream');
+          // Both a data element and a custom variable (set using setVar) named "vegetable" have
+          // been set. The data element has a higher priority.
+          expect(actionSettings.dataElementPriorityBased).toBe('carrot');
           expect(actionSettings.URIBased).toBe(document.location.pathname + document.location.search);
           expect(actionSettings.uriBased).toBe(document.location.pathname + document.location.search);
           expect(actionSettings.protocolBased).toBe(window.location.protocol);

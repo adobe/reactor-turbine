@@ -22,7 +22,8 @@ var offset = function(elem) {
 
   try {
     box = elem.getBoundingClientRect();
-  } catch (e) {}
+  } catch (e) {
+  }
 
   var doc = document,
     docElem = doc.documentElement;

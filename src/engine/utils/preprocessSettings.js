@@ -34,7 +34,7 @@ function preprocessArray(arr, elm, evt) {
   return ret;
 }
 
-module.exports = function (settings, elm, evt, forceLowerCase) {
+module.exports = function(settings, elm, evt, forceLowerCase) {
   if (!settings) {
     return settings;
   }

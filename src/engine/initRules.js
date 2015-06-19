@@ -4,8 +4,8 @@ var preprocessSettings = require('./utils/preprocessSettings');
 // TODO: Add a bunch of checks with error reporting.
 
 module.exports = function(rules, integrationRegistry, eventDelegates, conditionDelegates) {
-  function initEventDelegate(rule){
-    if (rule.events){
+  function initEventDelegate(rule) {
+    if (rule.events) {
 
       function trigger(event, relatedElement) {
         checkConditions(rule, event, relatedElement);
@@ -36,7 +36,7 @@ module.exports = function(rules, integrationRegistry, eventDelegates, conditionD
     runActions(rule, event, relatedElement);
   }
 
-  function runActions(rule, event, relatedElement){
+  function runActions(rule, event, relatedElement) {
     forEach(rule.actions, function(action) {
       action.settings = action.settings || {};
       forEach(action.integrationIds, function(integrationId) {
@@ -50,7 +50,7 @@ module.exports = function(rules, integrationRegistry, eventDelegates, conditionD
     });
   }
 
-  forEach(rules, function(rule){
+  forEach(rules, function(rule) {
     initEventDelegate(rule);
   });
 };

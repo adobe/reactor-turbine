@@ -1,11 +1,13 @@
 var assign = require('./object/assign');
 
-var matchUserAgent = function(regexs){
-  return function(userAgent){
-    for (var key in regexs){
+var matchUserAgent = function(regexs) {
+  return function(userAgent) {
+    for (var key in regexs) {
       var regex = regexs[key];
       var match = regex.test(userAgent);
-      if (match) return key;
+      if (match) {
+        return key;
+      }
     }
     return "Unknown";
   };
@@ -74,16 +76,16 @@ var getScreenWidth = function() {
 // Is a method because it has a likelihood of changing while the user is on the page.
 var getScreenHeight = function() {
   return window.screen.height;
-}
+};
 
 var colorDepth = window.screen.pixelDepth ? window.screen.pixelDepth : window.screen.colorDepth;
 
 var jsVersion = (function() {
   var
-      tm = new Date,
-      a,o,i,
-      j = '1.2',
-      pn = 0;
+    tm = new Date,
+    a, o, i,
+    j = '1.2',
+    pn = 0;
 
   if (tm.setUTCDate) {
     j = '1.3';
@@ -95,7 +97,7 @@ var jsVersion = (function() {
         i = 0;
         o = {};
         try {
-          i=new Iterator(o);
+          i = new Iterator(o);
           if (i.next) {
             j = '1.7';
             if (a.reduce) {
@@ -111,7 +113,8 @@ var jsVersion = (function() {
               }
             }
           }
-        } catch (e) {}
+        } catch (e) {
+        }
       }
     }
   }
@@ -127,7 +130,8 @@ var connectionType = (function() {
   try {
     document.body.addBehavior('#default#clientCaps');
     return document.body.connectionType;
-  } catch (e) {}
+  } catch (e) {
+  }
 })();
 
 // TODO: Can we get rid of this? It's used by the Analytics extension but is a deprecated browser API.
@@ -151,7 +155,8 @@ var isHomePage = (function() {
         topFrameSet = parent;
         parent = topFrameSet.parent;
       }
-    } catch (e) {}
+    } catch (e) {
+    }
 
     return topFrameSet;
   }
@@ -160,7 +165,8 @@ var isHomePage = (function() {
     document.body.addBehavior('#default#homePage');
     var isHomePage = document.body.isHomePage;
     return isHomePage ? isHomePage(getTopFrameSet().location) : false;
-  } catch (e) {}
+  } catch (e) {
+  }
 })();
 
 /**

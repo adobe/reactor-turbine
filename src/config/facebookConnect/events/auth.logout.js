@@ -5,5 +5,5 @@ module.exports = function(trigger) {
     FB.Event.subscribe('auth.logout', function(response) {
       trigger(response);
     });
-  })
+  });
 };

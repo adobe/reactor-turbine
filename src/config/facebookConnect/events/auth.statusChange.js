@@ -5,5 +5,5 @@ module.exports = function(trigger) {
     FB.Event.subscribe('auth.statusChange', function(response) {
       trigger(response);
     });
-  })
+  });
 };

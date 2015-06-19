@@ -7,11 +7,13 @@
 //
 // - `arr` - said array
 // - `obj` - said object
-module.exports = function(arr, obj){
-  if (arr.indexOf)
-    return arr.indexOf(obj)
+module.exports = function(arr, obj) {
+  if (arr.indexOf) {
+    return arr.indexOf(obj);
+  }
   for (var i = arr.length; i--;)
-    if (obj === arr[i])
-      return i
-  return -1
-}
+    if (obj === arr[i]) {
+      return i;
+    }
+  return -1;
+};

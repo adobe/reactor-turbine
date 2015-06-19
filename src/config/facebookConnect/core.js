@@ -18,7 +18,8 @@ function create(extensionSettings) {
       promise.then(function() {
         FB.getLoginStatus(function(response) {
           if (response.status !== 'connected') {
-            FB.login(function(){}, { scope: extensionSettings.scope });
+            FB.login(function() {
+            }, {scope: extensionSettings.scope});
           }
         });
       });

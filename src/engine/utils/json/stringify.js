@@ -19,8 +19,8 @@ function stringify(obj, seenValues) {
 
   if (isArray(obj)) {
     return '[' + map(obj, function(value) {
-          return stringify(value, seenValues);
-        }).join(',') + ']';
+        return stringify(value, seenValues);
+      }).join(',') + ']';
   } else if (isString(obj)) {
     return '"' + String(obj) + '"';
   }
@@ -33,6 +33,5 @@ function stringify(obj, seenValues) {
   } else {
     return String(obj);
   }
-};
-
+}
 module.exports = stringify;

@@ -22,7 +22,9 @@ var domReady = (function(ready) {
 
   function flush(f) {
     loaded = 1;
-    while (f = fns.shift()) f();
+    while (f = fns.shift()) {
+      f();
+    }
   }
 
   doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function() {

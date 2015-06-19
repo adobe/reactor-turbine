@@ -16,15 +16,20 @@ var privateData = {
   dataCache: {},
   uuid: 1
 };
-module.exports = function(elm, prop, val){
-  var __satellite__ = '__satellite__'
-  var cache = privateData.dataCache
-  var uuid = elm[__satellite__]
-  if (!uuid) uuid = elm[__satellite__] = privateData.uuid++
-  var datas = cache[uuid]
-  if (!datas) datas = cache[uuid] = {}
-  if (val === undefined)
-    return datas[prop]
-  else
-    datas[prop] = val
-}
+module.exports = function(elm, prop, val) {
+  var __satellite__ = '__satellite__';
+  var cache = privateData.dataCache;
+  var uuid = elm[__satellite__];
+  if (!uuid) {
+    uuid = elm[__satellite__] = privateData.uuid++;
+  }
+  var datas = cache[uuid];
+  if (!datas) {
+    datas = cache[uuid] = {};
+  }
+  if (val === undefined) {
+    return datas[prop];
+  } else {
+    datas[prop] = val;
+  }
+};

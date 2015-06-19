@@ -1,26 +1,29 @@
 var onLoad = function(url, script, callback) {
-  function cb(error){
+  function cb(error) {
     // TODO: Add logging.
     //if (error) SL.logError(error)
-    if (callback) callback(error)
+    if (callback) {
+      callback(error);
+    }
   }
-  if ('onload' in script){
-    script.onload = function(){
-      cb()
+
+  if ('onload' in script) {
+    script.onload = function() {
+      cb();
     };
-    script.onerror = function(){
-      cb(new Error('Failed to load script ' + url))
+    script.onerror = function() {
+      cb(new Error('Failed to load script ' + url));
     };
-  }else if ('readyState' in script){
-    script.onreadystatechange = function(){
+  } else if ('readyState' in script) {
+    script.onreadystatechange = function() {
       var rs = script.readyState;
-      if (rs === 'loaded' || rs === 'complete'){
+      if (rs === 'loaded' || rs === 'complete') {
         script.onreadystatechange = null;
         cb();
       }
-    }
+    };
   }
-}
+};
 
 module.exports = function(url, callback) {
   var script = document.createElement('script');

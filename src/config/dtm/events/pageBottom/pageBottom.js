@@ -22,7 +22,7 @@ window._satellite.pageBottom = function() {
       target: document.location
     };
 
-    forEach(triggers, function(trigger){
+    forEach(triggers, function(trigger) {
       trigger(pseudoEvent, document.location);
     });
   }

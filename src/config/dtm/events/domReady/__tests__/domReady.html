@@ -7,7 +7,7 @@
       var conditionSpy = jasmine.createSpy().and.returnValue(true);
       jasmine.clock().install();
       configureExtensionForEventTests(actionSpy);
-      configureRuleForEventTests([{ type: 'dtm.domReady' }], conditionSpy);
+      configureRuleForEventTests([{type: 'dtm.domReady'}], conditionSpy);
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/src/__tests__/helpers/testpage.js"></script>

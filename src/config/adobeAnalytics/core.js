@@ -128,11 +128,11 @@ assign(AdobeAnalytics.prototype, {
   _getTrackingURI: function(queryString) {
     var tagContainerMarker = 'D' + _satellite.appVersion;
     var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
-        Math.floor(Math.random() * 10000000000000);
+      Math.floor(Math.random() * 10000000000000);
     // TODO: Is this necessary or should we just leave off the protocol?
     var protocol = isHTTPS() ? 'https://' : 'http://';
     var uri = protocol + this._getTrackingServer() + '/b/ss/' + this.extensionSettings.account +
-        '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
+      '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
 
     if (queryString) {
       if (queryString[0] !== '?') {
@@ -148,13 +148,13 @@ assign(AdobeAnalytics.prototype, {
     var now = new Date();
     var year = now.getYear();
     return now.getDate() + '/'
-        + now.getMonth() + '/'
-        + (year < 1900 ? year + 1900 : year) + ' '
-        + now.getHours() + ':'
-        + now.getMinutes() + ':'
-        + now.getSeconds() + ' '
-        + now.getDay() + ' '
-        + now.getTimezoneOffset();
+      + now.getMonth() + '/'
+      + (year < 1900 ? year + 1900 : year) + ' '
+      + now.getHours() + ':'
+      + now.getMinutes() + ':'
+      + now.getSeconds() + ' '
+      + now.getDay() + ' '
+      + now.getTimezoneOffset();
   },
   _getTrackingServer: function() {
     // TODO: Use getAccount from tool since it deals with accountByHost? What is accountByHost anyway?
@@ -166,21 +166,21 @@ assign(AdobeAnalytics.prototype, {
     var account = this.extensionSettings.account;
 
     if (!account) {
-      return null
+      return null;
     }
 
     // based on code in AppMeasurement.
-    var c = ''
-    var dataCenter = this.extensionSettings.trackVars.dc || 'd1'
-    var e
-    var f
-    e = account.indexOf(",")
-    e >= 0 && (account = account.gb(0, e))
-    account = account.replace(/[^A-Za-z0-9]/g, "")
-    c || (c = "2o7.net")
-    c == "2o7.net" && (dataCenter == "d1" ? dataCenter = "112" : dataCenter == "d2" && (dataCenter = "122"), f = "")
-    e = account + "." + dataCenter + "." + f + c
-    return e
+    var c = '';
+    var dataCenter = this.extensionSettings.trackVars.dc || 'd1';
+    var e;
+    var f;
+    e = account.indexOf(",");
+    e >= 0 && (account = account.gb(0, e));
+    account = account.replace(/[^A-Za-z0-9]/g, "");
+    c || (c = "2o7.net");
+    c == "2o7.net" && (dataCenter == "d1" ? dataCenter = "112" : dataCenter == "d2" && (dataCenter = "122"), f = "");
+    e = account + "." + dataCenter + "." + f + c;
+    return e;
   },
   trackPageView: function(actionSettings) {
     var trackVars = {};
@@ -201,7 +201,7 @@ assign(AdobeAnalytics.prototype, {
 
     this._track(trackVars, actionSettings.trackEvents);
   },
-  _doesExtensionVarApplyToLinkTracking: function(varName){
+  _doesExtensionVarApplyToLinkTracking: function(varName) {
     return !/^(eVar[0-9]+)|(prop[0-9]+)|(hier[0-9]+)|campaign|purchaseID|channel|server|state|zip|pageType$/.test(varName);
   },
   trackLink: function(actionSettings) {

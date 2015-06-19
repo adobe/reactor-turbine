@@ -13,18 +13,18 @@ var isNumber = require('./../isType/isNumber');
 // * `fn` - function to be called repeatedly
 // * `freq` - frequency to call the function
 // * `max_retries` - number of times to retry
-module.exports = function(fn, freq, max_retries){
+module.exports = function(fn, freq, max_retries) {
   var retries = 0;
 
   freq = freq || 1000;
   check();
 
-  function check(){
+  function check() {
     if (isNumber(max_retries) && retries++ >= max_retries) {
       return;
     }
 
-    if (!fn()){
+    if (!fn()) {
       setTimeout(check, freq);
     }
   }

@@ -23,7 +23,7 @@ module.exports = function(selectorOrElements) {
   }
 
   var elements = isString(selectorOrElements) ?
-      querySelectorAll(selectorOrElements) : selectorOrElements;
+    querySelectorAll(selectorOrElements) : selectorOrElements;
 
   forEach(elements, function(element) {
     var numLocks = covertData(element, dataKey);
@@ -40,6 +40,7 @@ module.exports = function(selectorOrElements) {
   });
 
   var showCalled = false;
+
   function show() {
     // Don't allow this function to be called multiple times.
     if (showCalled) {
@@ -58,5 +59,5 @@ module.exports = function(selectorOrElements) {
     showCalled = true;
   }
 
-  return show
+  return show;
 };

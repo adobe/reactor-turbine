@@ -5,5 +5,5 @@ module.exports = function(trigger) {
     FB.Event.subscribe('comment.create', function(event) {
       trigger(event);
     });
-  })
+  });
 };

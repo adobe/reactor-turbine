@@ -10,7 +10,8 @@ config.coreDelegates = {
   testExtension: function(module, require) {
     module.exports = function() {
       return {
-        test: function() {}
+        test: function() {
+        }
       };
     };
   }
@@ -31,7 +32,7 @@ window.configureExtensionForEventTests = function(actionSpy) {
         test: actionSpy
       };
     };
-  }
+  };
 };
 
 /**
@@ -47,7 +48,9 @@ window.configureRuleForEventTests = function(events, conditionSpy) {
       {
         type: 'dtm.custom',
         settings: {
-          script: conditionSpy || function() { return true; }
+          script: conditionSpy || function() {
+            return true;
+          }
         }
       }
     ],

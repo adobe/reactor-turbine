@@ -2,41 +2,45 @@ var isString = require('./../isType/isString');
 var forEach = require('./../array/forEach');
 var escapeForHTML = require('./../string/escapeForHTML');
 
-function parseQueryParams(str){
-  var URIDecode = function (str) {
-    var result = str
+function parseQueryParams(str) {
+  var URIDecode = function(str) {
+    var result = str;
     try {
-      result = decodeURIComponent(str)
-    } catch(err) {}
+      result = decodeURIComponent(str);
+    } catch (err) {
+    }
 
-    return result
+    return result;
+  };
+
+  if (str === '' || isString(str) === false) {
+    return {};
   }
-
-  if (str === '' || isString(str) === false) return {}
   if (str.indexOf('?') === 0) {
-    str = str.substring(1)
+    str = str.substring(1);
   }
   var ret = {}
-    , pairs = str.split('&')
-  forEach(pairs, function(pair){
-    pair = pair.split('=')
+    , pairs = str.split('&');
+  forEach(pairs, function(pair) {
+    pair = pair.split('=');
     if (!pair[1]) {
-      return
+      return;
     }
-    ret[URIDecode(pair[0])] = escapeForHTML(URIDecode(pair[1]))
-  })
-  return ret
+    ret[URIDecode(pair[0])] = escapeForHTML(URIDecode(pair[1]));
+  });
+  return ret;
 }
 
 var caseSensitivityQueryParamsMap;
 function getCaseSensitivityQueryParamsMap(str) {
   if (!caseSensitivityQueryParamsMap) {
-    var mixCase = parseQueryParams(str)
-    var lowerCase = {}
+    var mixCase = parseQueryParams(str);
+    var lowerCase = {};
 
     for (var prop in mixCase)
-      if (mixCase.hasOwnProperty(prop))
-        lowerCase[prop.toLowerCase()] = mixCase[prop]
+      if (mixCase.hasOwnProperty(prop)) {
+        lowerCase[prop.toLowerCase()] = mixCase[prop];
+      }
 
     caseSensitivityQueryParamsMap = {
       mixCase: mixCase,

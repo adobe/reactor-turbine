@@ -9,6 +9,6 @@ var indexOf = require('./indexOf');
 //
 // - `arr` - said array
 // - `obj` - said object
-module.exports = function(arr, obj){
+module.exports = function(arr, obj) {
   return indexOf(arr, obj) !== -1;
 };

@@ -30,11 +30,11 @@ module.exports = function(selector, type, callback) {
   }
 };
 
-function addListenersToNewElements(config){
+function addListenersToNewElements(config) {
   var dataKey = 'dtm.liveListener.seen.' + config.id;
 
   var elements = querySelectorAll(config.selector);
-  forEach(elements, function(element){
+  forEach(elements, function(element) {
     if (covertData(element, dataKey)) {
       return;
     }

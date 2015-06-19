@@ -1,3 +1,3 @@
-module.exports = function(thing){
+module.exports = function(thing) {
   return typeof thing === 'function';
 };

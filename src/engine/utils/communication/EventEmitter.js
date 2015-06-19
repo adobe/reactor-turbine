@@ -1,7 +1,8 @@
 var assign = require('./../object/assign');
 var isFunction = require('./../isType/isFunction');
 
-var EventEmitter = function() {};
+var EventEmitter = function() {
+};
 
 EventEmitter.prototype.on = function(type, listener) {
   this._listenersByType = this._listenersByType || {};
@@ -66,7 +67,7 @@ EventEmitter.prototype.off = function(type, listener) {
 };
 
 EventEmitter.mixin = function(obj) {
-  assign(isFunction(obj) ? obj.prototype : obj,  EventEmitter.prototype);
+  assign(isFunction(obj) ? obj.prototype : obj, EventEmitter.prototype);
 };
 
 module.exports = EventEmitter;

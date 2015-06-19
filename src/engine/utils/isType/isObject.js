@@ -4,7 +4,7 @@ var isArray = require('./isArray');
 // -----------------
 //
 // Returns whether the given thing is a plain object.
-module.exports = function(thing){
+module.exports = function(thing) {
   return thing != null && !isArray(thing) &&
-      typeof thing === 'object'
-}
+    typeof thing === 'object';
+};

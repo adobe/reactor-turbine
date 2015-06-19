@@ -18,8 +18,8 @@ function startPolling() {
   }
 }
 
-module.exports = function(name, callback){
-  var listener = { name: name, callback: callback };
+module.exports = function(name, callback) {
+  var listener = {name: name, callback: callback};
   listeners.push(listener);
 
   startPolling();

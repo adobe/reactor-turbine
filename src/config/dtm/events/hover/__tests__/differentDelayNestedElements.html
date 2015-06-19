@@ -63,7 +63,7 @@
           expect(bConditionSpy.calls.count()).toEqual(1);
           expect(bConditionSpy.calls.mostRecent()).toEqual({
             object: b,
-            args: [{ type: 'hover(1000)', target: b }, b],
+            args: [{type: 'hover(1000)', target: b}, b],
             returnValue: true
           });
 
@@ -74,7 +74,7 @@
           expect(aConditionSpy.calls.count()).toEqual(1);
           expect(aConditionSpy.calls.mostRecent()).toEqual({
             object: a,
-            args: [{ type: 'hover(2000)', target: a }, a],
+            args: [{type: 'hover(2000)', target: a}, a],
             returnValue: true
           });
           expect(bConditionSpy.calls.count()).toEqual(1);

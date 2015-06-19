@@ -46,7 +46,7 @@ var createBeacon = function(config, successCallback, failCallback) {
    so it is always a success
    */
   var connection,
-      request = config.beaconURL;
+    request = config.beaconURL;
 
   // GET using an Image
   if (config.type === 'image') {

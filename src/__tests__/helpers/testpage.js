@@ -1,6 +1,6 @@
 (function() {
 
-  var domReady = (function (ready) {
+  var domReady = (function(ready) {
 
     var fns = [], fn, f = false
       , doc = document
@@ -13,16 +13,18 @@
 
     function flush(f) {
       loaded = 1;
-      while (f = fns.shift()) f();
+      while (f = fns.shift()) {
+        f();
+      }
     }
 
-    doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
+    doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function() {
       doc.removeEventListener(domContentLoaded, fn, f);
       flush();
     }, f);
 
 
-    hack && doc.attachEvent(onreadystatechange, (fn = function () {
+    hack && doc.attachEvent(onreadystatechange, (fn = function() {
       if (/^c/.test(doc.readyState)) {
         doc.detachEvent(onreadystatechange, fn);
         flush();
@@ -30,28 +32,32 @@
     }));
 
     return (ready = hack ?
-      function (fn) {
+      function(fn) {
         self != top ?
           loaded ? fn() : fns.push(fn) :
-          function () {
+          function() {
             try {
               testEl.doScroll('left');
             } catch (e) {
-              return setTimeout(function () {
+              return setTimeout(function() {
                 ready(fn);
               }, 50);
             }
             fn();
           }();
       } :
-      function (fn) {
+      function(fn) {
         loaded ? fn() : fns.push(fn);
       });
   }());
 
   var addEventListener = window.addEventListener ?
-    function(node, evt, cb){ node.addEventListener(evt, cb, false); } :
-    function(node, evt, cb){ node.attachEvent('on' + evt, cb); };
+    function(node, evt, cb) {
+      node.addEventListener(evt, cb, false);
+    } :
+    function(node, evt, cb) {
+      node.attachEvent('on' + evt, cb);
+    };
 
   var page = {
     queue: [],
@@ -79,8 +85,8 @@
   //}
 
   function waitForDOMLoaded() {
-    page.queue.push(function (next) {
-      domReady(function () {
+    page.queue.push(function(next) {
+      domReady(function() {
         next();
       });
     });
@@ -215,7 +221,7 @@
   //}
 
   function execute(cb) {
-    page.queue.push(function (next) {
+    page.queue.push(function(next) {
       cb(page);
       next();
     });
@@ -236,7 +242,9 @@
 
     function next() {
       var cb = queue[idx++];
-      if (!cb) return done();
+      if (!cb) {
+        return done();
+      }
       cb(next);
     }
 
@@ -398,7 +406,7 @@
   //  return page;
   //}
 
-  window.onerror = function (err, url, line) {
+  window.onerror = function(err, url, line) {
     fail(err + ' at ' + url + ' on line ' + line);
   };
 })();

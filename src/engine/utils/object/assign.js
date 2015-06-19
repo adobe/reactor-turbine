@@ -1,4 +1,4 @@
-module.exports = function(target){
+module.exports = function(target) {
   for (var i = 1; i < arguments.length; i++) {
     var from = arguments[i];
     if (from === null || from === undefined) {

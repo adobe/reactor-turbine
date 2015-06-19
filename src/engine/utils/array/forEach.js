@@ -12,7 +12,7 @@
 //      * `index` - the array index of said item
 //      * `arr` - the array
 // - `context` - the context to be bound to `func` when it is invoked
-module.exports = function(arr, func, context){
+module.exports = function(arr, func, context) {
   for (var i = 0, len = arr.length; i < len; i++)
     func.call(context, arr[i], i, arr)
-}
+};

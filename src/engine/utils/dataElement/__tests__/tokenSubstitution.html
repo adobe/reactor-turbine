@@ -24,7 +24,7 @@
       };
 
       config.eventDelegates = {
-        testEvent: function(module, require){
+        testEvent: function(module, require) {
           var allTriggers = [];
 
           _satellite.triggerTestEvent = function() {
@@ -49,7 +49,7 @@
             allTriggers.push(trigger);
           };
         }
-      }
+      };
 
       config.rules = [
         {

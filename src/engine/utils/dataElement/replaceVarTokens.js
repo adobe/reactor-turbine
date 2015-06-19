@@ -11,13 +11,16 @@ var getVar = require('./getVar');
 // - `elm`(optional) - object or element to use for substitutions of the form `%this.property%`
 // - `target`(optional) - element to use for subsitution of the form `%target.property%`
 module.exports = function(str, elm, evt) {
-  if (typeof str !== 'string') return str
+  if (typeof str !== 'string') {
+    return str;
+  }
   return str
-    .replace(/%(.*?)%/g, function(m, variable){
-      var val = getVar(variable, elm, evt)
-      if (val == null)
-        return m
-      else
-        return val
-    })
+    .replace(/%(.*?)%/g, function(m, variable) {
+      var val = getVar(variable, elm, evt);
+      if (val == null) {
+        return m;
+      } else {
+        return val;
+      }
+    });
 };

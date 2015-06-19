@@ -5,5 +5,5 @@ module.exports = function(trigger) {
     FB.Event.subscribe('comment.remove', function(event) {
       trigger(event);
     });
-  })
+  });
 };

@@ -31,8 +31,7 @@ function getMboxByName(name) {
       return mbox;
     }
   }
-};
-
+}
 var mbox = function(name, setOfferCallback) {
   this.name = name;
   this.setOfferCallback = setOfferCallback;
@@ -40,7 +39,8 @@ var mbox = function(name, setOfferCallback) {
 mbox.prototype.setOffer = function(mboxOfferAjax) {
   this.setOfferCallback(mboxOfferAjax.content);
   return {
-    show: function() {}
+    show: function() {
+    }
   };
 };
 mbox.prototype.getOffer = function() {
@@ -48,11 +48,14 @@ mbox.prototype.getOffer = function() {
     setOnLoad: function(fn) {
       fn(); // Normally not called until mbox.loaded() is called.
     }
-  }
+  };
 };
-mbox.prototype.loaded = function() {};
-mbox.prototype.setEventTime = function() {};
-mbox.prototype.cancelTimeout = function() {};
+mbox.prototype.loaded = function() {
+};
+mbox.prototype.setEventTime = function() {
+};
+mbox.prototype.cancelTimeout = function() {
+};
 
 window.mboxFactories = {
   get: function() {
@@ -60,15 +63,18 @@ window.mboxFactories = {
       get: getMboxByName,
       getPCId: function() {
         return {
-          forceId: function() {}
-        }
+          forceId: function() {
+          }
+        };
       }
-    }
+    };
   }
 };
 
-var mboxOfferDefault = function() {};
-mboxOfferDefault.prototype.show = function() {};
+var mboxOfferDefault = function() {
+};
+mboxOfferDefault.prototype.show = function() {
+};
 window.mboxOfferDefault = mboxOfferDefault;
 
 window.mboxOfferAjax = function(content) {
@@ -109,7 +115,7 @@ assign(AdobeTarget.prototype, {
   // TODO: Should this be a DTM util?
   _getTime: function() {
     var now = new Date();
-    return now.getTime() - (now.getTimezoneOffset() * MILLIS_IN_MINUTE)
+    return now.getTime() - (now.getTimezoneOffset() * MILLIS_IN_MINUTE);
   },
   addMbox: function(actionSettings) {
     if (getMboxByName(actionSettings.name)) {
@@ -164,8 +170,8 @@ assign(AdobeTarget.prototype, {
     var requestType = 'ajax';
 
     var url = protocol + '//' + this._extensionSettings.serverHost + '/m2/' +
-        this._extensionSettings.clientCode + '/mbox/' + requestType + '?' +
-        encodeObjectToURI(args);
+      this._extensionSettings.clientCode + '/mbox/' + requestType + '?' +
+      encodeObjectToURI(args);
 
     loadScript(url);
   }

@@ -7,7 +7,7 @@ var forEach = require('forEach');
  */
 var triggers = [];
 
-addEventListener(window, 'load', function(){
+addEventListener(window, 'load', function() {
   var pseudoEvent = {
     type: 'windowload',
     target: document.location

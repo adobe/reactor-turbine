@@ -6,4 +6,4 @@
 // - `attrName` - attribute name
 module.exports = function(element, attrName) {
   return element.hasAttribute ? element.hasAttribute(attrName) : element[attrName] !== undefined;
-}
+};

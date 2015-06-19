@@ -7,7 +7,7 @@ var cleanText = require('./../string/cleanText');
 //     this.@text
 module.exports = {
   text: getElementText,
-  cleanText: function(obj){
-    return cleanText(getElementText(obj))
+  cleanText: function(obj) {
+    return cleanText(getElementText(obj));
   }
-}
+};

@@ -65,7 +65,7 @@ module.exports = function() {
           }
 
           if ((node === event.target || listener.settings.bubbleFireIfParent) &&
-              matchesCSS(listener.settings.selector, node)) {
+            matchesCSS(listener.settings.selector, node)) {
 
             listener.callback(event, node);
 

@@ -10,7 +10,9 @@
   var IFrameJasmine = function(iframeWindow) {
     var _clock = new jasmine.Clock(
       iframeWindow,
-      function () { return new jasmine.DelayedFunctionScheduler(); },
+      function() {
+        return new jasmine.DelayedFunctionScheduler();
+      },
       new jasmine.MockDate(iframeWindow));
     this.clock = function() {
       return _clock;

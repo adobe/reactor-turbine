@@ -21,5 +21,5 @@ describe('forEach', function() {
     forEach(letters, handler, context);
 
     expect(handler.calls.first().object).toBe(context);
-  })
+  });
 });

@@ -16,17 +16,17 @@ module.exports = function(variable, suppressDefault, dataDef) {
   }
 
   if (value === undefined && storeLength) {
-    value = dataElementSafe(variable, storeLength)
+    value = dataElementSafe(variable, storeLength);
   } else if (value !== undefined && storeLength) {
-    dataElementSafe(variable, storeLength, value)
+    dataElementSafe(variable, storeLength, value);
   }
   if (value === undefined && !suppressDefault) {
     // Have to wrap "default" in quotes since it is a keyword.
-    value = dataDef.settings['default'] || ''
+    value = dataDef.settings['default'] || '';
   }
 
   if (dataDef.forceLowerCase) {
-    value = value.toLowerCase()
+    value = value.toLowerCase();
   }
-  return value
-}
+  return value;
+};

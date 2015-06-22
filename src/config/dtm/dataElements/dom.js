@@ -1,5 +1,3 @@
-var elementHasAttribute = require('elementHasAttribute');
-
 module.exports = function(settings) {
   var elements = document.querySelectorAll(settings.selector);
   if (elements.length > 0) {
@@ -8,8 +6,8 @@ module.exports = function(settings) {
     // TODO Can we use getObjectProperty() here or at least getElementText()?
     if (settings.property === 'text') {
       return element.innerText || element.textContent;
-    } else if (elementHasAttribute(element, settings.property)) {
-      return element[settings.property] || element.getAttribute(settings.property);
+    } else if (element.hasAttribute(settings.property)) {
+      return element.getAttribute(settings.property);
     }
   }
 };

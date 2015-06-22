@@ -27,7 +27,6 @@ var resources = {
     require('./utils/dom/isAnchor')(element, true);
   },
   'readCookie': require('./utils/cookie/readCookie'),
-  'elementHasAttribute': require('./utils/dom/hasAttribute'),
   'getObjectProperty': require('./utils/dataElement/getObjectProperty'),
   'bubbly': require('./utils/bubbly'),
   'addLiveEventListener': require('./utils/communication/addLiveEventListener')

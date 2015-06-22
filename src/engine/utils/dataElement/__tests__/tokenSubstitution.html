@@ -40,6 +40,7 @@
 
               var relatedElement = document.createElement('span');
               relatedElement.id = 'kazoo';
+              relatedElement.innerHTML = '  <a href="#">Content with non-ASCII Ä and multiple   spaces</a>';
 
               trigger(pseudoEvent, relatedElement);
             });
@@ -74,14 +75,20 @@
               settings: {
                 dataElementBased: '%treat%',
                 dataElementPriorityBased: '%vegetable%',
+                dataElementDefaultBased: '%meat%',
+                dataElementPageViewBased: '%beverage:pageview%',
+                dataElementVisitorBased: '%beverage:visitor%',
+                dataElementSessionBased: '%beverage:session%',
                 URIBased: '%URI%',
                 uriBased: '%uri%',
                 protocolBased: '%protocol%',
                 hostnameBased: '%hostname%',
                 thisBased: '%this.id%',
+                thisTextBased: '%this.@text%',
+                thisCleanTextBased: '%this.@cleanText%',
                 eventBased: '%event.fruit%',
                 targetBased: '%target.id%',
-                windowBased: '%window.location.protocol%',
+                windowBased: '%window.my.nested.thing%',
                 paramBased: '%param.fooParam%',
                 randBased: '%rand3%',
                 customBased: '%instrument%',
@@ -101,19 +108,52 @@
 
       config.dataElements = [
         {
-          "name": "treat",
-          "type": "testExtension.static",
-          "settings": {
-            "staticValue": "ice cream"
+          name: "treat",
+          type: "testExtension.static",
+          settings: {
+            staticValue: "Ice Cream  ¥  ",
+            forceLowerCase: true,
+            cleanText: true
           }
         },
         {
-          "name": "vegetable",
-          "type": "testExtension.static",
-          "settings": {
-            "staticValue": "carrot"
+          name: "vegetable",
+          type: "testExtension.static",
+          settings: {
+            staticValue: "carrot"
           }
-        }
+        },
+        {
+          name: "meat",
+          type: "testExtension.static",
+          settings: {
+            default: "default meat"
+          }
+        },
+        {
+          name: "beverage:pageview",
+          type: "testExtension.static",
+          settings: {
+            staticValue: 'Piña Colada',
+            storeLength: 'pageview'
+          }
+        },
+        {
+          name: "beverage:visitor",
+          type: "testExtension.static",
+          settings: {
+            staticValue: 'Soda',
+            storeLength: 'visitor'
+          }
+        },
+        {
+          name: "beverage:session",
+          type: "testExtension.static",
+          settings: {
+            staticValue: 'Fruit Punch',
+            storeLength: 'session'
+          }
+        },
       ];
     </script>
     <script src="/base/dist/engine.js"></script>
@@ -121,6 +161,12 @@
     <script>
       TestPage
         .execute(function() {
+          window.my = {
+            nested: {
+              thing: 'applejacks'
+            }
+          };
+
           _satellite.setVar('instrument', 'piccolo');
           _satellite.setVar('vegetable', 'onion');
 
@@ -135,14 +181,23 @@
           // Both a data element and a custom variable (set using setVar) named "vegetable" have
           // been set. The data element has a higher priority.
           expect(actionSettings.dataElementPriorityBased).toBe('carrot');
+          expect(actionSettings.dataElementDefaultBased).toBe('default meat');
+          expect(actionSettings.dataElementPageViewBased).toBe('Piña Colada');
+          expect(document.cookie.indexOf('_sdsat_beverage:pageview=Piña Colada')).toBe(-1);
+          expect(actionSettings.dataElementVisitorBased).toBe('Soda');
+          expect(document.cookie.indexOf('_sdsat_beverage:visitor=Soda') > -1).toBe(true);
+          expect(actionSettings.dataElementSessionBased).toBe('Fruit Punch');
+          expect(document.cookie.indexOf('_sdsat_beverage:session=Fruit Punch') > -1).toBe(true);
           expect(actionSettings.URIBased).toBe(document.location.pathname + document.location.search);
           expect(actionSettings.uriBased).toBe(document.location.pathname + document.location.search);
           expect(actionSettings.protocolBased).toBe(window.location.protocol);
           expect(actionSettings.hostnameBased).toBe(document.location.hostname);
           expect(actionSettings.thisBased).toBe('kazoo');
+          expect(actionSettings.thisTextBased).toBe('  Content with non-ASCII Ä and multiple   spaces');
+          expect(actionSettings.thisCleanTextBased).toBe('Content with non-ASCII and multiple spaces');
           expect(actionSettings.eventBased).toBe('apple');
           expect(actionSettings.targetBased).toBe('fruitPartyBowl');
-          expect(actionSettings.windowBased).toBe(window.location.protocol);
+          expect(actionSettings.windowBased).toBe('applejacks');
           expect(actionSettings.paramBased).toBe('barValue');
           expect(typeof actionSettings.randBased).toBe('string');
           expect(actionSettings.randBased.length).toBe(3);

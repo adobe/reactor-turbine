@@ -11,7 +11,8 @@ module.exports = function(variable, suppressDefault, dataDef) {
   var delegate = dataElementDelegates.get(dataDef.type);
   var value = delegate(dataDef.settings);
 
-  if (dataDef.cleanText) {
+  // TODO: Move this to data element delegates?
+  if (dataDef.settings.cleanText) {
     value = cleanText(value);
   }
 
@@ -25,7 +26,8 @@ module.exports = function(variable, suppressDefault, dataDef) {
     value = dataDef.settings['default'] || '';
   }
 
-  if (dataDef.forceLowerCase) {
+  // TODO: Move this to data element delegates?
+  if (dataDef.settings.forceLowerCase) {
     value = value.toLowerCase();
   }
   return value;

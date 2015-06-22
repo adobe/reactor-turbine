@@ -202,6 +202,10 @@
           expect(typeof actionSettings.randBased).toBe('string');
           expect(actionSettings.randBased.length).toBe(3);
           expect(actionSettings.customBased).toBe('piccolo');
+          expect(_satellite.getVar('instrument')).toBe('piccolo');
+          // Note that even though "onion" was set through setVar() the configured data element
+          // still takes precedence.
+          expect(_satellite.getVar('vegetable')).toBe('carrot');
         })
         .start();
     </script>

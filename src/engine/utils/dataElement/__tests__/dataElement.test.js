@@ -1,3 +1,3 @@
 describe('Data Element Tests', function() {
-  frunTestPage('tokenSubstitution.html?fooParam=barValue');
+  runTestPage('dataElements.html?fooParam=barValue');
 });

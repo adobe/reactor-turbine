@@ -1,4 +1,3 @@
-var stringify = require('./json/stringify');
 var encodeObjectToURI = require('./uri/encodeObjectToURI');
 var clientInfo = require('./clientInfo');
 
@@ -61,7 +60,7 @@ var createBeacon = function(config, successCallback, failCallback) {
   }
 
   if (config.type === 'form') {
-    createIframeBeacon(config.url, stringify(config.beaconData), successCallback);
+    createIframeBeacon(config.url, JSON.stringify(config.beaconData), successCallback);
   }
 
   // Default POST via ajax
@@ -91,7 +90,7 @@ var createBeacon = function(config, successCallback, failCallback) {
 
   if (config.type === 'ajax') {
     connection.open('POST', request, true);
-    connection.send(stringify(config.beaconData));
+    connection.send(JSON.stringify(config.beaconData));
   } else if (config.type === 'image') {
     connection.src = request;
   }

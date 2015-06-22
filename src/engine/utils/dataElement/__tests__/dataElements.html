@@ -40,7 +40,7 @@
 
               var relatedElement = document.createElement('span');
               relatedElement.id = 'kazoo';
-              relatedElement.innerHTML = '  <a href="#">Content with non-ASCII Ä and multiple   spaces</a>';
+              relatedElement.innerHTML = '  <a href="#">Content with line \n breaks and multiple   spaces</a>';
 
               trigger(pseudoEvent, relatedElement);
             });
@@ -111,7 +111,7 @@
           name: "treat",
           type: "testExtension.static",
           settings: {
-            staticValue: "Ice Cream  ¥  ",
+            staticValue: "Ice   \n Cream  \n  ",
             forceLowerCase: true,
             cleanText: true
           }
@@ -193,8 +193,8 @@
           expect(actionSettings.protocolBased).toBe(window.location.protocol);
           expect(actionSettings.hostnameBased).toBe(document.location.hostname);
           expect(actionSettings.thisBased).toBe('kazoo');
-          expect(actionSettings.thisTextBased).toBe('  Content with non-ASCII Ä and multiple   spaces');
-          expect(actionSettings.thisCleanTextBased).toBe('Content with non-ASCII and multiple spaces');
+          expect(actionSettings.thisTextBased).toBe('  Content with line \n breaks and multiple   spaces');
+          expect(actionSettings.thisCleanTextBased).toBe('Content with line breaks and multiple spaces');
           expect(actionSettings.eventBased).toBe('apple');
           expect(actionSettings.targetBased).toBe('fruitPartyBowl');
           expect(actionSettings.windowBased).toBe('applejacks');

@@ -125,6 +125,17 @@ gulp.task('watch', function() {
   gulp.watch(['./src/engine/**/!(__tests__)/*.js'], ['buildEngine']);
 });
 
+gulp.task('lint', function() {
+  return gulp.src('./src/**/*.js')
+    .pipe($.eslint())
+    // eslint.format() outputs the lint results to the console.
+    // Alternatively use eslint.formatEach() (see Docs).
+    .pipe($.eslint.format('stylish'))
+    // To have the process exit with an error code (1) on
+    // lint error, return the stream and pipe to failOnError last.
+    .pipe($.eslint.failAfterError());
+});
+
 gulp.task('default', ['buildConfig', 'buildEngine', 'watch']);
 
 gulp.task('buildCreateBeacon', require('./standAloneMethods/gulp/createBeaconTask.js'));

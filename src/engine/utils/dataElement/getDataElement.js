@@ -27,7 +27,7 @@ module.exports = function(variable, suppressDefault, dataDef) {
   }
 
   // TODO: Move this to data element delegates?
-  if (dataDef.settings.forceLowerCase) {
+  if (dataDef.settings.forceLowerCase && value.toLowerCase) {
     value = value.toLowerCase();
   }
   return value;

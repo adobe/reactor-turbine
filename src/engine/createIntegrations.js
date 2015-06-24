@@ -1,15 +1,23 @@
 var Promise = require('./utils/communication/Promise');
+var preprocessSettings = require('./utils/preprocessSettings');
 
 /**
- * Instantiates integrations.
- * @returns {Object} Object where the key is the instance ID and the value is the instance.
+ * Initializes integrations.
  */
-module.exports = function(integrationsMetas, integrationRegistry, coreDelegates) {
-  function createProxies() {
-    var proxyByInstanceId = {};
+module.exports = function(integrations, integrationRegistry, coreDelegates, propertySettings) {
+  /**
+   * Creates promises that represent each integration. The integrations haven't been initialized
+   * at this point. This allows an integration, while it's being initialized, to access the
+   * promises of other integrations that have yet to be initialized. This also allows the engine
+   * to not have to be aware of dependencies between integrations (making sure one is initialized
+   * before another, etc.)
+   * @returns {Object} Object where the key is the integration ID and the value is the promise.
+   */
+  function createProxyPromises() {
+    var promiseByIntegrationId = {};
 
-    for (var instanceId in integrationsMetas) {
-      var instanceMeta = integrationsMetas[instanceId];
+    for (var integrationId in integrations) {
+      var integration = integrations[integrationId];
 
       var proxy = {};
 
@@ -18,30 +26,36 @@ module.exports = function(integrationsMetas, integrationRegistry, coreDelegates)
         proxy.reject = reject;
       });
 
-      proxyByInstanceId[instanceId] = proxy;
+      promiseByIntegrationId[integrationId] = proxy;
 
-      integrationRegistry.register(instanceId, instanceMeta.type, promise);
+      integrationRegistry.register(integrationId, integration.type, promise);
     }
 
-    return proxyByInstanceId;
+    return promiseByIntegrationId;
   }
 
-  // Add proxies to require repo.
-  var proxies = createProxies();
+  function initializeIntegrations(proxyPromises) {
+    // Initialize each integration.
+    for (var integrationId in integrations) {
+      var integration = integrations[integrationId];
+      integration.settings = integration.settings || {};
+      var delegate = coreDelegates.get(integration.type);
+      var preprocessedSettings = preprocessSettings(
+        integration.settings,
+        propertySettings.undefinedVarsReturnEmpty);
+      var result = delegate(preprocessedSettings);
 
-  for (var instanceId in integrationsMetas) {
-    var instanceMeta = integrationsMetas[instanceId];
-    instanceMeta.settings = instanceMeta.settings || {};
-    var delegate = coreDelegates.get(instanceMeta.type);
-    var result = delegate(instanceMeta.settings);
-
-    if (!(result instanceof Promise)) {
-      result = new Promise(function(resolve) {
-        resolve(result);
-      });
+      // Get the proxy promise that was created beforehand for the integration and make sure it's
+      // resolved or rejected by the promise the integration actually returned. If the integration
+      // didn't return a promise then we can go ahead and resolve the proxy promise immediately.
+      var proxy = proxyPromises[integrationId];
+      if (result instanceof Promise) {
+        result.then(proxy.resolve, proxy.reject);
+      } else {
+        proxy.resolve(result);
+      }
     }
-
-    var proxy = proxies[instanceId];
-    result.then(proxy.resolve, proxy.reject);
   }
+
+  initializeIntegrations(createProxyPromises());
 };

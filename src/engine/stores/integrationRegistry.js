@@ -11,6 +11,10 @@ function getByWhitelist(source, whitelist) {
   return dest;
 }
 
+/**
+ * Stores integration instances (promises).
+ * @type {{register: Function, getById: Function, getByType: Function, getMappedById: Function, getMappedByType: Function}}
+ */
 module.exports = {
   register: function(id, type, instance) {
     instanceById[id] = instance;

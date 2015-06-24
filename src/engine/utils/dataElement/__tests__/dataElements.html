@@ -9,17 +9,23 @@
 
       config.integrations = {
         'abc': {
-          type: 'testExtension'
+          type: 'testExtension',
+          settings: {
+            mmmtreats: '%treat%',
+            accountId: 123
+          }
         }
       };
 
+      var coreDelegateSpy = jasmine.createSpy().and.callFake(function() {
+        return {
+          test: actionSpy
+        };
+      });
+
       config.coreDelegates = {
         testExtension: function(module, require) {
-          module.exports = function() {
-            return {
-              test: actionSpy
-            };
-          };
+          module.exports = coreDelegateSpy
         }
       };
 
@@ -60,14 +66,6 @@
               name: 'foo'
             }
           }],
-//          conditions: [
-//            {
-//              type: 'dtm.custom',
-//              settings: {
-//                script: conditionSpy || function() { return true; }
-//              }
-//            }
-//          ],
           actions: [
             {
               integrationIds: ['abc'],
@@ -76,6 +74,7 @@
                 dataElementBased: '%treat%',
                 dataElementPriorityBased: '%vegetable%',
                 dataElementDefaultBased: '%meat%',
+                dataElementIntegerBased: '%bottlesofbeeronthewall%',
                 dataElementPageViewBased: '%beverage:pageview%',
                 dataElementVisitorBased: '%beverage:visitor%',
                 dataElementSessionBased: '%beverage:session%',
@@ -92,6 +91,7 @@
                 paramBased: '%param.fooParam%',
                 randBased: '%rand3%',
                 customBased: '%instrument%',
+                undefinedBased: '%notdefined%',
               }
             }
           ]
@@ -131,6 +131,14 @@
           }
         },
         {
+          name: 'bottlesofbeeronthewall',
+          type: 'testExtension.static',
+          settings: {
+            staticValue: 99,
+            forceLowerCase: true
+          }
+        },
+        {
           name: "beverage:pageview",
           type: "testExtension.static",
           settings: {
@@ -153,8 +161,10 @@
             staticValue: 'Fruit Punch',
             storeLength: 'session'
           }
-        },
+        }
       ];
+
+      config.settings.undefinedVarsReturnEmpty = true;
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/src/__tests__/helpers/testpage.js"></script>
@@ -170,6 +180,13 @@
           _satellite.setVar('instrument', 'piccolo');
           _satellite.setVar('vegetable', 'onion');
 
+          expect(coreDelegateSpy.calls.argsFor(0)).toEqual([
+            {
+              mmmtreats: 'ice cream',
+              accountId: 123
+            }
+          ]);
+
           _satellite.triggerTestEvent();
 
           // Actions are always run asynchronously.
@@ -182,6 +199,7 @@
           // been set. The data element has a higher priority.
           expect(actionSettings.dataElementPriorityBased).toBe('carrot');
           expect(actionSettings.dataElementDefaultBased).toBe('default meat');
+          expect(actionSettings.dataElementIntegerBased).toBe('99');
           expect(actionSettings.dataElementPageViewBased).toBe('Piña Colada');
           expect(document.cookie.indexOf('_sdsat_beverage:pageview=Piña Colada')).toBe(-1);
           expect(actionSettings.dataElementVisitorBased).toBe('Soda');
@@ -202,10 +220,16 @@
           expect(typeof actionSettings.randBased).toBe('string');
           expect(actionSettings.randBased.length).toBe(3);
           expect(actionSettings.customBased).toBe('piccolo');
+          // undefinedVarsReturnEmpty=true on property settings so it returns an empty string
+          expect(actionSettings.undefinedBased).toBe('');
           expect(_satellite.getVar('instrument')).toBe('piccolo');
+          expect(_satellite.getVar('bottlesofbeeronthewall')).toBe(99);
           // Note that even though "onion" was set through setVar() the configured data element
           // still takes precedence.
           expect(_satellite.getVar('vegetable')).toBe('carrot');
+          // When undefinedVarsReturnEmpty is true on property settings, getVar() still returns
+          // undefined. It only returns an empty string when using a %% token for some reason.
+          expect(_satellite.getVar('undefinedBased')).toBe(undefined);
         })
         .start();
     </script>

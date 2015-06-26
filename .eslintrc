@@ -21,7 +21,8 @@
     "no-underscore-dangle": 0,
     "comma-style": [2],
     "one-var": [2, "never"],
-    "brace-style": [2, "1tbs", { "allowSingleLine": true }]
+    "brace-style": [2, "1tbs", { "allowSingleLine": true }],
+    "consistent-this": [0, "self"]
   },
   "globals": {
     "Simulate": true,

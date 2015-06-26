@@ -72,6 +72,9 @@ module.exports = function(config) {
 
     captureTimeout: 60000,
 
+    // Necessary because of https://github.com/webpack/karma-webpack/issues/44
+    autoWatchBatchDelay: 1000,
+
     singleRun: false,
 
     plugins: [

@@ -55,8 +55,8 @@ var createBeacon = function(config, successCallback, failCallback) {
     if (clientInfo.browser === 'IE') {
       request = request.substring(0, 2047);
     }
-    connection = new Image;
-    connection.alt = "";
+    connection = new Image();
+    connection.alt = '';
   }
 
   if (config.type === 'form') {
@@ -64,19 +64,22 @@ var createBeacon = function(config, successCallback, failCallback) {
   }
 
   // Default POST via ajax
-  connection = connection ? connection : new XMLHttpRequest;
+  connection = connection ? connection : new XMLHttpRequest();
 
 
   connection.success = function() {
-    successCallback ? successCallback(connection) : '';
+    if (successCallback) {
+      successCallback(connection);
+    }
   };
 
   connection.onload = connection.src ? connection.success : undefined;
 
 
   connection.onabort = connection.onerror = connection.failure = function() {
-    console.log('beacon failed');
-    failCallback ? failCallback(connection) : '';
+    if (failCallback) {
+      failCallback(connection);
+    }
   };
   connection.onreadystatechange = function() {
     if (connection.readyState === 4) {

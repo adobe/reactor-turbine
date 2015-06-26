@@ -3,7 +3,10 @@ var isObject = require('./isType/isObject');
 var isArray = require('./isType/isArray');
 var replaceVarTokens = require('./dataElement/replaceVarTokens');
 
-function preprocessObject(obj, undefinedVarsReturnEmpty, elm, evt) {
+var preprocessObject;
+var preprocessArray;
+
+preprocessObject = function(obj, undefinedVarsReturnEmpty, elm, evt) {
   var ret = {};
   for (var key in obj) {
     if (obj.hasOwnProperty(key)) {
@@ -18,9 +21,9 @@ function preprocessObject(obj, undefinedVarsReturnEmpty, elm, evt) {
     }
   }
   return ret;
-}
+};
 
-function preprocessArray(arr, undefinedVarsReturnEmpty, elm, evt) {
+preprocessArray = function(arr, undefinedVarsReturnEmpty, elm, evt) {
   var ret = [];
   for (var i = 0, len = arr.length; i < len; i++) {
     var value = arr[i];
@@ -32,7 +35,7 @@ function preprocessArray(arr, undefinedVarsReturnEmpty, elm, evt) {
     ret.push(value);
   }
   return ret;
-}
+};
 
 module.exports = function(settings, undefinedVarsReturnEmpty, elm, evt) {
   if (!settings) {

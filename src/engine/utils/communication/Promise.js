@@ -1,4 +1,5 @@
-// TODO: Promiscuous doesn't match our browser support requirements.
+/*eslint-disable */
+
 /**@license MIT-promiscuous library-©2013 Ruben Verborgh*/
 (function (func, obj) {
   // Type checking utility function

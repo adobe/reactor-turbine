@@ -16,10 +16,10 @@ var removeCookie = require('./utils/cookie/removeCookie');
 var _satellite = window._satellite;
 var property = _satellite.getConfig();
 
-_satellite.pageBottom = function() {
-}; // Will get replaced if a rule is configured with a page bottom event trigger.
-_satellite.track = function() {
-}; // Will get replaced if a rule is configured with a direct call event trigger.
+// Will get replaced if a rule is configured with a page bottom event trigger.
+_satellite.pageBottom = function() {};
+// Will get replaced if a rule is configured with a direct call event trigger.
+_satellite.track = function() {};
 _satellite.appVersion = property.appVersion;
 // TODO: _satellite.notify
 _satellite.getVar = getVar;
@@ -38,6 +38,15 @@ conditionDelegates.init(property.conditionDelegates);
 dataElementDefinitions.init(property.dataElements);
 coreDelegates.init(property.coreDelegates);
 
-createIntegrations(property.integrations, integrationRegistry, coreDelegates, property.settings);
-initRules(property.rules, property.settings, integrationRegistry, eventDelegates, conditionDelegates);
+createIntegrations(
+  property.integrations,
+  integrationRegistry,
+  coreDelegates,
+  property.settings);
 
+initRules(
+  property.rules,
+  property.settings,
+  integrationRegistry,
+  eventDelegates,
+  conditionDelegates);

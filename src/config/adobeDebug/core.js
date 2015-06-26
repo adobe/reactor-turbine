@@ -1,4 +1,7 @@
-var AdobeDebug = function(extensionSettings) {
+/*eslint no-alert:0*/
+'use strict';
+
+var AdobeDebug = function() {
 };
 
 AdobeDebug.prototype.alert = function(actionSettings) {

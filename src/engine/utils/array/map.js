@@ -10,7 +10,8 @@
 // a the value you want in the corresponding index of the returned array.
 module.exports = function(arr, func, context) {
   var ret = [];
-  for (var i = 0, len = arr.length; i < len; i++)
-    ret.push(func.call(context, arr[i], i, arr))
+  for (var i = 0, len = arr.length; i < len; i++) {
+    ret.push(func.call(context, arr[i], i, arr));
+  }
   return ret;
 };

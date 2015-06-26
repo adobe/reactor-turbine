@@ -1,3 +1,5 @@
+'use strict';
+
 var indexOf = require('../indexOf');
 
 var letters = ['A', 'B', 'C'];

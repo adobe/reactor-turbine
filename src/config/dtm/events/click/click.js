@@ -1,3 +1,5 @@
+'use strict';
+
 var bubbly = require('bubbly');
 var addLiveEventListener = require('addLiveEventListener');
 

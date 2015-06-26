@@ -1,3 +1,6 @@
+/*global FB*/
+'use strict';
+
 var loadScript = require('loadScript');
 
 // Only a single integration is supported primarily because the Facebook SDK only supports

@@ -1,3 +1,5 @@
+'use strict';
+
 var config = _satellite.getConfig();
 
 config.integrations = {
@@ -7,7 +9,7 @@ config.integrations = {
 };
 
 config.coreDelegates = {
-  testExtension: function(module, require) {
+  testExtension: function(module) {
     module.exports = function() {
       return {
         test: function() {
@@ -26,7 +28,7 @@ config.rules = [];
  * and passes conditions.
  */
 window.configureExtensionForEventTests = function(actionSpy) {
-  config.coreDelegates.testExtension = function(module, require) {
+  config.coreDelegates.testExtension = function(module) {
     module.exports = function() {
       return {
         test: actionSpy

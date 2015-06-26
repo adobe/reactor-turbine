@@ -1,26 +1,25 @@
 var isNumber = require('./../isType/isNumber');
 
-// `poll(fn, [freq], [max_retries])`
+// `poll(fn, [freq], [maxRetries])`
 // ------------------
 //
 // Runs `fn` for every `freq` ms. `freq` defaults to 1000. If any
 // invocation of `fn()` returns true, polling will stop.
 // The polling will stop if the number or retries exceeds the
-// provided `max_retries`.
+// provided `maxRetries`.
 //
 // Parameters:
 //
 // * `fn` - function to be called repeatedly
 // * `freq` - frequency to call the function
-// * `max_retries` - number of times to retry
-module.exports = function(fn, freq, max_retries) {
+// * `maxRetries` - number of times to retry
+module.exports = function(fn, freq, maxRetries) {
   var retries = 0;
 
   freq = freq || 1000;
-  check();
 
   function check() {
-    if (isNumber(max_retries) && retries++ >= max_retries) {
+    if (isNumber(maxRetries) && retries++ >= maxRetries) {
       return;
     }
 
@@ -28,4 +27,6 @@ module.exports = function(fn, freq, max_retries) {
       setTimeout(check, freq);
     }
   }
+
+  check();
 };

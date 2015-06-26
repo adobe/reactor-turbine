@@ -1,3 +1,6 @@
+/*global FB*/
+'use strict';
+
 var connect = require('extensions').getOne('facebookConnect');
 
 module.exports = function(trigger) {

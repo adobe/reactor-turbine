@@ -1,24 +1,25 @@
-var forEach = require('./utils/array/forEach');
 var preprocessSettings = require('./utils/preprocessSettings');
 
 // TODO: Add a bunch of checks with error reporting.
 
 module.exports = function(rules, propertySettings, integrationRegistry,
       eventDelegates, conditionDelegates) {
-  function initEventDelegate(rule) {
-    if (rule.events) {
-
-      function trigger(event, relatedElement) {
-        checkConditions(rule, event, relatedElement);
-      }
-
-      forEach(rule.events, function(event) {
-        event.settings = event.settings || {};
-
-        var delegate = eventDelegates.get(event.type);
-        delegate(trigger, event.settings);
+  function runActions(rule, event, relatedElement) {
+    rule.actions.forEach(function(action) {
+      action.settings = action.settings || {};
+      action.integrationIds.forEach(function(integrationId) {
+        var preprocessedSettings = preprocessSettings(
+          action.settings,
+          propertySettings.undefinedVarsReturnEmpty,
+          relatedElement,
+          event);
+        integrationRegistry
+          .getById(integrationId)
+          .then(function(instance) {
+            instance[action.method](preprocessedSettings);
+          });
       });
-    }
+    });
   }
 
   function checkConditions(rule, event, relatedElement) {
@@ -37,25 +38,23 @@ module.exports = function(rules, propertySettings, integrationRegistry,
     runActions(rule, event, relatedElement);
   }
 
-  function runActions(rule, event, relatedElement) {
-    forEach(rule.actions, function(action) {
-      action.settings = action.settings || {};
-      forEach(action.integrationIds, function(integrationId) {
-        var preprocessedSettings = preprocessSettings(
-          action.settings,
-          propertySettings.undefinedVarsReturnEmpty,
-          relatedElement,
-          event);
-        integrationRegistry
-          .getById(integrationId)
-          .then(function(instance) {
-            instance[action.method](preprocessedSettings);
-          });
+  function initEventDelegate(rule) {
+    if (rule.events) {
+
+      var trigger = function(event, relatedElement) {
+        checkConditions(rule, event, relatedElement);
+      };
+
+      rule.events.forEach(function(event) {
+        event.settings = event.settings || {};
+
+        var delegate = eventDelegates.get(event.type);
+        delegate(trigger, event.settings);
       });
-    });
+    }
   }
 
-  forEach(rules, function(rule) {
+  rules.forEach(function(rule) {
     initEventDelegate(rule);
   });
 };

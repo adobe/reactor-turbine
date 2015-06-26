@@ -1,4 +1,4 @@
-var forEach = require('forEach');
+'use strict';
 
 /**
  * Object where the key is the call name and the value is an array of all rule trigger functions
@@ -14,7 +14,7 @@ var triggersByCallName = {};
 window._satellite.track = function(name) {
   var triggers = triggersByCallName[name];
   if (triggers) {
-    forEach(triggers, function(trigger) {
+    triggers.forEach(function(trigger) {
       trigger();
     });
   }

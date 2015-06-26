@@ -1,3 +1,5 @@
+'use strict';
+
 describe('entersViewport Event Tests', function() {
   runTestPage('noDelayNestedElements.html');
   runTestPage('preAddElementInView.html');

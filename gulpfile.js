@@ -106,6 +106,14 @@ gulp.task("buildEngine", function() {
       devtool: "#inline-source-map",
       resolve: {
         extensions: ['', '.js']
+      },
+      module: {
+        loaders: [
+          {
+            test: /\.js$/,
+            loader: 'strict'
+          }
+        ]
       }
     }))
     .pipe(gulp.dest('./dist'));

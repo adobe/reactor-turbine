@@ -1,3 +1,5 @@
+'use strict';
+
 var loadScript = require('loadScript');
 
 var core;

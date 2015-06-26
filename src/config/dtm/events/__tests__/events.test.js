@@ -1,3 +1,6 @@
+/*eslint max-len:0*/
+'use strict';
+
 describe('Page Tests', function() {
   runTestPage('mouse/preAddElementWithHandlerOnDocument.html');
   runTestPage('mouse/preAddElementWithHandlerOnElement.html');

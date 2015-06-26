@@ -1,7 +1,9 @@
+'use strict';
+
 var Promise = require('Promise');
 
-module.exports = function(settings) {
-  return new Promise(function(resolve, reject) {
+module.exports = function() {
+  return new Promise(function(resolve) {
     var instance = {
       visitorId: null
     };

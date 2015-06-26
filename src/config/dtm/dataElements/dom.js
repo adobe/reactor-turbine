@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(settings) {
   var elements = document.querySelectorAll(settings.selector);
   if (elements.length > 0) {

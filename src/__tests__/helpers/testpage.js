@@ -1,5 +1,8 @@
+'use strict';
+
 (function() {
 
+  /*eslint-disable*/
   var domReady = (function(ready) {
 
     var fns = [], fn, f = false
@@ -11,10 +14,12 @@
       , onreadystatechange = 'onreadystatechange'
       , loaded = /^loade|^c/.test(doc.readyState);
 
-    function flush(f) {
+    function flush() {
       loaded = 1;
-      while (f = fns.shift()) {
-        f();
+
+      while (fns.length) {
+        var fn = fns.shift();
+        fn();
       }
     }
 
@@ -50,6 +55,7 @@
         loaded ? fn() : fns.push(fn);
       });
   }());
+  /*eslint-enable*/
 
   var addEventListener = window.addEventListener ?
     function(node, evt, cb) {
@@ -59,23 +65,7 @@
       node.attachEvent('on' + evt, cb);
     };
 
-  var page = {
-    queue: [],
-    //messages: takeOverConsole(),
-    waitForDOMLoaded: waitForDOMLoaded,
-    waitForContentLoaded: waitForContentLoaded,
-    //waitFor: waitFor,
-    //waitForLog: waitForLog,
-    //waitForCondition: waitForCondition,
-    //waitForImageRequest: waitForImageRequest,
-    //evaluate: evaluate,
-    execute: execute,
-    //assertLogged: assertLogged,
-    //assertNotLogged: assertNotLogged,
-    start: start
-  };
-
-  window.TestPage = page;
+  var page;
 
   //function map(arr, func, context) {
   //  var ret = [];
@@ -243,7 +233,7 @@
     function next() {
       var cb = queue[idx++];
       if (!cb) {
-        return done();
+        return window.done();
       }
       cb(next);
     }
@@ -409,4 +399,22 @@
   window.onerror = function(err, url, line) {
     fail(err + ' at ' + url + ' on line ' + line);
   };
+
+  page = {
+    queue: [],
+      //messages: takeOverConsole(),
+    waitForDOMLoaded: waitForDOMLoaded,
+    waitForContentLoaded: waitForContentLoaded,
+    //waitFor: waitFor,
+    //waitForLog: waitForLog,
+    //waitForCondition: waitForCondition,
+    //waitForImageRequest: waitForImageRequest,
+    //evaluate: evaluate,
+    execute: execute,
+    //assertLogged: assertLogged,
+    //assertNotLogged: assertNotLogged,
+    start: start
+  };
+
+  window.TestPage = page;
 })();

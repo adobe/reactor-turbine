@@ -48,12 +48,15 @@ module.exports = function(variable, elm, evt) {
     } else if (variable.substring(0, 6) === 'param.') {
       variable = variable.slice(6);
       value = getQueryParam(variable);
-    } else if (randMatch = variable.match(/^rand([0-9]+)$/)) {
-      var len = Number(randMatch[1])
-        , s = (Math.random() * (Math.pow(10, len) - 1)).toFixed(0);
-      value = Array(len - s.length + 1).join('0') + s;
     } else {
-      value = getObjectProperty(customVars, variable);
+      randMatch = variable.match(/^rand([0-9]+)$/);
+      if (randMatch) {
+        var len = Number(randMatch[1])
+          , s = (Math.random() * (Math.pow(10, len) - 1)).toFixed(0);
+        value = Array(len - s.length + 1).join('0') + s;
+      } else {
+        value = getObjectProperty(customVars, variable);
+      }
     }
   }
   return value;

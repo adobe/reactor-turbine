@@ -1,3 +1,5 @@
+'use strict';
+
 var dataElementDelegate = require('../custom');
 
 describe('custom data element delegate', function() {

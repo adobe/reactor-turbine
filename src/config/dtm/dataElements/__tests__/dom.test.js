@@ -1,3 +1,5 @@
+'use strict';
+
 var dataElementDelegate = require('../dom');
 
 describe('dom data element delegate', function() {

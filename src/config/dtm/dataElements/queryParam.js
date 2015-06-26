@@ -1,3 +1,5 @@
+'use strict';
+
 var getQueryParam = require('getQueryParam');
 
 module.exports = function(settings) {

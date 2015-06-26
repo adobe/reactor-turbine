@@ -1,0 +1,7 @@
+{
+  "rules": {
+    // Strict is auto-inserted into engine files by webpack.
+    "strict": 0,
+    "global-strict": 0
+  }
+}

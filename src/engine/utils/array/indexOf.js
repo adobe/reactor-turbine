@@ -11,9 +11,10 @@ module.exports = function(arr, obj) {
   if (arr.indexOf) {
     return arr.indexOf(obj);
   }
-  for (var i = arr.length; i--;)
+  for (var i = arr.length; i--; ) {
     if (obj === arr[i]) {
       return i;
     }
+  }
   return -1;
 };

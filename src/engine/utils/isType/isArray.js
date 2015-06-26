@@ -1,7 +1,7 @@
-// `isArray(thing)`
-// --------------
-//
-// Returns whether the given thing is an array.
-module.exports = Array.isArray || function(thing) {
-  return ToString.apply(thing) === "[object Array]";
-};
+/**
+ * Returns whether value is array
+ *
+ * @param {*} thing
+ * @returns {boolean}
+ */
+module.exports = Array.isArray;

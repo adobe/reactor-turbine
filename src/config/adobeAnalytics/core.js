@@ -1,3 +1,5 @@
+'use strict';
+
 var assign = require('assign');
 var encodeObjectToURI = require('encodeObjectToURI');
 var isHTTPS = require('isHTTPS');
@@ -19,7 +21,7 @@ assign(AdobeAnalytics.prototype, {
     colorDepth: 'c',
     connectionType: 'ct',
     cookiesEnabled: function(obj, key, value) {
-      obj['k'] = value ? 'Y' : 'N';
+      obj.k = value ? 'Y' : 'N';
     },
     currencyCode: 'cc',
     dynamicVariablePrefix: 'D',
@@ -27,27 +29,27 @@ assign(AdobeAnalytics.prototype, {
       obj['v' + key.substr(4)] = value;
     },
     events: function(obj, key, value) {
-      obj['events'] = value.join(',');
+      obj.events = value.join(',');
     },
     hier: function(obj, key, value) {
       obj['h' + key.substr(4)] = value.substr(0, 255);
     },
     homePage: function(obj, key, value) {
-      obj['hp'] = value ? 'Y' : 'N';
+      obj.hp = value ? 'Y' : 'N';
     },
     javaEnabled: function(obj, key, value) {
-      obj['v'] = value ? 'Y' : 'N';
+      obj.v = value ? 'Y' : 'N';
     },
     javaScriptVersion: 'j',
     linkName: 'pev2',
     linkType: function(obj, key, value) {
-      obj['pe'] = 'lnk_' + value;
+      obj.pe = 'lnk_' + value;
     },
     linkURL: 'pev1',
     pageName: 'pageName',
     pageType: 'pageType',
     pageURL: function(obj, key, value) {
-      obj['g'] = value.substr(0, 255);
+      obj.g = value.substr(0, 255);
       if (value.length > 255) {
         obj['-g'] = value.substring(255);
       }
@@ -91,14 +93,14 @@ assign(AdobeAnalytics.prototype, {
 
     queryStringParams.t = this._getTimestamp();
 
-    var clientInfo = data.clientInfo;
+    var ci = data.clientInfo;
 
-    if (clientInfo) {
-      for (key in clientInfo) {
-        if (clientInfo.hasOwnProperty(key)) {
-          var clientInfoValue = clientInfo[key];
-          if (clientInfoValue) {
-            this._translateToQueryStringParam(queryStringParams, key, clientInfoValue);
+    if (ci) {
+      for (key in ci) {
+        if (ci.hasOwnProperty(key)) {
+          var ciValue = ci[key];
+          if (ciValue) {
+            this._translateToQueryStringParam(queryStringParams, key, ciValue);
           }
         }
       }
@@ -127,7 +129,7 @@ assign(AdobeAnalytics.prototype, {
   },
   _getTrackingURI: function(queryString) {
     var tagContainerMarker = 'D' + _satellite.appVersion;
-    var cacheBuster = "s" + Math.floor(new Date().getTime() / 10800000) % 10 +
+    var cacheBuster = 's' + Math.floor(new Date().getTime() / 10800000) % 10 +
       Math.floor(Math.random() * 10000000000000);
     // TODO: Is this necessary or should we just leave off the protocol?
     var protocol = isHTTPS() ? 'https://' : 'http://';
@@ -157,7 +159,8 @@ assign(AdobeAnalytics.prototype, {
       + now.getTimezoneOffset();
   },
   _getTrackingServer: function() {
-    // TODO: Use getAccount from tool since it deals with accountByHost? What is accountByHost anyway?
+    // TODO: Use getAccount from tool since it deals with accountByHost? What is
+    // accountByHost anyway?
     // TODO: What do we do if account is not default. Returning null is probably not awesome.
     if (this.extensionSettings.trackingServer) {
       return this.extensionSettings.trackingServer;
@@ -170,16 +173,18 @@ assign(AdobeAnalytics.prototype, {
     }
 
     // based on code in AppMeasurement.
+    /*eslint-disable*/
     var c = '';
     var dataCenter = this.extensionSettings.trackVars.dc || 'd1';
     var e;
     var f;
-    e = account.indexOf(",");
+    e = account.indexOf(',');
     e >= 0 && (account = account.gb(0, e));
-    account = account.replace(/[^A-Za-z0-9]/g, "");
-    c || (c = "2o7.net");
-    c == "2o7.net" && (dataCenter == "d1" ? dataCenter = "112" : dataCenter == "d2" && (dataCenter = "122"), f = "");
-    e = account + "." + dataCenter + "." + f + c;
+    account = account.replace(/[^A-Za-z0-9]/g, '');
+    c || (c = '2o7.net');
+    c == '2o7.net' && (dataCenter == 'd1' ? dataCenter = '112' : dataCenter == 'd2' && (dataCenter = '122'), f = '');
+    e = account + '.' + dataCenter + '.' + f + c;
+    /*eslint-enable*/
     return e;
   },
   trackPageView: function(actionSettings) {
@@ -202,7 +207,9 @@ assign(AdobeAnalytics.prototype, {
     this._track(trackVars, actionSettings.trackEvents);
   },
   _doesExtensionVarApplyToLinkTracking: function(varName) {
+    /*eslint-disable max-len*/
     return !/^(eVar[0-9]+)|(prop[0-9]+)|(hier[0-9]+)|campaign|purchaseID|channel|server|state|zip|pageType$/.test(varName);
+    /*eslint-enable max-len*/
   },
   trackLink: function(actionSettings) {
     var trackVars = {};
@@ -239,7 +246,10 @@ assign(AdobeAnalytics.prototype, {
       type: 'image'
     });
 
-    recordDTMUrl(uri);
+    // TODO: Only used during development. Remove when done.
+    //if (window.recordDTMUrl) {
+    //  window.recordDTMUrl(uri);
+    //}
   }
 });
 

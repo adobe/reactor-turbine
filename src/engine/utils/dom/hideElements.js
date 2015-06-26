@@ -1,6 +1,4 @@
-var querySelectorAll = require('./querySelectorAll');
 var isString = require('./../isType/isString');
-var forEach = require('./../array/forEach');
 var addClass = require('./addClass');
 var removeClass = require('./removeClass');
 var covertData = require('./../covertData');
@@ -23,9 +21,9 @@ module.exports = function(selectorOrElements) {
   }
 
   var elements = isString(selectorOrElements) ?
-    querySelectorAll(selectorOrElements) : selectorOrElements;
+    document.querySelectorAll(selectorOrElements) : selectorOrElements;
 
-  forEach(elements, function(element) {
+  elements.forEach(function(element) {
     var numLocks = covertData(element, dataKey);
 
     if (numLocks === undefined) {
@@ -47,7 +45,7 @@ module.exports = function(selectorOrElements) {
       return;
     }
 
-    forEach(elements, function(element) {
+    elements.forEach(function(element) {
       var numLocks = covertData(element, dataKey);
       covertData(element, dataKey, --numLocks);
 

@@ -1,20 +1,29 @@
 {
   "env": {
-      "browser": true
+    "browser": true,
+    "jasmine": true,
+    "node": true
   },
   "rules": {
-      "camelcase": [2, {"properties": "always"}],
-      "indent": [2, 2], // 2 spaces indentation
-      "semi": [2, "always"],
-      "space-after-keywords": [2, "always"],
-      "space-before-function-paren": [2, "never"],
-      "space-before-blocks": [2, "always"],
-      "space-infix-ops": [2, {"int32Hint": false}],
-      "quotes": [1, "single", "avoid-escape"],
-      "max-len": [2, 100, 4],
-      "eqeqeq": [2, "allow-null"],
-      "global-strict": [2, "always"], // deprecated but enabled by default
-      "strict": [2, "global"],
-      "no-nested-ternary": [2]
+    "camelcase": [2, {"properties": "always"}],
+    "indent": [2, 2], // 2 spaces indentation
+    "semi": [2, "always"],
+    "space-after-keywords": [2, "always"],
+    "space-before-function-paren": [2, "never"],
+    "space-before-blocks": [2, "always"],
+    "space-infix-ops": [2, {"int32Hint": false}],
+    "quotes": [1, "single", "avoid-escape"],
+    "max-len": [2, 100, 4],
+    "eqeqeq": [2, "allow-null"],
+    "global-strict": [2, "always"], // deprecated but enabled by default
+    "strict": [2, "global"],
+    "no-nested-ternary": [2],
+    "no-underscore-dangle": 0
+  },
+  "globals": {
+    "Simulate": true,
+    "TestPage": true,
+    "runTestPage": true,
+    "_satellite": true
   }
 }

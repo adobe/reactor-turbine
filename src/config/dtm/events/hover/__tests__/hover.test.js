@@ -1,3 +1,5 @@
+'use strict';
+
 describe('hover Event Tests', function() {
   runTestPage('noDelayNestedElements.html');
   runTestPage('noDelaySameElement.html');

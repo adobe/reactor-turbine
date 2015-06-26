@@ -1,3 +1,5 @@
+'use strict';
+
 (function() {
   /**
    * We have to deliver a new instance of the jasmine clock because jasmine.clock is already tied

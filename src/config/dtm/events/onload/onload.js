@@ -1,5 +1,6 @@
+'use strict';
+
 var addEventListener = require('addEventListener');
-var forEach = require('forEach');
 
 /**
  * All trigger methods registered for this event type.
@@ -13,7 +14,7 @@ addEventListener(window, 'load', function() {
     target: document.location
   };
 
-  forEach(triggers, function(trigger) {
+  triggers.forEach(function(trigger) {
     trigger(pseudoEvent, document.location);
   });
 });

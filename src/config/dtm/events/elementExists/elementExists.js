@@ -1,5 +1,6 @@
+'use strict';
+
 var poll = require('poll');
-var forEach = require('forEach');
 var bubbly = require('bubbly');
 var covertData = require('covertData');
 

@@ -25,7 +25,7 @@ module.exports = (function(docEl) {
         return false;
       }
     };
-  } else if (docEl.querySelectorAll) {
+  } else {
     return function(selector, elm) {
       var parent = elm.parentNode;
       if (!parent) {
@@ -36,26 +36,15 @@ module.exports = (function(docEl) {
       }
       try {
         var nodeList = elm.parentNode.querySelectorAll(selector);
-        for (var i = nodeList.length; i--;)
+        for (var i = nodeList.length; i--; ) {
           if (nodeList[i] === elm) {
             return true;
           }
+        }
       } catch (e) {
         //
       }
       return false;
-    };
-  } else {
-    return function(selector, elm) {
-      if (selector.match(/^[a-z]+$/i)) {
-        return simpleTagMatch(selector, elm);
-      }
-      // TODO: Re-implement once we start loading sizzle.
-      //try {
-      //  return SL.Sizzle.matches(selector, [elm]).length > 0
-      //} catch (e) {
-      //  return false
-      //}
     };
   }
 }(document.documentElement));

@@ -1,3 +1,5 @@
+'use strict';
+
 var assign = require('assign');
 var clientInfo = require('clientInfo');
 var hideElements = require('hideElements');
@@ -106,7 +108,7 @@ var AdobeTarget = function(extensionSettings) {
 assign(AdobeTarget.prototype, {
   // TODO: Can we use an ID generator util provided by DTM?
   _generateId: function() {
-    return (new Date()).getTime() + "-" + Math.floor(Math.random() * 999999);
+    return (new Date()).getTime() + '-' + Math.floor(Math.random() * 999999);
   },
   // TODO: Should this be a DTM util?
   _getBrowserTimeOffset: function() {
@@ -122,7 +124,7 @@ assign(AdobeTarget.prototype, {
       return;
     }
 
-    var protocol = document.location.protocol == 'file:' ? 'http:' : document.location.protocol;
+    var protocol = document.location.protocol === 'file:' ? 'http:' : document.location.protocol;
 
     var args = {
       mboxHost: document.location.hostname,
@@ -139,8 +141,12 @@ assign(AdobeTarget.prototype, {
       mboxTime: this._getTime(),
       mbox: actionSettings.name,
       mboxId: 0, // TODO needs to come from the number of mboxes with the same mbox name?
-      mboxURL: document.location, // TODO should only get sent when passPageParameters is true? See _urlBuilder.setUrlProcessAction
-      mboxReferrer: document.referrer, // TODO should only get sent when passPageParameters is true and URL is under 2000? See _urlBuilder.setUrlProcessAction
+      // TODO should only get sent when passPageParameters is true?
+      // See _urlBuilder.setUrlProcessAction
+      mboxURL: document.location,
+      // TODO should only get sent when passPageParameters is true and URL is under 2000?
+      // See _urlBuilder
+      mboxReferrer: document.referrer,
       mboxVersion: 56 // TODO remove when using framework?
     };
 
@@ -165,7 +171,9 @@ assign(AdobeTarget.prototype, {
       }
     };
 
+    /*eslint-disable new-cap*/
     mboxes.push(new mbox(actionSettings.name, setOffer));
+    /*eslint-enable new-cap*/
 
     var requestType = 'ajax';
 

@@ -1,7 +1,6 @@
 var dataElementDefinitions = require('../../stores/dataElementDefinitions');
 var dataElementDelegates = require('../../stores/extensionDelegates/dataElementDelegates');
 var dataElementSafe = require('../../stores/dataElementSafe');
-var querySelectorAll = require('./../dom/querySelectorAll');
 var cleanText = require('./../string/cleanText');
 
 module.exports = function(variable, suppressDefault, dataDef) {
@@ -23,7 +22,9 @@ module.exports = function(variable, suppressDefault, dataDef) {
   }
   if (value === undefined && !suppressDefault) {
     // Have to wrap "default" in quotes since it is a keyword.
+    /*eslint-disable dot-notation*/
     value = dataDef.settings['default'] || '';
+    /*eslint-enable dot-notation*/
   }
 
   // TODO: Move this to data element delegates?

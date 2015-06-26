@@ -1,3 +1,5 @@
+'use strict';
+
 var bubbly = require('bubbly');
 var addLiveEventListener = require('addLiveEventListener');
 
@@ -15,15 +17,17 @@ function delayHover(event, delay, handler) {
   }
 
   var timeoutId;
+  var removeMouseLeaveListener;
+  var handleMouseLeave;
 
-  function removeMouseLeaveListener() {
+  removeMouseLeaveListener = function() {
     event.target.removeEventListener('mouseleave', handleMouseLeave);
-  }
+  };
 
-  function handleMouseLeave() {
+  handleMouseLeave = function() {
     clearTimeout(timeoutId);
     removeMouseLeaveListener();
-  }
+  };
 
   timeoutId = setTimeout(function() {
     handler(event);

@@ -1,3 +1,5 @@
+'use strict';
+
 var getObjectProperty = require('getObjectProperty');
 
 module.exports = function(settings) {

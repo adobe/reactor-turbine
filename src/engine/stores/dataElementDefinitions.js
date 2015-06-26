@@ -1,9 +1,8 @@
-var forEach = require('../utils/array/forEach');
 var definitionsByName = {};
 
 module.exports = {
   init: function(definitions) {
-    forEach(definitions, function(definition) {
+    definitions.forEach(function(definition) {
       // Prefix with $ to avoid important Object properties from being masked (e.g., "prototype").
       definitionsByName['$' + definition.name] = definition;
     });

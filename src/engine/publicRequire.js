@@ -9,7 +9,6 @@ var resources = {
     }
   },
   'Promise': require('./utils/communication/Promise'),
-  'forEach': require('./utils/array/forEach'),
   'poll': require('./utils/communication/globalPoll'),
   'bind': require('./utils/dom/bind'),
   'covertData': require('./utils/covertData'),

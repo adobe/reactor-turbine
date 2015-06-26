@@ -1,4 +1,4 @@
-var forEach = require('forEach');
+'use strict';
 
 /**
  * All trigger methods registered for this event type.
@@ -22,7 +22,7 @@ window._satellite.pageBottom = function() {
       target: document.location
     };
 
-    forEach(triggers, function(trigger) {
+    triggers.forEach(function(trigger) {
       trigger(pseudoEvent, document.location);
     });
   }

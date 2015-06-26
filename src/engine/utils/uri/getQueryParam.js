@@ -1,13 +1,13 @@
 var isString = require('./../isType/isString');
-var forEach = require('./../array/forEach');
 var escapeForHTML = require('./../string/escapeForHTML');
 
 function parseQueryParams(str) {
-  var URIDecode = function(str) {
-    var result = str;
+  var decode = function(value) {
+    var result = value;
     try {
-      result = decodeURIComponent(str);
+      result = decodeURIComponent(value);
     } catch (err) {
+      // ignore
     }
 
     return result;
@@ -21,12 +21,12 @@ function parseQueryParams(str) {
   }
   var ret = {}
     , pairs = str.split('&');
-  forEach(pairs, function(pair) {
+  pairs.forEach(function(pair) {
     pair = pair.split('=');
     if (!pair[1]) {
       return;
     }
-    ret[URIDecode(pair[0])] = escapeForHTML(URIDecode(pair[1]));
+    ret[decode(pair[0])] = escapeForHTML(decode(pair[1]));
   });
   return ret;
 }
@@ -52,7 +52,8 @@ function getCaseSensitivityQueryParamsMap(str) {
 }
 
 
-// TODO: We're caching query string parameters which could change when using pushState. Remove caching? Re-cache when URL changes?
+// TODO: We're caching query string parameters which could change when using pushState.
+// Remove caching? Re-cache when URL changes?
 module.exports = function(key, ignoreCase) {
   var paramsMap = getCaseSensitivityQueryParamsMap(window.location.search);
   if (ignoreCase) {

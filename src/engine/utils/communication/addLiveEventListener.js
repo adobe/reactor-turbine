@@ -1,6 +1,4 @@
-var forEach = require('./../array/forEach');
 var covertData = require('./../covertData');
-var querySelectorAll = require('./../dom/querySelectorAll');
 var addEventListener = require('./../dom/addEventListener');
 var globalPoll = require('./globalPoll');
 
@@ -8,35 +6,16 @@ var listeners = [];
 var listenerId = 0;
 
 var registeredWithPoller = false;
-module.exports = function(selector, type, callback) {
-  var config = {
-    selector: selector,
-    type: type,
-    callback: callback,
-    id: listenerId++
-  };
 
-  listeners.push(config);
+function addListenersToNewElements(listener) {
+  var dataKey = 'dtm.liveListener.seen.' + listener.id;
+  var elements = document.querySelectorAll(listener.selector);
 
-  // While we could just wait for the global poller's next tick, let's try to
-  // add the event listener to the target element immediately.
-  addListenersToNewElements(config);
+  for (var i = 0; i < elements.length; i++) {
+    var element = elements[i];
 
-  if (!registeredWithPoller) {
-    globalPoll('dynamicEvents', function() {
-      forEach(listeners, addListenersToNewElements);
-    });
-    registeredWithPoller = true;
-  }
-};
-
-function addListenersToNewElements(config) {
-  var dataKey = 'dtm.liveListener.seen.' + config.id;
-
-  var elements = querySelectorAll(config.selector);
-  forEach(elements, function(element) {
     if (covertData(element, dataKey)) {
-      return;
+      continue;
     }
 
     covertData(element, dataKey, true);
@@ -46,6 +25,28 @@ function addListenersToNewElements(config) {
     //   SL.registerEvents(elm, [rule.event])
     // }
 
-    addEventListener(element, config.type, config.callback);
-  });
+    addEventListener(element, listener.type, listener.callback);
+  }
 }
+
+module.exports = function(selector, type, callback) {
+  var listener = {
+    selector: selector,
+    type: type,
+    callback: callback,
+    id: listenerId++
+  };
+
+  listeners.push(listener);
+
+  // While we could just wait for the global poller's next tick, let's try to
+  // add the event listener to the target element immediately.
+  addListenersToNewElements(listener);
+
+  if (!registeredWithPoller) {
+    globalPoll('dynamicEvents', function() {
+      listeners.forEach(addListenersToNewElements);
+    });
+    registeredWithPoller = true;
+  }
+};

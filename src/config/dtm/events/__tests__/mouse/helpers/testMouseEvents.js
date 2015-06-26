@@ -1,3 +1,5 @@
+'use strict';
+
 window.testMouseEvents = function(options) {
   var EVENT_TYPES = ['click'];
 
@@ -24,8 +26,8 @@ window.testMouseEvents = function(options) {
     }
   ];
 
-  configureExtensionForEventTests(actionSpy);
-  configureRuleForEventTests(ruleEvents, conditionSpy);
+  window.configureExtensionForEventTests(actionSpy);
+  window.configureRuleForEventTests(ruleEvents, conditionSpy);
 
   TestPage
     .waitForContentLoaded()

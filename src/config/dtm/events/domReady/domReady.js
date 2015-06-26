@@ -1,3 +1,5 @@
+'use strict';
+
 // `domReady(callback)`
 // --------------------
 //
@@ -8,6 +10,7 @@
 // - `callback` - a function to be called at `domready`
 //
 // *domReady is borrowed from <https://github.com/ded/domready>*
+/*eslint-disable */
 var domReady = (function(ready) {
 
   var fns = [],
@@ -59,6 +62,7 @@ var domReady = (function(ready) {
       loaded ? fn() : fns.push(fn);
     });
 }());
+/*eslint-enable */
 
 /**
  * DOM ready event. This event occurs as soon as HTML document has been completely loaded and

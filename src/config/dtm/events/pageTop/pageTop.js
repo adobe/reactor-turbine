@@ -1,3 +1,5 @@
+'use strict';
+
 var pseudoEvent = {
   type: 'pagetop',
   target: document.location

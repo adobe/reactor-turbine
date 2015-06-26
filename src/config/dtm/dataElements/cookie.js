@@ -1,3 +1,5 @@
+'use strict';
+
 var readCookie = require('readCookie');
 
 module.exports = function(settings) {

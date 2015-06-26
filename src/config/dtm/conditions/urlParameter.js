@@ -1,3 +1,5 @@
+'use strict';
+
 var textMatch = require('textMatch');
 var getQueryParam = require('getQueryParam');
 

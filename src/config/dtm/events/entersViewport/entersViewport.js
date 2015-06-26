@@ -1,6 +1,7 @@
+'use strict';
+
 var addEventListener = require('addEventListener');
 var poll = require('poll');
-var forEach = require('forEach');
 var covertData = require('covertData');
 var bubbly = require('bubbly');
 
@@ -23,6 +24,7 @@ var offset = function(elem) {
   try {
     box = elem.getBoundingClientRect();
   } catch (e) {
+    // ignore
   }
 
   var doc = document,
@@ -52,7 +54,7 @@ var getViewportHeight = function() {
   var mode = document.compatMode;
 
   if (mode) { // IE, Gecko
-    height = (mode == 'CSS1Compat') ?
+    height = (mode === 'CSS1Compat') ?
       document.documentElement.clientHeight : // Standards
       document.body.clientHeight; // Quirks
   }
@@ -118,21 +120,28 @@ var checkIfElementsInViewport = function() {
   var scrollTop = getScrollTop();
   var timeoutId;
 
-  forEach(listeners, function(listener) {
+  listeners.forEach(function(listener) {
     var elements = document.querySelectorAll(listener.settings.selector);
-    forEach(elements, function(element) {
+    for (var i = 0; i < elements.length; i++) {
+      var element = elements[i];
+
       if (covertData(element, listener.completeDataKey)) {
-        return;
+        continue;
       }
 
       if (elementIsInView(element, viewportHeight, scrollTop)) {
         if (listener.settings.delay) { // Element is in view, has delay
           if (!covertData(element, listener.timeoutDataKey)) {
+            /*eslint-disable no-loop-func*/
             timeoutId = setTimeout(function() {
               if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
-                markEntersViewportComplete(element, listener.settings.delay, listener.completeDataKey);
+                markEntersViewportComplete(
+                  element,
+                  listener.settings.delay,
+                  listener.completeDataKey);
               }
             }, listener.settings.delay);
+            /*eslint-enable no-loop-func*/
 
             covertData(element, listener.timeoutDataKey, timeoutId);
           }
@@ -146,7 +155,7 @@ var checkIfElementsInViewport = function() {
           covertData(element, listener.timeoutDataKey, null);
         }
       }
-    });
+    }
   });
 };
 

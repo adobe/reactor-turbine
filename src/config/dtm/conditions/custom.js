@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Custom condition. This executes a condition script provided by the user.
  * @param {Object} settings Condition settings.

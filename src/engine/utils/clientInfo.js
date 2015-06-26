@@ -1,3 +1,4 @@
+/*global Iterator*/
 var assign = require('./object/assign');
 
 var matchUserAgent = function(regexs) {
@@ -9,7 +10,7 @@ var matchUserAgent = function(regexs) {
         return key;
       }
     }
-    return "Unknown";
+    return 'Unknown';
   };
 };
 
@@ -17,13 +18,13 @@ var exports = {};
 
 var browser = matchUserAgent({
   OmniWeb: /OmniWeb/,
-  "Opera Mini": /Opera Mini/,
-  "Opera Mobile": /Opera Mobi/,
+  'Opera Mini': /Opera Mini/,
+  'Opera Mobile': /Opera Mobi/,
   Opera: /Opera/,
-  "Mobile Safari": /Mobile(\/[0-9A-z]+)? Safari/,
+  'Mobile Safari': /Mobile(\/[0-9A-z]+)? Safari/,
   Chrome: /Chrome/,
   Firefox: /Firefox/,
-  "IE Mobile": /IEMobile/,
+  'IE Mobile': /IEMobile/,
   IE: /MSIE|Trident/,
   Safari: /Safari/
 })(navigator.userAgent);
@@ -31,7 +32,7 @@ var browser = matchUserAgent({
 var os = matchUserAgent({
   iOS: /iPhone|iPad|iPod/,
   Blackberry: /BlackBerry/,
-  "Symbian OS": /SymbOS/,
+  'Symbian OS': /SymbOS/,
   Maemo: /Maemo/,
   Android: /Android [0-9\.]+;/,
   Linux: / Linux /,
@@ -45,7 +46,7 @@ var deviceType = matchUserAgent({
   iPad: /iPad/,
   iPod: /iPod/,
   Nokia: /SymbOS|Maemo/,
-  "Windows Phone": /IEMobile/,
+  'Windows Phone': /IEMobile/,
   Blackberry: /BlackBerry/,
   Android: /Android [0-9\.]+;/,
   Desktop: /.*/
@@ -65,7 +66,7 @@ var getBrowserHeight = function() {
 
 // Is a method because it has a likelihood of changing while the user is on the page.
 var getResolution = function() {
-  return window.screen.width + "x" + window.screen.height;
+  return window.screen.width + 'x' + window.screen.height;
 };
 
 // Is a method because it has a likelihood of changing while the user is on the page.
@@ -82,7 +83,7 @@ var colorDepth = window.screen.pixelDepth ? window.screen.pixelDepth : window.sc
 
 var jsVersion = (function() {
   var
-    tm = new Date,
+    tm = new Date(),
     a, o, i,
     j = '1.2',
     pn = 0;
@@ -114,6 +115,7 @@ var jsVersion = (function() {
             }
           }
         } catch (e) {
+          // Ignore
         }
       }
     }
@@ -125,16 +127,19 @@ var isJavaEnabled = navigator.javaEnabled();
 
 var isCookiesEnabled = window.navigator.cookieEnabled;
 
-// TODO: Can we get rid of this? It's used by the Analytics extension but is a deprecated browser API.
+// TODO: Can we get rid of this? It's used by the Analytics extension but is a
+// deprecated browser API.
 var connectionType = (function() {
   try {
     document.body.addBehavior('#default#clientCaps');
     return document.body.connectionType;
   } catch (e) {
+    // Ignore
   }
 })();
 
-// TODO: Can we get rid of this? It's used by the Analytics extension but is a deprecated browser API.
+// TODO: Can we get rid of this? It's used by the Analytics extension but is a
+// deprecated browser API.
 var isHomePage = (function() {
   function getTopFrameSet() {
     // Get the top frame set
@@ -148,14 +153,15 @@ var isHomePage = (function() {
       while ((parent) &&
       (parent.location) &&
       (location) &&
-      ('' + parent.location != '' + location) &&
+      ('' + parent.location !== '' + location) &&
       (topFrameSet.location) &&
-      ('' + parent.location != '' + topFrameSet.location) &&
-      (parent.location.host == location.host)) {
+      ('' + parent.location !== '' + topFrameSet.location) &&
+      (parent.location.host === location.host)) {
         topFrameSet = parent;
         parent = topFrameSet.parent;
       }
     } catch (e) {
+      // Ignore
     }
 
     return topFrameSet;
@@ -163,9 +169,10 @@ var isHomePage = (function() {
 
   try {
     document.body.addBehavior('#default#homePage');
-    var isHomePage = document.body.isHomePage;
-    return isHomePage ? isHomePage(getTopFrameSet().location) : false;
+    var nativeIsHomePage = document.body.isHomePage;
+    return nativeIsHomePage ? nativeIsHomePage(getTopFrameSet().location) : false;
   } catch (e) {
+    // Ignore
   }
 })();
 
@@ -180,6 +187,7 @@ var staticInfo = {
   jsVersion: jsVersion,
   isJavaEnabled: isJavaEnabled,
   isCookiesEnabled: isCookiesEnabled,
+  connectionType: connectionType,
   isHomePage: isHomePage
 };
 

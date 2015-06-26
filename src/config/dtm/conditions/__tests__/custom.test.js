@@ -1,3 +1,5 @@
+'use strict';
+
 var conditionDelegate = require('../custom');
 
 describe('custom condition delegate', function() {

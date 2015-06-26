@@ -21,10 +21,12 @@ module.exports = function(integrations, integrationRegistry, coreDelegates, prop
 
       var proxy = {};
 
+      /*eslint-disable no-loop-func*/
       var promise = new Promise(function(resolve, reject) {
         proxy.resolve = resolve;
         proxy.reject = reject;
       });
+      /*eslint-enable no-loop-func*/
 
       promiseByIntegrationId[integrationId] = proxy;
 

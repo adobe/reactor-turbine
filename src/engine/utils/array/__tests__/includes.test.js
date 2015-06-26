@@ -1,3 +1,5 @@
+'use strict';
+
 var rewire = require('rewire');
 var includes = rewire('../includes');
 

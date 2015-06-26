@@ -27,9 +27,8 @@ var offset = function(elem) {
     // ignore
   }
 
-  var doc = document,
-    docElem = doc.documentElement;
-
+  var doc = document;
+  var docElem = doc.documentElement;
   var body = doc.body;
   var win = window;
   var clientTop = docElem.clientTop || body.clientTop || 0;

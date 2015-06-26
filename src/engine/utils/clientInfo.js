@@ -82,11 +82,12 @@ var getScreenHeight = function() {
 var colorDepth = window.screen.pixelDepth ? window.screen.pixelDepth : window.screen.colorDepth;
 
 var jsVersion = (function() {
-  var
-    tm = new Date(),
-    a, o, i,
-    j = '1.2',
-    pn = 0;
+  var tm = new Date();
+  var a;
+  var o;
+  var i;
+  var j = '1.2';
+  var pn = 0;
 
   if (tm.setUTCDate) {
     j = '1.3';
@@ -143,10 +144,9 @@ var connectionType = (function() {
 var isHomePage = (function() {
   function getTopFrameSet() {
     // Get the top frame set
-    var
-      topFrameSet = window,
-      parent,
-      location;
+    var topFrameSet = window;
+    var parent;
+    var location;
     try {
       parent = topFrameSet.parent;
       location = topFrameSet.location;

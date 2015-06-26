@@ -44,8 +44,8 @@ var createBeacon = function(config, successCallback, failCallback) {
    iframe beacons have no way to give a failiure response.
    so it is always a success
    */
-  var connection,
-    request = config.beaconURL;
+  var connection;
+  var request = config.beaconURL;
 
   // GET using an Image
   if (config.type === 'image') {

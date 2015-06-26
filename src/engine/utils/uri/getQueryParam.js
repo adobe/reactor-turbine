@@ -19,8 +19,8 @@ function parseQueryParams(str) {
   if (str.indexOf('?') === 0) {
     str = str.substring(1);
   }
-  var ret = {}
-    , pairs = str.split('&');
+  var ret = {};
+  var pairs = str.split('&');
   pairs.forEach(function(pair) {
     pair = pair.split('=');
     if (!pair[1]) {

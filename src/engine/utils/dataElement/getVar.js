@@ -18,10 +18,10 @@ var getQueryParam = require('./../uri/getQueryParam');
 // - `[elm]` - the associated element, if any
 // - `[evt]` - the associated event, if any
 module.exports = function(variable, elm, evt) {
-  var target = evt ? (evt.target || evt.srcElement) : null
-    , URI = getURI()
-    , randMatch
-    , value;
+  var target = evt ? (evt.target || evt.srcElement) : null;
+  var URI = getURI();
+  var randMatch;
+  var value;
   var map = {
     URI: URI,
     uri: URI,
@@ -51,8 +51,8 @@ module.exports = function(variable, elm, evt) {
     } else {
       randMatch = variable.match(/^rand([0-9]+)$/);
       if (randMatch) {
-        var len = Number(randMatch[1])
-          , s = (Math.random() * (Math.pow(10, len) - 1)).toFixed(0);
+        var len = Number(randMatch[1]);
+        var s = (Math.random() * (Math.pow(10, len) - 1)).toFixed(0);
         value = Array(len - s.length + 1).join('0') + s;
       } else {
         value = getObjectProperty(customVars, variable);

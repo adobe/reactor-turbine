@@ -18,7 +18,9 @@
     "global-strict": [2, "always"], // deprecated but enabled by default
     "strict": [2, "global"],
     "no-nested-ternary": [2],
-    "no-underscore-dangle": 0
+    "no-underscore-dangle": 0,
+    "comma-style": [2],
+    "one-var": [2, "never"]
   },
   "globals": {
     "Simulate": true,

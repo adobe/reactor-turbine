@@ -4,7 +4,7 @@ var config = _satellite.getConfig();
 
 config.extensions = {
   testExtension: {
-    name: "Test Extension"
+    name: 'Test Extension'
   }
 };
 

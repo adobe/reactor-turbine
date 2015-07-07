@@ -147,5 +147,3 @@ gulp.task('lint', function() {
 });
 
 gulp.task('default', ['buildConfig', 'buildEngine', 'watch']);
-
-gulp.task('buildCreateBeacon', require('./standAloneMethods/gulp/createBeaconTask.js'));

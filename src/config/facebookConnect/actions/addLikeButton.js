@@ -23,9 +23,7 @@ module.exports = function(config) {
 
       container.appendChild(div);
 
-      engine.parseXFBML({
-        selector: actionConfig.selector
-      });
+      FB.XFBML.parse(container);
     }
   });
 };

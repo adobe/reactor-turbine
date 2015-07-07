@@ -74,8 +74,8 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
       /**
        * This is the callback that executes a particular rule when an event has occurred.
        * @callback ruleTrigger
-       * @param {Object} [event] An event object (native or synthetic) that contains detail regarding
-       * the event that occurred.
+       * @param {Object} [event] An event object (native or synthetic) that contains detail
+       * regarding the event that occurred.
        * @param {HTMLElement} [relatedElement] The element the rule targeted.
        */
       var trigger = function(event, relatedElement) {

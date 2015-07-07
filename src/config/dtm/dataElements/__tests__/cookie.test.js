@@ -8,7 +8,9 @@ dataElementDelegate.__set__('readCookie', function() { return 'bar'; });
 describe('cookie data element delegate', function() {
   it('should return the value of a cookie', function() {
     var settings = {
-      name: 'foo'
+      dataElementSettings: {
+        name: 'foo'
+      }
     };
 
     expect(dataElementDelegate(settings)).toBe('bar');

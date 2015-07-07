@@ -2,20 +2,15 @@
 
 var config = _satellite.getConfig();
 
-config.integrations = {
-  'abc': {
-    type: 'testExtension'
+config.extensions = {
+  testExtension: {
+    name: "Test Extension"
   }
 };
 
-config.coreDelegates = {
-  testExtension: function(module) {
-    module.exports = function() {
-      return {
-        test: function() {
-        }
-      };
-    };
+config.actionDelegates = {
+  test: function(module) {
+    module.exports = function() {};
   }
 };
 
@@ -28,12 +23,8 @@ config.rules = [];
  * and passes conditions.
  */
 window.configureExtensionForEventTests = function(actionSpy) {
-  config.coreDelegates.testExtension = function(module) {
-    module.exports = function() {
-      return {
-        test: actionSpy
-      };
-    };
+  config.actionDelegates.test = function(module) {
+    module.exports = actionSpy;
   };
 };
 
@@ -58,8 +49,7 @@ window.configureRuleForEventTests = function(events, conditionSpy) {
     ],
     actions: [
       {
-        integrationIds: ['abc'],
-        method: 'test'
+        type: 'test'
       }
     ]
   });

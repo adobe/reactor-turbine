@@ -9,8 +9,10 @@ dataElementDelegate.__set__('getQueryParam', getQueryParamSpy);
 describe('queryParam data element delegate', function() {
   it('should return a query parameter value', function() {
     var settings = {
-      name: 'foo',
-      ignoreCase: true
+      dataElementSettings: {
+        name: 'foo',
+        ignoreCase: true
+      }
     };
 
     var value = dataElementDelegate(settings);

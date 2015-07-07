@@ -1,11 +1,7 @@
 var resources = {
-  'extensions': {
+  'extensionCores': {
     get: function(extensionType) {
-      return require('./stores/integrationRegistry').getByType(extensionType);
-    },
-    getOne: function(extensionType) {
-      var instances = this.get(extensionType);
-      return instances.length ? instances[0] : null;
+      return require('./stores/coreRegistry').get(extensionType);
     }
   },
   'Promise': require('./utils/communication/Promise'),

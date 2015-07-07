@@ -22,6 +22,12 @@ module.exports = function() {
           script(module, publicRequire);
           exports = exportsByName[name] = module.exports;
 
+          // Delegate exports should always be functions. Having this check allows us to find
+          // bugs more easily.
+          if (typeof exports !== 'function') {
+            throw new Error('Exported module "' + name + '" is not a function.');
+          }
+
         } else {
           throw new Error('Cannot resolve module "' + name + '".');
         }

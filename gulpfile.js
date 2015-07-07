@@ -76,6 +76,7 @@ function getDelegates(baseDir) {
       var pkg = JSON.parse(fs.readFileSync(packagePath, { encoding: 'utf8' }));
       populateFeatureDelegates('eventDelegates', pkg, extensionDir);
       populateFeatureDelegates('conditionDelegates', pkg, extensionDir);
+      populateFeatureDelegates('actionDelegates', pkg, extensionDir);
       populateFeatureDelegates('dataElementDelegates', pkg, extensionDir);
       populateCoreDelegates(pkg, extensionDir);
     }
@@ -91,6 +92,7 @@ gulp.task('buildConfig', function() {
   return gulp.src([path.join(baseDir, 'config.txt')])
     .pipe(replace('{{eventDelegates}}', shallowStringifyWithFunctionValues(delegates.eventDelegates)))
     .pipe(replace('{{conditionDelegates}}', shallowStringifyWithFunctionValues(delegates.conditionDelegates)))
+    .pipe(replace('{{actionDelegates}}', shallowStringifyWithFunctionValues(delegates.actionDelegates)))
     .pipe(replace('{{dataElementDelegates}}', shallowStringifyWithFunctionValues(delegates.dataElementDelegates)))
     .pipe(replace('{{coreDelegates}}', shallowStringifyWithFunctionValues(delegates.coreDelegates)))
     .pipe(rename('config.js'))

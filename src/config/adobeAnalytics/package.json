@@ -1,4 +1,10 @@
 {
   "name": "adobeAnalytics",
-  "core": "core.js"
+  "actionDelegates": [
+    {
+      "name": "Send Tracking Beacon",
+      "path": "actions/track.js",
+      "requireIntegration": true
+    }
+  ]
 }

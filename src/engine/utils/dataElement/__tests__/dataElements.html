@@ -7,6 +7,12 @@
       var config = _satellite.getConfig();
       var actionSpy = jasmine.createSpy();
 
+      config.extensions = {
+        testExtension: {
+          name: "Test Extension"
+        }
+      };
+
       config.integrations = {
         'abc': {
           type: 'testExtension',
@@ -17,15 +23,17 @@
         }
       };
 
-      var coreDelegateSpy = jasmine.createSpy().and.callFake(function() {
-        return {
-          test: actionSpy
-        };
-      });
+      var coreDelegateSpy = jasmine.createSpy();
 
       config.coreDelegates = {
         testExtension: function(module, require) {
           module.exports = coreDelegateSpy
+        }
+      };
+
+      config.actionDelegates = {
+        test: function(module) {
+          module.exports = actionSpy;
         }
       };
 
@@ -52,7 +60,7 @@
             });
           };
 
-          module.exports = function(trigger, settings) {
+          module.exports = function(settings, trigger) {
             allTriggers.push(trigger);
           };
         }
@@ -69,7 +77,7 @@
           actions: [
             {
               integrationIds: ['abc'],
-              method: 'test',
+              type: 'test',
               settings: {
                 dataElementBased: '%treat%',
                 dataElementPriorityBased: '%vegetable%',
@@ -180,7 +188,7 @@
           _satellite.setVar('instrument', 'piccolo');
           _satellite.setVar('vegetable', 'onion');
 
-          expect(coreDelegateSpy.calls.argsFor(0)).toEqual([
+          expect(coreDelegateSpy.calls.argsFor(0)[0].integrationsSettings).toEqual([
             {
               mmmtreats: 'ice cream',
               accountId: 123
@@ -193,7 +201,7 @@
           jasmine.clock().tick(1);
 
           expect(actionSpy.calls.count()).toBe(1);
-          var actionSettings = actionSpy.calls.argsFor(0)[0];
+          var actionSettings = actionSpy.calls.argsFor(0)[0].actionSettings;
           expect(actionSettings.dataElementBased).toBe('ice cream');
           // Both a data element and a custom variable (set using setVar) named "vegetable" have
           // been set. The data element has a higher priority.

@@ -2,8 +2,29 @@
   var config = {
     "eventDelegates": {{eventDelegates}},
     "conditionDelegates": {{conditionDelegates}},
+    "actionDelegates": {{actionDelegates}},
     "dataElementDelegates": {{dataElementDelegates}},
     "coreDelegates": {{coreDelegates}},
+    "extensions": {
+      "adobeAnalytics": {
+        "name": "Adobe Analytics"
+      },
+      "adobeTarget": {
+        "name": "Adobe Target"
+      },
+      "adobeDebug": {
+        "name": "Adobe Debug"
+      },
+      "adobeVisitor": {
+        "name": "Adobe Visitor"
+      },
+      "facebookConnect": {
+        "name": "Facebook Connect"
+      },
+      "facebookPixel": {
+        "name": "Facebook Pixel"
+      }
+    },
     "integrations": {
       "abcdef": {
         "type": "adobeAnalytics",
@@ -60,8 +81,8 @@
         "actions": [
           {
             "integrationIds": ["abcdef"],
-            "method": "trackPageView",
             "settings": {
+              "trackType": "pageView",
               "trackVars": {
                 "eVar10": "MyEvar10",
                 "eVar11": "MyEvar11",
@@ -105,8 +126,8 @@
         "actions": [
           {
             "integrationIds": ["abcdef"],
-            "method": "trackLink",
             "settings": {
+              "trackType": "link",
               "trackVars": {
                 "linkType": "o",
                 "linkName": "MyLink",
@@ -151,8 +172,8 @@
         "actions": [
           {
             "integrationIds": ["abcdef"],
-            "method": "trackLink",
             "settings": {
+              "trackType": "link",
               "trackVars": {
                 "linkType": "o",
                 "linkName": "MyLink",

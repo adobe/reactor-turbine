@@ -42,5 +42,27 @@
       "name": "XFBML Rendered",
       "path": "events/xfbml.render.js"
     }
+  ],
+  "actionDelegates": [
+    {
+      "name": "Add Like Button",
+      "path": "actions/addLikeButton.js"
+    },
+    {
+      "name": "Log In",
+      "path": "actions/logIn.js"
+    },
+    {
+      "name": "Log Out",
+      "path": "actions/logOut.js"
+    },
+    {
+      "name": "Parse XFBML",
+      "path": "actions/parseXFBML.js"
+    },
+    {
+      "name": "Show Dialog",
+      "path": "actions/showDialog.js"
+    }
   ]
 }

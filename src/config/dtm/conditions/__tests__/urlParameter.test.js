@@ -11,8 +11,10 @@ conditionDelegate.__set__('getQueryParam', function() {
 describe('url parameter condition delegate', function() {
   it('returns true when value matches using regular string', function() {
     var settings = {
-      name: 'testParam',
-      value: 'foo'
+      conditionSettings: {
+        name: 'testParam',
+        value: 'foo'
+      }
     };
 
     expect(conditionDelegate(settings)).toBe(true);
@@ -20,8 +22,10 @@ describe('url parameter condition delegate', function() {
 
   it('returns true when value matches using regex', function() {
     var settings = {
-      name: 'testParam',
-      value: /^f[ojd]o$/
+      conditionSettings: {
+        name: 'testParam',
+        value: /^f[ojd]o$/
+      }
     };
 
     expect(conditionDelegate(settings)).toBe(true);
@@ -29,8 +33,10 @@ describe('url parameter condition delegate', function() {
 
   it('returns false when value does not match using regular string', function() {
     var settings = {
-      name: 'testParam',
-      value: 'goo'
+      conditionSettings: {
+        name: 'testParam',
+        value: 'goo'
+      }
     };
 
     expect(conditionDelegate(settings)).toBe(false);
@@ -38,8 +44,10 @@ describe('url parameter condition delegate', function() {
 
   it('returns false when value does not match using regex', function() {
     var settings = {
-      name: 'testParam',
-      value: /^g[ojd]o$/
+      conditionSettings: {
+        name: 'testParam',
+        value: /^g[ojd]o$/
+      }
     };
 
     expect(conditionDelegate(settings)).toBe(false);

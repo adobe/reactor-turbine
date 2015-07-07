@@ -253,6 +253,24 @@ assign(AdobeAnalytics.prototype, {
   }
 });
 
-module.exports = function(extensionSettings) {
-  return new AdobeAnalytics(extensionSettings);
+var instanceByIntegrationId = {};
+
+module.exports = function(settings) {
+  settings.integrationsSettings.forEach(function(integrationSettings) {
+    var instance = instanceByIntegrationId[integrationSettings.id];
+
+    if (!instance) {
+      instance = instanceByIntegrationId[integrationSettings.id] =
+          new AdobeAnalytics(settings.extensionSettings);
+    }
+
+    switch (settings.actionSettings.trackType) {
+      case 'link':
+        instance.trackLink(settings.actionSettings);
+        break;
+      case 'pageView':
+        instance.trackPageView(settings.actionSettings);
+        break;
+    }
+  });
 };

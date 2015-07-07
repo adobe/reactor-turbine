@@ -1,11 +1,12 @@
-var createIntegrations = require('./createIntegrations');
+var createExtensionCores = require('./createExtensionCores');
 var initRules = require('./initRules');
 var dataElementDefinitions = require('./stores/dataElementDefinitions');
 var eventDelegates = require('./stores/extensionDelegates/eventDelegates');
-var dataElementDelegates = require('./stores/extensionDelegates/dataElementDelegates');
 var conditionDelegates = require('./stores/extensionDelegates/conditionDelegates');
+var actionDelegates = require('./stores/extensionDelegates/actionDelegates');
+var dataElementDelegates = require('./stores/extensionDelegates/dataElementDelegates');
 var coreDelegates = require('./stores/extensionDelegates/coreDelegates');
-var integrationRegistry = require('./stores/integrationRegistry');
+var coreRegistry = require('./stores/coreRegistry');
 var getVar = require('./utils/dataElement/getVar');
 var setVar = require('./utils/dataElement/setVar');
 var isAnchor = require('./utils/dom/isAnchor');
@@ -33,20 +34,19 @@ _satellite.isLinked = function(element) {
 };
 
 eventDelegates.init(property.eventDelegates);
-dataElementDelegates.init(property.dataElementDelegates);
 conditionDelegates.init(property.conditionDelegates);
+actionDelegates.init(property.actionDelegates);
+dataElementDelegates.init(property.dataElementDelegates);
 dataElementDefinitions.init(property.dataElements);
 coreDelegates.init(property.coreDelegates);
 
-createIntegrations(
-  property.integrations,
-  integrationRegistry,
-  coreDelegates,
-  property.settings);
+createExtensionCores(
+  property,
+  coreRegistry,
+  coreDelegates);
 
 initRules(
-  property.rules,
-  property.settings,
-  integrationRegistry,
+  property,
   eventDelegates,
-  conditionDelegates);
+  conditionDelegates,
+  actionDelegates);

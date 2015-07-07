@@ -9,7 +9,9 @@ dataElementDelegate.__set__('getObjectProperty', getObjectPropertySpy);
 describe('variable data element delegate', function() {
   it('should return an object property value', function() {
     var settings = {
-      path: 'my.path.var'
+      dataElementSettings: {
+        path: 'my.path.var'
+      }
     };
 
     var value = dataElementDelegate(settings);

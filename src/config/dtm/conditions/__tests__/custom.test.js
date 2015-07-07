@@ -5,8 +5,10 @@ var conditionDelegate = require('../custom');
 describe('custom condition delegate', function() {
   it('should run a user-defined function', function() {
     var settings = {
-      script: function() {
-        return true;
+      conditionSettings: {
+        script: function() {
+          return true;
+        }
       }
     };
 
@@ -17,10 +19,10 @@ describe('custom condition delegate', function() {
 
     var relatedElement = {};
 
-    spyOn(settings, 'script').and.callThrough();
+    spyOn(settings.conditionSettings, 'script').and.callThrough();
     conditionDelegate(settings, event, relatedElement);
 
-    expect(settings.script.calls.first()).toEqual({
+    expect(settings.conditionSettings.script.calls.first()).toEqual({
       object: relatedElement,
       args: [event, event.target],
       returnValue: true

@@ -24,8 +24,14 @@
   IFrameJasmine.prototype = jasmine;
 
   function cacheBust(url) {
-    var cacheBustSeparator = url.indexOf('?') !== -1 ? '&' : '?';
-    return url + cacheBustSeparator + 'cachebust=' + Date.now();
+    // Don't cache bust if we're using the Karma debug page. Using the cachebusting when
+    // debugging makes it difficult to work with breakpoints.
+    if (document.location.pathname.indexOf('debug.html') === -1) {
+      var cacheBustSeparator = url.indexOf('?') !== -1 ? '&' : '?';
+      return url + cacheBustSeparator + 'cachebust=' + Date.now();
+    } else {
+      return url;
+    }
   }
 
   function loadIframe(url) {

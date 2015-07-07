@@ -1,6 +1,12 @@
 {
   "name": "adobeTarget",
-  "core": "core.js",
+  "actionDelegates": [
+    {
+      "name": "Add Mbox",
+      "path": "actions/addMbox.js",
+      "requireIntegration": true
+    }
+  ],
   "dependencies": [
     "adobeVisitor"
   ]

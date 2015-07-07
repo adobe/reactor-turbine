@@ -1,4 +1,15 @@
 {
   "name": "adobeDebug",
-  "core": "core.js"
+  "actionDelegates": [
+    {
+      "name": "Alert",
+      "path": "actions/alert.js",
+      "requireIntegration": false
+    },
+    {
+      "name": "Log",
+      "path": "actions/log.js",
+      "requireIntegration": false
+    }
+  ]
 }

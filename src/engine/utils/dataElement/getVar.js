@@ -15,10 +15,9 @@ var getQueryParam = require('./../uri/getQueryParam');
 // a query parameter, or a random number.
 //
 // - `variable` - the name of the variable to get
-// - `[elm]` - the associated element, if any
-// - `[evt]` - the associated event, if any
-module.exports = function(variable, elm, evt) {
-  var target = evt ? (evt.target || evt.srcElement) : null;
+// - `[element]` - the associated element, if any
+// - `[event]` - the associated event, if any
+module.exports = function(variable, element, event) {
   var URI = getURI();
   var randMatch;
   var value;
@@ -34,14 +33,20 @@ module.exports = function(variable, elm, evt) {
   value = map[variable];
   if (value === undefined) {
     if (variable.substring(0, 5) === 'this.') {
-      variable = variable.slice(5);
-      value = getObjectProperty(elm, variable, true);
+      if (element) {
+        variable = variable.slice(5);
+        value = getObjectProperty(element, variable, true);
+      }
     } else if (variable.substring(0, 6) === 'event.') {
-      variable = variable.slice(6);
-      value = getObjectProperty(evt, variable);
+      if (event) {
+        variable = variable.slice(6);
+        value = getObjectProperty(event, variable);
+      }
     } else if (variable.substring(0, 7) === 'target.') {
-      variable = variable.slice(7);
-      value = getObjectProperty(target, variable);
+      if (event.target) {
+        variable = variable.slice(7);
+        value = getObjectProperty(event.target, variable);
+      }
     } else if (variable.substring(0, 7) === 'window.') {
       variable = variable.slice(7);
       value = getObjectProperty(window, variable);

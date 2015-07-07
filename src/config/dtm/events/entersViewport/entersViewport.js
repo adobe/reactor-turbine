@@ -1,6 +1,5 @@
 'use strict';
 
-var addEventListener = require('addEventListener');
 var poll = require('poll');
 var covertData = require('covertData');
 var bubbly = require('bubbly');
@@ -159,8 +158,8 @@ var checkIfElementsInViewport = function() {
 };
 
 // TODO: Add debounce to the scroll event handling?
-addEventListener(window, 'scroll', checkIfElementsInViewport);
-addEventListener(window, 'load', checkIfElementsInViewport);
+window.addEventListener('scroll', checkIfElementsInViewport);
+window.addEventListener('load', checkIfElementsInViewport);
 poll('enters viewport event delegate', checkIfElementsInViewport);
 
 /**

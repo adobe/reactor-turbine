@@ -1,5 +1,4 @@
 var covertData = require('./../covertData');
-var addEventListener = require('./../dom/addEventListener');
 var globalPoll = require('./globalPoll');
 
 var listeners = [];
@@ -25,7 +24,7 @@ function addListenersToNewElements(listener) {
     //   SL.registerEvents(elm, [rule.event])
     // }
 
-    addEventListener(element, listener.type, listener.callback);
+    element.addEventListener(listener.type, listener.callback);
   }
 }
 

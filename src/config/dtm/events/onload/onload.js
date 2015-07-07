@@ -1,14 +1,12 @@
 'use strict';
 
-var addEventListener = require('addEventListener');
-
 /**
  * All trigger methods registered for this event type.
  * @type {ruleTrigger[]}
  */
 var triggers = [];
 
-addEventListener(window, 'load', function() {
+window.addEventListener('load', function() {
   var pseudoEvent = {
     type: 'windowload',
     target: document.location

@@ -5,11 +5,15 @@ module.exports = function(config) {
   if (elements.length > 0) {
     var element = elements[0];
 
+    var property = config.dataElementConfig.property;
+
     // TODO Can we use getObjectProperty() here or at least getElementText()?
-    if (config.dataElementConfig.property === 'text') {
+    if (property === 'text') {
       return element.innerText || element.textContent;
-    } else if (element.hasAttribute(config.dataElementConfig.property)) {
-      return element.getAttribute(config.dataElementConfig.property);
+    } else if (property in element) {
+      return element[property];
+    } else {
+      return element.getAttribute ? element.getAttribute(property) : undefined;
     }
   }
 };

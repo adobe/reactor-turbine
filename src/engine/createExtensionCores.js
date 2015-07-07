@@ -1,5 +1,5 @@
 var Promise = require('./utils/communication/Promise');
-var preprocessSettings = require('./utils/preprocessSettings');
+var preprocessConfig = require('./utils/preprocessConfig');
 
 /**
  * Initializes extension cores.
@@ -34,29 +34,29 @@ module.exports = function(property, coreRegistry, coreDelegates) {
     return promiseByExtensionId;
   }
 
-  function getIntegrationsSettingsForExtension(extensionId) {
-    var integrationsSettings = [];
+  function getIntegrationConfigsForExtension(extensionId) {
+    var integrationConfigs = [];
     for (var integrationId in property.integrations) {
       var integration = property.integrations[integrationId];
       if (integration.type === extensionId) {
-        var preprocessedIntegrationSettings = preprocessSettings(
-          integration.settings,
-          property.settings.undefinedVarsReturnEmpty
+        var preprocessedIntegrationConfig = preprocessConfig(
+          integration.config,
+          property.config.undefinedVarsReturnEmpty
         );
-        integrationsSettings.push(preprocessedIntegrationSettings);
+        integrationConfigs.push(preprocessedIntegrationConfig);
       }
     }
-    return integrationsSettings;
+    return integrationConfigs;
   }
 
   function initializeCores(promiseByExtensionId) {
     // Initialize each integration.
     for (var extensionId in property.extensions) {
-      var settings = {
-        integrationsSettings: getIntegrationsSettingsForExtension(extensionId),
-        propertySettings: preprocessSettings(
-          property.settings,
-          property.settings.undefinedVarsReturnEmpty
+      var config = {
+        integrationConfigs: getIntegrationConfigsForExtension(extensionId),
+        propertyConfig: preprocessConfig(
+          property.config,
+          property.config.undefinedVarsReturnEmpty
         )
       };
 
@@ -66,7 +66,7 @@ module.exports = function(property, coreRegistry, coreDelegates) {
       // If there is no core for the extension then the promise should be resolved with undefined.
       if (property.coreDelegates[extensionId]) {
         delegate = coreDelegates.get(extensionId);
-        result = delegate(settings);
+        result = delegate(config);
       }
 
       // Get the proxy promise that was created beforehand for the integration and make sure it's

@@ -115,15 +115,15 @@ adobeVisitor.then(function(instance) {
   console.log('VisitorID received by Target extension: ' + instance.visitorId);
 });
 
-module.exports = function(settings) {
-  if (!settings.integrationsSettings.length) {
+module.exports = function(config) {
+  if (!config.integrationConfigs.length) {
     return;
   }
 
   // Only support one integration at the moment.
-  var integrationSettings = settings.integrationsSettings[0];
+  var integrationConfig = config.integrationConfigs[0];
 
-  if (getMboxByName(settings.actionSettings.name)) {
+  if (getMboxByName(config.actionConfig.name)) {
     return;
   }
 
@@ -142,7 +142,7 @@ module.exports = function(settings) {
     mboxPC: mboxPCId,
     mboxCount: 1, // TODO needs to be incremented for each Mbox I believe.
     mboxTime: getTime(),
-    mbox: settings.actionSettings.name,
+    mbox: config.actionConfig.name,
     mboxId: 0, // TODO needs to come from the number of mboxes with the same mbox name?
     // TODO should only get sent when passPageParameters is true?
     // See _urlBuilder.setUrlProcessAction
@@ -153,17 +153,17 @@ module.exports = function(settings) {
     mboxVersion: 56 // TODO remove when using framework?
   };
 
-  assign(args, settings.actionSettings.arguments);
+  assign(args, config.actionConfig.arguments);
 
   var showPage;
 
-  if (settings.actionSettings.hideElement) {
-    showPage = hideElements(settings.actionSettings.hideElement);
+  if (config.actionConfig.hideElement) {
+    showPage = hideElements(config.actionConfig.hideElement);
   }
 
   var setOffer = function(mboxContent) {
     if (mboxContent !== undefined) {
-      var mboxContainer = document.querySelector(settings.actionSettings.populateElement);
+      var mboxContainer = document.querySelector(config.actionConfig.populateElement);
       if (mboxContainer) {
         mboxContainer.innerHTML = mboxContent;
       }
@@ -175,13 +175,13 @@ module.exports = function(settings) {
   };
 
   /*eslint-disable new-cap*/
-  mboxes.push(new mbox(settings.actionSettings.name, setOffer));
+  mboxes.push(new mbox(config.actionConfig.name, setOffer));
   /*eslint-enable new-cap*/
 
   var requestType = 'ajax';
 
-  var url = protocol + '//' + integrationSettings.serverHost + '/m2/' +
-    integrationSettings.clientCode + '/mbox/' + requestType + '?' +
+  var url = protocol + '//' + integrationConfig.serverHost + '/m2/' +
+    integrationConfig.clientCode + '/mbox/' + requestType + '?' +
     encodeObjectToURI(args);
 
   loadScript(url);

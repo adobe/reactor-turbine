@@ -3,28 +3,28 @@
 
 var corePromise = require('extensionCores').get('facebookConnect');
 
-module.exports = function(settings) {
-  var actionSettings = settings.actionSettings;
+module.exports = function(config) {
+  var actionConfig = config.actionConfig;
   corePromise.then(function() {
-    var container = document.querySelector(actionSettings.selector);
+    var container = document.querySelector(actionConfig.selector);
 
     if (container) {
       var div = document.createElement('div');
       div.classList.add('fb-like');
       div.setAttribute('data-action', 'like');
-      div.setAttribute('data-href', actionSettings.href);
-      div.setAttribute('data-layout', actionSettings.layout);
-      div.setAttribute('data-show-faces', actionSettings.showFaces);
-      div.setAttribute('data-share', actionSettings.share);
+      div.setAttribute('data-href', actionConfig.href);
+      div.setAttribute('data-layout', actionConfig.layout);
+      div.setAttribute('data-show-faces', actionConfig.showFaces);
+      div.setAttribute('data-share', actionConfig.share);
 
-      if (actionSettings.hasOwnProperty('width')) {
-        div.setAttribute('data-width', actionSettings.width);
+      if (actionConfig.hasOwnProperty('width')) {
+        div.setAttribute('data-width', actionConfig.width);
       }
 
       container.appendChild(div);
 
       engine.parseXFBML({
-        selector: actionSettings.selector
+        selector: actionConfig.selector
       });
     }
   });

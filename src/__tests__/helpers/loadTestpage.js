@@ -44,7 +44,7 @@
     return iframe;
   }
 
-  function eraseLocalStorageSettings() {
+  function eraseLocalStorageConfig() {
     if (!window.localStorage) {
       return;
     }
@@ -56,11 +56,11 @@
   /**
    * Run a test page within an iframe.
    * @param {string} path The path of the test page. May be absolute or relative.
-   * @param {Object} [testSettings] An object to set on the iframe window object. This can
+   * @param {Object} [testConfig] An object to set on the iframe window object. This can
    * be used to configure a test in the iframe.
    * @param {boolean} [focus] If true, only this test will run and no other tests.
    */
-  window.runTestPage = function(path, testSettings, focus) {
+  window.runTestPage = function(path, testConfig, focus) {
     var absolutePath;
 
     if (path.charAt(0) === '/') {
@@ -73,7 +73,7 @@
     }
 
     function runTest(done) {
-      eraseLocalStorageSettings();
+      eraseLocalStorageConfig();
 
       var iframe = loadIframe(absolutePath);
       var iwin = iframe.contentWindow || iframe.contentDocument.defaultView;
@@ -86,7 +86,7 @@
       iwin.expect = expect;
       iwin.fail = fail;
       iwin.jasmine = new IFrameJasmine(iwin);
-      iwin.testSettings = testSettings;
+      iwin.testConfig = testConfig;
     }
 
     describe('test page', function() {
@@ -102,10 +102,10 @@
   /**
    * Run a single test page and ignore all other tests.
    * @param {string} path The path of the test page. May be absolute or relative.
-   * @param {Object} [testSettings] An object to set on the iframe window object. This can
+   * @param {Object} [testConfig] An object to set on the iframe window object. This can
    * be used to configure a test in the iframe.
    */
-  window.frunTestPage = function(path, testSettings) {
-    window.runTestPage(path, testSettings, true);
+  window.frunTestPage = function(path, testConfig) {
+    window.runTestPage(path, testConfig, true);
   };
 })();

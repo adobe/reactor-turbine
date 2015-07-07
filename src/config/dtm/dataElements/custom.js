@@ -1,5 +1,5 @@
 'use strict';
 
-module.exports = function(settings) {
-  return settings.dataElementSettings.script();
+module.exports = function(config) {
+  return config.dataElementConfig.script();
 };

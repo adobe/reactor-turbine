@@ -3,10 +3,10 @@
 
 var corePromise = require('extensionCores').get('facebookConnect');
 
-module.exports = function(settings) {
+module.exports = function(config) {
   corePromise.then(function() {
-    if (settings.actionSettings.hasOwnProperty('selector')) {
-      FB.XFBML.parse(document.querySelector(settings.actionSettings.selector));
+    if (config.actionConfig.hasOwnProperty('selector')) {
+      FB.XFBML.parse(document.querySelector(config.actionConfig.selector));
     } else {
       FB.XFBML.parse();
     }

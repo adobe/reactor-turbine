@@ -2,6 +2,6 @@
 
 var readCookie = require('readCookie');
 
-module.exports = function(settings) {
-  return readCookie(settings.dataElementSettings.name);
+module.exports = function(config) {
+  return readCookie(config.dataElementConfig.name);
 };

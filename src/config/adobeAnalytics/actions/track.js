@@ -7,8 +7,8 @@ var clientInfo = require('clientInfo');
 var createBeacon = require('createBeacon');
 
 // TODO: Handle canceling tool initialization. Not sure why this is supported.
-var AdobeAnalytics = function(extensionSettings) {
-  this.extensionSettings = extensionSettings;
+var AdobeAnalytics = function(extensionConfig) {
+  this.extensionConfig = extensionConfig;
 };
 
 assign(AdobeAnalytics.prototype, {
@@ -133,7 +133,7 @@ assign(AdobeAnalytics.prototype, {
       Math.floor(Math.random() * 10000000000000);
     // TODO: Is this necessary or should we just leave off the protocol?
     var protocol = isHTTPS() ? 'https://' : 'http://';
-    var uri = protocol + this._getTrackingServer() + '/b/ss/' + this.extensionSettings.account +
+    var uri = protocol + this._getTrackingServer() + '/b/ss/' + this.extensionConfig.account +
       '/1/JS-1.4.3-' + tagContainerMarker + '/' + cacheBuster;
 
     if (queryString) {
@@ -162,11 +162,11 @@ assign(AdobeAnalytics.prototype, {
     // TODO: Use getAccount from tool since it deals with accountByHost? What is
     // accountByHost anyway?
     // TODO: What do we do if account is not default. Returning null is probably not awesome.
-    if (this.extensionSettings.trackingServer) {
-      return this.extensionSettings.trackingServer;
+    if (this.extensionConfig.trackingServer) {
+      return this.extensionConfig.trackingServer;
     }
 
-    var account = this.extensionSettings.account;
+    var account = this.extensionConfig.account;
 
     if (!account) {
       return null;
@@ -175,7 +175,7 @@ assign(AdobeAnalytics.prototype, {
     // based on code in AppMeasurement.
     /*eslint-disable*/
     var c = '';
-    var dataCenter = this.extensionSettings.trackVars.dc || 'd1';
+    var dataCenter = this.extensionConfig.trackVars.dc || 'd1';
     var e;
     var f;
     e = account.indexOf(',');
@@ -187,10 +187,10 @@ assign(AdobeAnalytics.prototype, {
     /*eslint-enable*/
     return e;
   },
-  trackPageView: function(actionSettings) {
+  trackPageView: function(actionConfig) {
     var trackVars = {};
-    assign(trackVars, this.extensionSettings.trackVars);
-    assign(trackVars, actionSettings.trackVars);
+    assign(trackVars, this.extensionConfig.trackVars);
+    assign(trackVars, actionConfig.trackVars);
 
     // Referrer is intentionally only tracked on the first page view beacon.
     if (this.initialPageViewTracked) {
@@ -199,38 +199,38 @@ assign(AdobeAnalytics.prototype, {
 
     this.initialPageViewTracked = true;
 
-    if (actionSettings.customSetup) {
+    if (actionConfig.customSetup) {
       // TODO: Do we need to send the originating event into the custom setup function?
-      actionSettings.customSetup();
+      actionConfig.customSetup();
     }
 
-    this._track(trackVars, actionSettings.trackEvents);
+    this._track(trackVars, actionConfig.trackEvents);
   },
   _doesExtensionVarApplyToLinkTracking: function(varName) {
     /*eslint-disable max-len*/
     return !/^(eVar[0-9]+)|(prop[0-9]+)|(hier[0-9]+)|campaign|purchaseID|channel|server|state|zip|pageType$/.test(varName);
     /*eslint-enable max-len*/
   },
-  trackLink: function(actionSettings) {
+  trackLink: function(actionConfig) {
     var trackVars = {};
 
-    for (var varName in this.extensionSettings.trackVars) {
+    for (var varName in this.extensionConfig.trackVars) {
       if (this._doesExtensionVarApplyToLinkTracking(varName)) {
-        trackVars[varName] = this.extensionSettings.trackVars[varName];
+        trackVars[varName] = this.extensionConfig.trackVars[varName];
       }
     }
 
-    assign(trackVars, actionSettings.trackVars);
+    assign(trackVars, actionConfig.trackVars);
 
     // Referrer is never sent for link tracking.
     delete trackVars.referrer;
 
-    if (actionSettings.customSetup) {
+    if (actionConfig.customSetup) {
       // TODO: Do we need to send the originating event into the custom setup function?
-      actionSettings.customSetup();
+      actionConfig.customSetup();
     }
 
-    this._track(trackVars, actionSettings.trackEvents);
+    this._track(trackVars, actionConfig.trackEvents);
   },
   _track: function(trackVars, trackEvents) {
     var queryString = this._remodelDataToQueryString({
@@ -255,21 +255,21 @@ assign(AdobeAnalytics.prototype, {
 
 var instanceByIntegrationId = {};
 
-module.exports = function(settings) {
-  settings.integrationsSettings.forEach(function(integrationSettings) {
-    var instance = instanceByIntegrationId[integrationSettings.id];
+module.exports = function(config) {
+  config.integrationConfigs.forEach(function(integrationConfig) {
+    var instance = instanceByIntegrationId[integrationConfig.id];
 
     if (!instance) {
-      instance = instanceByIntegrationId[integrationSettings.id] =
-          new AdobeAnalytics(settings.extensionSettings);
+      instance = instanceByIntegrationId[integrationConfig.id] =
+          new AdobeAnalytics(config.extensionConfig);
     }
 
-    switch (settings.actionSettings.trackType) {
+    switch (config.actionConfig.trackType) {
       case 'link':
-        instance.trackLink(settings.actionSettings);
+        instance.trackLink(config.actionConfig);
         break;
       case 'pageView':
-        instance.trackPageView(settings.actionSettings);
+        instance.trackPageView(config.actionConfig);
         break;
     }
   });

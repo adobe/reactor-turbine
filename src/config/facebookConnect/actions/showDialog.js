@@ -3,8 +3,8 @@
 
 var corePromise = require('extensionCores').get('facebookConnect');
 
-module.exports = function(settings) {
+module.exports = function(config) {
   corePromise.then(function() {
-    FB.ui(settings.actionSettings);
+    FB.ui(config.actionConfig);
   });
 };

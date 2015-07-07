@@ -41,21 +41,21 @@ poll('element exists event delegate', function() {
 /**
  * Element exists event. This event occurs when an element has been added to the DOM. The rule
  * should only run once per targeted element.
- * @param {Object} settings
- * @param {Object} settings.eventSettings The event settings object.
- * @param {string} settings.eventSettings.selector The CSS selector for elements the rule is targeting.
- * @param {boolean} [settings.eventSettings.bubbleFireIfParent=false] Whether the rule should fire if the event
+ * @param {Object} config
+ * @param {Object} config.eventConfig The event config object.
+ * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.
+ * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire if the event
  * originated from a descendant element.
- * @param {boolean} [settings.eventSettings.bubbleFireIfChildFired=false] Whether the rule should fire if the
+ * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should fire if the
  * same event has already triggered a rule targeting a descendant element.
- * @param {boolean} [settings.eventSettings.bubbleStop=false] Whether the event should not trigger rules on
+ * @param {boolean} [config.eventConfig.bubbleStop=false] Whether the event should not trigger rules on
  * ancestor elements.
  * @param {ruleTrigger} trigger The trigger callback.
  */
-module.exports = function(settings, trigger) {
-  elementExistsBubbly.addListener(settings.eventSettings, trigger);
+module.exports = function(config, trigger) {
+  elementExistsBubbly.addListener(config.eventConfig, trigger);
 
-  if (selectors.indexOf(settings.eventSettings.selector) === -1) {
-    selectors.push(settings.eventSettings.selector);
+  if (selectors.indexOf(config.eventConfig.selector) === -1) {
+    selectors.push(config.eventConfig.selector);
   }
 };

@@ -7,22 +7,22 @@ var clickBubbly = bubbly();
 
 /**
  * Click event. This event occurs when a user has clicked an element.
- * @param {Object} settings
- * @param {Object} settings.eventSettings The event settings object.
- * @param {string} settings.eventSettings.selector The CSS selector for elements the rule is targeting.
- * @param {boolean} [settings.eventSettings.bubbleFireIfParent=false] Whether the rule should fire if the event
+ * @param {Object} config
+ * @param {Object} config.eventConfig The event config object.
+ * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.
+ * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire if the event
  * originated from a descendant element.
- * @param {boolean} [settings.eventSettings.bubbleFireIfChildFired=false] Whether the rule should fire if the
+ * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should fire if the
  * same event has already triggered a rule targeting a descendant element.
- * @param {boolean} [settings.eventSettings.bubbleStop=false] Whether the event should not trigger rules on
+ * @param {boolean} [config.eventConfig.bubbleStop=false] Whether the event should not trigger rules on
  * @param {ruleTrigger} trigger The trigger callback.
  * ancestor elements.
  */
-module.exports = function(settings, trigger) {
-  clickBubbly.addListener(settings.eventSettings, trigger);
+module.exports = function(config, trigger) {
+  clickBubbly.addListener(config.eventConfig, trigger);
 
-  if (settings.eventSettings.eventHandlerOnElement) {
-    addLiveEventListener(settings.eventSettings.selector, 'click', clickBubbly.evaluateEvent);
+  if (config.eventConfig.eventHandlerOnElement) {
+    addLiveEventListener(config.eventConfig.selector, 'click', clickBubbly.evaluateEvent);
   } else {
     document.addEventListener('click', clickBubbly.evaluateEvent);
   }

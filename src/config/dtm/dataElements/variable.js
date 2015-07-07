@@ -2,6 +2,6 @@
 
 var getObjectProperty = require('getObjectProperty');
 
-module.exports = function(settings) {
-  return getObjectProperty(window, settings.dataElementSettings.path);
+module.exports = function(config) {
+  return getObjectProperty(window, config.dataElementConfig.path);
 };

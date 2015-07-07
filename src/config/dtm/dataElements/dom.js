@@ -1,15 +1,15 @@
 'use strict';
 
-module.exports = function(settings) {
-  var elements = document.querySelectorAll(settings.dataElementSettings.selector);
+module.exports = function(config) {
+  var elements = document.querySelectorAll(config.dataElementConfig.selector);
   if (elements.length > 0) {
     var element = elements[0];
 
     // TODO Can we use getObjectProperty() here or at least getElementText()?
-    if (settings.dataElementSettings.property === 'text') {
+    if (config.dataElementConfig.property === 'text') {
       return element.innerText || element.textContent;
-    } else if (element.hasAttribute(settings.dataElementSettings.property)) {
-      return element.getAttribute(settings.dataElementSettings.property);
+    } else if (element.hasAttribute(config.dataElementConfig.property)) {
+      return element.getAttribute(config.dataElementConfig.property);
     }
   }
 };

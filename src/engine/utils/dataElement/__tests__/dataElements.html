@@ -16,7 +16,7 @@
       config.integrations = {
         'abc': {
           type: 'testExtension',
-          settings: {
+          config: {
             mmmtreats: '%treat%',
             accountId: 123
           }
@@ -60,7 +60,7 @@
             });
           };
 
-          module.exports = function(settings, trigger) {
+          module.exports = function(config, trigger) {
             allTriggers.push(trigger);
           };
         }
@@ -70,7 +70,7 @@
         {
           events: [{
             type: 'testEvent',
-            settings: {
+            config: {
               name: 'foo'
             }
           }],
@@ -78,7 +78,7 @@
             {
               integrationIds: ['abc'],
               type: 'test',
-              settings: {
+              config: {
                 dataElementBased: '%treat%',
                 dataElementPriorityBased: '%vegetable%',
                 dataElementDefaultBased: '%meat%',
@@ -108,8 +108,8 @@
 
       config.dataElementDelegates = {
         'testExtension.static': function(module, require) {
-          module.exports = function(settings) {
-            return settings.staticValue;
+          module.exports = function(config) {
+            return config.staticValue;
           };
         }
       };
@@ -118,7 +118,7 @@
         {
           name: "treat",
           type: "testExtension.static",
-          settings: {
+          config: {
             staticValue: "Ice   \n Cream  \n  ",
             forceLowerCase: true,
             cleanText: true
@@ -127,21 +127,21 @@
         {
           name: "vegetable",
           type: "testExtension.static",
-          settings: {
+          config: {
             staticValue: "carrot"
           }
         },
         {
           name: "meat",
           type: "testExtension.static",
-          settings: {
+          config: {
             default: "default meat"
           }
         },
         {
           name: 'bottlesofbeeronthewall',
           type: 'testExtension.static',
-          settings: {
+          config: {
             staticValue: 99,
             forceLowerCase: true
           }
@@ -149,7 +149,7 @@
         {
           name: "beverage:pageview",
           type: "testExtension.static",
-          settings: {
+          config: {
             staticValue: 'Piña Colada',
             storeLength: 'pageview'
           }
@@ -157,7 +157,7 @@
         {
           name: "beverage:visitor",
           type: "testExtension.static",
-          settings: {
+          config: {
             staticValue: 'Soda',
             storeLength: 'visitor'
           }
@@ -165,14 +165,14 @@
         {
           name: "beverage:session",
           type: "testExtension.static",
-          settings: {
+          config: {
             staticValue: 'Fruit Punch',
             storeLength: 'session'
           }
         }
       ];
 
-      config.settings.undefinedVarsReturnEmpty = true;
+      config.config.undefinedVarsReturnEmpty = true;
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/src/__tests__/helpers/testpage.js"></script>
@@ -188,7 +188,7 @@
           _satellite.setVar('instrument', 'piccolo');
           _satellite.setVar('vegetable', 'onion');
 
-          expect(coreDelegateSpy.calls.argsFor(0)[0].integrationsSettings).toEqual([
+          expect(coreDelegateSpy.calls.argsFor(0)[0].integrationConfigs).toEqual([
             {
               mmmtreats: 'ice cream',
               accountId: 123
@@ -201,41 +201,41 @@
           jasmine.clock().tick(1);
 
           expect(actionSpy.calls.count()).toBe(1);
-          var actionSettings = actionSpy.calls.argsFor(0)[0].actionSettings;
-          expect(actionSettings.dataElementBased).toBe('ice cream');
+          var actionConfig = actionSpy.calls.argsFor(0)[0].actionConfig;
+          expect(actionConfig.dataElementBased).toBe('ice cream');
           // Both a data element and a custom variable (set using setVar) named "vegetable" have
           // been set. The data element has a higher priority.
-          expect(actionSettings.dataElementPriorityBased).toBe('carrot');
-          expect(actionSettings.dataElementDefaultBased).toBe('default meat');
-          expect(actionSettings.dataElementIntegerBased).toBe('99');
-          expect(actionSettings.dataElementPageViewBased).toBe('Piña Colada');
+          expect(actionConfig.dataElementPriorityBased).toBe('carrot');
+          expect(actionConfig.dataElementDefaultBased).toBe('default meat');
+          expect(actionConfig.dataElementIntegerBased).toBe('99');
+          expect(actionConfig.dataElementPageViewBased).toBe('Piña Colada');
           expect(document.cookie.indexOf('_sdsat_beverage:pageview=Piña Colada')).toBe(-1);
-          expect(actionSettings.dataElementVisitorBased).toBe('Soda');
+          expect(actionConfig.dataElementVisitorBased).toBe('Soda');
           expect(document.cookie.indexOf('_sdsat_beverage:visitor=Soda') > -1).toBe(true);
-          expect(actionSettings.dataElementSessionBased).toBe('Fruit Punch');
+          expect(actionConfig.dataElementSessionBased).toBe('Fruit Punch');
           expect(document.cookie.indexOf('_sdsat_beverage:session=Fruit Punch') > -1).toBe(true);
-          expect(actionSettings.URIBased).toBe(document.location.pathname + document.location.search);
-          expect(actionSettings.uriBased).toBe(document.location.pathname + document.location.search);
-          expect(actionSettings.protocolBased).toBe(window.location.protocol);
-          expect(actionSettings.hostnameBased).toBe(document.location.hostname);
-          expect(actionSettings.thisBased).toBe('kazoo');
-          expect(actionSettings.thisTextBased).toBe('  Content with line \n breaks and multiple   spaces');
-          expect(actionSettings.thisCleanTextBased).toBe('Content with line breaks and multiple spaces');
-          expect(actionSettings.eventBased).toBe('apple');
-          expect(actionSettings.targetBased).toBe('fruitPartyBowl');
-          expect(actionSettings.windowBased).toBe('applejacks');
-          expect(actionSettings.paramBased).toBe('barValue');
-          expect(typeof actionSettings.randBased).toBe('string');
-          expect(actionSettings.randBased.length).toBe(3);
-          expect(actionSettings.customBased).toBe('piccolo');
-          // undefinedVarsReturnEmpty=true on property settings so it returns an empty string
-          expect(actionSettings.undefinedBased).toBe('');
+          expect(actionConfig.URIBased).toBe(document.location.pathname + document.location.search);
+          expect(actionConfig.uriBased).toBe(document.location.pathname + document.location.search);
+          expect(actionConfig.protocolBased).toBe(window.location.protocol);
+          expect(actionConfig.hostnameBased).toBe(document.location.hostname);
+          expect(actionConfig.thisBased).toBe('kazoo');
+          expect(actionConfig.thisTextBased).toBe('  Content with line \n breaks and multiple   spaces');
+          expect(actionConfig.thisCleanTextBased).toBe('Content with line breaks and multiple spaces');
+          expect(actionConfig.eventBased).toBe('apple');
+          expect(actionConfig.targetBased).toBe('fruitPartyBowl');
+          expect(actionConfig.windowBased).toBe('applejacks');
+          expect(actionConfig.paramBased).toBe('barValue');
+          expect(typeof actionConfig.randBased).toBe('string');
+          expect(actionConfig.randBased.length).toBe(3);
+          expect(actionConfig.customBased).toBe('piccolo');
+          // undefinedVarsReturnEmpty=true on property config so it returns an empty string
+          expect(actionConfig.undefinedBased).toBe('');
           expect(_satellite.getVar('instrument')).toBe('piccolo');
           expect(_satellite.getVar('bottlesofbeeronthewall')).toBe(99);
           // Note that even though "onion" was set through setVar() the configured data element
           // still takes precedence.
           expect(_satellite.getVar('vegetable')).toBe('carrot');
-          // When undefinedVarsReturnEmpty is true on property settings, getVar() still returns
+          // When undefinedVarsReturnEmpty is true on property config, getVar() still returns
           // undefined. It only returns an empty string when using a %% token for some reason.
           expect(_satellite.getVar('undefinedBased')).toBe(undefined);
         })

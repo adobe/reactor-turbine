@@ -28,7 +28,7 @@
     "integrations": {
       "abcdef": {
         "type": "adobeAnalytics",
-        "settings": {
+        "config": {
           "account": "aaronhardyprod",
           "euCookie": false,
           "trackVars": {
@@ -46,14 +46,14 @@
             "dynamicVariablePrefix": "$$",
             "eVar50": "toolevar50",
             "prop50": "toolprop50",
-            // TODO: Why is this in the var list and not a direct child of settings? (currently follows Tool structure)
+            // TODO: Why is this in the var list and not a direct child of config? (currently follows Tool structure)
             "dc": "122"
           }
         }
       },
       "efghi": {
         "type": "adobeTarget",
-        "settings": {
+        "config": {
           "serverHost": "adobeinternaldtmdemo.tt.omtrdc.net",
           "clientCode": "adobeinternaldtmdemo"
         }
@@ -66,7 +66,7 @@
       },
       "uvw": {
         "type": "facebookConnect",
-        "settings": {
+        "config": {
           "appId": "8170496322"
         }
       },
@@ -81,7 +81,7 @@
         "actions": [
           {
             "integrationIds": ["abcdef"],
-            "settings": {
+            "config": {
               "trackType": "pageView",
               "trackVars": {
                 "eVar10": "MyEvar10",
@@ -108,7 +108,7 @@
         "events": [
           {
             "type": "dtm.click",
-            "settings": {
+            "config": {
               "selector": "h1, h2, h3, h4, h5"
             }
           }
@@ -116,7 +116,7 @@
         "conditions": [
           {
             "type":"dtm.custom",
-            "settings": {
+            "config": {
               "script": function(event, target) {
                 return !_satellite.isLinked(target);
               }
@@ -126,7 +126,7 @@
         "actions": [
           {
             "integrationIds": ["abcdef"],
-            "settings": {
+            "config": {
               "trackType": "link",
               "trackVars": {
                 "linkType": "o",
@@ -147,7 +147,7 @@
         "events": [
           {
             "type": "dtm.click",
-            "settings": {
+            "config": {
               "selector": "h1, h2, h3, h4, h5",
               "bubbleFireIfParent": true,
               "bubbleFireIfChildFired": false,
@@ -162,7 +162,7 @@
         "conditions": [
           {
             "type":"dtm.custom",
-            "settings": {
+            "config": {
               "script": function(event, target) {
                 return !_satellite.isLinked(target);
               }
@@ -172,7 +172,7 @@
         "actions": [
           {
             "integrationIds": ["abcdef"],
-            "settings": {
+            "config": {
               "trackType": "link",
               "trackVars": {
                 "linkType": "o",
@@ -193,7 +193,7 @@
         "events": [
           {
             "type": "dtm.click",
-            "settings": {
+            "config": {
               "selector": "#hero"
             }
           }
@@ -202,7 +202,7 @@
           {
             "integrationIds": ["efghi"],
             "method": "addMbox",
-            "settings": {
+            "config": {
               "name": "frameworkdemo",
               "populateElement": "#hero",
               "hideElement": "#hero",
@@ -219,7 +219,7 @@
         "events": [
           {
             "type": "dtm.click",
-            "settings": {
+            "config": {
               "selector": ".clickme",
               "eventHandlerOnElement": true
             }
@@ -229,7 +229,7 @@
           {
             "integrationIds": ["jklmno"],
             "method": "alert",
-            "settings": {
+            "config": {
               "text": "Click Me rule fired"
             }
           }
@@ -240,7 +240,7 @@
         "events": [
           {
             "type": "dtm.click",
-            "settings": {
+            "config": {
               "selector": "#redirectButton"
             }
           }
@@ -249,7 +249,7 @@
           {
             "integrationIds": ["efghi"],
             "method": "addMbox",
-            "settings": {
+            "config": {
               "name": "frameworkredirectdemo",
               "populateElement": "#redirector",
               "hideElement": "html",
@@ -272,7 +272,7 @@
           {
             "integrationIds": ["jklmno"],
             "method": "log",
-            "settings": {
+            "config": {
               "text": "Dom Ready rule fired"
             }
           }
@@ -289,7 +289,7 @@
           {
             "integrationIds": ["jklmno"],
             "method": "log",
-            "settings": {
+            "config": {
               "text": "Page Top rule fired"
             }
           }
@@ -306,7 +306,7 @@
           {
             "integrationIds": ["jklmno"],
             "method": "log",
-            "settings": {
+            "config": {
               "text": "Page Bottom rule fired"
             }
           }
@@ -323,7 +323,7 @@
           {
             "integrationIds": ["jklmno"],
             "method": "log",
-            "settings": {
+            "config": {
               "text": "onload rule fired"
             }
           }
@@ -334,7 +334,7 @@
         "events": [
           {
             "type": "dtm.directCall",
-            "settings": {
+            "config": {
               "name": "dc1"
             }
           }
@@ -343,7 +343,7 @@
           {
             "integrationIds": ["jklmno"],
             "method": "log",
-            "settings": {
+            "config": {
               "text": "direct call rule fired"
             }
           }
@@ -354,7 +354,7 @@
         "events": [
           {
             "type": "dtm.mouseover",
-            "settings": {
+            "config": {
               "selector": "[href='file.zip']"
             }
           }
@@ -363,7 +363,7 @@
           {
             "integrationIds": ["jklmno"],
             "method": "log",
-            "settings": {
+            "config": {
               "text": "mouseover download link rule fired"
             }
           }
@@ -374,7 +374,7 @@
         "events": [
           {
             "type": "dtm.mouseover",
-            "settings": {
+            "config": {
               "selector": ".clickme",
               "eventHandlerOnElement": true
             }
@@ -384,7 +384,7 @@
           {
             "integrationIds": ["jklmno"],
             "method": "log",
-            "settings": {
+            "config": {
               "text": "mouseover Click Me fired"
             }
           }
@@ -394,7 +394,7 @@
         "events": [
           {
             "type": "dtm.entersViewport",
-            "settings": {
+            "config": {
               "selector": ".clickme"
             }
           }
@@ -402,7 +402,7 @@
         "actions": [{
           "integrationIds": ["jklmno"],
           "method": "log",
-          "settings": {
+          "config": {
             "text": "entersViewport fired rule fired"
           }
         }]
@@ -411,7 +411,7 @@
         "events": [
           {
             "type": "dtm.elementExists",
-            "settings": {
+            "config": {
               "selector": ".clickme"
             }
           }
@@ -419,7 +419,7 @@
         "actions": [{
           "integrationIds": ["jklmno"],
           "method": "log",
-          "settings": {
+          "config": {
             "text": "elementExists fired rule fired"
           }
         }]
@@ -428,7 +428,7 @@
         "events": [
           {
             "type": "dtm.click",
-            "settings": {
+            "config": {
               "selector": ".facebook-login"
             }
           }
@@ -442,7 +442,7 @@
         "events": [
           {
             "type": "dtm.click",
-            "settings": {
+            "config": {
               "selector": ".facebook-share"
             }
           }
@@ -451,7 +451,7 @@
           {
             "integrationIds": ["uvw"],
             "method": "showDialog",
-            "settings": {
+            "config": {
               "method": "send",
               "link": "http://dtm.aaronhardy.com/shoes.html"
             }
@@ -468,7 +468,7 @@
           {
             "integrationIds": ["jklmno"],
             "method": "log",
-            "settings": {
+            "config": {
               "text": "Shared with BFFs."
             }
           }
@@ -478,7 +478,7 @@
         "events": [
           {
             "type": "dtm.click",
-            "settings": {
+            "config": {
               "selector": ".trackFBConversionButton"
             }
           }
@@ -487,7 +487,7 @@
           {
             "integrationIds": ["xyz"],
             "method": "track",
-            "settings": {
+            "config": {
               "eventName": 6032027988706,
               "customData": {
                 "value": 0.01,
@@ -501,7 +501,7 @@
         "events": [
           {
             "type": "dtm.click",
-            "settings": {
+            "config": {
               "selector": ".trackFBEventButton"
             }
           }
@@ -510,14 +510,14 @@
           {
             "integrationIds": ["xyz"],
             "method": "addPixelId",
-            "settings": {
+            "config": {
               "pixelId": 6032027988706
             }
           },
           {
             "integrationIds": ["xyz"],
             "method": "track",
-            "settings": {
+            "config": {
               "eventName": "myCustomEvent",
               "customData": {
                 "something": "important"
@@ -527,7 +527,7 @@
         ]
       }
     ],
-    "settings": {
+    "config": {
       "trackInternalLinks": true,
       "libraryName": "satelliteLib-802733f55cb916def018044ee9a299e20898b26d",
       "isStaging": true,
@@ -557,7 +557,7 @@
       {
         "name": "myBrowserWidth",
         "type": "dtm.custom",
-        "settings": {
+        "config": {
           "script": function() { return 'my custom value from script' },
           "default": "my default value for script",
           "storeLength": "session",
@@ -567,7 +567,7 @@
       {
        "name": "myCookie",
         "type": "dtm.cookie",
-        "settings": {
+        "config": {
           "name": "myCookie",
           "default": "my default value",
           "storeLength": "pageview"
@@ -576,7 +576,7 @@
       {
         "name": "myDOM",
         "type": "dtm.dom",
-        "settings": {
+        "config": {
           "selector": "a",
           "property": "href",
           "default": "http://mydefaultvalue.com",
@@ -586,7 +586,7 @@
       {
         "name": "myVariable",
         "type": "dtm.variable",
-        "settings": {
+        "config": {
           "path": "my.object.path",
           "default": "my default value",
           "storeLength": "visitor"
@@ -595,7 +595,7 @@
       {
         "name": "myQueryParam",
         "type": "queryParam",
-        "settings": {
+        "config": {
           "name": "myParam",
           "default": "myDefaultValue",
           "storeLength": "pageview",

@@ -18,7 +18,7 @@ window.testMouseEvents = function(options) {
   var ruleEvents = [
     {
       type: 'dtm.click',
-      settings: {
+      config: {
         selector: '#test',
         bubbleFireIfParent: true,
         eventHandlerOnElement: options.eventHandlerOnElement

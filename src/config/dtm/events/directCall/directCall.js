@@ -22,16 +22,16 @@ window._satellite.track = function(name) {
 
 /**
  * Direct call event. This event occurs as soon as the user calls _satellite.track().
- * @oaran {Object} settings
- * @param {Object} settings.eventSettings The event settings object.
- * @param {string} settings.eventSettings.name The string identifier of the direct-call rule.
+ * @oaran {Object} config
+ * @param {Object} config.eventConfig The event config object.
+ * @param {string} config.eventConfig.name The string identifier of the direct-call rule.
  * @param {ruleTrigger} trigger The trigger callback.
  */
-module.exports = function(settings, trigger) {
-  var triggers = triggersByCallName[settings.eventSettings.name];
+module.exports = function(config, trigger) {
+  var triggers = triggersByCallName[config.eventConfig.name];
 
   if (!triggers) {
-    triggers = triggersByCallName[settings.eventSettings.name] = [];
+    triggers = triggersByCallName[config.eventConfig.name] = [];
   }
 
   triggers.push(trigger);

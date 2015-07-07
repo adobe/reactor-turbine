@@ -1,6 +1,6 @@
 /*eslint no-alert:0*/
 'use strict';
 
-module.exports = function(settings) {
-  alert(settings.actionSettings.text);
+module.exports = function(config) {
+  alert(config.actionConfig.text);
 };

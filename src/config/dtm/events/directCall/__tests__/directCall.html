@@ -6,7 +6,7 @@
       var conditionSpy = jasmine.createSpy().and.returnValue(true);
       configureRuleForEventTests([{
         type: 'dtm.directCall',
-        settings: {
+        config: {
           name: 'foo'
         }
       }], conditionSpy);

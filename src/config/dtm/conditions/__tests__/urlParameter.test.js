@@ -10,46 +10,46 @@ conditionDelegate.__set__('getQueryParam', function() {
 
 describe('url parameter condition delegate', function() {
   it('returns true when value matches using regular string', function() {
-    var settings = {
-      conditionSettings: {
+    var config = {
+      conditionConfig: {
         name: 'testParam',
         value: 'foo'
       }
     };
 
-    expect(conditionDelegate(settings)).toBe(true);
+    expect(conditionDelegate(config)).toBe(true);
   });
 
   it('returns true when value matches using regex', function() {
-    var settings = {
-      conditionSettings: {
+    var config = {
+      conditionConfig: {
         name: 'testParam',
         value: /^f[ojd]o$/
       }
     };
 
-    expect(conditionDelegate(settings)).toBe(true);
+    expect(conditionDelegate(config)).toBe(true);
   });
 
   it('returns false when value does not match using regular string', function() {
-    var settings = {
-      conditionSettings: {
+    var config = {
+      conditionConfig: {
         name: 'testParam',
         value: 'goo'
       }
     };
 
-    expect(conditionDelegate(settings)).toBe(false);
+    expect(conditionDelegate(config)).toBe(false);
   });
 
   it('returns false when value does not match using regex', function() {
-    var settings = {
-      conditionSettings: {
+    var config = {
+      conditionConfig: {
         name: 'testParam',
         value: /^g[ojd]o$/
       }
     };
 
-    expect(conditionDelegate(settings)).toBe(false);
+    expect(conditionDelegate(config)).toBe(false);
   });
 });

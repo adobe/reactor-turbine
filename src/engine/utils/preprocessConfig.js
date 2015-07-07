@@ -37,10 +37,10 @@ preprocessArray = function(arr, undefinedVarsReturnEmpty, elm, evt) {
   return ret;
 };
 
-module.exports = function(settings, undefinedVarsReturnEmpty, elm, evt) {
-  if (!settings) {
-    return settings;
+module.exports = function(config, undefinedVarsReturnEmpty, elm, evt) {
+  if (!config) {
+    return config;
   }
 
-  return preprocessObject(settings, undefinedVarsReturnEmpty, elm, evt);
+  return preprocessObject(config, undefinedVarsReturnEmpty, elm, evt);
 };

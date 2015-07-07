@@ -5,13 +5,13 @@ var cleanText = require('./../string/cleanText');
 
 module.exports = function(variable, suppressDefault, dataDef) {
   dataDef = dataDef || dataElementDefinitions.getByName(variable);
-  var storeLength = dataDef.settings.storeLength;
+  var storeLength = dataDef.config.storeLength;
 
   var delegate = dataElementDelegates.get(dataDef.type);
-  var value = delegate(dataDef.settings);
+  var value = delegate(dataDef.config);
 
   // TODO: Move this to data element delegates?
-  if (dataDef.settings.cleanText) {
+  if (dataDef.config.cleanText) {
     value = cleanText(value);
   }
 
@@ -23,12 +23,12 @@ module.exports = function(variable, suppressDefault, dataDef) {
   if (value === undefined && !suppressDefault) {
     // Have to wrap "default" in quotes since it is a keyword.
     /*eslint-disable dot-notation*/
-    value = dataDef.settings['default'] || '';
+    value = dataDef.config['default'] || '';
     /*eslint-enable dot-notation*/
   }
 
   // TODO: Move this to data element delegates?
-  if (dataDef.settings.forceLowerCase && value.toLowerCase) {
+  if (dataDef.config.forceLowerCase && value.toLowerCase) {
     value = value.toLowerCase();
   }
   return value;

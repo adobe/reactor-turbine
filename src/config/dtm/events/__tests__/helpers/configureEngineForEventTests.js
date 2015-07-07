@@ -40,7 +40,7 @@ window.configureRuleForEventTests = function(events, conditionSpy) {
     conditions: [
       {
         type: 'dtm.custom',
-        settings: {
+        config: {
           script: conditionSpy || function() {
             return true;
           }

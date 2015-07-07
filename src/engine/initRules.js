@@ -1,47 +1,47 @@
-var _preprocessSettings = require('./utils/preprocessSettings');
+var _preprocessConfig = require('./utils/preprocessConfig');
 
 // TODO: Add a bunch of checks with error reporting.
 
 module.exports = function(property, eventDelegates, conditionDelegates, actionDelegates) {
 
-  function preprocessSettings(settings, relatedElement, event) {
-    return _preprocessSettings(
-      settings,
-      property.settings.undefinedVarsReturnEmpty,
+  function preprocessConfig(config, relatedElement, event) {
+    return _preprocessConfig(
+      config,
+      property.config.undefinedVarsReturnEmpty,
       relatedElement,
       event
     );
   }
 
-  function getPreprocessedIntegrationsSettings(integrationIds) {
-    var integrationsSettings;
+  function getPreprocessedIntegrationConfigs(integrationIds) {
+    var integrationConfigs;
 
     if (integrationIds) {
-      integrationsSettings = integrationIds.map(function(integrationId) {
-        return preprocessSettings(property.integrations[integrationId]);
+      integrationConfigs = integrationIds.map(function(integrationId) {
+        return preprocessConfig(property.integrations[integrationId]);
       });
     } else {
-      integrationsSettings = [];
+      integrationConfigs = [];
     }
 
-    return integrationsSettings;
+    return integrationConfigs;
   }
 
 
   function runActions(rule, event, relatedElement) {
     if (rule.actions) {
       rule.actions.forEach(function(action) {
-        action.settings = action.settings || {};
+        action.config = action.config || {};
 
         var delegate = actionDelegates.get(action.type);
 
-        var settings = {
-          actionSettings: preprocessSettings(action.settings, relatedElement, event),
-          integrationSettings: getPreprocessedIntegrationsSettings(action.integrationIds),
-          propertySettings: preprocessSettings(property.settings)
+        var config = {
+          actionConfig: preprocessConfig(action.config, relatedElement, event),
+          integrationConfig: getPreprocessedIntegrationConfigs(action.integrationIds),
+          propertyConfig: preprocessConfig(property.config)
         };
 
-        delegate(settings);
+        delegate(config);
       });
     }
   }
@@ -50,17 +50,17 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
     if (rule.conditions) {
       for (var i = 0; i < rule.conditions.length; i++) {
         var condition = rule.conditions[i];
-        condition.settings = condition.settings || {};
+        condition.config = condition.config || {};
 
         var delegate = conditionDelegates.get(condition.type);
 
-        var settings = {
-          conditionSettings: preprocessSettings(condition.settings, relatedElement, event),
-          integrationsSettings: getPreprocessedIntegrationsSettings(condition.integrationIds),
-          propertySettings: preprocessSettings(property.settings)
+        var config = {
+          conditionConfig: preprocessConfig(condition.config, relatedElement, event),
+          integrationConfigs: getPreprocessedIntegrationConfigs(condition.integrationIds),
+          propertyConfig: preprocessConfig(property.config)
         };
 
-        if (!delegate(settings, event, relatedElement)) {
+        if (!delegate(config, event, relatedElement)) {
           return;
         }
       }
@@ -83,17 +83,17 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
       };
 
       rule.events.forEach(function(event) {
-        event.settings = event.settings || {};
+        event.config = event.config || {};
 
         var delegate = eventDelegates.get(event.type);
 
-        var settings = {
-          eventSettings: preprocessSettings(event.settings),
-          integrationsSettings: getPreprocessedIntegrationsSettings(event.integrationIds),
-          propertySettings: preprocessSettings(property.settings)
+        var config = {
+          eventConfig: preprocessConfig(event.config),
+          integrationConfigs: getPreprocessedIntegrationConfigs(event.integrationIds),
+          propertyConfig: preprocessConfig(property.config)
         };
 
-        delegate(settings, trigger);
+        delegate(config, trigger);
       });
     }
   }

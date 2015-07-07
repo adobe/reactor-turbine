@@ -6,10 +6,10 @@ var loadScript = require('loadScript');
 
 var Promise = require('Promise');
 
-module.exports = function(settings) {
+module.exports = function(config) {
   // Only a single integration is supported primarily because the Facebook SDK only supports
   // a single app ID per page.
-  var integrationSettings = settings.integrationsSettings[0];
+  var integrationConfig = config.integrationConfigs[0];
 
   return new Promise(function(resolve, reject) {
     // TODO: Implement timeout.
@@ -18,9 +18,9 @@ module.exports = function(settings) {
         reject();
       } else {
         FB.init({
-          appId: integrationSettings.appId,
-          xfbml: !integrationSettings.hasOwnProperty('xfbml') || integrationSettings.xfbml === true,
-          version: integrationSettings.version || 'v2.3'
+          appId: integrationConfig.appId,
+          xfbml: !integrationConfig.hasOwnProperty('xfbml') || integrationConfig.xfbml === true,
+          version: integrationConfig.version || 'v2.3'
         });
         resolve();
       }

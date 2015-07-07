@@ -120,7 +120,7 @@ var checkIfElementsInViewport = function() {
   var timeoutId;
 
   listeners.forEach(function(listener) {
-    var elements = document.querySelectorAll(listener.settings.selector);
+    var elements = document.querySelectorAll(listener.config.selector);
     for (var i = 0; i < elements.length; i++) {
       var element = elements[i];
 
@@ -129,25 +129,25 @@ var checkIfElementsInViewport = function() {
       }
 
       if (elementIsInView(element, viewportHeight, scrollTop)) {
-        if (listener.settings.delay) { // Element is in view, has delay
+        if (listener.config.delay) { // Element is in view, has delay
           if (!covertData(element, listener.timeoutDataKey)) {
             /*eslint-disable no-loop-func*/
             timeoutId = setTimeout(function() {
               if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
                 markEntersViewportComplete(
                   element,
-                  listener.settings.delay,
+                  listener.config.delay,
                   listener.completeDataKey);
               }
-            }, listener.settings.delay);
+            }, listener.config.delay);
             /*eslint-enable no-loop-func*/
 
             covertData(element, listener.timeoutDataKey, timeoutId);
           }
         } else { // Element is in view, has no delay
-          markEntersViewportComplete(element, listener.settings.delay, listener.completeDataKey);
+          markEntersViewportComplete(element, listener.config.delay, listener.completeDataKey);
         }
-      } else if (listener.settings.delay) { // Element is not in view, has delay
+      } else if (listener.config.delay) { // Element is not in view, has delay
         timeoutId = covertData(element, listener.timeoutDataKey);
         if (timeoutId) {
           clearTimeout(timeoutId);
@@ -166,25 +166,25 @@ poll('enters viewport event delegate', checkIfElementsInViewport);
 /**
  * Enters viewport event. This event occurs when an element has entered the viewport. The rule
  * should only run once per targeted element.
- * @param {Object} settings
- * @param {Object} settings.eventSettings The event settings object.
- * @param {string} settings.eventSettings.selector The CSS selector for elements the rule is
+ * @param {Object} config
+ * @param {Object} config.eventConfig The event config object.
+ * @param {string} config.eventConfig.selector The CSS selector for elements the rule is
  * targeting.
- * @param {Number} [settings.eventSettings.delay] The number of milliseconds the element must be
+ * @param {Number} [config.eventConfig.delay] The number of milliseconds the element must be
  * within the viewport before declaring that the event has occurred.
- * @param {boolean} [settings.eventSettings.bubbleFireIfParent=false] Whether the rule should fire
+ * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire
  * if the event originated from a descendant element.
- * @param {boolean} [settings.eventSettings.bubbleFireIfChildFired=false] Whether the rule should
+ * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should
  * fire if the same event has already triggered a rule targeting a descendant element.
- * @param {boolean} [settings.eventSettings.bubbleStop=false] Whether the event should not trigger
+ * @param {boolean} [config.eventConfig.bubbleStop=false] Whether the event should not trigger
  * rules on ancestor elements.
  * @param {ruleTrigger} trigger The trigger callback.
  */
-module.exports = function(settings, trigger) {
+module.exports = function(config, trigger) {
   // Bubbling for this event is dependent upon the delay configured for rules.
   // An event can "bubble up" to other rules with the same delay but not to rules with
   // different delays. See the tests for how this plays out.
-  var delay = settings.eventSettings.delay || 0;
+  var delay = config.eventConfig.delay || 0;
 
   var delayBubbly = bubblyByDelay[delay];
 
@@ -192,7 +192,7 @@ module.exports = function(settings, trigger) {
     delayBubbly = bubblyByDelay[delay] = bubbly();
   }
 
-  delayBubbly.addListener(settings.eventSettings, trigger);
+  delayBubbly.addListener(config.eventConfig, trigger);
 
   listeners.push({
     // These strings are created and stored here for optimization purposes only. It avoids
@@ -200,6 +200,6 @@ module.exports = function(settings, trigger) {
     // polled repeatedly.
     timeoutDataKey: 'dtm.entersViewport.timeoutId.' + delay,
     completeDataKey: 'dtm.entersViewport.complete.' + delay,
-    settings: settings.eventSettings
+    config: config.eventConfig
   });
 };

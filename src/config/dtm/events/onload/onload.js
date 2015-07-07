@@ -23,9 +23,9 @@ addEventListener(window, 'load', function() {
  * Onload event. This event occurs at the end of the document loading process. At this point,
  * all of the objects in the document are loaded in the DOM, and all images, scripts, links,
  * and sub-frames have finished loading.
- * @param {Object} settings
+ * @param {Object} config
  * @param {ruleTrigger} trigger The trigger callback.
  */
-module.exports = function(settings, trigger) {
+module.exports = function(config, trigger) {
   triggers.push(trigger);
 };

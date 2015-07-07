@@ -10,7 +10,7 @@ var getQueryParam = require('./../uri/getQueryParam');
 //
 // Return the value of a variable, where the variable
 // can be a data element, defined in the "data" section
-// of the initial settings, or reference properties on
+// of the initial config, or reference properties on
 // an element, event, or target of the event in question,
 // a query parameter, or a random number.
 //

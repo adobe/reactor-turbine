@@ -6,7 +6,7 @@
       var actionSpy = jasmine.createSpy();
       var conditionSpy = jasmine.createSpy().and.returnValue(true);
       jasmine.clock().install();
-      configureExtensionForEventTests(actionSpy);
+      configureActionForEventTests(actionSpy);
       configureRuleForEventTests([{type: 'dtm.pageTop'}], conditionSpy);
     </script>
     <script src="/base/dist/engine.js"></script>

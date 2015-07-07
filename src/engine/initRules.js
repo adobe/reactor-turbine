@@ -29,19 +29,21 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
 
 
   function runActions(rule, event, relatedElement) {
-    rule.actions.forEach(function(action) {
-      action.settings = action.settings || {};
+    if (rule.actions) {
+      rule.actions.forEach(function(action) {
+        action.settings = action.settings || {};
 
-      var delegate = actionDelegates.get(action.type);
+        var delegate = actionDelegates.get(action.type);
 
-      var settings = {
-        actionSettings: preprocessSettings(action.settings, relatedElement, event),
-        integrationSettings: getPreprocessedIntegrationsSettings(action.integrationIds),
-        propertySettings: preprocessSettings(property.settings)
-      };
+        var settings = {
+          actionSettings: preprocessSettings(action.settings, relatedElement, event),
+          integrationSettings: getPreprocessedIntegrationsSettings(action.integrationIds),
+          propertySettings: preprocessSettings(property.settings)
+        };
 
-      delegate(settings);
-    });
+        delegate(settings);
+      });
+    }
   }
 
   function checkConditions(rule, event, relatedElement) {

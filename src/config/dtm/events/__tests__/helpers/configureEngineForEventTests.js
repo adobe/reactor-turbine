@@ -17,12 +17,12 @@ config.actionDelegates = {
 config.rules = [];
 
 /**
- * Configures an extension for the engine for testing event delegates. Calling this multiple
- * times will override configuration made by previous calls. It should really only be called once.
+ * Configures an action for the engine for testing event delegates. Calling this multiple
+ * times will override configuration made by previous calls.
  * @param {Function} actionSpy An action spy. This will be called if a configured rule is triggered
  * and passes conditions.
  */
-window.configureExtensionForEventTests = function(actionSpy) {
+window.configureActionForEventTests = function(actionSpy) {
   config.actionDelegates.test = function(module) {
     module.exports = actionSpy;
   };

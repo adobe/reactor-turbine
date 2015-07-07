@@ -26,7 +26,7 @@ window.testMouseEvents = function(options) {
     }
   ];
 
-  window.configureExtensionForEventTests(actionSpy);
+  window.configureActionForEventTests(actionSpy);
   window.configureRuleForEventTests(ruleEvents, conditionSpy);
 
   TestPage

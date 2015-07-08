@@ -10,7 +10,7 @@ module.exports = function(config) {
     files: [
       { pattern: '**/__tests__/**/loadTestpage.js', watched: true, included: true, served: true },
       { pattern: '**/__tests__/**/*.test.js', watched: true, included: true, served: true },
-      { pattern: 'dist/config.js', watched: true, included: false, served: true },
+      { pattern: 'dist/container.js', watched: true, included: false, served: true },
       { pattern: 'dist/engine.js', watched: true, included: false, served: true },
       { pattern: '**/__tests__/**/testpage.js', watched: true, included: false, served: true },
       { pattern: '**/__tests__/**/*!(.test)*', watched: true, included: false, served: true },
@@ -41,7 +41,7 @@ module.exports = function(config) {
         // it will create a mock module that just returns null instead of throwing an error
         // saying it can't find the referenced module on the file system.
         function(context, request, callback) {
-          if (/^(?!.*__tests__$).*\/src\/config\/.*$/.test(context) &&
+          if (/^(?!.*__tests__$).*\/src\/extensions\/.*$/.test(context) &&
               /^[a-zA-Z]/.test(request)) {
             callback(null, 'var null');
           } else {

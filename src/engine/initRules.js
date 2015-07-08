@@ -2,12 +2,12 @@ var _preprocessConfig = require('./utils/preprocessConfig');
 
 // TODO: Add a bunch of checks with error reporting.
 
-module.exports = function(property, eventDelegates, conditionDelegates, actionDelegates) {
+module.exports = function(container, eventDelegates, conditionDelegates, actionDelegates) {
 
   function preprocessConfig(config, relatedElement, event) {
     return _preprocessConfig(
       config,
-      property.config.undefinedVarsReturnEmpty,
+      container.config.undefinedVarsReturnEmpty,
       relatedElement,
       event
     );
@@ -18,7 +18,7 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
 
     if (integrationIds) {
       integrationConfigs = integrationIds.map(function(integrationId) {
-        return preprocessConfig(property.integrations[integrationId]);
+        return preprocessConfig(container.integrations[integrationId]);
       });
     } else {
       integrationConfigs = [];
@@ -42,7 +42,7 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
         var config = {
           actionConfig: preprocessConfig(action.config, relatedElement, event),
           integrationConfig: getPreprocessedIntegrationConfigs(action.integrationIds),
-          propertyConfig: preprocessConfig(property.config)
+          propertyConfig: preprocessConfig(container.config)
         };
 
         delegate(config);
@@ -65,7 +65,7 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
         var config = {
           conditionConfig: preprocessConfig(condition.config, relatedElement, event),
           integrationConfigs: getPreprocessedIntegrationConfigs(condition.integrationIds),
-          propertyConfig: preprocessConfig(property.config)
+          propertyConfig: preprocessConfig(container.config)
         };
 
         if (!delegate(config, event, relatedElement)) {
@@ -102,7 +102,7 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
         var config = {
           eventConfig: preprocessConfig(event.config),
           integrationConfigs: getPreprocessedIntegrationConfigs(event.integrationIds),
-          propertyConfig: preprocessConfig(property.config)
+          propertyConfig: preprocessConfig(container.config)
         };
 
         delegate(config, trigger);
@@ -110,7 +110,7 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
     }
   }
 
-  property.rules.forEach(function(rule) {
+  container.rules.forEach(function(rule) {
     initEventDelegate(rule);
   });
 };

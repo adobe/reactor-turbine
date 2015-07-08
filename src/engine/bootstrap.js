@@ -15,13 +15,13 @@ var readCookie = require('./utils/cookie/readCookie');
 var removeCookie = require('./utils/cookie/removeCookie');
 
 var _satellite = window._satellite;
-var property = _satellite.getConfig();
+var container = _satellite.container;
 
 // Will get replaced if a rule is configured with a page bottom event trigger.
 _satellite.pageBottom = function() {};
 // Will get replaced if a rule is configured with a direct call event trigger.
 _satellite.track = function() {};
-_satellite.appVersion = property.appVersion;
+_satellite.appVersion = container.appVersion;
 // TODO: _satellite.notify
 _satellite.getVar = getVar;
 _satellite.setVar = setVar;
@@ -33,20 +33,20 @@ _satellite.isLinked = function(element) {
   return isAnchor(element, true);
 };
 
-eventDelegates.init(property.eventDelegates);
-conditionDelegates.init(property.conditionDelegates);
-actionDelegates.init(property.actionDelegates);
-dataElementDelegates.init(property.dataElementDelegates);
-dataElementDefinitions.init(property.dataElements);
-coreDelegates.init(property.coreDelegates);
+eventDelegates.init(container.eventDelegates);
+conditionDelegates.init(container.conditionDelegates);
+actionDelegates.init(container.actionDelegates);
+dataElementDelegates.init(container.dataElementDelegates);
+dataElementDefinitions.init(container.dataElements);
+coreDelegates.init(container.coreDelegates);
 
 createExtensionCores(
-  property,
+  container,
   coreRegistry,
   coreDelegates);
 
 initRules(
-  property,
+  container,
   eventDelegates,
   conditionDelegates,
   actionDelegates);

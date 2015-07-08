@@ -4,7 +4,7 @@ var preprocessConfig = require('./utils/preprocessConfig');
 /**
  * Initializes extension cores.
  */
-module.exports = function(property, coreRegistry, coreDelegates) {
+module.exports = function(container, coreRegistry, coreDelegates) {
   /**
    * Creates promises that represent each extension core. The cores haven't been initialized
    * at this point. This allows a core, while it's being initialized, to access the
@@ -16,7 +16,7 @@ module.exports = function(property, coreRegistry, coreDelegates) {
   function createProxyPromises() {
     var promiseByExtensionId = {};
 
-    for (var extensionId in property.extensions) {
+    for (var extensionId in container.extensions) {
       var proxy = {};
 
       /*eslint-disable no-loop-func*/
@@ -36,12 +36,12 @@ module.exports = function(property, coreRegistry, coreDelegates) {
 
   function getIntegrationConfigsForExtension(extensionId) {
     var integrationConfigs = [];
-    for (var integrationId in property.integrations) {
-      var integration = property.integrations[integrationId];
+    for (var integrationId in container.integrations) {
+      var integration = container.integrations[integrationId];
       if (integration.type === extensionId) {
         var preprocessedIntegrationConfig = preprocessConfig(
           integration.config,
-          property.config.undefinedVarsReturnEmpty
+          container.config.undefinedVarsReturnEmpty
         );
         integrationConfigs.push(preprocessedIntegrationConfig);
       }
@@ -51,12 +51,12 @@ module.exports = function(property, coreRegistry, coreDelegates) {
 
   function initializeCores(promiseByExtensionId) {
     // Initialize each integration.
-    for (var extensionId in property.extensions) {
+    for (var extensionId in container.extensions) {
       var config = {
         integrationConfigs: getIntegrationConfigsForExtension(extensionId),
         propertyConfig: preprocessConfig(
-          property.config,
-          property.config.undefinedVarsReturnEmpty
+          container.config,
+          container.config.undefinedVarsReturnEmpty
         )
       };
 

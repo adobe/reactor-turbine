@@ -6,7 +6,7 @@
       var coreDelegateSpy = jasmine.createSpy();
       var actionDelegateSpy = jasmine.createSpy();
 
-      var config = {
+      var container = {
         extensions: {
           testExtension: {
             name: "Test Extension"
@@ -168,9 +168,7 @@
       };
 
       _satellite = {
-        getConfig: function() {
-          return config;
-        }
+        container: container
       };
     </script>
     <script src="/base/dist/engine.js"></script>

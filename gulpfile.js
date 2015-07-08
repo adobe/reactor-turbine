@@ -85,17 +85,17 @@ function getDelegates(baseDir) {
   return delegates;
 }
 
-gulp.task('buildConfig', function() {
-  var baseDir = './src/config';
-  var delegates = getDelegates(baseDir);
+gulp.task('buildContainer', function() {
+  var extensionsDir = './src/extensions';
+  var delegates = getDelegates(extensionsDir);
 
-  return gulp.src([path.join(baseDir, 'config.txt')])
+  return gulp.src(['container.txt'])
     .pipe(replace('{{eventDelegates}}', shallowStringifyWithFunctionValues(delegates.eventDelegates)))
     .pipe(replace('{{conditionDelegates}}', shallowStringifyWithFunctionValues(delegates.conditionDelegates)))
     .pipe(replace('{{actionDelegates}}', shallowStringifyWithFunctionValues(delegates.actionDelegates)))
     .pipe(replace('{{dataElementDelegates}}', shallowStringifyWithFunctionValues(delegates.dataElementDelegates)))
     .pipe(replace('{{coreDelegates}}', shallowStringifyWithFunctionValues(delegates.coreDelegates)))
-    .pipe(rename('config.js'))
+    .pipe(rename('container.js'))
     .pipe(gulp.dest('./dist'));
 });
 
@@ -131,7 +131,7 @@ gulp.task('test', ['default'], function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch(['./src/config/**/!(__tests__)/*'], ['buildConfig']);
+  gulp.watch(['./src/extensions/**/!(__tests__)/*'], ['buildContainer']);
   gulp.watch(['./src/engine/**/!(__tests__)/*.js'], ['buildEngine']);
 });
 
@@ -146,4 +146,4 @@ gulp.task('lint', function() {
     .pipe($.eslint.failAfterError());
 });
 
-gulp.task('default', ['buildConfig', 'buildEngine', 'watch']);
+gulp.task('default', ['buildContainer', 'buildEngine', 'watch']);

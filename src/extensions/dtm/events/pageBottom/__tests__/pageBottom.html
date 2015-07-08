@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <script src="/base/dist/container.js"></script>
+    <script src="../../__tests__/helpers/configureEngineForEventTests.js"></script>
+    <script>
+      var actionSpy = jasmine.createSpy();
+      var conditionSpy = jasmine.createSpy().and.returnValue(true);
+      jasmine.clock().install();
+      configureActionForEventTests(actionSpy);
+      configureRuleForEventTests([{type: 'dtm.pageBottom'}], conditionSpy);
+    </script>
+    <script src="/base/dist/engine.js"></script>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+  </head>
+  <body>
+    <script>
+      TestPage
+        .execute(function() {
+          // Actions are always run asynchronously.
+          jasmine.clock().tick(1);
+          expect(actionSpy.calls.count()).toEqual(0);
+
+          _satellite.pageBottom();
+
+          jasmine.clock().tick(1);
+          expect(actionSpy.calls.count()).toEqual(1);
+          expect(conditionSpy.calls.mostRecent()).toEqual({
+            object: document.location,
+            args: [{type: 'pagebottom', target: document.location}, document.location],
+            returnValue: true
+          });
+
+          jasmine.clock().uninstall();
+        })
+        .start();
+    </script>
+  </body>
+</html>

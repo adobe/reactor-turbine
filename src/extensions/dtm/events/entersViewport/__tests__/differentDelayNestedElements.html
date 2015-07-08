@@ -1,0 +1,89 @@
+<html>
+  <head>
+    <script src="/base/dist/container.js"></script>
+    <script src="../../__tests__/helpers/configureEngineForEventTests.js"></script>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script src="helpers/entersViewportHelper.js"></script>
+    <script>
+      jasmine.clock().install();
+
+      var aConditionSpy = jasmine.createSpy().and.returnValue(true);
+      configureRuleForEventTests([
+        {
+          type: 'dtm.entersViewport',
+          config: {
+            selector: '#a',
+            delay: 1000,
+            bubbleFireIfParent: true,
+            bubbleFireIfChildFired: true,
+            bubbleStop: false
+          }
+        }
+      ], aConditionSpy);
+
+      var bConditionSpy = jasmine.createSpy().and.returnValue(true);
+      configureRuleForEventTests([
+        {
+          type: 'dtm.entersViewport',
+          config: {
+            selector: '#b',
+            delay: 2000,
+            bubbleFireIfParent: true,
+            bubbleFireIfChildFired: true,
+            bubbleStop: false
+          }
+        }
+      ], bConditionSpy);
+
+      TestPage
+        .waitForContentLoaded()
+        .execute(function() {
+          var a = document.getElementById('a');
+          var b = document.getElementById('b');
+
+          // Give time for the poller to cycle.
+          jasmine.clock().tick(3000);
+
+          expect(aConditionSpy.calls.count()).toEqual(0);
+          expect(bConditionSpy.calls.count()).toEqual(0);
+
+          jasmine.clock().tick(1200);
+
+          expect(aConditionSpy.calls.count()).toEqual(1);
+          expect(bConditionSpy.calls.count()).toEqual(0);
+
+          assertEntersViewportConditionCall({
+            call: aConditionSpy.calls.first(),
+            delay: 1000,
+            relatedElement: a,
+            target: a
+          });
+
+          jasmine.clock().tick(1000);
+
+          expect(aConditionSpy.calls.count()).toEqual(1);
+          expect(bConditionSpy.calls.count()).toEqual(1);
+
+          assertEntersViewportConditionCall({
+            call: bConditionSpy.calls.mostRecent(),
+            delay: 2000,
+            relatedElement: b,
+            target: b
+          });
+        })
+        .start();
+    </script>
+    <script src="/base/dist/engine.js"></script>
+  </head>
+  <body>
+    <div id="a">
+      A
+      <div id="b">
+        B
+      </div>
+    </div>
+    <script>
+      _satellite.pageBottom();
+    </script>
+  </body>
+</html>

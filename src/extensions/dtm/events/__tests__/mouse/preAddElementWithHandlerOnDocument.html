@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <script src="/base/dist/container.js"></script>
+    <script src="../helpers/configureEngineForEventTests.js"></script>
+    <script src="/base/node_modules/simulate/simulate.js"></script>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script src="helpers/testMouseEvents.js"></script>
+    <script>
+      testMouseEvents({
+        eventHandlerOnElement: false
+      });
+    </script>
+    <script src="/base/dist/engine.js"></script>
+  </head>
+  <body>
+    <div id="test">
+      Test
+      <div id="nested">Nested</div>
+    </div>
+    <script>
+      _satellite.pageBottom();
+    </script>
+  </body>
+</html>

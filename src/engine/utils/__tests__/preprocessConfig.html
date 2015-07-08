@@ -154,9 +154,10 @@
       TestPage
         .execute(function() {
           // We're not testing all the various forms of data elements here. Those tests are in
-          // the data element tests. These tests are only to ensure that that configurations objects
-          // are being run through preprocessing at the right times and that preprocessing
-          // deeply preprocesses the configuration object.
+          // the data element tests. These tests are only to ensure that the configuration objects
+          // are being run through preprocessing at the right times, that preprocessing
+          // deeply preprocesses the configuration object, and that an element and event are
+          // included in preprocessing for conditions and actions.
 
           window.triggerTestEvent();
 

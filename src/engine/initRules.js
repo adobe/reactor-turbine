@@ -9,7 +9,7 @@ module.exports = function(container, eventDelegates, conditionDelegates, actionD
 
     if (integrationIds) {
       integrationConfigs = integrationIds.map(function(integrationId) {
-        return preprocessConfig(container.integrations[integrationId]);
+        return preprocessConfig(container.integrations[integrationId].config);
       });
     } else {
       integrationConfigs = [];
@@ -32,7 +32,7 @@ module.exports = function(container, eventDelegates, conditionDelegates, actionD
 
         var config = {
           actionConfig: preprocessConfig(action.config, relatedElement, event),
-          integrationConfig: getPreprocessedIntegrationConfigs(action.integrationIds),
+          integrationConfigs: getPreprocessedIntegrationConfigs(action.integrationIds),
           propertyConfig: preprocessConfig(container.config)
         };
 

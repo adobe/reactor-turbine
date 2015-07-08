@@ -42,12 +42,12 @@ preprocessArray = function(arr, element, event) {
  * Preprocesses a configuration object by deeply inspecting the object and replacing any data
  * element tokens (%myDataElement%) which their associated data element values. This could
  * potentially preprocess other information in the future.
- * @param {Object|Array} config Configuration object or array.
+ * @param {Object} config Configuration object.
  * @param {HTMLElement} [element] Associated HTML element. Used for special tokens
  * (%this.something%).
  * @param {Object} [event] Associated event. Used for special tokens (%event.something%,
  * %target.something%)
- * @returns {Object|Array} A new, preprocessed object or array.
+ * @returns {Object} A new, preprocessed object.
  */
 var preprocessConfig = function(config, element, event) {
   if (!config) {

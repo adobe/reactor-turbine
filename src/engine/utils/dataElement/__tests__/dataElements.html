@@ -25,7 +25,7 @@
           }
         },
         actionDelegates: {
-          test: function(module) {
+          testAction: function(module) {
             module.exports = actionDelegateSpy;
           }
         },
@@ -68,7 +68,7 @@
             actions: [
               {
                 integrationIds: ['abc'],
-                type: 'test',
+                type: 'testAction',
                 config: {
                   dataElementBased: '%treat%',
                   dataElementPriorityBased: '%vegetable%',

@@ -1,0 +1,254 @@
+<html>
+  <head>
+    <script>
+      var coreDelegateSpy = jasmine.createSpy();
+      var eventDelegateSpy = jasmine.createSpy();
+      var conditionDelegateSpy = jasmine.createSpy();
+      var actionDelegateSpy = jasmine.createSpy();
+
+      // This text is appended onto data element values. This can be changed to determine
+      // whether a configuration object is preprocessed each time rather than being saved to
+      // some sort of cache.
+      var dataElementAppendText = ':first';
+
+      var unprocessedConfig = {
+        accountId: '%account%',
+        nestedObjectCheck: {
+          firstName: '%firstName%',
+          lastName: '%lastName%',
+          arrayCheck: ['%firstName%', '%lastName%'],
+        }
+      };
+
+      var unprocessedConfigWithElementAndEvent = {
+        accountId: '%account%',
+        nestedObjectCheck: {
+          firstName: '%firstName%',
+          lastName: '%lastName%',
+          arrayCheck: ['%firstName%', '%lastName%'],
+        },
+        elementCheck: '%this.id%',
+        eventCheck: '%event.fruit%'
+      };
+
+      var container = {
+        extensions: {
+          testExtension: {
+            name: "Test Extension"
+          }
+        },
+        integrations: {
+          'abc': {
+            type: 'testExtension',
+            config: unprocessedConfig
+          }
+        },
+        coreDelegates: {
+          testExtension: function(module) {
+            module.exports = coreDelegateSpy;
+          }
+        },
+        eventDelegates: {
+          testEvent: function(module) {
+            var allTriggers = [];
+
+            window.triggerTestEvent = function() {
+              allTriggers.forEach(function(trigger) {
+                var pseudoEvent = {
+                  type: 'fruitParty',
+                  target: document.createElement('div'),
+                  fruit: 'apple'
+                };
+
+                var relatedElement = document.createElement('span');
+                relatedElement.id = 'kazoo';
+
+                trigger(pseudoEvent, relatedElement);
+              });
+            };
+
+            module.exports = eventDelegateSpy.and.callFake(function(config, trigger) {
+              allTriggers.push(trigger);
+            });
+          }
+        },
+        conditionDelegates: {
+          testCondition: function(module) {
+            module.exports = conditionDelegateSpy.and.returnValue(true);
+          }
+        },
+        actionDelegates: {
+          testAction: function(module) {
+            module.exports = actionDelegateSpy;
+          }
+        },
+        rules: [
+          {
+            events: [
+              {
+                type: 'testEvent',
+                integrationIds: ['abc'],
+                config: unprocessedConfig
+              }
+            ],
+            conditions: [
+              {
+                type: 'testCondition',
+                integrationIds: ['abc'],
+                // Only conditions and actions can use %this.something% and %event.something%
+                config: unprocessedConfigWithElementAndEvent
+              }
+            ],
+            actions: [
+              {
+                type: 'testAction',
+                integrationIds: ['abc'],
+                // Only conditions and actions can use %this.something% and %event.something%
+                config: unprocessedConfigWithElementAndEvent
+              }
+            ]
+          }
+        ],
+        dataElementDelegates: {
+          'testExtension.appendText': function(module) {
+            module.exports = function(config) {
+              // Append some text. This allows us to change the text that is appended in order to
+              // test that configurations are processed each time a condition or action is called.
+              return config.value + dataElementAppendText;
+            };
+          }
+        },
+        dataElements: [
+          {
+            name: "account",
+            type: "testExtension.appendText",
+            config: {
+              value: "ABC123"
+            }
+          },
+          {
+            name: "firstName",
+            type: "testExtension.appendText",
+            config: {
+              value: "John"
+            }
+          },
+          {
+            name: "lastName",
+            type: "testExtension.appendText",
+            config: {
+              value: "Doe"
+            }
+          }
+        ],
+        config: unprocessedConfig
+      };
+
+      _satellite = {
+        container: container
+      };
+    </script>
+    <script src="/base/dist/engine.js"></script>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script>
+      TestPage
+        .execute(function() {
+          // We're not testing all the various forms of data elements here. Those tests are in
+          // the data element tests. These tests are only to ensure that that configurations objects
+          // are being run through preprocessing at the right times and that preprocessing
+          // deeply preprocesses the configuration object.
+
+          window.triggerTestEvent();
+
+          var firstProcessedConfig = {
+            accountId: 'ABC123:first',
+            nestedObjectCheck: {
+              firstName: 'John:first',
+              lastName: 'Doe:first',
+              arrayCheck: ['John:first', 'Doe:first']
+            }
+          };
+
+          // Only conditions and actions can use %this.something% and %event.something%
+          var firstProcessedConfigWithElementAndEvent = {
+            accountId: 'ABC123:first',
+            nestedObjectCheck: {
+              firstName: 'John:first',
+              lastName: 'Doe:first',
+              arrayCheck: ['John:first', 'Doe:first']
+            },
+            elementCheck: 'kazoo',
+            eventCheck: 'apple'
+          };
+
+          expect(coreDelegateSpy.calls.argsFor(0)[0]).toEqual({
+            integrationConfigs: [ firstProcessedConfig ],
+            propertyConfig: firstProcessedConfig
+          });
+
+          expect(eventDelegateSpy.calls.argsFor(0)[0]).toEqual({
+            eventConfig: firstProcessedConfig,
+            integrationConfigs: [ firstProcessedConfig ],
+            propertyConfig: firstProcessedConfig
+          });
+
+          expect(conditionDelegateSpy.calls.argsFor(0)[0]).toEqual({
+            conditionConfig: firstProcessedConfigWithElementAndEvent,
+            integrationConfigs: [ firstProcessedConfig ],
+            propertyConfig: firstProcessedConfig
+          });
+
+          expect(actionDelegateSpy.calls.argsFor(0)[0]).toEqual({
+            actionConfig: firstProcessedConfigWithElementAndEvent,
+            integrationConfigs: [ firstProcessedConfig ],
+            propertyConfig: firstProcessedConfig
+          });
+
+          // Test that configurations are being preprocessed each time a condition or action is
+          // called and not just the first time.
+
+          var secondProcessedConfig = {
+            accountId: 'ABC123:second',
+            nestedObjectCheck: {
+              firstName: 'John:second',
+              lastName: 'Doe:second',
+              arrayCheck: ['John:second', 'Doe:second']
+            }
+          };
+
+          // Only conditions and actions can use %this.something% and %event.something%
+          var secondProcessedConfigWithElementAndEvent = {
+            accountId: 'ABC123:second',
+            nestedObjectCheck: {
+              firstName: 'John:second',
+              lastName: 'Doe:second',
+              arrayCheck: ['John:second', 'Doe:second']
+            },
+            elementCheck: 'kazoo',
+            eventCheck: 'apple'
+          };
+
+          dataElementAppendText = ':second';
+          window.triggerTestEvent();
+
+          expect(conditionDelegateSpy.calls.argsFor(1)[0]).toEqual({
+            conditionConfig: secondProcessedConfigWithElementAndEvent,
+            integrationConfigs: [ secondProcessedConfig ],
+            propertyConfig: secondProcessedConfig
+          });
+
+          expect(actionDelegateSpy.calls.argsFor(1)[0]).toEqual({
+            actionConfig: secondProcessedConfigWithElementAndEvent,
+            integrationConfigs: [ secondProcessedConfig ],
+            propertyConfig: secondProcessedConfig
+          });
+        })
+        .start();
+    </script>
+  </head>
+  <body>
+    <script>
+      _satellite.pageBottom();
+    </script>
+  </body>
+</html>

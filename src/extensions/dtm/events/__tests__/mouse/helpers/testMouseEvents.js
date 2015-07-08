@@ -48,8 +48,6 @@ window.testMouseEvents = function(options) {
 
       function testEventType(eventType) {
         Simulate[eventType](nestedElement);
-        // Actions are always run asynchronously.
-        jasmine.clock().tick(1);
         expect(actionSpy.calls.count()).toEqual(1);
         expect(conditionSpy.calls.count()).toEqual(1);
         expect(conditionSpy.calls.first().object).toBe(testElement);

@@ -1,8 +1,6 @@
 <html>
   <head>
     <script>
-      jasmine.clock().install();
-
       var coreDelegateSpy = jasmine.createSpy();
       var actionDelegateSpy = jasmine.createSpy();
 
@@ -35,7 +33,7 @@
           testEvent: function(module, require) {
             var allTriggers = [];
 
-            _satellite.triggerTestEvent = function() {
+            window.triggerTestEvent = function() {
               allTriggers.forEach(function(trigger) {
                 var targetElement = document.createElement('div');
                 targetElement.id = 'fruitPartyBowl';
@@ -192,10 +190,7 @@
             }
           ]);
 
-          _satellite.triggerTestEvent();
-
-          // Actions are always run asynchronously.
-          jasmine.clock().tick(1);
+          window.triggerTestEvent();
 
           expect(actionDelegateSpy.calls.count()).toBe(1);
           var actionConfig = actionDelegateSpy.calls.argsFor(0)[0].actionConfig;

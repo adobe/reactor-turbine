@@ -24,14 +24,8 @@
   IFrameJasmine.prototype = jasmine;
 
   function cacheBust(url) {
-    // Don't cache bust if we're using the Karma debug page. Using the cachebusting when
-    // debugging makes it difficult to work with breakpoints.
-    if (document.location.pathname.indexOf('debug.html') === -1) {
-      var cacheBustSeparator = url.indexOf('?') !== -1 ? '&' : '?';
-      return url + cacheBustSeparator + 'cachebust=' + Date.now();
-    } else {
-      return url;
-    }
+    var cacheBustSeparator = url.indexOf('?') !== -1 ? '&' : '?';
+    return url + cacheBustSeparator + 'cachebust=' + Date.now();
   }
 
   function loadIframe(url) {
@@ -39,7 +33,14 @@
     iframe.style.width = '600px';
     iframe.style.height = '400px';
     iframe.style.border = '1px solid #888';
-    iframe.src = cacheBust(url);
+
+    // Don't cache bust if we're using the Karma debug page. Using the cachebusting when
+    // debugging makes it difficult to work with breakpoints.
+    if (document.location.pathname.indexOf('debug.html') === -1) {
+      url = cacheBust(url);
+    }
+
+    iframe.src = url;
     document.body.appendChild(iframe);
     return iframe;
   }

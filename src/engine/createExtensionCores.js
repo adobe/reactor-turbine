@@ -63,9 +63,10 @@ module.exports = function(property, coreRegistry, coreDelegates) {
       var delegate;
       var result;
 
-      // If there is no core for the extension then the promise should be resolved with undefined.
-      if (property.coreDelegates[extensionId]) {
-        delegate = coreDelegates.get(extensionId);
+      delegate = coreDelegates.get(extensionId);
+
+      if (delegate) {
+        // If there is no core for the extension then the promise should be resolved with undefined.
         result = delegate(config);
       }
 

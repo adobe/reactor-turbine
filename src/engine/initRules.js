@@ -35,6 +35,10 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
 
         var delegate = actionDelegates.get(action.type);
 
+        if (!delegate) {
+          throw new Error('Action delegate of type ' + action.type + ' not found.');
+        }
+
         var config = {
           actionConfig: preprocessConfig(action.config, relatedElement, event),
           integrationConfig: getPreprocessedIntegrationConfigs(action.integrationIds),
@@ -53,6 +57,10 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
         condition.config = condition.config || {};
 
         var delegate = conditionDelegates.get(condition.type);
+
+        if (!delegate) {
+          throw new Error('Condition delegate of type ' + condition.type + ' not found.');
+        }
 
         var config = {
           conditionConfig: preprocessConfig(condition.config, relatedElement, event),
@@ -86,6 +94,10 @@ module.exports = function(property, eventDelegates, conditionDelegates, actionDe
         event.config = event.config || {};
 
         var delegate = eventDelegates.get(event.type);
+
+        if (!delegate) {
+          throw new Error('Event delegate of type ' + event.type + ' not found.');
+        }
 
         var config = {
           eventConfig: preprocessConfig(event.config),

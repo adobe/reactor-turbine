@@ -1,178 +1,177 @@
 <html>
   <head>
-    <script src="/base/dist/config.js"></script>
     <script>
       jasmine.clock().install();
 
-      var config = _satellite.getConfig();
-      var actionSpy = jasmine.createSpy();
-
-      config.extensions = {
-        testExtension: {
-          name: "Test Extension"
-        }
-      };
-
-      config.integrations = {
-        'abc': {
-          type: 'testExtension',
-          config: {
-            mmmtreats: '%treat%',
-            accountId: 123
-          }
-        }
-      };
-
       var coreDelegateSpy = jasmine.createSpy();
+      var actionDelegateSpy = jasmine.createSpy();
 
-      config.coreDelegates = {
-        testExtension: function(module, require) {
-          module.exports = coreDelegateSpy
-        }
-      };
-
-      config.actionDelegates = {
-        test: function(module) {
-          module.exports = actionSpy;
-        }
-      };
-
-      config.eventDelegates = {
-        testEvent: function(module, require) {
-          var allTriggers = [];
-
-          _satellite.triggerTestEvent = function() {
-            allTriggers.forEach(function(trigger) {
-              var targetElement = document.createElement('div');
-              targetElement.id = 'fruitPartyBowl';
-
-              var pseudoEvent = {
-                type: 'fruitParty',
-                target: targetElement,
-                fruit: 'apple'
-              };
-
-              var relatedElement = document.createElement('span');
-              relatedElement.id = 'kazoo';
-              relatedElement.innerHTML = '  <a href="#">Content with line \n breaks and multiple   spaces</a>';
-
-              trigger(pseudoEvent, relatedElement);
-            });
-          };
-
-          module.exports = function(config, trigger) {
-            allTriggers.push(trigger);
-          };
-        }
-      };
-
-      config.rules = [
-        {
-          events: [{
-            type: 'testEvent',
+      var config = {
+        extensions: {
+          testExtension: {
+            name: "Test Extension"
+          }
+        },
+        integrations: {
+          'abc': {
+            type: 'testExtension',
             config: {
-              name: 'foo'
+              mmmtreats: '%treat%',
+              accountId: 123
             }
-          }],
-          actions: [
-            {
-              integrationIds: ['abc'],
-              type: 'test',
-              config: {
-                dataElementBased: '%treat%',
-                dataElementPriorityBased: '%vegetable%',
-                dataElementDefaultBased: '%meat%',
-                dataElementIntegerBased: '%bottlesofbeeronthewall%',
-                dataElementPageViewBased: '%beverage:pageview%',
-                dataElementVisitorBased: '%beverage:visitor%',
-                dataElementSessionBased: '%beverage:session%',
-                URIBased: '%URI%',
-                uriBased: '%uri%',
-                protocolBased: '%protocol%',
-                hostnameBased: '%hostname%',
-                thisBased: '%this.id%',
-                thisTextBased: '%this.@text%',
-                thisCleanTextBased: '%this.@cleanText%',
-                eventBased: '%event.fruit%',
-                targetBased: '%target.id%',
-                windowBased: '%window.my.nested.thing%',
-                paramBased: '%param.fooParam%',
-                randBased: '%rand3%',
-                customBased: '%instrument%',
-                undefinedBased: '%notdefined%',
-              }
-            }
-          ]
-        }
-      ];
+          }
+        },
+        coreDelegates: {
+          testExtension: function(module, require) {
+            module.exports = coreDelegateSpy;
+          }
+        },
+        actionDelegates: {
+          test: function(module) {
+            module.exports = actionDelegateSpy;
+          }
+        },
+        eventDelegates: {
+          testEvent: function(module, require) {
+            var allTriggers = [];
 
-      config.dataElementDelegates = {
-        'testExtension.static': function(module, require) {
-          module.exports = function(config) {
-            return config.staticValue;
-          };
+            _satellite.triggerTestEvent = function() {
+              allTriggers.forEach(function(trigger) {
+                var targetElement = document.createElement('div');
+                targetElement.id = 'fruitPartyBowl';
+
+                var pseudoEvent = {
+                  type: 'fruitParty',
+                  target: targetElement,
+                  fruit: 'apple'
+                };
+
+                var relatedElement = document.createElement('span');
+                relatedElement.id = 'kazoo';
+                relatedElement.innerHTML = '  <a href="#">Content with line \n breaks and multiple   spaces</a>';
+
+                trigger(pseudoEvent, relatedElement);
+              });
+            };
+
+            module.exports = function(config, trigger) {
+              allTriggers.push(trigger);
+            };
+          }
+        },
+        rules: [
+          {
+            events: [{
+              type: 'testEvent',
+              config: {
+                name: 'foo'
+              }
+            }],
+            actions: [
+              {
+                integrationIds: ['abc'],
+                type: 'test',
+                config: {
+                  dataElementBased: '%treat%',
+                  dataElementPriorityBased: '%vegetable%',
+                  dataElementDefaultBased: '%meat%',
+                  dataElementIntegerBased: '%bottlesofbeeronthewall%',
+                  dataElementPageViewBased: '%beverage:pageview%',
+                  dataElementVisitorBased: '%beverage:visitor%',
+                  dataElementSessionBased: '%beverage:session%',
+                  URIBased: '%URI%',
+                  uriBased: '%uri%',
+                  protocolBased: '%protocol%',
+                  hostnameBased: '%hostname%',
+                  thisBased: '%this.id%',
+                  thisTextBased: '%this.@text%',
+                  thisCleanTextBased: '%this.@cleanText%',
+                  eventBased: '%event.fruit%',
+                  targetBased: '%target.id%',
+                  windowBased: '%window.my.nested.thing%',
+                  paramBased: '%param.fooParam%',
+                  randBased: '%rand3%',
+                  customBased: '%instrument%',
+                  undefinedBased: '%notdefined%',
+                }
+              }
+            ]
+          }
+        ],
+        dataElementDelegates: {
+          'testExtension.static': function(module, require) {
+            module.exports = function(config) {
+              return config.staticValue;
+            };
+          }
+        },
+        dataElements: [
+          {
+            name: "treat",
+            type: "testExtension.static",
+            config: {
+              staticValue: "Ice   \n Cream  \n  ",
+              forceLowerCase: true,
+              cleanText: true
+            }
+          },
+          {
+            name: "vegetable",
+            type: "testExtension.static",
+            config: {
+              staticValue: "carrot"
+            }
+          },
+          {
+            name: "meat",
+            type: "testExtension.static",
+            config: {
+              default: "default meat"
+            }
+          },
+          {
+            name: 'bottlesofbeeronthewall',
+            type: 'testExtension.static',
+            config: {
+              staticValue: 99,
+              forceLowerCase: true
+            }
+          },
+          {
+            name: "beverage:pageview",
+            type: "testExtension.static",
+            config: {
+              staticValue: 'Piña Colada',
+              storeLength: 'pageview'
+            }
+          },
+          {
+            name: "beverage:visitor",
+            type: "testExtension.static",
+            config: {
+              staticValue: 'Soda',
+              storeLength: 'visitor'
+            }
+          },
+          {
+            name: "beverage:session",
+            type: "testExtension.static",
+            config: {
+              staticValue: 'Fruit Punch',
+              storeLength: 'session'
+            }
+          }
+        ],
+        config: {
+          undefinedVarsReturnEmpty: true
         }
       };
 
-      config.dataElements = [
-        {
-          name: "treat",
-          type: "testExtension.static",
-          config: {
-            staticValue: "Ice   \n Cream  \n  ",
-            forceLowerCase: true,
-            cleanText: true
-          }
-        },
-        {
-          name: "vegetable",
-          type: "testExtension.static",
-          config: {
-            staticValue: "carrot"
-          }
-        },
-        {
-          name: "meat",
-          type: "testExtension.static",
-          config: {
-            default: "default meat"
-          }
-        },
-        {
-          name: 'bottlesofbeeronthewall',
-          type: 'testExtension.static',
-          config: {
-            staticValue: 99,
-            forceLowerCase: true
-          }
-        },
-        {
-          name: "beverage:pageview",
-          type: "testExtension.static",
-          config: {
-            staticValue: 'Piña Colada',
-            storeLength: 'pageview'
-          }
-        },
-        {
-          name: "beverage:visitor",
-          type: "testExtension.static",
-          config: {
-            staticValue: 'Soda',
-            storeLength: 'visitor'
-          }
-        },
-        {
-          name: "beverage:session",
-          type: "testExtension.static",
-          config: {
-            staticValue: 'Fruit Punch',
-            storeLength: 'session'
-          }
+      _satellite = {
+        getConfig: function() {
+          return config;
         }
-      ];
-
-      config.config.undefinedVarsReturnEmpty = true;
+      };
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/src/__tests__/helpers/testpage.js"></script>
@@ -200,8 +199,8 @@
           // Actions are always run asynchronously.
           jasmine.clock().tick(1);
 
-          expect(actionSpy.calls.count()).toBe(1);
-          var actionConfig = actionSpy.calls.argsFor(0)[0].actionConfig;
+          expect(actionDelegateSpy.calls.count()).toBe(1);
+          var actionConfig = actionDelegateSpy.calls.argsFor(0)[0].actionConfig;
           expect(actionConfig.dataElementBased).toBe('ice cream');
           // Both a data element and a custom variable (set using setVar) named "vegetable" have
           // been set. The data element has a higher priority.

@@ -201,7 +201,7 @@
         "actions": [
           {
             "integrationIds": ["efghi"],
-            "method": "addMbox",
+            "type": "adobeTarget.addMbox",
             "config": {
               "name": "frameworkdemo",
               "populateElement": "#hero",
@@ -228,7 +228,7 @@
         "actions": [
           {
             "integrationIds": ["jklmno"],
-            "method": "alert",
+            "type": "adobeDebug.alert",
             "config": {
               "text": "Click Me rule fired"
             }
@@ -248,7 +248,7 @@
         "actions": [
           {
             "integrationIds": ["efghi"],
-            "method": "addMbox",
+            "type": "adobeTarget.addMbox",
             "config": {
               "name": "frameworkredirectdemo",
               "populateElement": "#redirector",
@@ -271,7 +271,7 @@
         "actions": [
           {
             "integrationIds": ["jklmno"],
-            "method": "log",
+            "type": "adobeDebug.log",
             "config": {
               "text": "Dom Ready rule fired"
             }
@@ -288,7 +288,7 @@
         "actions": [
           {
             "integrationIds": ["jklmno"],
-            "method": "log",
+            "type": "adobeDebug.log",
             "config": {
               "text": "Page Top rule fired"
             }
@@ -305,7 +305,7 @@
         "actions": [
           {
             "integrationIds": ["jklmno"],
-            "method": "log",
+            "type": "adobeDebug.log",
             "config": {
               "text": "Page Bottom rule fired"
             }
@@ -322,7 +322,7 @@
         "actions": [
           {
             "integrationIds": ["jklmno"],
-            "method": "log",
+            "type": "adobeDebug.log",
             "config": {
               "text": "onload rule fired"
             }
@@ -342,7 +342,7 @@
         "actions": [
           {
             "integrationIds": ["jklmno"],
-            "method": "log",
+            "type": "adobeDebug.log",
             "config": {
               "text": "direct call rule fired"
             }
@@ -362,7 +362,7 @@
         "actions": [
           {
             "integrationIds": ["jklmno"],
-            "method": "log",
+            "type": "adobeDebug.log",
             "config": {
               "text": "mouseover download link rule fired"
             }
@@ -383,7 +383,7 @@
         "actions": [
           {
             "integrationIds": ["jklmno"],
-            "method": "log",
+            "type": "adobeDebug.log",
             "config": {
               "text": "mouseover Click Me fired"
             }
@@ -401,7 +401,7 @@
         ],
         "actions": [{
           "integrationIds": ["jklmno"],
-          "method": "log",
+          "type": "adobeDebug.log",
           "config": {
             "text": "entersViewport fired rule fired"
           }
@@ -418,7 +418,7 @@
         ],
         "actions": [{
           "integrationIds": ["jklmno"],
-          "method": "log",
+          "type": "adobeDebug.log",
           "config": {
             "text": "elementExists fired rule fired"
           }
@@ -435,7 +435,7 @@
         ],
         "actions": [{
           "integrationIds": ["uvw"],
-          "method": "logIn"
+          "type": "facebookConnect.logIn"
         }]
       },{
         "name": "Send Purchase on Facebook",
@@ -450,7 +450,7 @@
         "actions": [
           {
             "integrationIds": ["uvw"],
-            "method": "showDialog",
+            "type": "facebookConnect.showDialog",
             "config": {
               "method": "send",
               "link": "http://dtm.aaronhardy.com/shoes.html"
@@ -467,7 +467,7 @@
         "actions": [
           {
             "integrationIds": ["jklmno"],
-            "method": "log",
+            "type": "adobeDebug.log",
             "config": {
               "text": "Shared with BFFs."
             }
@@ -486,7 +486,7 @@
         "actions": [
           {
             "integrationIds": ["xyz"],
-            "method": "track",
+            "type": "facebookPixel.track",
             "config": {
               "eventName": 6032027988706,
               "customData": {
@@ -509,14 +509,14 @@
         "actions": [
           {
             "integrationIds": ["xyz"],
-            "method": "addPixelId",
+            "type": "facebookPixel.addPixelId",
             "config": {
               "pixelId": 6032027988706
             }
           },
           {
             "integrationIds": ["xyz"],
-            "method": "track",
+            "type": "facebookPixel.track",
             "config": {
               "eventName": "myCustomEvent",
               "customData": {

@@ -5,42 +5,66 @@ var replaceVarTokens = require('./dataElement/replaceVarTokens');
 
 var preprocessObject;
 var preprocessArray;
+var _undefinedVarsReturnEmpty;
 
-preprocessObject = function(obj, undefinedVarsReturnEmpty, elm, evt) {
+preprocessObject = function(obj, element, event) {
   var ret = {};
   for (var key in obj) {
     if (obj.hasOwnProperty(key)) {
       var value = obj[key];
       if (isObject(value)) {
-        ret[key] = preprocessObject(value, undefinedVarsReturnEmpty, elm, evt);
+        ret[key] = preprocessObject(value, element, event);
       } else if (isArray(value)) {
-        ret[key] = preprocessArray(value, undefinedVarsReturnEmpty, elm, evt);
+        ret[key] = preprocessArray(value, element, event);
       } else {
-        ret[key] = replaceVarTokens(value, undefinedVarsReturnEmpty, elm, evt);
+        ret[key] = replaceVarTokens(value, _undefinedVarsReturnEmpty, element, event);
       }
     }
   }
   return ret;
 };
 
-preprocessArray = function(arr, undefinedVarsReturnEmpty, elm, evt) {
+preprocessArray = function(arr, element, event) {
   var ret = [];
   for (var i = 0, len = arr.length; i < len; i++) {
     var value = arr[i];
     if (isString(value)) {
-      value = replaceVarTokens(value, elm, evt);
+      value = replaceVarTokens(value, element, event);
     } else if (value && value.constructor === Object) { // TODO: Can we use isObject here?
-      value = preprocessObject(value, undefinedVarsReturnEmpty, elm, evt);
+      value = preprocessObject(value, element, event);
     }
     ret.push(value);
   }
   return ret;
 };
 
-module.exports = function(config, undefinedVarsReturnEmpty, elm, evt) {
+/**
+ * Preprocesses a configuration object by deeply inspecting the object and replacing any data
+ * element tokens (%myDataElement%) which their associated data element values. This could
+ * potentially preprocess other information in the future.
+ * @param {Object|Array} config Configuration object or array.
+ * @param {HTMLElement} [element] Associated HTML element. Used for special tokens
+ * (%this.something%).
+ * @param {Object} [event] Associated event. Used for special tokens (%event.something%,
+ * %target.something%)
+ * @returns {Object|Array} A new, preprocessed object or array.
+ */
+var preprocessConfig = function(config, element, event) {
   if (!config) {
     return config;
   }
 
-  return preprocessObject(config, undefinedVarsReturnEmpty, elm, evt);
+  return preprocessObject(config, element, event);
 };
+
+/**
+ * Initialize the preprocessor with any property-wide settings.
+ * @param [boolean] undefinedVarsReturnEmpty=false Whether to return an empty string if the
+ * preprocessor finds a data element token (%myDataElement%) in a configuration object that doesn't
+ * match any existing data element.
+ */
+preprocessConfig.init = function(undefinedVarsReturnEmpty) {
+  _undefinedVarsReturnEmpty = undefinedVarsReturnEmpty;
+};
+
+module.exports = preprocessConfig;

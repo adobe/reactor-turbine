@@ -13,6 +13,7 @@ var isAnchor = require('./utils/dom/isAnchor');
 var setCookie = require('./utils/cookie/setCookie');
 var readCookie = require('./utils/cookie/readCookie');
 var removeCookie = require('./utils/cookie/removeCookie');
+var preprocessConfig = require('./utils/preprocessConfig');
 
 var _satellite = window._satellite;
 var container = _satellite.container;
@@ -33,6 +34,7 @@ _satellite.isLinked = function(element) {
   return isAnchor(element, true);
 };
 
+preprocessConfig.init(container.config.undefinedVarsReturnEmpty);
 eventDelegates.init(container.eventDelegates);
 conditionDelegates.init(container.conditionDelegates);
 actionDelegates.init(container.actionDelegates);

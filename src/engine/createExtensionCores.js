@@ -39,10 +39,7 @@ module.exports = function(container, coreRegistry, coreDelegates) {
     for (var integrationId in container.integrations) {
       var integration = container.integrations[integrationId];
       if (integration.type === extensionId) {
-        var preprocessedIntegrationConfig = preprocessConfig(
-          integration.config,
-          container.config.undefinedVarsReturnEmpty
-        );
+        var preprocessedIntegrationConfig = preprocessConfig(integration.config);
         integrationConfigs.push(preprocessedIntegrationConfig);
       }
     }
@@ -54,10 +51,7 @@ module.exports = function(container, coreRegistry, coreDelegates) {
     for (var extensionId in container.extensions) {
       var config = {
         integrationConfigs: getIntegrationConfigsForExtension(extensionId),
-        propertyConfig: preprocessConfig(
-          container.config,
-          container.config.undefinedVarsReturnEmpty
-        )
+        propertyConfig: preprocessConfig(container.config)
       };
 
       var delegate;

@@ -1,17 +1,8 @@
-var _preprocessConfig = require('./utils/preprocessConfig');
+var preprocessConfig = require('./utils/preprocessConfig');
 
 // TODO: Add a bunch of checks with error reporting.
 
 module.exports = function(container, eventDelegates, conditionDelegates, actionDelegates) {
-
-  function preprocessConfig(config, relatedElement, event) {
-    return _preprocessConfig(
-      config,
-      container.config.undefinedVarsReturnEmpty,
-      relatedElement,
-      event
-    );
-  }
 
   function getPreprocessedIntegrationConfigs(integrationIds) {
     var integrationConfigs;

@@ -14,16 +14,17 @@ var setCookie = require('./utils/cookie/setCookie');
 var readCookie = require('./utils/cookie/readCookie');
 var removeCookie = require('./utils/cookie/removeCookie');
 var preprocessConfig = require('./utils/preprocessConfig');
+var logger = require('./utils/logger');
 
 var _satellite = window._satellite;
 var container = _satellite.container;
 
-// Will get replaced if a rule is configured with a page bottom event trigger.
+// Will get replaced by the pageBottom event delegate.
 _satellite.pageBottom = function() {};
-// Will get replaced if a rule is configured with a direct call event trigger.
+// Will get replaced by the directCall event delegate.
 _satellite.track = function() {};
 _satellite.appVersion = container.appVersion;
-// TODO: _satellite.notify
+_satellite.notify = logger.notify;
 _satellite.getVar = getVar;
 _satellite.setVar = setVar;
 // TODO: _satellite.getVisitorId
@@ -34,6 +35,7 @@ _satellite.isLinked = function(element) {
   return isAnchor(element, true);
 };
 
+logger.outputEnabled = container.config.notifications;
 preprocessConfig.init(container.config.undefinedVarsReturnEmpty);
 eventDelegates.init(container.eventDelegates);
 conditionDelegates.init(container.conditionDelegates);

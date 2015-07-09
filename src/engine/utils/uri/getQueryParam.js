@@ -31,22 +31,19 @@ function parseQueryParams(str) {
   return ret;
 }
 
-var caseSensitivityQueryParamsMap;
 function getCaseSensitivityQueryParamsMap(str) {
-  if (!caseSensitivityQueryParamsMap) {
-    var mixCase = parseQueryParams(str);
-    var lowerCase = {};
+  var mixCase = parseQueryParams(str);
+  var lowerCase = {};
 
-    for (var prop in mixCase)
-      if (mixCase.hasOwnProperty(prop)) {
-        lowerCase[prop.toLowerCase()] = mixCase[prop];
-      }
+  for (var prop in mixCase)
+    if (mixCase.hasOwnProperty(prop)) {
+      lowerCase[prop.toLowerCase()] = mixCase[prop];
+    }
 
-    caseSensitivityQueryParamsMap = {
-      mixCase: mixCase,
-      lowerCase: lowerCase
-    };
-  }
+  var caseSensitivityQueryParamsMap = {
+    mixCase: mixCase,
+    lowerCase: lowerCase
+  };
 
   return caseSensitivityQueryParamsMap;
 }

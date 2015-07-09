@@ -2,19 +2,29 @@
 
 var rewire = require('rewire');
 var getURI = rewire('../getURI');
-var setLocation = function(pathname, search) {
-  getURI.__set__({
-    document: {
-      location: {
-        pathname: pathname,
-        search: search,
-        protocol: 'http:'
-      }
-    }
-  });
-};
+var setLocation;
+var revert;
 
 describe('getURI', function() {
+
+  beforeEach(function() {
+    setLocation = function(pathname, search) {
+      revert = getURI.__set__({
+        document: {
+          location: {
+            pathname: pathname,
+            search: search,
+            protocol: 'http:'
+          }
+        }
+      });
+    };
+  });
+
+  afterEach(function() {
+    revert();
+  });
+
   it('returns the correct path with no search parameters', function() {
     setLocation('/flyFishers.php', '');
     expect(getURI()).toEqual('/flyFishers.php');

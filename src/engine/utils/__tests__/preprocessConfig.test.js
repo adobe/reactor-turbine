@@ -1,5 +1,5 @@
 'use strict';
 
-describe('Uncategorized Utility Tests', function() {
+describe('preprocessConfig', function() {
   runTestPage('preprocessConfig.html');
 });

@@ -32,4 +32,8 @@ describe('escapeForHTML', function() {
       '&gt;&lt;&#x2F;head&gt;&lt;body&gt;&lt;&#x2F;body&gt;';
     expect(escaper(el.innerHTML)).toEqual(output);
   });
+
+  it('returns undefined if no arguments are specified', function() {
+    expect(escaper()).toBeUndefined();
+  });
 });

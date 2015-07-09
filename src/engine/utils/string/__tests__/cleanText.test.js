@@ -9,11 +9,16 @@ describe('cleanText', function() {
     expect(textCleaner('new line here \n and here \n')).toEqual('new line here and here');
   });
 
-  it('removes Same sting if no modifications need to be made', function() {
+  it('returns same string if no modifications need to be made', function() {
     expect(textCleaner('This is my Perfect String')).toEqual('This is my Perfect String');
   });
 
   it('removes extra spaces from the end of a string', function() {
     expect(textCleaner('This is my String     ')).toEqual('This is my String');
   });
+
+  it('returns null if no arguments are specified', function() {
+    expect(textCleaner()).toBeNull();
+  });
+
 });

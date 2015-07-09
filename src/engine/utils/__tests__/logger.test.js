@@ -15,7 +15,7 @@ describe('logger', function() {
   });
 
   it('outputs a message when output is enabled and a logging method is called', function() {
-    STANDARD_LOG_METHODS.forEach(function(fnName, i) {
+    STANDARD_LOG_METHODS.forEach(function(fnName) {
       logger.outputEnabled = true;
       logger[fnName]('test ' + fnName);
       var calls = window.console[fnName].calls;

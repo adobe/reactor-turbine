@@ -1,6 +1,5 @@
 var isString = require('./../isType/isString');
-var addClass = require('./addClass');
-var removeClass = require('./removeClass');
+var classList = require('./classList');
 var covertData = require('./../covertData');
 var hideStyleAdded = false;
 var dataKey = 'dtm.hideElements.numLocks';
@@ -34,7 +33,7 @@ module.exports = function(selectorOrElements) {
 
     covertData(element, dataKey, numLocks);
 
-    addClass(element, 'dtm-hidden');
+    classList.add(element, 'dtm-hidden');
   });
 
   var showCalled = false;
@@ -50,7 +49,7 @@ module.exports = function(selectorOrElements) {
       covertData(element, dataKey, --numLocks);
 
       if (numLocks === 0) {
-        removeClass(element, 'dtm-hidden');
+        classList.remove(element, 'dtm-hidden');
       }
     });
 

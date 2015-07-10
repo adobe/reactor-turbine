@@ -1,64 +1,14 @@
-var isString = require('./../isType/isString');
-var escapeForHTML = require('./../string/escapeForHTML');
-
-function parseQueryParams(str) {
-  var decode = function(value) {
-    var result = value;
-    try {
-      result = decodeURIComponent(value);
-    } catch (err) {
-      // ignore
-    }
-
-    return result;
-  };
-
-  if (str === '' || isString(str) === false) {
-    return {};
-  }
-  if (str.indexOf('?') === 0) {
-    str = str.substring(1);
-  }
-  var ret = {};
-  var pairs = str.split('&');
-  pairs.forEach(function(pair) {
-    pair = pair.split('=');
-    if (!pair[1]) {
-      return;
-    }
-    ret[decode(pair[0])] = escapeForHTML(decode(pair[1]));
-  });
-  return ret;
-}
-
-var caseSensitivityQueryParamsMap;
-function getCaseSensitivityQueryParamsMap(str) {
-  if (!caseSensitivityQueryParamsMap) {
-    var mixCase = parseQueryParams(str);
-    var lowerCase = {};
-
-    for (var prop in mixCase)
-      if (mixCase.hasOwnProperty(prop)) {
-        lowerCase[prop.toLowerCase()] = mixCase[prop];
-      }
-
-    caseSensitivityQueryParamsMap = {
-      mixCase: mixCase,
-      lowerCase: lowerCase
-    };
-  }
-
-  return caseSensitivityQueryParamsMap;
-}
-
-
-// TODO: We're caching query string parameters which could change when using pushState.
-// Remove caching? Re-cache when URL changes?
-module.exports = function(key, ignoreCase) {
-  var paramsMap = getCaseSensitivityQueryParamsMap(window.location.search);
-  if (ignoreCase) {
-    return paramsMap.lowerCase[key.toLowerCase()];
-  } else {
-    return paramsMap.mixCase[key];
-  }
+/**
+ * Retrieves a variable value from the current URL querystring.
+ * @param name The name of the querystring parameter.
+ * @param [caseInsensitive=false] Whether differences in parameter name casing should be ignored.
+ * This does not change the value that is returned.
+ * @returns {string}
+ */
+module.exports = function(name, caseInsensitive) {
+  // We can't cache querystring values because they can be changed at any time with
+  // the HTML5 History API.
+  var match = new RegExp('[?&]' + name + '=([^&]*)', caseInsensitive ? 'i' : '')
+      .exec(window.location.search);
+  return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
 };

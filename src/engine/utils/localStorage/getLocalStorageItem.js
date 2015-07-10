@@ -7,9 +7,9 @@ module.exports = function(name) {
   // When local storage is disabled on Safari, the mere act of referencing window.localStorage
   // throws an error. For this reason, referencing window.localStorage without being inside
   // a try-catch should be avoided.
-  try{
+  try {
     return window.localStorage.getItem(name);
-  }catch(e){
+  } catch(e) {
     return null;
   }
 };

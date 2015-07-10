@@ -9,7 +9,7 @@ module.exports = function(name, value) {
   // throws an error. For this reason, referencing window.localStorage without being inside
   // a try-catch should be avoided.
   try {
-    window.localStorage.setItem(name, value)
+    window.localStorage.setItem(name, value);
     return true;
   } catch (e) {
     return false;

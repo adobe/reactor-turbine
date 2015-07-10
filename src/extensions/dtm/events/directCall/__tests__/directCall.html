@@ -16,6 +16,7 @@
     <script>
       TestPage
         .execute(function() {
+          _satellite.track('woo');
           expect(conditionSpy.calls.count()).toEqual(0);
           _satellite.track('foo');
           expect(conditionSpy.calls.count()).toEqual(1);

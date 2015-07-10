@@ -1,5 +1,5 @@
 'use strict';
 
-describe('onload Event Tests', function() {
-  runTestPage('onload.html');
+describe('onload event type', function() {
+  runTestPage('triggers rule when the load event occurs', 'onload.html');
 });

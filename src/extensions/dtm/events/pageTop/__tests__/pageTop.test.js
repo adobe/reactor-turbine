@@ -1,5 +1,5 @@
 'use strict';
 
-describe('pageTop Event Tests', function() {
-  runTestPage('pageTop.html');
+describe('pageTop event type', function() {
+  runTestPage('triggers rule when the engine is loaded', 'pageTop.html');
 });

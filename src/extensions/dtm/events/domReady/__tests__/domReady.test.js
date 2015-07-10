@@ -1,5 +1,5 @@
 'use strict';
 
-describe('domReady Event Tests', function() {
-  runTestPage('domReady.html');
+describe('domReady event type', function() {
+  runTestPage('triggers rule when the dom ready event occurs', 'domReady.html');
 });

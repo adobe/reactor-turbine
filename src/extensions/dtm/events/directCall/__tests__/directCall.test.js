@@ -1,5 +1,7 @@
 'use strict';
 
-describe('directCall Event Tests', function() {
-  runTestPage('directCall.html');
+describe('directCall event type', function() {
+  runTestPage(
+    'triggers rule when _satellite.track() is called with matching name',
+    'directCall.html');
 });

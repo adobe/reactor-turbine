@@ -61,7 +61,7 @@
    * be used to configure a test in the iframe.
    * @param {boolean} [focus] If true, only this test will run and no other tests.
    */
-  window.runTestPage = function(path, testConfig, focus) {
+  window.runTestPage = function(description, path, testConfig, focus) {
     var absolutePath;
 
     if (path.charAt(0) === '/') {
@@ -91,14 +91,11 @@
       iwin.spyOn = spyOn;
     }
 
-    describe('test page', function() {
-      var testName = 'validates ' + path;
-      if (focus) {
-        fit(testName, runTest);
-      } else {
-        it(testName, runTest);
-      }
-    });
+    if (focus) {
+      fit(description, runTest);
+    } else {
+      it(description, runTest);
+    }
   };
 
   /**
@@ -107,7 +104,7 @@
    * @param {Object} [testConfig] An object to set on the iframe window object. This can
    * be used to configure a test in the iframe.
    */
-  window.frunTestPage = function(path, testConfig) {
-    window.runTestPage(path, testConfig, true);
+  window.frunTestPage = function(description, path, testConfig) {
+    window.runTestPage(description, path, testConfig, true);
   };
 })();

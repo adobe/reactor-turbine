@@ -1,3 +1,6 @@
+var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
+var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
+
 var createExtensionCores = require('./createExtensionCores');
 var initRules = require('./initRules');
 var dataElementDefinitions = require('./stores/dataElementDefinitions');
@@ -11,7 +14,9 @@ var getVar = require('./utils/dataElement/getVar');
 var setVar = require('./utils/dataElement/setVar');
 var isAnchor = require('./utils/dom/isAnchor');
 var setCookie = require('./utils/cookie/setCookie');
-var readCookie = require('./utils/cookie/readCookie');
+var getCookie = require('./utils/cookie/getCookie');
+var getLocalStorageItem = require('./utils/localStorage/getLocalStorageItem');
+var setLocalStorageItem = require('./utils/localStorage/setLocalStorageItem');
 var removeCookie = require('./utils/cookie/removeCookie');
 var preprocessConfig = require('./utils/preprocessConfig');
 var logger = require('./utils/logger');
@@ -24,18 +29,23 @@ _satellite.pageBottom = function() {};
 // Will get replaced by the directCall event delegate.
 _satellite.track = function() {};
 _satellite.appVersion = container.appVersion;
-_satellite.notify = logger.notify;
+_satellite.notify = logger.notify.bind(logger);
 _satellite.getVar = getVar;
 _satellite.setVar = setVar;
 // TODO: _satellite.getVisitorId
 _satellite.setCookie = setCookie;
-_satellite.readCookie = readCookie;
+_satellite.readCookie = getCookie;
 _satellite.removeCookie = removeCookie;
 _satellite.isLinked = function(element) {
   return isAnchor(element, true);
 };
+_satellite.setDebug = function(value) {
+  setLocalStorageItem(DEBUG_LOCAL_STORAGE_NAME, value);
+  logger.outputEnabled = value;
+};
 
-logger.outputEnabled = container.config.notifications;
+// This setting is primarily used by browser plugins.
+logger.outputEnabled = getLocalStorageItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';
 preprocessConfig.init(container.config.undefinedVarsReturnEmpty);
 eventDelegates.init(container.eventDelegates);
 conditionDelegates.init(container.conditionDelegates);
@@ -53,4 +63,5 @@ initRules(
   container,
   eventDelegates,
   conditionDelegates,
-  actionDelegates);
+  actionDelegates,
+  getLocalStorageItem(HIDE_ACTIVITY_LOCAL_STORAGE_NAME) !== 'true');

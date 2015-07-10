@@ -1,3 +1,8 @@
+/**
+ * Reads a cookie value.
+ * @param {string} name The name of the cookie to read.
+ * @returns {string}
+ */
 module.exports = function(name) {
   var nameEQ = name + '=';
   var parts = document.cookie.split(';');
@@ -10,5 +15,5 @@ module.exports = function(name) {
       return c.substring(nameEQ.length, c.length);
     }
   }
-  return undefined;
+  return null;
 };

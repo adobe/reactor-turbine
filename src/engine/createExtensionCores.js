@@ -39,7 +39,7 @@ module.exports = function(container, coreRegistry, coreDelegates) {
     for (var integrationId in container.integrations) {
       var integration = container.integrations[integrationId];
       if (integration.type === extensionId) {
-        var preprocessedIntegrationConfig = preprocessConfig(integration.config);
+        var preprocessedIntegrationConfig = preprocessConfig(integration.config || {});
         integrationConfigs.push(preprocessedIntegrationConfig);
       }
     }

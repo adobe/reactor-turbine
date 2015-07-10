@@ -2,9 +2,9 @@
 
 var loadScript = require('loadScript');
 
-module.exports = function(integrationConfigs) {
+module.exports = function(config) {
   // Can only have one integration.
-  var integrationConfig = integrationConfigs[0];
+  var integrationConfig = config.integrationConfigs[0];
 
   var _fbq = window._fbq || (window._fbq = []);
 

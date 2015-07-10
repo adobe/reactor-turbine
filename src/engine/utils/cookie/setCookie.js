@@ -1,3 +1,9 @@
+/**
+ * Writes a cookie.
+ * @param {string} name The name of the cookie to save.
+ * @param {string} value The value of the cookie to save.
+ * @param {number} days The number of days to store the cookie.
+ */
 module.exports = function(name, value, days) {
   var expires;
   if (days) {

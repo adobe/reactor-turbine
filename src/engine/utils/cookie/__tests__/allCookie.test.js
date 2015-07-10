@@ -1,4 +1,4 @@
-var readCookie = require('../readCookie');
+var getCookie = require('../getCookie');
 var setCookie = require('../setCookie');
 var removeCookie = require('../removeCookie');
 
@@ -11,7 +11,7 @@ describe('cookie utility', function() {
 
     expect(document.cookie.indexOf(cookieName + '=' + cookieValue)).toBeGreaterThan(-1);
 
-    expect(readCookie(cookieName)).toEqual('TEST_COOKIE');
+    expect(getCookie(cookieName)).toEqual('TEST_COOKIE');
 
     removeCookie(cookieName);
 

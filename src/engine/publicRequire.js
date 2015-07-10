@@ -19,7 +19,8 @@ var resources = {
   'isLinked': function(element) { // For backward compatibility.
     require('./utils/dom/isAnchor')(element, true);
   },
-  'readCookie': require('./utils/cookie/readCookie'),
+  'getCookie': require('./utils/cookie/getCookie'),
+  'setCookie': require('./utils/cookie/setCookie'),
   'getObjectProperty': require('./utils/dataElement/getObjectProperty'),
   'bubbly': require('./utils/bubbly'),
   'addLiveEventListener': require('./utils/communication/addLiveEventListener')

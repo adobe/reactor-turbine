@@ -1,7 +1,7 @@
 'use strict';
 
-var readCookie = require('readCookie');
+var getCookie = require('getCookie');
 
 module.exports = function(config) {
-  return readCookie(config.dataElementConfig.name);
+  return getCookie(config.dataElementConfig.name);
 };

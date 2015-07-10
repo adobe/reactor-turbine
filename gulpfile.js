@@ -105,7 +105,7 @@ gulp.task("buildEngine", function() {
       output: {
         filename: "engine.js"
       },
-      devtool: "#inline-source-map",
+      devtool: "source-map",
       resolve: {
         extensions: ['', '.js']
       },

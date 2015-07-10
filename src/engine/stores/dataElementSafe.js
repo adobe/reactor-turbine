@@ -1,5 +1,5 @@
 var setCookie = require('../utils/cookie/setCookie');
-var readCookie = require('../utils/cookie/readCookie');
+var getCookie = require('../utils/cookie/getCookie');
 
 var pageviewCache = {};
 
@@ -21,7 +21,7 @@ module.exports = function(key, length) {
     if (length === 'pageview') {
       return pageviewCache[key];
     } else if (length === 'session' || length === 'visitor') {
-      return readCookie('_sdsat_' + key);
+      return getCookie('_sdsat_' + key);
     }
   }
 };

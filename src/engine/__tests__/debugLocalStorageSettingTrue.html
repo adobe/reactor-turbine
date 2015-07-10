@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script>
+      window.localStorage.setItem('sdsat_debug', true);
+      spyOn(window.console, 'log');
+    </script>
+    <script src="/base/dist/container.js"></script>
+    <script src="/base/dist/engine.js"></script>
+    <script>
+      TestPage
+        .execute(function() {
+          _satellite.notify('debug setting test');
+          var calls = window.console.log.calls;
+
+          var logged = false;
+          for (var i = 0, ii = calls.count(); i < ii; i++) {
+            var message = calls.argsFor(i)[0];
+            if (message === 'SATELLITE: debug setting test') {
+              logged = true;
+              break;
+            }
+          }
+
+          expect(logged).toBe(true);
+        })
+        .start();
+    </script>
+  </head>
+  <body>
+    <script>
+      _satellite.pageBottom();
+    </script>
+  </body>
+</html>

@@ -2,7 +2,8 @@ var preprocessConfig = require('./utils/preprocessConfig');
 
 // TODO: Add a bunch of checks with error reporting.
 
-module.exports = function(container, eventDelegates, conditionDelegates, actionDelegates) {
+module.exports = function(
+    container, eventDelegates, conditionDelegates, actionDelegates, actionsEnabled) {
 
   function getPreprocessedIntegrationConfigs(integrationIds) {
     var integrationConfigs;
@@ -20,7 +21,7 @@ module.exports = function(container, eventDelegates, conditionDelegates, actionD
 
 
   function runActions(rule, event, relatedElement) {
-    if (rule.actions) {
+    if (actionsEnabled && rule.actions) {
       rule.actions.forEach(function(action) {
         action.config = action.config || {};
 

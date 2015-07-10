@@ -88,6 +88,7 @@
       iwin.fail = fail;
       iwin.jasmine = new IFrameJasmine(iwin);
       iwin.testConfig = testConfig;
+      iwin.spyOn = spyOn;
     }
 
     describe('test page', function() {

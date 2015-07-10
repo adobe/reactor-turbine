@@ -6,5 +6,5 @@ describe('sdsat_debug local storage setting', function() {
 });
 
 describe('setDebug', function() {
-  runTestPage('logs to the console when called with true', 'setDebugTrue.html');
+  runTestPage('toggles logging to the console', 'setDebug.html');
 });

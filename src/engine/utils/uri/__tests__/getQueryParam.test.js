@@ -23,38 +23,49 @@ describe('getQueryParam', function() {
     revert();
   });
 
-  it('returns undefined if the queryString is empty', function() {
+  it('returns null if the queryString is empty', function() {
     setSearch('');
-    expect(getQueryParam()).toBeUndefined();
+    expect(getQueryParam('fly')).toBeNull();
   });
 
-  it('returns undefined if the queryString is not a string', function() {
-    setSearch({a: 'apple'});
-    expect(getQueryParam()).toBeUndefined();
-  });
-
-  it('returns a value for a key in the queryString - Case Sensitive', function() {
+  it('returns null when null is passed as the parameter name', function() {
     setSearch('?fly=caddis');
-    expect(getQueryParam('fly', false)).toEqual('caddis');
+    expect(getQueryParam(null)).toBeNull();
   });
 
-  it('returns undefined for a key in the queryString - Case Sensitive', function() {
+  it('returns value for matching parameter - Case Sensitive', function() {
     setSearch('?fly=caddis');
-    expect(getQueryParam('Fly', false)).toBeUndefined();
+    expect(getQueryParam('fly')).toEqual('caddis');
   });
 
-  it('returns a value for a key in the queryString - Case InSensitive', function() {
+  it('returns null when no matching parameter is found - Case Sensitive', function() {
+    setSearch('?fly=caddis');
+    expect(getQueryParam('Fly')).toBeNull();
+  });
+
+  it('returns value for matching parameter - Case Insensitive', function() {
     setSearch('?fly=caddis');
     expect(getQueryParam('Fly', true)).toEqual('caddis');
   });
 
-  it('returns undefined for an unknown key in the queryString', function() {
+  it('returns null when no matching parameter is found', function() {
     setSearch('?fly=caddis');
-    expect(getQueryParam('nymph', true)).toBeUndefined();
+    expect(getQueryParam('nymph', true)).toBeNull();
   });
 
-  it('returns a value for specific key when multiple keys exist in the queryString', function() {
+  it('returns a value for specific parameter when multiple ' +
+      'parameters exist in the queryString', function() {
     setSearch('?fly=caddis&nymph=RS2');
     expect(getQueryParam('nymph', true)).toEqual('RS2');
+  });
+
+  it('returns a decoded value', function() {
+    setSearch('?fly=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
+    expect(getQueryParam('fly')).toEqual('шеллы');
+  });
+
+  it('replaces plus signs with spaces', function() {
+    setSearch('?fly=caddis+fly');
+    expect(getQueryParam('fly')).toEqual('caddis fly');
   });
 });

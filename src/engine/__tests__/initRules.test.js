@@ -150,6 +150,41 @@ describe('initRules', function() {
       'Condition delegate of type testCondition not found.');
   });
 
+  it('logs an error when the condition doesn\'t pass', function() {
+    var conditionDelegates = {
+      get: function() {
+        return function() {
+          return false;
+        };
+      }
+    };
+
+    expect(function() {
+      initRules({
+          rules: [
+            {
+              name: 'Test Rule',
+              events: [
+                {
+                  type: 'testEvent'
+                }
+              ],
+              conditions: [
+                {
+                  type: 'testCondition'
+                }
+              ]
+            }
+          ]
+        },
+        eventDelegatesWithImmediateTriggerCall,
+        conditionDelegates);
+    }).not.toThrowError();
+
+    expect(logger.log.calls.mostRecent().args[0]).toEqual(
+      'Condition for rule Test Rule not met.');
+  });
+
   it('logs an error when the action delegate throws an error', function() {
     var actionDelegates = {
       get: function() {

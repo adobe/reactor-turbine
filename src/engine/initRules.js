@@ -1,6 +1,5 @@
 var preprocessConfig = require('./utils/preprocessConfig');
-
-// TODO: Add a bunch of checks with error reporting.
+var logger = require('./utils/logger');
 
 module.exports = function(
     container, eventDelegates, conditionDelegates, actionDelegates, actionsEnabled) {
@@ -28,7 +27,8 @@ module.exports = function(
         var delegate = actionDelegates.get(action.type);
 
         if (!delegate) {
-          throw new Error('Action delegate of type ' + action.type + ' not found.');
+          logger.error('Action delegate of type ' + action.type + ' not found.');
+          return;
         }
 
         var config = {
@@ -37,9 +37,16 @@ module.exports = function(
           propertyConfig: preprocessConfig(container.config)
         };
 
-        delegate(config);
+        try {
+          delegate(config);
+        } catch (e) {
+          logger.error('Error when executing action for rule ' + rule.name);
+          // Don't re-throw the error because we want to continue execution.
+        }
       });
     }
+
+    logger.log('Rule "' + rule.name + '" fired.');
   }
 
   function checkConditions(rule, event, relatedElement) {
@@ -51,7 +58,10 @@ module.exports = function(
         var delegate = conditionDelegates.get(condition.type);
 
         if (!delegate) {
-          throw new Error('Condition delegate of type ' + condition.type + ' not found.');
+          logger.error('Condition delegate of type ' + condition.type + ' not found.');
+          // Return because we want to assume the condition would have failed and therefore
+          // we don't want to run the rule's actions.
+          return;
         }
 
         var config = {
@@ -60,7 +70,15 @@ module.exports = function(
           propertyConfig: preprocessConfig(container.config)
         };
 
-        if (!delegate(config, event, relatedElement)) {
+        try {
+          if (!delegate(config, event, relatedElement)) {
+            return;
+          }
+        } catch (e) {
+          logger.error('Error when executing condition for rule ' + rule.name);
+          // Don't re-throw the error because we want to continue execution. We do return
+          // however because we want to assume the condition would have failed and therefore
+          // we don't want to run the rule's actions.
           return;
         }
       }
@@ -88,7 +106,8 @@ module.exports = function(
         var delegate = eventDelegates.get(event.type);
 
         if (!delegate) {
-          throw new Error('Event delegate of type ' + event.type + ' not found.');
+          logger.error('Event delegate of type ' + event.type + ' not found.');
+          return;
         }
 
         var config = {
@@ -97,7 +116,12 @@ module.exports = function(
           propertyConfig: preprocessConfig(container.config)
         };
 
-        delegate(config, trigger);
+        try {
+          delegate(config, trigger);
+        } catch (e) {
+          logger.error('Error when executing event listener for rule ' + rule.name);
+          // Don't re-throw the error because we want to continue execution.
+        }
       });
     }
   }

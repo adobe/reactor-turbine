@@ -1,5 +1,6 @@
 var Promise = require('./utils/communication/Promise');
 var preprocessConfig = require('./utils/preprocessConfig');
+var logger = require('./utils/logger');
 
 /**
  * Initializes extension cores.
@@ -61,7 +62,13 @@ module.exports = function(container, coreRegistry, coreDelegates) {
 
       if (delegate) {
         // If there is no core for the extension then the promise should be resolved with undefined.
-        result = delegate(config);
+        try {
+          result = delegate(config);
+        } catch (e) {
+          logger.error('Error when initializing extension core for extension ' +
+              container.extensions[extensionId].name);
+          // Don't re-throw the error because we want to continue execution.
+        }
       }
 
       // Get the proxy promise that was created beforehand for the integration and make sure it's

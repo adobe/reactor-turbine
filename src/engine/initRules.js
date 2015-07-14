@@ -72,6 +72,7 @@ module.exports = function(
 
         try {
           if (!delegate(config, event, relatedElement)) {
+            logger.log('Condition for rule ' + rule.name + ' not met.');
             return;
           }
         } catch (e) {

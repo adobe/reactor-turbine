@@ -1,5 +1,7 @@
 'use strict';
 
+var logger = require('logger');
+
 /**
  * Object where the key is the call name and the value is an array of all rule trigger functions
  * for that call name.
@@ -12,11 +14,14 @@ var triggersByCallName = {};
  * @param {string} name The string matching a string configured for a rule.
  */
 window._satellite.track = function(name) {
+  name = name.trim();
   var triggers = triggersByCallName[name];
   if (triggers) {
     triggers.forEach(function(trigger) {
       trigger();
     });
+  } else {
+    logger.log('Direct call rule ' + name + ' not found.');
   }
 };
 

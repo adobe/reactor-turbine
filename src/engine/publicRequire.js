@@ -23,7 +23,8 @@ var resources = {
   'setCookie': require('./utils/cookie/setCookie'),
   'getObjectProperty': require('./utils/dataElement/getObjectProperty'),
   'bubbly': require('./utils/bubbly'),
-  'addLiveEventListener': require('./utils/communication/addLiveEventListener')
+  'addLiveEventListener': require('./utils/communication/addLiveEventListener'),
+  'logger': require('./utils/logger')
 };
 
 module.exports = function(key) {

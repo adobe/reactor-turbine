@@ -1,4 +1,3 @@
-var getElementText = require('./../dom/getElementText');
 var cleanText = require('./../string/cleanText');
 
 // Special Properties for DOM elements. You use special properties using
@@ -6,8 +5,10 @@ var cleanText = require('./../string/cleanText');
 //
 //     this.@text
 module.exports = {
-  text: getElementText,
+  text: function(obj) {
+    return obj.textContent;
+  },
   cleanText: function(obj) {
-    return cleanText(getElementText(obj));
+    return cleanText(obj.textContent);
   }
 };

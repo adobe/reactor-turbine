@@ -1,14 +1,14 @@
 <html>
   <head>
     <script src="/base/dist/container.js"></script>
-    <script src="../helpers/configureEngineForEventTests.js"></script>
+    <script src="configureEngineForEventTests.js"></script>
     <script src="/base/node_modules/simulate/simulate.js"></script>
     <script src="/base/src/__tests__/helpers/testpage.js"></script>
-    <script src="helpers/testMouseEvents.js"></script>
+    <script src="testStandardEvents.js"></script>
     <script>
-      testMouseEvents({
-        eventHandlerOnElement: false
-      });
+      var options = Object.create(window.testConfig);
+      options.eventHandlerOnElement = true;
+      testStandardEvents(options);
     </script>
     <script src="/base/dist/engine.js"></script>
   </head>

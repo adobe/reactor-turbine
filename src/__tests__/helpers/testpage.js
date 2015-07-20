@@ -397,7 +397,8 @@
   //}
 
   window.onerror = function(err, url, line) {
-    fail(err + ' at ' + url + ' on line ' + line);
+    window.fail(err + ' at ' + url + ' on line ' + line);
+    window.done();
   };
 
   page = {

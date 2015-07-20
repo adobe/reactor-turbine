@@ -1,21 +1,6 @@
 /*eslint max-len:0*/
 'use strict';
 
-describe('mouse event types', function() {
-  runTestPage(
-    'triggers rule when element already added and listener added to document',
-    'mouse/preAddElementWithHandlerOnDocument.html');
-  runTestPage(
-    'triggers rule when element already added with listener added to element',
-    'mouse/preAddElementWithHandlerOnElement.html');
-  runTestPage(
-    'triggers rule when element added later with listener added to document',
-    'mouse/postAddElementWithHandlerOnDocument.html');
-  runTestPage(
-    'triggers rule when element added later with listener added to element',
-    'mouse/postAddElementWithHandlerOnElement.html');
-});
-
 describe('bubbling', function() {
   // Test each scenario with eventHandlerOnElement toggled. The behavior should be consistent.
   [true, false].forEach(function(eventHandlerOnElement) {
@@ -36,7 +21,7 @@ describe('bubbling', function() {
     //      Rule A will be                                           processed
     //      Rule B will be                                           not processed
     //      Rule C will be                                           processed
-    runTestPage('handles bubbling with config A', 'bubbling/bubbling.html', {
+    runTestPage('handles bubbling with config A', 'bubbling.html', {
       bubbleFireIfParent: false,
       bubbleFireIfChildFired: true,
       bubbleStop: false,
@@ -63,7 +48,7 @@ describe('bubbling', function() {
     //      Rule A will be                                           processed
     //      Rule B will be                                           processed
     //      Rule C will be                                           processed
-    runTestPage('handles bubbling with config B', 'bubbling/bubbling.html', {
+    runTestPage('handles bubbling with config B', 'bubbling.html', {
       bubbleFireIfParent: true,
       bubbleFireIfChildFired: true,
       bubbleStop: false,
@@ -90,7 +75,7 @@ describe('bubbling', function() {
     //      Rule A will be                                           processed
     //      Rule B will be                                           not processed
     //      Rule C will be                                           processed
-    runTestPage('handles bubbling with config C', 'bubbling/bubbling.html', {
+    runTestPage('handles bubbling with config C', 'bubbling.html', {
       bubbleFireIfParent: false,
       bubbleFireIfChildFired: false,
       bubbleStop: false,
@@ -117,7 +102,7 @@ describe('bubbling', function() {
     //      Rule A will be                                           processed
     //      Rule B will be                                           not processed
     //      Rule C will be                                           processed
-    runTestPage('handles bubbling with config D', 'bubbling/bubbling.html', {
+    runTestPage('handles bubbling with config D', 'bubbling.html', {
       bubbleFireIfParent: false,
       bubbleFireIfChildFired: true,
       bubbleStop: true,
@@ -144,7 +129,7 @@ describe('bubbling', function() {
     //      Rule A will be                                           processed
     //      Rule B will be                                           not processed
     //      Rule C will be                                           processed
-    runTestPage('handles bubbling with config E', 'bubbling/bubbling.html', {
+    runTestPage('handles bubbling with config E', 'bubbling.html', {
       bubbleFireIfParent: true,
       bubbleFireIfChildFired: false,
       bubbleStop: false,
@@ -171,7 +156,7 @@ describe('bubbling', function() {
     //      Rule A will be                                           not processed
     //      Rule B will be                                           processed
     //      Rule C will be                                           processed
-    runTestPage('handles bubbling with config F', 'bubbling/bubbling.html', {
+    runTestPage('handles bubbling with config F', 'bubbling.html', {
       bubbleFireIfParent: true,
       bubbleFireIfChildFired: true,
       bubbleStop: true,
@@ -198,7 +183,7 @@ describe('bubbling', function() {
     //      Rule A will be                                           processed
     //      Rule B will be                                           not processed
     //      Rule C will be                                           processed
-    runTestPage('handles bubbling with config G', 'bubbling/bubbling.html', {
+    runTestPage('handles bubbling with config G', 'bubbling.html', {
       bubbleFireIfParent: false,
       bubbleFireIfChildFired: false,
       bubbleStop: true,
@@ -225,7 +210,7 @@ describe('bubbling', function() {
     //      Rule A will be                                           processed
     //      Rule B will be                                           not processed
     //      Rule C will be                                           processed
-    runTestPage('handles bubbling with config H', 'bubbling/bubbling.html', {
+    runTestPage('handles bubbling with config H', 'bubbling.html', {
       bubbleFireIfParent: true,
       bubbleFireIfChildFired: false,
       bubbleStop: true,

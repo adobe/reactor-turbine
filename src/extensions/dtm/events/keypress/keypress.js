@@ -3,10 +3,11 @@
 var bubbly = require('bubbly');
 var addLiveEventListener = require('addLiveEventListener');
 
-var clickBubbly = bubbly();
+var keypressBubbly = bubbly();
 
 /**
- * Click event. This event occurs when a user has clicked an element.
+ * Keypress event. This event occurs when a key is pressed down and the key normally produces
+ * a character value.
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.
  * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.
@@ -17,14 +18,13 @@ var clickBubbly = bubbly();
  * @param {boolean} [config.eventConfig.bubbleStop=false] Whether the event should not trigger
  * rules on ancestor elements.
  * @param {ruleTrigger} trigger The trigger callback.
- * ancestor elements.
  */
 module.exports = function(config, trigger) {
-  clickBubbly.addListener(config.eventConfig, trigger);
+  keypressBubbly.addListener(config.eventConfig, trigger);
 
   if (config.eventConfig.eventHandlerOnElement) {
-    addLiveEventListener(config.eventConfig.selector, 'click', clickBubbly.evaluateEvent);
+    addLiveEventListener(config.eventConfig.selector, 'keypress', keypressBubbly.evaluateEvent);
   } else {
-    document.addEventListener('click', clickBubbly.evaluateEvent);
+    document.addEventListener('keypress', keypressBubbly.evaluateEvent);
   }
 };

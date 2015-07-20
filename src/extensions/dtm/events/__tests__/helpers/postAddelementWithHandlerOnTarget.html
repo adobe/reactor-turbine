@@ -3,11 +3,11 @@
     <script src="/base/dist/container.js"></script>
     <script src="../configureEngineForEventTests.js"></script>
     <script src="/base/src/__tests__/testpage.js"></script>
-    <script src="testMouseEvents.js"></script>
+    <script src="testStandardEvents.js"></script>
     <script>
-      testMouseEvents({
-        eventHandlerOnElement: true
-      });
+      var options = Object.create(window.testConfig);
+      options.eventHandlerOnElement = true;
+      testStandardEvents(options);
     </script>
     <script src="/base/dist/engine.js"></script>
     <script src="/base/node_modules/simulate/simulate.js"></script>

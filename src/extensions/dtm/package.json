@@ -50,6 +50,10 @@
     {
       "name": "Timeout",
       "path": "events/timeout/timeout.js"
+    },
+    {
+      "name": "Keypress",
+      "path": "events/keypress/keypress.js"
     }
   ],
   "dataElementDelegates": [

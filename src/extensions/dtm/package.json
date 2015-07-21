@@ -54,6 +54,10 @@
     {
       "name": "Keypress",
       "path": "events/keypress/keypress.js"
+    },
+    {
+      "name": "Focus",
+      "path": "events/focus/focus.js"
     }
   ],
   "dataElementDelegates": [

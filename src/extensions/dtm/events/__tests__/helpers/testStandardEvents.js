@@ -15,7 +15,7 @@ window.testStandardEvents = function(options) {
 
   var ruleEvents = [
     {
-      type: options.dtmEventType,
+      type: options.extensionEventType,
       config: {
         selector: '#test',
         bubbleFireIfParent: true,

@@ -1,9 +1,9 @@
 'use strict';
 
-describe('keypress event type', function() {
+describe('submit event type', function() {
   var options = {
-    nativeEventType: 'keypress',
-    extensionEventType: 'dtm.keypress'
+    nativeEventType: 'submit',
+    extensionEventType: 'dtm.submit'
   };
 
   runTestPage(

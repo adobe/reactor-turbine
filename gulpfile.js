@@ -1,6 +1,8 @@
 var gulp = require('gulp');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
+var uglify = require('gulp-uglify');
+var gzip = require('gulp-gzip');
 var fs = require('fs');
 var path = require('path');
 var karma = require('karma').server;
@@ -99,13 +101,22 @@ gulp.task('buildContainer', function() {
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task("buildEngine", function() {
+gulp.task('compressContainer', ['buildContainer'], function() {
+  return gulp.src(['./dist/container.js'])
+    .pipe(rename('container.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('./dist'))
+    .pipe(gzip())
+    .pipe(gulp.dest('./dist'));
+});
+
+gulp.task('buildEngine', function() {
   return gulp.src('./src/engine/bootstrap.js')
     .pipe($.webpack({
       output: {
-        filename: "engine.js"
+        filename: 'engine.js'
       },
-      devtool: "source-map",
+      devtool: 'source-map',
       resolve: {
         extensions: ['', '.js']
       },
@@ -118,6 +129,15 @@ gulp.task("buildEngine", function() {
         ]
       }
     }))
+    .pipe(gulp.dest('./dist'));
+});
+
+gulp.task('compressEngine', ['buildEngine'], function() {
+  return gulp.src('./dist/engine.js')
+    .pipe(rename('engine.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('./dist'))
+    .pipe(gzip())
     .pipe(gulp.dest('./dist'));
 });
 

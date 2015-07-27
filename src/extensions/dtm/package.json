@@ -62,6 +62,10 @@
     {
       "name": "Blur",
       "path": "events/blur/blur.js"
+    },
+    {
+      "name": "Submit",
+      "path": "events/submit/submit.js"
     }
   ],
   "dataElementDelegates": [

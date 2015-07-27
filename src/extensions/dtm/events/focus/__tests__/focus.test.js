@@ -3,7 +3,7 @@
 describe('focus event type', function() {
   var options = {
     nativeEventType: 'focus',
-    dtmEventType: 'dtm.focus'
+    extensionEventType: 'dtm.focus'
   };
 
   runTestPage(

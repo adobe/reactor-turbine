@@ -3,7 +3,7 @@
 describe('click event type', function() {
   var options = {
     nativeEventType: 'click',
-    dtmEventType: 'dtm.click'
+    extensionEventType: 'dtm.click'
   };
 
   runTestPage(

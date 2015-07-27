@@ -3,7 +3,7 @@
 describe('blur event type', function() {
   var options = {
     nativeEventType: 'blur',
-    dtmEventType: 'dtm.blur'
+    extensionEventType: 'dtm.blur'
   };
 
   runTestPage(

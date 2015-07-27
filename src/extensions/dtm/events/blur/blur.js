@@ -2,12 +2,10 @@
 
 var bubbly = require('bubbly');
 var addLiveEventListener = require('addLiveEventListener');
-
-var keypressBubbly = bubbly();
+var blurBubbly = bubbly();
 
 /**
- * Keypress event. This event occurs when a key is pressed down and the key normally produces
- * a character value.
+ * Blur event. This event occurs when an element has lost focus.
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.
  * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.
@@ -22,11 +20,12 @@ var keypressBubbly = bubbly();
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  keypressBubbly.addListener(config.eventConfig, trigger);
+  blurBubbly.addListener(config.eventConfig, trigger);
 
   if (config.eventConfig.eventHandlerOnElement) {
-    addLiveEventListener(config.eventConfig.selector, 'keypress', keypressBubbly.evaluateEvent);
+    addLiveEventListener(config.eventConfig.selector, 'blur', blurBubbly.evaluateEvent);
   } else {
-    document.addEventListener('keypress', keypressBubbly.evaluateEvent);
+    // The event doesn't bubble but it does have a capture phase.
+    document.addEventListener('blur', blurBubbly.evaluateEvent, true);
   }
 };

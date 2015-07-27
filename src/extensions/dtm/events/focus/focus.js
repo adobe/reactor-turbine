@@ -9,6 +9,8 @@ var focusBubbly = bubbly();
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.
  * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.
+ * @oaram {boolean} [config.eventHandlerOnElement=false] Whether the event listener should be
+ * added directly to the element rather than an ancestor.
  * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire if
  * the event originated from a descendant element.
  * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should fire

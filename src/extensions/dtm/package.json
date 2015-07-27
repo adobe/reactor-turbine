@@ -58,6 +58,10 @@
     {
       "name": "Focus",
       "path": "events/focus/focus.js"
+    },
+    {
+      "name": "Blur",
+      "path": "events/blur/blur.js"
     }
   ],
   "dataElementDelegates": [

@@ -24,7 +24,6 @@ module.exports = function(config, trigger) {
   if (config.eventConfig.eventHandlerOnElement) {
     addLiveEventListener(config.eventConfig.selector, 'focus', bubbly.evaluateEvent);
   } else {
-    // The event doesn't bubble but it does have a capture phase.
     document.addEventListener('focus', bubbly.evaluateEvent, true);
   }
 };

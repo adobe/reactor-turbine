@@ -25,6 +25,6 @@ module.exports = function(config, trigger) {
   if (config.eventConfig.eventHandlerOnElement) {
     addLiveEventListener(config.eventConfig.selector, 'keypress', bubbly.evaluateEvent);
   } else {
-    document.addEventListener('keypress', bubbly.evaluateEvent);
+    document.addEventListener('keypress', bubbly.evaluateEvent, true);
   }
 };

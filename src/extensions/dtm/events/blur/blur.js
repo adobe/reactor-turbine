@@ -24,7 +24,6 @@ module.exports = function(config, trigger) {
   if (config.eventConfig.eventHandlerOnElement) {
     addLiveEventListener(config.eventConfig.selector, 'blur', bubbly.evaluateEvent);
   } else {
-    // The event doesn't bubble but it does have a capture phase.
     document.addEventListener('blur', bubbly.evaluateEvent, true);
   }
 };

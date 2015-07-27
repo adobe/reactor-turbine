@@ -25,6 +25,6 @@ module.exports = function(config, trigger) {
   if (config.eventConfig.eventHandlerOnElement) {
     addLiveEventListener(config.eventConfig.selector, 'click', bubbly.evaluateEvent);
   } else {
-    document.addEventListener('click', bubbly.evaluateEvent);
+    document.addEventListener('click', bubbly.evaluateEvent, true);
   }
 };

@@ -1,9 +1,7 @@
 'use strict';
 
-var bubbly = require('bubbly');
+var bubbly = require('bubbly')();
 var addLiveEventListener = require('addLiveEventListener');
-
-var keypressBubbly = bubbly();
 
 /**
  * Keypress event. This event occurs when a key is pressed down and the key normally produces
@@ -22,11 +20,11 @@ var keypressBubbly = bubbly();
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  keypressBubbly.addListener(config.eventConfig, trigger);
+  bubbly.addListener(config.eventConfig, trigger);
 
   if (config.eventConfig.eventHandlerOnElement) {
-    addLiveEventListener(config.eventConfig.selector, 'keypress', keypressBubbly.evaluateEvent);
+    addLiveEventListener(config.eventConfig.selector, 'keypress', bubbly.evaluateEvent);
   } else {
-    document.addEventListener('keypress', keypressBubbly.evaluateEvent);
+    document.addEventListener('keypress', bubbly.evaluateEvent);
   }
 };

@@ -1,10 +1,8 @@
 'use strict';
 
 var poll = require('poll');
-var bubbly = require('bubbly');
+var bubbly = require('bubbly')();
 var covertData = require('covertData');
-
-var elementExistsBubbly = bubbly();
 var completeDataKey = 'dtm.elementExists.complete';
 
 /**
@@ -22,7 +20,7 @@ poll('element exists event delegate', function() {
       // If the element has been seen before, bubbly will have already run all rules that apply
       // to it.
       if (!covertData(element, completeDataKey)) {
-        elementExistsBubbly.evaluateEvent({
+        bubbly.evaluateEvent({
           type: 'elementexists',
           target: element
         });
@@ -53,7 +51,7 @@ poll('element exists event delegate', function() {
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  elementExistsBubbly.addListener(config.eventConfig, trigger);
+  bubbly.addListener(config.eventConfig, trigger);
 
   if (selectors.indexOf(config.eventConfig.selector) === -1) {
     selectors.push(config.eventConfig.selector);

@@ -1,9 +1,7 @@
 'use strict';
 
-var bubbly = require('bubbly');
+var bubbly = require('bubbly')();
 var addLiveEventListener = require('addLiveEventListener');
-
-var clickBubbly = bubbly();
 
 /**
  * Click event. This event occurs when a user has clicked an element.
@@ -22,11 +20,11 @@ var clickBubbly = bubbly();
  * ancestor elements.
  */
 module.exports = function(config, trigger) {
-  clickBubbly.addListener(config.eventConfig, trigger);
+  bubbly.addListener(config.eventConfig, trigger);
 
   if (config.eventConfig.eventHandlerOnElement) {
-    addLiveEventListener(config.eventConfig.selector, 'click', clickBubbly.evaluateEvent);
+    addLiveEventListener(config.eventConfig.selector, 'click', bubbly.evaluateEvent);
   } else {
-    document.addEventListener('click', clickBubbly.evaluateEvent);
+    document.addEventListener('click', bubbly.evaluateEvent);
   }
 };

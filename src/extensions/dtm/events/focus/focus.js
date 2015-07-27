@@ -1,8 +1,7 @@
 'use strict';
 
-var bubbly = require('bubbly');
+var bubbly = require('bubbly')();
 var addLiveEventListener = require('addLiveEventListener');
-var focusBubbly = bubbly();
 
 /**
  * Focus event. This event occurs when an element has received focus.
@@ -20,12 +19,12 @@ var focusBubbly = bubbly();
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  focusBubbly.addListener(config.eventConfig, trigger);
+  bubbly.addListener(config.eventConfig, trigger);
 
   if (config.eventConfig.eventHandlerOnElement) {
-    addLiveEventListener(config.eventConfig.selector, 'focus', focusBubbly.evaluateEvent);
+    addLiveEventListener(config.eventConfig.selector, 'focus', bubbly.evaluateEvent);
   } else {
     // The event doesn't bubble but it does have a capture phase.
-    document.addEventListener('focus', focusBubbly.evaluateEvent, true);
+    document.addEventListener('focus', bubbly.evaluateEvent, true);
   }
 };

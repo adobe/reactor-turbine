@@ -1,8 +1,7 @@
 'use strict';
 
-var bubbly = require('bubbly');
+var bubbly = require('bubbly')();
 var addLiveEventListener = require('addLiveEventListener');
-var blurBubbly = bubbly();
 
 /**
  * Blur event. This event occurs when an element has lost focus.
@@ -20,12 +19,12 @@ var blurBubbly = bubbly();
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  blurBubbly.addListener(config.eventConfig, trigger);
+  bubbly.addListener(config.eventConfig, trigger);
 
   if (config.eventConfig.eventHandlerOnElement) {
-    addLiveEventListener(config.eventConfig.selector, 'blur', blurBubbly.evaluateEvent);
+    addLiveEventListener(config.eventConfig.selector, 'blur', bubbly.evaluateEvent);
   } else {
     // The event doesn't bubble but it does have a capture phase.
-    document.addEventListener('blur', blurBubbly.evaluateEvent, true);
+    document.addEventListener('blur', bubbly.evaluateEvent, true);
   }
 };

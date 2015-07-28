@@ -6,7 +6,7 @@ var addLiveEventListener = require('addLiveEventListener');
 document.addEventListener('blur', bubbly.evaluateEvent, true);
 
 /**
- * Blur event. This event occurs when an element has lost focus.
+ * The blur event. This event occurs when an element has lost focus.
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.
  * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.

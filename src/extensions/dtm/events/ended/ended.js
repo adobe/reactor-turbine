@@ -1,12 +1,11 @@
 'use strict';
 
 var bubbly = require('bubbly')();
-var addLiveEventListener = require('addLiveEventListener');
 
 document.addEventListener('ended', bubbly.evaluateEvent, true);
 
 /**
- * Ended event. This event occurs when playback has stopped because the end of the media was
+ * The ended event. This event occurs when playback has stopped because the end of the media was
  * reached.
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.

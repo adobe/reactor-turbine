@@ -6,7 +6,7 @@ var selectorsWatched = [];
 var docWatched = false;
 
 /**
- * Click event. This event occurs when a user has clicked an element.
+ * The click event. This event occurs when a user has clicked an element.
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.
  * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.

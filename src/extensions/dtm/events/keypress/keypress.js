@@ -4,7 +4,7 @@ var bubbly = require('bubbly')();
 var addLiveEventListener = require('addLiveEventListener');
 
 /**
- * Keypress event. This event occurs when a key is pressed down and the key normally produces
+ * The keypress event. This event occurs when a key is pressed down and the key normally produces
  * a character value.
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.

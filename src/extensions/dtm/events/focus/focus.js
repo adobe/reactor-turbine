@@ -6,7 +6,7 @@ var addLiveEventListener = require('addLiveEventListener');
 document.addEventListener('focus', bubbly.evaluateEvent, true);
 
 /**
- * Focus event. This event occurs when an element has received focus.
+ * The focus event. This event occurs when an element has received focus.
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.
  * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.

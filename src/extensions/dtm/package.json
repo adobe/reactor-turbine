@@ -68,8 +68,28 @@
       "path": "events/submit/submit.js"
     },
     {
+      "name": "Play",
+      "path": "events/play/play.js"
+    },
+    {
+      "name": "Pause",
+      "path": "events/pause/pause.js"
+    },
+    {
       "name": "Ended",
       "path": "events/ended/ended.js"
+    },
+    {
+      "name": "Volume Change",
+      "path": "events/volumechange/volumechange.js"
+    },
+    {
+      "name": "Stalled",
+      "path": "events/stalled/stalled.js"
+    },
+    {
+      "name": "Loaded Data",
+      "path": "events/loadeddata/loadeddata.js"
     }
   ],
   "dataElementDelegates": [

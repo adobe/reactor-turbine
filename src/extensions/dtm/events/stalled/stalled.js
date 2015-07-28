@@ -1,15 +1,15 @@
 'use strict';
 
 var bubbly = require('bubbly')();
-var addLiveEventListener = require('addLiveEventListener');
+
+document.addEventListener('stalled', bubbly.evaluateEvent, true);
 
 /**
- * The submit event. This event occurs when an element has lost focus.
+ * The stalled event. This event occurs when the user agent is trying to fetch media data, but
+ * data is unexpectedly not forthcoming.
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.
  * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.
- * @oaram {boolean} [config.eventHandlerOnElement=false] Whether the event listener should be
- * added directly to the element rather than an ancestor.
  * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire if
  * the event originated from a descendant element.
  * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should fire
@@ -20,11 +20,4 @@ var addLiveEventListener = require('addLiveEventListener');
  */
 module.exports = function(config, trigger) {
   bubbly.addListener(config.eventConfig, trigger);
-
-  if (config.eventConfig.eventHandlerOnElement) {
-    addLiveEventListener(config.eventConfig.selector, 'submit', bubbly.evaluateEvent);
-  } else {
-    // The event doesn't bubble but it does have a capture phase.
-    document.addEventListener('submit', bubbly.evaluateEvent, true);
-  }
 };

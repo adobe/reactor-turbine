@@ -40,7 +40,7 @@ function delayHover(event, delay, handler) {
 var bubblyByDelay = {};
 
 /**
- * Hover event. This event occurs when a user has moved the pointer to be on top of an element.
+ * The hover event. This event occurs when a user has moved the pointer to be on top of an element.
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.
  * @param {string} config.eventConfig.selector The CSS selector for elements the rule is

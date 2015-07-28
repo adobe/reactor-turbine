@@ -45,10 +45,10 @@ function initializePolling() {
 }
 
 module.exports = function(selector, type, callback, useCapture) {
-  var listenersForSelector = listenersBySelector[selector];
+  var listeners = listenersBySelector[selector];
 
-  if (!listenersForSelector) {
-    listenersForSelector = listenersBySelector[selector] = [];
+  if (!listeners) {
+    listeners = listenersBySelector[selector] = [];
   }
 
   var listener = {
@@ -58,7 +58,7 @@ module.exports = function(selector, type, callback, useCapture) {
     id: listenerId++
   };
 
-  listenersForSelector.push(listener);
+  listeners.push(listener);
 
   // While we could just wait for the poller's next tick, let's try to
   // add the event listener to the target element immediately.

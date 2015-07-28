@@ -2,16 +2,15 @@
 
 var bubbly = require('bubbly')();
 var addLiveEventListener = require('addLiveEventListener');
-var selectorsWatched = [];
-var docWatched = false;
+
+document.addEventListener('ended', bubbly.evaluateEvent, true);
 
 /**
- * Click event. This event occurs when a user has clicked an element.
+ * Ended event. This event occurs when playback has stopped because the end of the media was
+ * reached.
  * @param {Object} config
  * @param {Object} config.eventConfig The event config object.
  * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.
- * @oaram {boolean} [config.eventHandlerOnElement=false] Whether the event listener should be
- * added directly to the element rather than an ancestor.
  * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire if
  * the event originated from a descendant element.
  * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should fire
@@ -22,15 +21,4 @@ var docWatched = false;
  */
 module.exports = function(config, trigger) {
   bubbly.addListener(config.eventConfig, trigger);
-
-  if (config.eventConfig.eventHandlerOnElement) {
-    var selector = config.eventConfig.selector;
-    if (selectorsWatched.indexOf(selector) === -1) {
-      addLiveEventListener(selector, 'click', bubbly.evaluateEvent, true);
-      selectorsWatched.push(selector);
-    }
-  } else if (!docWatched) {
-    document.addEventListener('click', bubbly.evaluateEvent, true);
-    docWatched = true;
-  }
 };

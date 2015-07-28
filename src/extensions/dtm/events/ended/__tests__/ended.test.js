@@ -1,9 +1,9 @@
 'use strict';
 
-describe('focus event type', function() {
+describe('ended event type', function() {
   var options = {
-    nativeEventType: 'focus',
-    extensionEventType: 'dtm.focus'
+    nativeEventType: 'ended',
+    extensionEventType: 'dtm.ended'
   };
 
   runTestPage(

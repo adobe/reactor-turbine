@@ -5,13 +5,13 @@ var EventEmitter = function() {
 };
 
 EventEmitter.prototype.on = function(type, listener) {
-  this._listenersByType = this._listenersByType || {};
+  // Create a naked object with no prototype so we can safely use it as a map.
+  this._listenersByType = this._listenersByType || Object.create(null);
 
-  // Prefix with $ to avoid important Object properties from being masked (e.g., "prototype").
-  var listeners = this._listenersByType['$' + type];
+  var listeners = this._listenersByType[type];
 
   if (!listeners) {
-    listeners = this._listenersByType['$' + type] = [];
+    listeners = this._listenersByType[type] = [];
   }
 
   listeners.push(listener);
@@ -31,7 +31,7 @@ EventEmitter.prototype.trigger = function(type, args) {
     return;
   }
 
-  var listeners = this._listenersByType['$' + type];
+  var listeners = this._listenersByType[type];
 
   if (!listeners) {
     return;
@@ -53,7 +53,7 @@ EventEmitter.prototype.off = function(type, listener) {
     return;
   }
 
-  var listeners = this._listenersByType['$' + type];
+  var listeners = this._listenersByType[type];
 
   if (!listeners) {
     return;

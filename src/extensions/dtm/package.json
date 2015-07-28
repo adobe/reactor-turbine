@@ -66,6 +66,10 @@
     {
       "name": "Submit",
       "path": "events/submit/submit.js"
+    },
+    {
+      "name": "Ended",
+      "path": "events/ended/ended.js"
     }
   ],
   "dataElementDelegates": [

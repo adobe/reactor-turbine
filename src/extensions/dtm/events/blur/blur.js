@@ -3,6 +3,8 @@
 var bubbly = require('bubbly')();
 var addLiveEventListener = require('addLiveEventListener');
 
+document.addEventListener('blur', bubbly.evaluateEvent, true);
+
 /**
  * Blur event. This event occurs when an element has lost focus.
  * @param {Object} config
@@ -20,10 +22,4 @@ var addLiveEventListener = require('addLiveEventListener');
  */
 module.exports = function(config, trigger) {
   bubbly.addListener(config.eventConfig, trigger);
-
-  if (config.eventConfig.eventHandlerOnElement) {
-    addLiveEventListener(config.eventConfig.selector, 'blur', bubbly.evaluateEvent);
-  } else {
-    document.addEventListener('blur', bubbly.evaluateEvent, true);
-  }
 };

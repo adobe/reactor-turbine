@@ -38,6 +38,10 @@ module.exports = function() {
      * @param {HTMLElement} event.target The HTML element where the event originated.
      */
     evaluateEvent: function(event) {
+      if (!listeners.length) {
+        return;
+      }
+
       // When an event is handled it is evaluated a single time but checks out which rules are
       // targeting elements starting at the target node and looking all the way up the element
       // hierarchy. This should only happen once regardless of how many listeners exist for the

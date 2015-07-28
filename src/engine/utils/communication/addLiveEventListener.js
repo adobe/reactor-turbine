@@ -1,51 +1,68 @@
 var covertData = require('./../covertData');
 var globalPoll = require('./globalPoll');
 
-var listeners = [];
+// Create a naked object with no prototype so we can safely use it as a map.
+var listenersBySelector = Object.create(null);
 var listenerId = 0;
 
-var registeredWithPoller = false;
+var pollingInitialized = false;
 
-function addListenersToNewElements(listener) {
-  var dataKey = 'dtm.liveListener.seen.' + listener.id;
-  var elements = document.querySelectorAll(listener.selector);
+function addListenersToNewElements(selector, listeners) {
+  var elements = document.querySelectorAll(selector);
 
-  for (var i = 0; i < elements.length; i++) {
-    var element = elements[i];
+  for (var i = 0; i < listeners.length; i++) {
+    var listener = listeners[i];
+    var dataKey = 'dtm.liveListener.seen.' + listener.id;
 
-    if (covertData(element, dataKey)) {
-      continue;
+    for (var j = 0; j < elements.length; j++) {
+      var element = elements[j];
+
+      if (covertData(element, dataKey)) {
+        continue;
+      }
+
+      covertData(element, dataKey, true);
+
+      // TODO: understand this chunk below
+      // if (SL.propertiesMatch(rule.property, elm)){
+      //   SL.registerEvents(elm, [rule.event])
+      // }
+
+      element.addEventListener(listener.type, listener.callback, listener.useCapture);
     }
-
-    covertData(element, dataKey, true);
-
-    // TODO: understand this chunk below
-    // if (SL.propertiesMatch(rule.property, elm)){
-    //   SL.registerEvents(elm, [rule.event])
-    // }
-
-    element.addEventListener(listener.type, listener.callback);
   }
 }
 
-module.exports = function(selector, type, callback) {
+function initializePolling() {
+  if (!pollingInitialized) {
+    globalPoll('dynamicEvents', function() {
+      for (var selector in listenersBySelector) {
+        addListenersToNewElements(selector, listenersBySelector[selector]);
+      }
+    });
+    pollingInitialized = true;
+  }
+}
+
+module.exports = function(selector, type, callback, useCapture) {
+  var listenersForSelector = listenersBySelector[selector];
+
+  if (!listenersForSelector) {
+    listenersForSelector = listenersBySelector[selector] = [];
+  }
+
   var listener = {
-    selector: selector,
     type: type,
     callback: callback,
+    useCapture: useCapture,
     id: listenerId++
   };
 
-  listeners.push(listener);
+  listenersForSelector.push(listener);
 
-  // While we could just wait for the global poller's next tick, let's try to
+  // While we could just wait for the poller's next tick, let's try to
   // add the event listener to the target element immediately.
-  addListenersToNewElements(listener);
+  addListenersToNewElements(selector, [listener]);
 
-  if (!registeredWithPoller) {
-    globalPoll('dynamicEvents', function() {
-      listeners.forEach(addListenersToNewElements);
-    });
-    registeredWithPoller = true;
-  }
+  initializePolling();
 };

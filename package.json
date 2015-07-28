@@ -37,7 +37,7 @@
     "promiscuous": "^0.6.0",
     "rewire": "^2.3.3",
     "rewire-webpack": "^1.0.0",
-    "simulate": "git+https://github.com/Aaronius/simulate.js.git#619bbc2cdbfe670c6d0cd326e23c6df03025c768",
+    "simulate": "git+https://github.com/Aaronius/simulate.js.git#d8538a34fb85b513ae76a9def5d2615c0b702bbc",
     "strict-loader": "^0.1.2"
   }
 }

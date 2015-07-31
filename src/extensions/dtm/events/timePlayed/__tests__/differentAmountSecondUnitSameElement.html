@@ -1,0 +1,106 @@
+<html>
+  <head>
+    <script src="/base/dist/container.js"></script>
+    <script src="../../__tests__/helpers/configureEngineForEventTests.js"></script>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script src="helpers/timePlayedHelper.js"></script>
+    <script src="/base/node_modules/simulate/simulate.js"></script>
+    <script>
+      var aConditionSpy = jasmine.createSpy().and.returnValue(true);
+      configureRuleForEventTests([
+        {
+          type: 'dtm.timePlayed',
+          config: {
+            selector: '#a',
+            amount: 5,
+            unit: 'second',
+            bubbleFireIfParent: true,
+            bubbleFireIfChildFired: true,
+            bubbleStop: false
+          }
+        }
+      ], aConditionSpy);
+
+      var a2ConditionSpy = jasmine.createSpy().and.returnValue(true);
+      configureRuleForEventTests([
+        {
+          type: 'dtm.timePlayed',
+          config: {
+            selector: '#a',
+            amount: 10,
+            unit: 'second',
+            bubbleFireIfParent: true,
+            bubbleFireIfChildFired: true,
+            bubbleStop: false
+          }
+        }
+      ], a2ConditionSpy);
+
+      TestPage
+        .waitForContentLoaded()
+        .execute(function() {
+          var a = document.getElementById('a');
+
+          expect(aConditionSpy.calls.count()).toEqual(0);
+
+          var seekable = {
+            start: function() {
+              return 30;
+            },
+            end: function() {
+              return 100;
+            },
+            length: 1
+          };
+
+          a.seekable = seekable;
+          a.currentTime = 34;
+
+          Simulate.timeupdate(a);
+
+          expect(aConditionSpy.calls.count()).toEqual(0);
+          expect(a2ConditionSpy.calls.count()).toEqual(0);
+
+          a.currentTime = 35;
+
+          Simulate.timeupdate(a);
+
+          expect(aConditionSpy.calls.count()).toEqual(1);
+          expect(a2ConditionSpy.calls.count()).toEqual(0);
+
+          a.currentTime = 42;
+
+          Simulate.timeupdate(a);
+
+          expect(aConditionSpy.calls.count()).toEqual(1);
+          expect(a2ConditionSpy.calls.count()).toEqual(1);
+
+          assertTimePlayedConditionCall({
+            call: aConditionSpy.calls.first(),
+            relatedElement: a,
+            target: a,
+            amount: 5,
+            unit: 'second'
+          });
+
+          assertTimePlayedConditionCall({
+            call: a2ConditionSpy.calls.first(),
+            relatedElement: a,
+            target: a,
+            amount: 10,
+            unit: 'second'
+          });
+        })
+        .start();
+    </script>
+    <script src="/base/dist/engine.js"></script>
+  </head>
+  <body>
+    <div id="a">
+      A
+    </div>
+    <script>
+      _satellite.pageBottom();
+    </script>
+  </body>
+</html>

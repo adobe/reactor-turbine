@@ -90,6 +90,10 @@
     {
       "name": "Loaded Data",
       "path": "events/loadeddata/loadeddata.js"
+    },
+    {
+      "name": "Time Played",
+      "path": "events/timePlayed/timePlayed.js"
     }
   ],
   "dataElementDelegates": [

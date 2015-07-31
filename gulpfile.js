@@ -116,7 +116,7 @@ gulp.task('buildEngine', function() {
       output: {
         filename: 'engine.js'
       },
-      devtool: 'source-map',
+      //devtool: 'source-map', // Doesn't match the right lines in the debugger half the time. :/
       resolve: {
         extensions: ['', '.js']
       },

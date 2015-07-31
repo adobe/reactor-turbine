@@ -46,6 +46,10 @@ _satellite.setDebug = function(value) {
 
 // This setting is primarily used by browser plugins.
 logger.outputEnabled = getLocalStorageItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';
+
+// TODO: For use during development in order to see errors. Remove or handle in some other way.
+logger.outputEnabled = true;
+
 preprocessConfig.init(container.config.undefinedVarsReturnEmpty);
 eventDelegates.init(container.eventDelegates);
 conditionDelegates.init(container.conditionDelegates);

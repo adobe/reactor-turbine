@@ -48,7 +48,7 @@ _satellite.setDebug = function(value) {
 logger.outputEnabled = getLocalStorageItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';
 
 // TODO: For use during development in order to see errors. Remove or handle in some other way.
-logger.outputEnabled = true;
+//logger.outputEnabled = true;
 
 preprocessConfig.init(container.config.undefinedVarsReturnEmpty);
 eventDelegates.init(container.eventDelegates);

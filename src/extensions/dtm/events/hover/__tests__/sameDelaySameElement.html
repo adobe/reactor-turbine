@@ -2,6 +2,7 @@
   <head>
     <script src="/base/dist/container.js"></script>
     <script src="../../__tests__/helpers/configureEngineForEventTests.js"></script>
+    <script src="helpers/hoverHelper.js"></script>
     <script>
       jasmine.clock().install();
 
@@ -60,16 +61,21 @@
           jasmine.clock().tick(1200);
 
           expect(aConditionSpy.calls.count()).toEqual(1);
-          expect(aConditionSpy.calls.mostRecent()).toEqual({
-            object: a,
-            args: [{type: 'hover(1000)', target: a, delay: 1000}, a],
-            returnValue: true
+
+          assertHoverCall({
+            call: aConditionSpy.calls.mostRecent(),
+            relatedElement: a,
+            target: a,
+            delay: 1000
           });
+
           expect(a2ConditionSpy.calls.count()).toEqual(1);
-          expect(a2ConditionSpy.calls.mostRecent()).toEqual({
-            object: a,
-            args: [{type: 'hover(1000)', target: a, delay: 1000}, a],
-            returnValue: true
+
+          assertHoverCall({
+            call: a2ConditionSpy.calls.mostRecent(),
+            relatedElement: a,
+            target: a,
+            delay: 1000
           });
         })
         .start();

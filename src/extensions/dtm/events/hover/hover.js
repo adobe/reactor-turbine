@@ -1,7 +1,9 @@
 'use strict';
 
 var bubbly = require('bubbly')();
-var addLiveEventListener = require('addLiveEventListener');
+var liveQuerySelector = require('liveQuerySelector');
+var covertData = require('covertData');
+var covertDataKey = 'dtm.hover.watched';
 
 /**
  * After a mouseenter has occurred, waits a given amount of time before declaring that a hover
@@ -14,6 +16,7 @@ var addLiveEventListener = require('addLiveEventListener');
 function delayHover(event, delay, handler) {
   if (delay === 0) {
     handler(event);
+    return;
   }
 
   var timeoutId;
@@ -78,9 +81,23 @@ module.exports = function(config, trigger) {
   bubblyEventConfig.type = getPseudoEventType(delay);
   bubbly.addListener(bubblyEventConfig, trigger);
 
-  addLiveEventListener(config.eventConfig.selector, 'mouseenter', function(event) {
-    delayHover(event, delay, function() {
-      bubbly.evaluateEvent(getPseudoEvent(event.target, delay));
-    });
+  liveQuerySelector(config.eventConfig.selector, function(element) {
+    var trackedDelays = covertData(element, covertDataKey);
+
+    if (trackedDelays) {
+      if (trackedDelays.indexOf(delay) === -1) {
+        trackedDelays.push(delay);
+      }
+    } else {
+      trackedDelays = [delay];
+      covertData(element, covertDataKey, trackedDelays);
+      element.addEventListener('mouseenter', function(event) {
+        trackedDelays.forEach(function(trackedDelay) {
+          delayHover(event, trackedDelay, function() {
+            bubbly.evaluateEvent(getPseudoEvent(event.target, trackedDelay));
+          });
+        });
+      });
+    }
   });
 };

@@ -1,35 +1,31 @@
-// `covertData(elm, prop, [val])`
-// ----------------------------
-//
-// Our own `covertData()` method, [a la jQuery](http://api.jquery.com/jQuery.data/)
-// , used to get or set
-// properties on DOM elements without going insane.
-// `uuid` and `dataCache` are used by `covertData()`
-//
-// Parameters:
-//
-// - `elm` - the element to get or set a property to
-// - `prop` - the property name
-// - `val` - the value of the property, if omitted, the method will
-//      return the existing value of the property, if any
-var privateData = {
-  dataCache: {},
-  uuid: 1
-};
-module.exports = function(elm, prop, val) {
-  var __satellite__ = '__satellite__';
-  var cache = privateData.dataCache;
-  var uuid = elm[__satellite__];
+var SATELLITE_KEY = '__satellite__';
+var caches = {};
+var cacheId = 0;
+
+/**
+ * Store and retrieve arbitrary data associated with a particular object. This arbitrary data is
+ * stored within a __satellite__ attribute on the object. It is similar to jquery's data method
+ * {@link https://api.jquery.com/jquery.data/}.
+ *
+ * @param {Object} object The object to store the data on or retrieve the data from. This may be an
+ * HTML element.
+ * @param {string} key The string naming the piece of data to set.
+ * @param {*} [value] The new data value. If undefined, the data for the specified key will be
+ * returned.
+ * @returns {*}
+ */
+module.exports = function(object, key, value) {
+  var uuid = object[SATELLITE_KEY];
   if (!uuid) {
-    uuid = elm[__satellite__] = privateData.uuid++;
+    uuid = object[SATELLITE_KEY] = cacheId++;
   }
-  var datas = cache[uuid];
-  if (!datas) {
-    datas = cache[uuid] = {};
+  var cache = caches[uuid];
+  if (!cache) {
+    cache = caches[uuid] = {};
   }
-  if (val === undefined) {
-    return datas[prop];
+  if (value === undefined) {
+    return cache[key];
   } else {
-    datas[prop] = val;
+    cache[key] = value;
   }
 };

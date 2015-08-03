@@ -1,7 +1,6 @@
 'use strict';
 
 var bubbly = require('bubbly')();
-var addLiveEventListener = require('addLiveEventListener');
 
 document.addEventListener('blur', bubbly.evaluateEvent, true);
 

@@ -1,9 +1,16 @@
 'use strict';
 
 var bubbly = require('bubbly')();
-var addLiveEventListener = require('addLiveEventListener');
-var selectorsWatched = [];
-var docWatched = false;
+var liveQuerySelector = require('liveQuerySelector');
+var covertData = require('covertData');
+var COVERT_DATA_KEY = 'dtm.submit.watched';
+
+function watchElement(element) {
+  if (!covertData(element, COVERT_DATA_KEY)) {
+    covertData(element, COVERT_DATA_KEY, true);
+    element.addEventListener('submit', bubbly.evaluateEvent, true);
+  }
+}
 
 /**
  * The submit event. This event occurs when an element has lost focus.
@@ -24,13 +31,8 @@ module.exports = function(config, trigger) {
   bubbly.addListener(config.eventConfig, trigger);
 
   if (config.eventConfig.eventHandlerOnElement) {
-    var selector = config.eventConfig.selector;
-    if (selectorsWatched.indexOf(selector) === -1) {
-      addLiveEventListener(selector, 'submit', bubbly.evaluateEvent, true);
-      selectorsWatched.push(selector);
-    }
-  } else if (!docWatched) {
-    document.addEventListener('submit', bubbly.evaluateEvent, true);
-    docWatched = true;
+    liveQuerySelector(config.eventConfig.selector, watchElement);
+  } else {
+    watchElement(document);
   }
 };

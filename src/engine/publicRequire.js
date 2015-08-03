@@ -23,7 +23,6 @@ var resources = {
   'setCookie': require('./utils/cookie/setCookie'),
   'getObjectProperty': require('./utils/dataElement/getObjectProperty'),
   'bubbly': require('./utils/bubbly'),
-  'addLiveEventListener': require('./utils/communication/addLiveEventListener'),
   'liveQuerySelector': require('./utils/dom/liveQuerySelector'),
   'logger': require('./utils/logger')
 };

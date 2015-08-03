@@ -1,9 +1,9 @@
 'use strict';
 
 var bubbly = require('bubbly')();
-var covertData = require('covertData');
+var dataStash = require('createDataStash')('timePlayed');
 
-var LAST_TRIGGERED_DATA_KEY = 'dtm.timePlayed.LastTriggered';
+var LAST_TRIGGERED = 'lastTriggered';
 
 /**
  * Unit string values.
@@ -41,7 +41,7 @@ function handleTimeUpdate(event) {
   var currentTime = target.currentTime;
   var playedSeconds = currentTime - startTime;
 
-  var secondsLastTriggered = covertData(target, LAST_TRIGGERED_DATA_KEY) || 0;
+  var secondsLastTriggered = dataStash(target, LAST_TRIGGERED) || 0;
   var pseudoEvent;
 
   relevantMarkers.forEach(function(eventConfig) {
@@ -53,7 +53,7 @@ function handleTimeUpdate(event) {
     }
   });
 
-  covertData(event.target, LAST_TRIGGERED_DATA_KEY, playedSeconds);
+  dataStash(event.target, LAST_TRIGGERED, playedSeconds);
 }
 
 document.addEventListener('timeupdate', handleTimeUpdate, true);

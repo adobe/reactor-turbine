@@ -2,12 +2,12 @@
 
 var bubbly = require('bubbly')();
 var liveQuerySelector = require('liveQuerySelector');
-var covertData = require('covertData');
-var COVERT_DATA_KEY = 'dtm.submit.watched';
+var dataStash = require('createDataStash')('submit');
+var WATCHED = 'watched';
 
 function watchElement(element) {
-  if (!covertData(element, COVERT_DATA_KEY)) {
-    covertData(element, COVERT_DATA_KEY, true);
+  if (!dataStash(element, WATCHED)) {
+    dataStash(element, WATCHED, true);
     element.addEventListener('submit', bubbly.evaluateEvent, true);
   }
 }

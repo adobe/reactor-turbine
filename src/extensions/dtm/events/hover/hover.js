@@ -2,8 +2,8 @@
 
 var bubbly = require('bubbly')();
 var liveQuerySelector = require('liveQuerySelector');
-var covertData = require('covertData');
-var covertDataKey = 'dtm.hover.watched';
+var dataStash = require('createDataStash')('hover');
+var DELAYS = 'delays';
 
 /**
  * After a mouseenter has occurred, waits a given amount of time before declaring that a hover
@@ -82,7 +82,7 @@ module.exports = function(config, trigger) {
   bubbly.addListener(bubblyEventConfig, trigger);
 
   liveQuerySelector(config.eventConfig.selector, function(element) {
-    var trackedDelays = covertData(element, covertDataKey);
+    var trackedDelays = dataStash(element, DELAYS);
 
     if (trackedDelays) {
       if (trackedDelays.indexOf(delay) === -1) {
@@ -90,7 +90,7 @@ module.exports = function(config, trigger) {
       }
     } else {
       trackedDelays = [delay];
-      covertData(element, covertDataKey, trackedDelays);
+      dataStash(element, DELAYS, trackedDelays);
       element.addEventListener('mouseenter', function(event) {
         trackedDelays.forEach(function(trackedDelay) {
           delayHover(event, trackedDelay, function() {

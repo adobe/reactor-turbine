@@ -1,12 +1,11 @@
 'use strict';
 
 var poll = require('poll');
-var createDataStash = require('createDataStash');
+var dataStash = require('createDataStash')('entersViewport');
 var bubbly = require('bubbly')();
 var TIMEOUT_ID = 'timeoutId';
 var COMPLETE = 'complete';
 
-var dataStashByDelay = Object.create(null);
 var listeners = [];
 
 /**
@@ -108,23 +107,6 @@ function triggerCompleteEvent(element, delay) {
   bubbly.evaluateEvent(event);
 }
 
-/**
- * Retrieves the data stash for a given delay
- * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
- * the viewport.
- * @returns {Object}
- */
-function getDataStashForDelay(delay) {
-  delay = delay || 0;
-
-  var dataStash = dataStashByDelay[delay];
-
-  if (!dataStash) {
-    dataStash = dataStashByDelay[delay] = createDataStash('entersViewport');
-  }
-
-  return dataStash;
-}
 
 /**
  * Gets the timeout ID for a particular element + delay combo.
@@ -134,7 +116,7 @@ function getDataStashForDelay(delay) {
  * @returns {number}
  */
 function getTimeoutId(element, delay) {
-  return getDataStashForDelay(delay)(element, TIMEOUT_ID);
+  return dataStash(element, TIMEOUT_ID + delay);
 }
 
 /**
@@ -145,7 +127,7 @@ function getTimeoutId(element, delay) {
  * @param {number} timeoutId
  */
 function storeTimeoutId(element, delay, timeoutId) {
-  getDataStashForDelay(delay)(element, TIMEOUT_ID, timeoutId);
+  dataStash(element, TIMEOUT_ID + delay, timeoutId);
 }
 
 /**
@@ -157,7 +139,7 @@ function storeTimeoutId(element, delay, timeoutId) {
  * @returns {boolean}
  */
 function isComplete(element, delay) {
-  return getDataStashForDelay(delay)(element, COMPLETE);
+  return dataStash(element, COMPLETE + delay);
 }
 
 /**
@@ -167,7 +149,7 @@ function isComplete(element, delay) {
  * @param delay
  */
 function storeCompletion(element, delay) {
-  getDataStashForDelay(delay)(element, COMPLETE, true);
+  dataStash(element, COMPLETE + delay, true);
 }
 
 /**

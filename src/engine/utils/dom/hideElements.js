@@ -1,8 +1,8 @@
 var isString = require('./../isType/isString');
 var classList = require('./classList');
-var covertData = require('./../covertData');
+var dataStash = require('./../createDataStash')('hideElements');
+var NUM_LOCKS = 'numLocks';
 var hideStyleAdded = false;
-var dataKey = 'dtm.hideElements.numLocks';
 
 /**
  * Hides one or more elements and returns a show function. The elements will not be shown
@@ -23,7 +23,7 @@ module.exports = function(selectorOrElements) {
     document.querySelectorAll(selectorOrElements) : selectorOrElements;
 
   elements.forEach(function(element) {
-    var numLocks = covertData(element, dataKey);
+    var numLocks = dataStash(element, NUM_LOCKS);
 
     if (numLocks === undefined) {
       numLocks = 1;
@@ -31,7 +31,7 @@ module.exports = function(selectorOrElements) {
       numLocks++;
     }
 
-    covertData(element, dataKey, numLocks);
+    dataStash(element, NUM_LOCKS, numLocks);
 
     classList.add(element, 'dtm-hidden');
   });
@@ -45,8 +45,8 @@ module.exports = function(selectorOrElements) {
     }
 
     elements.forEach(function(element) {
-      var numLocks = covertData(element, dataKey);
-      covertData(element, dataKey, --numLocks);
+      var numLocks = dataStash(element, NUM_LOCKS);
+      dataStash(element, NUM_LOCKS, --numLocks);
 
       if (numLocks === 0) {
         classList.remove(element, 'dtm-hidden');

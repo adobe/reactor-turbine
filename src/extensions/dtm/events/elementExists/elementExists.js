@@ -2,8 +2,8 @@
 
 var poll = require('poll');
 var bubbly = require('bubbly')();
-var covertData = require('covertData');
-var completeDataKey = 'dtm.elementExists.complete';
+var dataStash = require('createDataStash')('elementExists');
+var SEEN = 'seen';
 
 /**
  *
@@ -19,12 +19,12 @@ poll('element exists event delegate', function() {
     if (element) {
       // If the element has been seen before, bubbly will have already run all rules that apply
       // to it.
-      if (!covertData(element, completeDataKey)) {
+      if (!dataStash(element, SEEN)) {
+        dataStash(element, SEEN, true);
         bubbly.evaluateEvent({
           type: 'elementexists',
           target: element
         });
-        covertData(element, completeDataKey, true);
       }
 
       // No need to keep watching for the selector.

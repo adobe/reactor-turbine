@@ -7,6 +7,7 @@ var resources = {
   'Promise': require('./utils/communication/Promise'),
   'poll': require('./utils/communication/globalPoll'),
   'covertData': require('./utils/covertData'),
+  'createDataStash': require('./utils/createDataStash'),
   'assign': require('./utils/object/assign'),
   'encodeObjectToURI': require('./utils/uri/encodeObjectToURI'),
   'isHTTPS': require('./utils/uri/isHTTPS'),

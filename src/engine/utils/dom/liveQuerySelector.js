@@ -1,29 +1,23 @@
-var covertData = require('./../covertData');
-var globalPoll = require('../communication/globalPoll');
+var createDataStash = require('./../createDataStash');
+var globalPoll = require('../communication/globalPoll')
+var SEEN = 'seen';
 
 // Create a naked object with no prototype so we can safely use it as a map.
-var listenersBySelector = Object.create(null);
-var listenerId = 0;
+var callbacksBySelector = Object.create(null);
 var pollingInitialized = false;
 
 function findElements() {
   // Using for loops instead of forEach and functions because this will process a lot and we want
   // to be as efficient as possible.
-  for (var selector in listenersBySelector) {
-    var listeners = listenersBySelector[selector];
+  for (var selector in callbacksBySelector) {
+    var callbacks = callbacksBySelector[selector];
 
-    for (var i = 0; i < listeners.length; i++) {
-      var listener = listeners[i];
-      var covertDataKey = 'dtm.liveQuerySelector.seen.' + listener.id;
+    for (var i = 0; i < callbacks.length; i++) {
+      var callback = callbacks[i];
       var elements = document.querySelectorAll(selector);
 
       for (var j = 0; j < elements.length; j++) {
-        var element = elements[j];
-
-        if (!covertData(element, covertDataKey)) {
-          covertData(element, covertDataKey, true);
-          listener.callback(element);
-        }
+        callback(elements[j]);
       }
     }
   }
@@ -37,15 +31,18 @@ function initializePolling() {
 }
 
 module.exports = function(selector, callback) {
-  var listeners = listenersBySelector[selector];
+  var dataStash = createDataStash('liveQuery');
+  var callbacks = callbacksBySelector[selector];
 
-  if (!listeners) {
-    listeners = listenersBySelector[selector] = [];
+  if (!callbacks) {
+    callbacks = callbacksBySelector[selector] = [];
   }
 
-  listeners.push({
-    id: listenerId++,
-    callback: callback
+  callbacks.push(function(element) {
+    if (!dataStash(element, SEEN)) {
+      dataStash(element, SEEN, true);
+      callback(element);
+    }
   });
 
   initializePolling();

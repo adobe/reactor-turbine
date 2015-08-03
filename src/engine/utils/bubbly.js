@@ -1,7 +1,6 @@
-var covertData = require('./covertData');
+var createDataStash = require('./createDataStash');
+var PROCESSED = 'processed';
 var matchesCSS = require('./dom/matchesCSS');
-
-var id = 0;
 
 /**
  * Handles logic related to bubbling options provided for many event types.
@@ -11,7 +10,10 @@ var id = 0;
 module.exports = function() {
   var listeners = [];
 
-  var eventProcessedDataKey = 'dtm.bubbly.eventProcessed.' + id++;
+  // It's important that a new data stash is created for each instance of bubbly in order to store
+  // whether this particular bubbly instance has processed the event. More than one instance of
+  // bubbly may process an event. No instance of bubbly should process an event more than once.
+  var dataStash = createDataStash('bubbly');
 
   return {
     /**
@@ -51,7 +53,7 @@ module.exports = function() {
       // targeting elements starting at the target node and looking all the way up the element
       // hierarchy. This should only happen once regardless of how many listeners exist for the
       // event.
-      if (covertData(event, eventProcessedDataKey)) {
+      if (dataStash(event, PROCESSED)) {
         return;
       }
 
@@ -106,7 +108,7 @@ module.exports = function() {
         node = node.parentNode;
       }
 
-      covertData(event, eventProcessedDataKey, true);
+      dataStash(event, PROCESSED, true);
     }
   };
 };

@@ -1,9 +1,12 @@
 'use strict';
 
 var poll = require('poll');
-var covertData = require('covertData');
+var createDataStash = require('createDataStash');
 var bubbly = require('bubbly')();
+var TIMEOUT_ID = 'timeoutId';
+var COMPLETE = 'complete';
 
+var dataStashByDelay = Object.create(null);
 var listeners = [];
 
 /**
@@ -89,14 +92,12 @@ function getPseudoEventType(delay) {
 }
 
 /**
- * Mark an element as having been in the viewport for the specified delay.
+ * Notifies that an element as having been in the viewport for the specified delay.
  * @param {HTMLElement} element The element that is in the viewport.
  * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
  * the viewport.
- * @param {string} completeDataKey Identifier string to use for storing completion information on
- * the element.
  */
-function markEntersViewportComplete(element, delay, completeDataKey) {
+function triggerCompleteEvent(element, delay) {
   var event = {
     type: getPseudoEventType(delay),
     target: element,
@@ -105,7 +106,68 @@ function markEntersViewportComplete(element, delay, completeDataKey) {
   };
 
   bubbly.evaluateEvent(event);
-  covertData(element, completeDataKey, true);
+}
+
+/**
+ * Retrieves the data stash for a given delay
+ * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
+ * the viewport.
+ * @returns {Object}
+ */
+function getDataStashForDelay(delay) {
+  delay = delay || 0;
+
+  var dataStash = dataStashByDelay[delay];
+
+  if (!dataStash) {
+    dataStash = dataStashByDelay[delay] = createDataStash('entersViewport');
+  }
+
+  return dataStash;
+}
+
+/**
+ * Gets the timeout ID for a particular element + delay combo.
+ * @param {HTMLElement} element
+ * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
+ * the viewport.
+ * @returns {number}
+ */
+function getTimeoutId(element, delay) {
+  return getDataStashForDelay(delay)(element, TIMEOUT_ID);
+}
+
+/**
+ * Stored a timeout ID for ar particular element + delay combo.
+ * @param {HTMLElement} element
+ * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
+ * the viewport.
+ * @param {number} timeoutId
+ */
+function storeTimeoutId(element, delay, timeoutId) {
+  getDataStashForDelay(delay)(element, TIMEOUT_ID, timeoutId);
+}
+
+/**
+ * Returns whether the process is complete for detecting when the element has entered the
+ * viewport for a particular element + delay combo.
+ * @param {HTMLElement} element
+ * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
+ * the viewport.
+ * @returns {boolean}
+ */
+function isComplete(element, delay) {
+  return getDataStashForDelay(delay)(element, COMPLETE);
+}
+
+/**
+ * Stores that the process has been completed for detecting when the element has entered the
+ * viewport for a particular element + delay combo.
+ * @param element
+ * @param delay
+ */
+function storeCompletion(element, delay) {
+  getDataStashForDelay(delay)(element, COMPLETE, true);
 }
 
 /**
@@ -123,38 +185,38 @@ var checkIfElementsInViewport = function() {
   var timeoutId;
 
   listeners.forEach(function(listener) {
-    var elements = document.querySelectorAll(listener.config.selector);
+    var delay = listener.delay;
+    var elements = document.querySelectorAll(listener.selector);
     for (var i = 0; i < elements.length; i++) {
       var element = elements[i];
 
-      if (covertData(element, listener.completeDataKey)) {
+      if (isComplete(element, delay)) {
         continue;
       }
 
       if (elementIsInView(element, viewportHeight, scrollTop)) {
-        if (listener.config.delay) { // Element is in view, has delay
-          if (!covertData(element, listener.timeoutDataKey)) {
+        if (delay) { // Element is in view, has delay
+          if (!getTimeoutId(element, delay)) {
             /*eslint-disable no-loop-func*/
             timeoutId = setTimeout(function() {
               if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
-                markEntersViewportComplete(
-                  element,
-                  listener.config.delay,
-                  listener.completeDataKey);
+                storeCompletion(element, delay);
+                triggerCompleteEvent(element, delay);
               }
-            }, listener.config.delay);
+            }, delay);
             /*eslint-enable no-loop-func*/
 
-            covertData(element, listener.timeoutDataKey, timeoutId);
+            storeTimeoutId(element, delay, timeoutId);
           }
         } else { // Element is in view, has no delay
-          markEntersViewportComplete(element, listener.config.delay, listener.completeDataKey);
+          storeCompletion(element, delay);
+          triggerCompleteEvent(element, delay);
         }
-      } else if (listener.config.delay) { // Element is not in view, has delay
-        timeoutId = covertData(element, listener.timeoutDataKey);
+      } else if (delay) { // Element is not in view, has delay
+        timeoutId = getTimeoutId(element, delay)
         if (timeoutId) {
           clearTimeout(timeoutId);
-          covertData(element, listener.timeoutDataKey, null);
+          storeTimeoutId(element, delay, null);
         }
       }
     }
@@ -187,13 +249,12 @@ module.exports = function(config, trigger) {
   // Bubbling for this event is dependent upon the delay configured for rules.
   // An event can "bubble up" to other rules with the same delay but not to rules with
   // different delays. See the tests for how this plays out.
-  var delay = config.eventConfig.delay || 0;
 
   // Re-use the event config object for configuring the bubbly listener since it has most
   // everything needed. Use Object.create so we can add a type attribute without modifying the
   // original object.
   var bubblyEventConfig = Object.create(config.eventConfig);
-  bubblyEventConfig.type = getPseudoEventType(delay);
+  bubblyEventConfig.type = getPseudoEventType(config.eventConfig.delay);
 
   bubbly.addListener(bubblyEventConfig, function(event, relatedElement) {
     // The psuedo event going through bubbly has a type that looks like "inview(40)" so that only
@@ -210,12 +271,5 @@ module.exports = function(config, trigger) {
     trigger(eventForRule, relatedElement);
   });
 
-  listeners.push({
-    // These strings are created and stored here for optimization purposes only. It avoids
-    // having to recreate the strings a bunch of times in the above functions as they are
-    // polled repeatedly.
-    timeoutDataKey: 'dtm.entersViewport.timeoutId.' + delay,
-    completeDataKey: 'dtm.entersViewport.complete.' + delay,
-    config: config.eventConfig
-  });
+  listeners.push(config.eventConfig);
 };

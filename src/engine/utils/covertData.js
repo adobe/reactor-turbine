@@ -1,4 +1,4 @@
-var SATELLITE_KEY = '__satellite__';
+var SATELLITE_KEY = '__satellite__covert';
 var caches = {};
 var cacheId = 0;
 

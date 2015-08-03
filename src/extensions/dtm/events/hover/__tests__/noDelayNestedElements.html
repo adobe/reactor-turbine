@@ -2,6 +2,7 @@
   <head>
     <script src="/base/dist/container.js"></script>
     <script src="../../__tests__/helpers/configureEngineForEventTests.js"></script>
+    <script src="helpers/hoverHelper.js"></script>
     <script>
       jasmine.clock().install();
 
@@ -47,27 +48,33 @@
           Simulate.mouseenter(document.getElementById('a'));
 
           expect(aConditionSpy.calls.count()).toEqual(1);
-          expect(aConditionSpy.calls.mostRecent()).toEqual({
-            object: a,
-            args: [{type: 'hover(0)', target: a}, a],
-            returnValue: true
+
+          assertHoverCall({
+            call: aConditionSpy.calls.mostRecent(),
+            relatedElement: a,
+            target: a,
+            delay: 0
           });
 
           Simulate.mouseenter(document.getElementById('b'));
 
           // Rule A ran again because the hover from element B also "bubbled up" to element A.
           expect(aConditionSpy.calls.count()).toEqual(2);
-          expect(aConditionSpy.calls.mostRecent()).toEqual({
-            object: a,
-            args: [{type: 'hover(0)', target: b}, b],
-            returnValue: true
+
+          assertHoverCall({
+            call: aConditionSpy.calls.mostRecent(),
+            relatedElement: a,
+            target: b,
+            delay: 0
           });
 
           expect(bConditionSpy.calls.count()).toEqual(1);
-          expect(bConditionSpy.calls.mostRecent()).toEqual({
-            object: b,
-            args: [{type: 'hover(0)', target: b}, b],
-            returnValue: true
+
+          assertHoverCall({
+            call: bConditionSpy.calls.mostRecent(),
+            relatedElement: b,
+            target: b,
+            delay: 0
           });
         })
         .start();

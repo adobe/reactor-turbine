@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('bubbly');
+var bubbly = require('bubbly')();
 var addLiveEventListener = require('addLiveEventListener');
 
 /**
@@ -37,7 +37,17 @@ function delayHover(event, delay, handler) {
   event.target.addEventListener('mouseleave', handleMouseLeave);
 }
 
-var bubblyByDelay = {};
+function getPseudoEventType(delay) {
+  return 'hover(' + delay + ')';
+}
+
+function getPseudoEvent(target, delay) {
+  return {
+    type: getPseudoEventType(delay),
+    target: target,
+    delay: delay
+  };
+}
 
 /**
  * The hover event. This event occurs when a user has moved the pointer to be on top of an element.
@@ -59,26 +69,18 @@ module.exports = function(config, trigger) {
   // Bubbling for this event is dependent upon the delay configured for rules.
   // An event can "bubble up" to other rules with the same delay but not to rules with
   // different delays. See the tests for how this plays out.
-  var delay = config.eventConfig.hasOwnProperty('delay') ? config.eventConfig.delay : 0;
+  var delay = config.eventConfig.delay || 0;
 
-  var delayBubbly = bubblyByDelay[delay];
-
-  if (!delayBubbly) {
-    delayBubbly = bubblyByDelay[delay] = bubbly();
-  }
-
-  delayBubbly.addListener(config.eventConfig, function(event, relatedElement) {
-    var pseudoEvent = {
-      // The parenthesis is a bit odd and inconsistent with the enters viewport event
-      // but is maintained for backward-compatibility since custom conditions may be expecting it.
-      // Note that if the user did not configure a delay, it should be hover(0)
-      type: 'hover(' + delay + ')',
-      target: event.target
-    };
-    trigger(pseudoEvent, relatedElement);
-  });
+  // Re-use the event config object for configuring the bubbly listener since it has most
+  // everything needed. Use Object.create so we can add a type attribute without modifying the
+  // original object.
+  var bubblyEventConfig = Object.create(config.eventConfig);
+  bubblyEventConfig.type = getPseudoEventType(delay);
+  bubbly.addListener(bubblyEventConfig, trigger);
 
   addLiveEventListener(config.eventConfig.selector, 'mouseenter', function(event) {
-    delayHover(event, delay, delayBubbly.evaluateEvent);
+    delayHover(event, delay, function() {
+      bubbly.evaluateEvent(getPseudoEvent(event.target, delay));
+    });
   });
 };

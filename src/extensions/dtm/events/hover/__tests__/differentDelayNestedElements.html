@@ -2,6 +2,7 @@
   <head>
     <script src="/base/dist/container.js"></script>
     <script src="../../__tests__/helpers/configureEngineForEventTests.js"></script>
+    <script src="helpers/hoverHelper.js"></script>
     <script>
       jasmine.clock().install();
 
@@ -61,10 +62,12 @@
 
           expect(aConditionSpy.calls.count()).toEqual(0);
           expect(bConditionSpy.calls.count()).toEqual(1);
-          expect(bConditionSpy.calls.mostRecent()).toEqual({
-            object: b,
-            args: [{type: 'hover(1000)', target: b}, b],
-            returnValue: true
+
+          assertHoverCall({
+            call: bConditionSpy.calls.mostRecent(),
+            relatedElement: b,
+            target: b,
+            delay: 1000
           });
 
           jasmine.clock().tick(1000);
@@ -72,12 +75,14 @@
           // Because the rules are on different delays, the hover event from element B doesn't
           // execute rule A when it "bubbles up".
           expect(aConditionSpy.calls.count()).toEqual(1);
-          expect(aConditionSpy.calls.mostRecent()).toEqual({
-            object: a,
-            args: [{type: 'hover(2000)', target: a}, a],
-            returnValue: true
-          });
           expect(bConditionSpy.calls.count()).toEqual(1);
+
+          assertHoverCall({
+            call: aConditionSpy.calls.mostRecent(),
+            relatedElement: a,
+            target: a,
+            delay: 2000
+          });
         })
         .start();
     </script>

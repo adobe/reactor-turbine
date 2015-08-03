@@ -25,7 +25,7 @@ describe('timePlayed event type', function() {
     'differentAmountPercentUnitNestedElements.html'
   );
   runTestPage(
-    'triggers multiple rules with the same amount using percent unit targeting the same ' +
+    'triggers multiple rules with the same amount using different units targeting the same ' +
       'element',
     'sameAmountDifferentUnitSameElement.html'
   );

@@ -5,6 +5,7 @@ var id = 0;
 
 /**
  * Handles logic related to bubbling options provided for many event types.
+ *
  * @returns {{addListener: Function, evaluateEvent: Function}}
  */
 module.exports = function() {
@@ -15,8 +16,11 @@ module.exports = function() {
   return {
     /**
      * Register a config object that should be evaluated for an event to determine if a rule
-     * should be executed. If it should be executed, the trigger function will be called.
+     * should be executed. If it should be executed, the callback function will be called.
      * @param {Object} config The event config object.
+     * @param {string} selector The selector the rule is matching on.
+     * @param {string} [type] If specified, the callback will only be called if the event's type
+     * matches.
      * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire if the
      * event originated from a descendant element.
      * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should fire if the
@@ -33,7 +37,8 @@ module.exports = function() {
     },
     /**
      * Evaluate an event to determine if any rule targeting elements in the event target's DOM
-     * hierarchy should be executed.
+     * hierarchy should be executed. Note that event.type is not inspected. This assumes that
+     * all registered listeners care about this particular event type. Whether they
      * @param {Event} event The event that has occurred.
      * @param {HTMLElement} event.target The HTML element where the event originated.
      */
@@ -68,17 +73,25 @@ module.exports = function() {
             continue;
           }
 
-          if ((node === event.target || listener.config.bubbleFireIfParent) &&
-            matchesCSS(listener.config.selector, node)) {
+          if (node !== event.target && !listener.config.bubbleFireIfParent) {
+            continue;
+          }
 
-            listener.callback(event, node);
+          if (listener.config.type !== undefined && listener.config.type !== event.type) {
+            continue;
+          }
 
-            nodeTriggeredRule = true;
+          if (!matchesCSS(listener.config.selector, node)) {
+            continue;
+          }
 
-            // Note that bubbling is only stopped if the rule actually triggered!
-            if (listener.config.bubbleStop) {
-              preventEvaluationOnAncestors = true;
-            }
+          listener.callback(event, node);
+
+          nodeTriggeredRule = true;
+
+          // Note that bubbling is only stopped if the rule actually triggered!
+          if (listener.config.bubbleStop) {
+            preventEvaluationOnAncestors = true;
           }
         }
 

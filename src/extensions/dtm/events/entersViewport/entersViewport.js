@@ -2,13 +2,7 @@
 
 var poll = require('poll');
 var covertData = require('covertData');
-var bubbly = require('bubbly');
-
-/**
- * Object where the key is the delay and the value is the bubbly instance used for that delay.
- * @type {Object}
- */
-var bubblyByDelay = {};
+var bubbly = require('bubbly')();
 
 var listeners = [];
 
@@ -84,6 +78,17 @@ var elementIsInView = function(element, viewportHeight, scrollTop) {
 };
 
 /**
+ * Gets an event type specific to the delay to use in the pseudo event.
+ * @param {number} delay The amount of time, in milliseconds, the element was required to be in
+ * the viewport.
+ * @returns {string}
+ */
+function getPseudoEventType(delay) {
+  delay = delay || 0;
+  return 'inview(' + delay + ')';
+}
+
+/**
  * Mark an element as having been in the viewport for the specified delay.
  * @param {HTMLElement} element The element that is in the viewport.
  * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
@@ -93,14 +98,13 @@ var elementIsInView = function(element, viewportHeight, scrollTop) {
  */
 function markEntersViewportComplete(element, delay, completeDataKey) {
   var event = {
-    type: 'inview',
+    type: getPseudoEventType(delay),
     target: element,
     // If the user did not configure a delay, inviewDelay should be undefined. Probably not
     inviewDelay: delay
   };
 
-  var delayBubbly = bubblyByDelay[delay || 0];
-  delayBubbly.evaluateEvent(event);
+  bubbly.evaluateEvent(event);
   covertData(element, completeDataKey, true);
 }
 
@@ -185,13 +189,26 @@ module.exports = function(config, trigger) {
   // different delays. See the tests for how this plays out.
   var delay = config.eventConfig.delay || 0;
 
-  var delayBubbly = bubblyByDelay[delay];
+  // Re-use the event config object for configuring the bubbly listener since it has most
+  // everything needed. Use Object.create so we can add a type attribute without modifying the
+  // original object.
+  var bubblyEventConfig = Object.create(config.eventConfig);
+  bubblyEventConfig.type = getPseudoEventType(delay);
 
-  if (!delayBubbly) {
-    delayBubbly = bubblyByDelay[delay] = bubbly();
-  }
-
-  delayBubbly.addListener(config.eventConfig, trigger);
+  bubbly.addListener(bubblyEventConfig, function(event, relatedElement) {
+    // The psuedo event going through bubbly has a type that looks like "inview(40)" so that only
+    // listeners watching for a delay of 40 would be called. However, the event that gets passed
+    // to the engine which later get passed to conditions don't have the parenthesis. Oddly,
+    // this is different than other similar event types like hover and time played (they use the
+    // parenthesis). We maintain this difference for backward compatibility in case users are
+    // referencing the type in their conditions, etc.
+    var eventForRule = {
+      type: 'inview',
+      target: event.target,
+      inviewDelay: event.inviewDelay
+    };
+    trigger(eventForRule, relatedElement);
+  });
 
   listeners.push({
     // These strings are created and stored here for optimization purposes only. It avoids

@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('bubbly');
+var bubbly = require('bubbly')();
 var covertData = require('covertData');
 
 var LAST_TRIGGERED_DATA_KEY = 'dtm.timePlayed.LastTriggered';
@@ -14,26 +14,18 @@ var TIME_PLAYED_UNIT = {
   PERCENT: 'percent'
 };
 
-var bubblyByPercent = {};
-var bubblyBySecond = {};
+function getPseudoEventType(amount, unit) {
+  var unitSuffix = unit === TIME_PLAYED_UNIT.SECOND ? 's' : '%';
+  return 'videoplayed(' + amount + unitSuffix + ')';
+}
 
 function getPseudoEvent(amount, unit, target) {
-  var event = {};
-  var unitSuffix;
-
-  switch (unit) {
-    case TIME_PLAYED_UNIT.SECOND:
-      unitSuffix = 's';
-      break;
-    case TIME_PLAYED_UNIT.PERCENT:
-      unitSuffix = '%';
-      break;
-  }
-
-  // built to match behavior of prior engine.
-  event.type = 'videoplayed(' + amount + unitSuffix + ')';
-  event.target = target;
-  return event;
+  return {
+    type: getPseudoEventType(amount, unit),
+    target: target,
+    amount: amount,
+    unit: unit
+  };
 }
 
 function handleTimeUpdate(event) {
@@ -47,33 +39,26 @@ function handleTimeUpdate(event) {
   var startTime = seekable.start(0);
   var endTime = seekable.end(0);
   var currentTime = target.currentTime;
-  var playedPercent = 100 * (currentTime - startTime) / (endTime - startTime);
   var playedSeconds = currentTime - startTime;
 
   var secondsLastTriggered = covertData(target, LAST_TRIGGERED_DATA_KEY) || 0;
   var pseudoEvent;
 
-  for (var bubblySecond in bubblyBySecond) {
-    bubblySecond = parseFloat(bubblySecond);
-    if (bubblySecond > secondsLastTriggered && bubblySecond <= playedSeconds) {
-      pseudoEvent = getPseudoEvent(bubblySecond, TIME_PLAYED_UNIT.SECOND, target);
-      bubblyBySecond[bubblySecond].evaluateEvent(pseudoEvent);
+  relevantMarkers.forEach(function(eventConfig) {
+    var configuredSeconds = eventConfig.unit === TIME_PLAYED_UNIT.SECOND ?
+      eventConfig.amount : (endTime - startTime) * (eventConfig.amount / 100);
+    if (configuredSeconds > secondsLastTriggered && configuredSeconds <= playedSeconds) {
+      pseudoEvent = getPseudoEvent(eventConfig.amount, eventConfig.unit, target);
+      bubbly.evaluateEvent(pseudoEvent);
     }
-  }
-
-  for (var bubblyPercent in bubblyByPercent) {
-    bubblyPercent = parseFloat(bubblyPercent);
-    var bubblySecondsEquivalent = (endTime - startTime) * (bubblyPercent / 100);
-    if (bubblySecondsEquivalent > secondsLastTriggered && bubblyPercent <= playedPercent) {
-      pseudoEvent = getPseudoEvent(bubblyPercent, TIME_PLAYED_UNIT.PERCENT, target);
-      bubblyByPercent[bubblyPercent].evaluateEvent(pseudoEvent);
-    }
-  }
+  });
 
   covertData(event.target, LAST_TRIGGERED_DATA_KEY, playedSeconds);
 }
 
 document.addEventListener('timeupdate', handleTimeUpdate, true);
+
+var relevantMarkers = [];
 
 /**
  * The time played event. This event occurs when the media has been played for a specified amount
@@ -94,22 +79,23 @@ document.addEventListener('timeupdate', handleTimeUpdate, true);
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  var bubblyByAmount;
+  var doesMarkerMatch = function(marker) {
+    return marker.amount === config.eventConfig.amount && marker.unit === config.eventConfig.unit;
+  };
 
-  switch (config.eventConfig.unit) {
-    case TIME_PLAYED_UNIT.SECOND:
-      bubblyByAmount = bubblyBySecond;
-      break;
-    case TIME_PLAYED_UNIT.PERCENT:
-      bubblyByAmount = bubblyByPercent;
-      break;
+  var markerRegistered = relevantMarkers.some(doesMarkerMatch);
+
+  if (!markerRegistered) {
+    relevantMarkers.push({
+      amount: config.eventConfig.amount,
+      unit: config.eventConfig.unit
+    });
   }
 
-  var timePlayedBubbly = bubblyByAmount[config.eventConfig.amount];
-
-  if (!timePlayedBubbly) {
-    timePlayedBubbly = bubblyByAmount[config.eventConfig.amount] = bubbly();
-  }
-
-  timePlayedBubbly.addListener(config.eventConfig, trigger);
+  // Re-use the event config object for configuring the bubbly listener since it has most
+  // everything needed. Use Object.create so we can add a type attribute without modifying the
+  // original object.
+  var bubblyEventConfig = Object.create(config.eventConfig);
+  bubblyEventConfig.type = getPseudoEventType(config.eventConfig.amount, config.eventConfig.unit);
+  bubbly.addListener(bubblyEventConfig, trigger);
 };

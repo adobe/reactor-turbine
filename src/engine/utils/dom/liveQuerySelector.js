@@ -30,6 +30,12 @@ function initializePolling() {
   }
 }
 
+/**
+ * Polls for elements added to the DOM matching a given selector.
+ * @param {String} selector The CSS selector used to find elements.
+ * @param {Function} callback A function that will be called for each element found. The element
+ * will be passed to the callback.
+ */
 module.exports = function(selector, callback) {
   var dataStash = createDataStash('liveQuery');
   var callbacks = callbacksBySelector[selector];
@@ -38,6 +44,8 @@ module.exports = function(selector, callback) {
     callbacks = callbacksBySelector[selector] = [];
   }
 
+  // This function will be called for every element found matching the selector but we will only
+  // call the consumer's callback if it has not already been called for the element.
   callbacks.push(function(element) {
     if (!dataStash(element, SEEN)) {
       dataStash(element, SEEN, true);

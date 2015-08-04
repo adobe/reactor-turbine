@@ -1,3 +1,9 @@
+/**
+ * Returns whether an element matches a selector.
+ * @param {string} selector The CSS selector.
+ * @param {HTMLElement} element The HTML element being tested.
+ * @returns {boolean}
+ */
 module.exports = (function(docEl) {
 
   function simpleTagMatch(selector, elm) {

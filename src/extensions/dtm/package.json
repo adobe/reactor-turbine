@@ -94,6 +94,10 @@
     {
       "name": "Time Played",
       "path": "events/timePlayed/timePlayed.js"
+    },
+    {
+      "name": "Orientation Change",
+      "path": "events/orientationchange/orientationchange.js"
     }
   ],
   "dataElementDelegates": [

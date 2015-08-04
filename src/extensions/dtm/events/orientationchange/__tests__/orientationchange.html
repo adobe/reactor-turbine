@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <script src="/base/dist/container.js"></script>
+    <script src="../../__tests__/helpers/configureEngineForEventTests.js"></script>
+    <script src="helpers/orientationchangeHelper.js"></script>
+    <script>
+      var conditionSpy = jasmine.createSpy().and.returnValue(true);
+      configureRuleForEventTests([
+        {
+          type: 'dtm.orientationchange',
+          config: {}
+        }
+      ], conditionSpy);
+    </script>
+    <script src="/base/dist/engine.js"></script>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script src="/base/node_modules/simulate/simulate.js"></script>
+    <script>
+      TestPage
+        .waitForContentLoaded()
+        .execute(function() {
+          expect(conditionSpy.calls.count()).toEqual(0);
+
+          window.orientation = 0;
+
+          Simulate.event(window, 'orientationchange');
+
+          expect(conditionSpy.calls.count()).toEqual(1);
+
+          assertOrientationchangeCall({
+            call: conditionSpy.calls.mostRecent(),
+            orientation: 'portrait'
+          });
+
+          window.orientation = 90;
+
+          Simulate.event(window, 'orientationchange');
+
+          expect(conditionSpy.calls.count()).toEqual(2);
+
+          assertOrientationchangeCall({
+            call: conditionSpy.calls.mostRecent(),
+            orientation: 'landscape'
+          });
+        })
+        .start();
+    </script>
+  </head>
+  <body>
+    <script>
+      _satellite.pageBottom();
+    </script>
+  </body>
+</html>

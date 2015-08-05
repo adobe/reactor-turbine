@@ -1,5 +1,5 @@
 var createDataStash = require('./../createDataStash');
-var globalPoll = require('../communication/globalPoll')
+var globalPoll = require('../communication/globalPoll');
 var SEEN = 'seen';
 
 // Create a naked object with no prototype so we can safely use it as a map.

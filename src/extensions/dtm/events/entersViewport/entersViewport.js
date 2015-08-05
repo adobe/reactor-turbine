@@ -195,7 +195,7 @@ var checkIfElementsInViewport = function() {
           triggerCompleteEvent(element, delay);
         }
       } else if (delay) { // Element is not in view, has delay
-        timeoutId = getTimeoutId(element, delay)
+        timeoutId = getTimeoutId(element, delay);
         if (timeoutId) {
           clearTimeout(timeoutId);
           storeTimeoutId(element, delay, null);

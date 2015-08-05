@@ -4,6 +4,7 @@ var bubbly = require('bubbly')();
 var dataStash = require('createDataStash')('timePlayed');
 
 var LAST_TRIGGERED = 'lastTriggered';
+var relevantMarkers = [];
 
 /**
  * Unit string values.
@@ -57,8 +58,6 @@ function handleTimeUpdate(event) {
 }
 
 document.addEventListener('timeupdate', handleTimeUpdate, true);
-
-var relevantMarkers = [];
 
 /**
  * The time played event. This event occurs when the media has been played for a specified amount

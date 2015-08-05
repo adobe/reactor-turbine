@@ -18,33 +18,33 @@ if ('ongestureend' in window && 'ontouchend' in window) {
   var delayFire = 1000;
   var currentTimer;
 
-  document.addEventListener('gestureend', function(){
-    gestureEndTime = + new Date();
+  document.addEventListener('gestureend', function() {
+    gestureEndTime = +new Date();
 
     // Could we use a generic throttling or debouncing function?
-    setTimeout(function(){
-      var z = getCurrentZoom();
+    setTimeout(function() {
+      var zoom = getCurrentZoom();
 
-      if (z === lastZoom) {
+      if (zoom === lastZoom) {
         return;
       }
 
-      lastZoom = z;
+      lastZoom = zoom;
 
       if (currentTimer) {
         clearTimeout(currentTimer);
       }
 
-      currentTimer = setTimeout(function(){
+      currentTimer = setTimeout(function() {
         currentTimer = null;
 
-        var z = getCurrentZoom();
+        zoom = getCurrentZoom();
 
-        if (lastZoom === z) {
+        if (lastZoom === zoom) {
           callTriggers({
             type: 'zoomchange',
             method: 'pinch',
-            zoom: z.toFixed(2),
+            zoom: zoom.toFixed(2),
             target: document
           });
         }
@@ -52,37 +52,33 @@ if ('ongestureend' in window && 'ontouchend' in window) {
     }, 50);
   });
 
-  document.addEventListener('touchend', function(){
-    console.log('step 1')
+  document.addEventListener('touchend', function() {
     if (gestureEndTime && (+new Date() - gestureEndTime) < 50) {
-      console.log('gettin trapped');
       return;
     }
 
     // Could we use a generic throttling or debouncing function?
-    setTimeout(function(){
-      console.log('step 2')
-      var z = getCurrentZoom();
+    setTimeout(function() {
+      var zoom = getCurrentZoom();
 
-      if (z === lastZoom) {
+      if (zoom === lastZoom) {
         return;
       }
 
-      lastZoom = z;
+      lastZoom = zoom;
 
       if (currentTimer) {
-        clearTimeout(currentTimer)
+        clearTimeout(currentTimer);
       }
 
-      currentTimer = setTimeout(function(){
-        console.log('step 3')
+      currentTimer = setTimeout(function() {
         currentTimer = null;
-        var z = getCurrentZoom();
-        if (lastZoom === z) {
+        zoom = getCurrentZoom();
+        if (lastZoom === zoom) {
           callTriggers({
             type: 'zoomchange',
             method: 'double tap',
-            zoom: z.toFixed(2),
+            zoom: zoom.toFixed(2),
             target: document
           });
         }

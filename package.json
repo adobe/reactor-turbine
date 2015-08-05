@@ -32,6 +32,7 @@
     "karma-chrome-launcher": "^0.1.12",
     "karma-firefox-launcher": "^0.1.6",
     "karma-jasmine": "^0.3.5",
+    "karma-nyan-reporter": "^0.2.1",
     "karma-sourcemap-loader": "^0.3.5",
     "karma-webpack": "^1.5.1",
     "promiscuous": "^0.6.0",

@@ -57,7 +57,7 @@ module.exports = function(config) {
       }
     },
 
-    reporters: ['progress'],
+    reporters: ['nyan'],
 
     port: 9876,
 
@@ -81,7 +81,8 @@ module.exports = function(config) {
       require("karma-chrome-launcher"),
       require("karma-firefox-launcher"),
       require("karma-webpack"),
-      require("karma-sourcemap-loader")
+      require("karma-sourcemap-loader"),
+      require("karma-nyan-reporter")
     ]
   });
 };

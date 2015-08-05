@@ -13,7 +13,6 @@ describe('classList', function() {
   });
 
   describe('add()', function() {
-    // add tests
     it('returns a className when the className is not previously defined', function() {
       testElement.className = 'fooMan';
       classList.add(testElement, 'fooMan');
@@ -40,7 +39,6 @@ describe('classList', function() {
     });
   });
 
-  //contains tests
   describe('contains()', function() {
     it('returns null if the element does not have the specified className', function() {
       testElement.className = 'fooMan';
@@ -57,23 +55,22 @@ describe('classList', function() {
     });
   });
 
-  //toggle tests
   describe('toggle()', function() {
     it('adds the className if it does not exist.', function() {
       classList.toggle(testElement, 'fooMan');
-      expect(testElement.className).toEqual(' fooMan');
+      expect(testElement.className.trim()).toEqual('fooMan');
     });
 
     it('removes the className if it already exists.', function() {
       testElement.className = 'fooMan';
       classList.toggle(testElement, 'fooMan');
-      expect(testElement.className).toEqual('');
+      expect(testElement.className.trim()).toEqual('');
     });
 
     it('removes the className if multiples already exists.', function() {
       testElement.className = 'foo Man';
       classList.toggle(testElement, 'Man');
-      expect(testElement.className).toEqual('foo ');
+      expect(testElement.className.trim()).toEqual('foo');
 
       classList.add(testElement, 'Man');
       expect(testElement.className).toEqual('foo  Man'); // double spaces
@@ -85,13 +82,13 @@ describe('classList', function() {
     it('removes the className if it already exists.', function() {
       testElement.className = 'fooMan';
       classList.remove(testElement, 'fooMan');
-      expect(testElement.className).toEqual('');
+      expect(testElement.className.trim()).toEqual('');
     });
 
     it('removes only one if multiple classNames exists.', function() {
       testElement.className = 'foo Man';
       classList.remove(testElement, 'foo');
-      expect(testElement.className).toEqual(' Man');
+      expect(testElement.className.trim()).toEqual('Man');
     });
   });
 });

@@ -34,9 +34,9 @@
       }
       // If the value is a promise, take over its state
       if (is(func, then)) {
-        function valueHandler(resolved) {
+        var valueHandler = function(resolved) {
           return function (value) { then && (then = 0, pendingHandler(is, resolved, value)); };
-        }
+        };
         try { then.call(value, valueHandler(1), rejected = valueHandler(0)); }
         catch (reason) { rejected(reason); }
       }

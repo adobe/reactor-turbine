@@ -98,6 +98,10 @@
     {
       "name": "Orientation Change",
       "path": "events/orientationchange/orientationchange.js"
+    },
+    {
+      "name": "Zoom Change",
+      "path": "events/zoomchange/zoomchange.js"
     }
   ],
   "dataElementDelegates": [

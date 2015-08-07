@@ -12,7 +12,16 @@ function callTriggers(event) {
   });
 }
 
-if ('ongestureend' in window && 'ontouchend' in window) {
+var watchingForZoom = false;
+function watchForZoom() {
+  if (watchingForZoom) {
+    return;
+  }
+
+  //if (!('ongestureend' in window) || !('ontouchend' in window)) {
+  //  return;
+  //}
+
   var lastZoom = getCurrentZoom();
   var gestureEndTime;
   var delayFire = 1000;
@@ -85,6 +94,8 @@ if ('ongestureend' in window && 'ontouchend' in window) {
       }, delayFire);
     }, 250);
   });
+
+  watchingForZoom = true;
 }
 
 /**
@@ -94,5 +105,6 @@ if ('ongestureend' in window && 'ontouchend' in window) {
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
+  watchForZoom();
   triggers.push(trigger);
 };

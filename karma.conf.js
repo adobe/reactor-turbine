@@ -67,6 +67,7 @@ module.exports = function(config) {
 
     autoWatch: true,
 
+    //browsers: ['Chrome', 'Firefox', 'Safari'],
     browsers: ['Chrome'],
 
     captureTimeout: 60000,
@@ -80,6 +81,7 @@ module.exports = function(config) {
       require("karma-jasmine"),
       require("karma-chrome-launcher"),
       require("karma-firefox-launcher"),
+      require("karma-safari-launcher"),
       require("karma-webpack"),
       require("karma-sourcemap-loader"),
       require("karma-nyan-reporter")

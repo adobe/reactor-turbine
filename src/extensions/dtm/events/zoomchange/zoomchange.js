@@ -18,9 +18,9 @@ function watchForZoom() {
     return;
   }
 
-  //if (!('ongestureend' in window) || !('ontouchend' in window)) {
-  //  return;
-  //}
+  if (!('ongestureend' in window) || !('ontouchend' in window)) {
+    return;
+  }
 
   var lastZoom = getCurrentZoom();
   var gestureEndTime;

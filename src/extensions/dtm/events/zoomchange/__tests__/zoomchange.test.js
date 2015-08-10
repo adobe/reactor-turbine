@@ -11,26 +11,23 @@ function assertTriggerCall(options) {
 }
 
 describe('zoomchange event type', function() {
-  var zoomchangeDelegate;
-  var mockWindow;
+  var delegate;
+  var mockWindow = {
+    ongestureend: null,
+    ontouchend: null
+  };
 
-  beforeEach(function() {
+  beforeAll(function() {
     jasmine.clock().install();
     jasmine.clock().mockDate();
 
-    zoomchangeDelegate = rewire('../zoomchange.js');
-
-    mockWindow = {
-      ongestureend: null,
-      ontouchend: null
-    };
-
-    zoomchangeDelegate.__set__({
+    var delegateInjector = require('inject!../zoomchange');
+    delegate = delegateInjector({
       window: mockWindow
     });
   });
 
-  afterEach(function() {
+  afterAll(function() {
     jasmine.clock().uninstall();
   });
 
@@ -39,7 +36,7 @@ describe('zoomchange event type', function() {
 
     mockWindow.innerWidth = document.documentElement.clientWidth;
 
-    zoomchangeDelegate({}, trigger);
+    delegate({}, trigger);
 
     Simulate.event(document, 'gestureend');
 

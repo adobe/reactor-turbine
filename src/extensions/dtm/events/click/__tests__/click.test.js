@@ -1,25 +1,16 @@
 'use strict';
 
 describe('click event type', function() {
-  var options = {
-    nativeEventType: 'click',
-    extensionEventType: 'dtm.click'
-  };
+  var standardEventHelper = require('../../__tests__/helpers/standardEventHelper');
+  var publicRequire = require('../../../../../engine/publicRequire');
+  var delegateInjector = require('inject!../click');
+  var delegate = delegateInjector({
+    createBubbly: publicRequire('createBubbly'),
+    liveQuerySelector: publicRequire('liveQuerySelector'),
+    createDataStash: publicRequire('createDataStash')
+  });
 
-  runTestPage(
-    'triggers rule when element already added and listener added to document',
-    '../../__tests__/helpers/preAddElementWithHandlerOnDocument.html',
-    options);
-  runTestPage(
-    'triggers rule when element already added with listener added to element',
-    '../../__tests__/helpers/preAddElementWithHandlerOnElement.html',
-    options);
-  runTestPage(
-    'triggers rule when element added later with listener added to document',
-    '../../__tests__/helpers/postAddElementWithHandlerOnDocument.html',
-    options);
-  runTestPage(
-    'triggers rule when element added later with listener added to element',
-    '../../__tests__/helpers/postAddElementWithHandlerOnElement.html',
-    options);
+  var helper = standardEventHelper(delegate, 'click');
+  helper.testListenerAddedToElement();
+  helper.testListenerAddedToDocument();
 });

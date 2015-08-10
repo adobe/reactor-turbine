@@ -1,8 +1,10 @@
 'use strict';
 
 var poll = require('poll');
-var dataStash = require('createDataStash')('entersViewport');
-var bubbly = require('bubbly')();
+var createDataStash = require('createDataStash');
+var createBubbly = require('createBubbly');
+var dataStash = createDataStash('entersViewport');
+var bubbly = createBubbly();
 var TIMEOUT_ID = 'timeoutId';
 var COMPLETE = 'complete';
 
@@ -76,7 +78,8 @@ var getScrollTop = function() {
 var elementIsInView = function(element, viewportHeight, scrollTop) {
   var top = offset(element).top;
   var height = element.offsetHeight;
-  return !(scrollTop > (top + height) || scrollTop + viewportHeight < top);
+  return document.contains(element) &&
+    !(scrollTop > (top + height) || scrollTop + viewportHeight < top);
 };
 
 /**
@@ -180,12 +183,14 @@ var checkIfElementsInViewport = function() {
         if (delay) { // Element is in view, has delay
           if (!getTimeoutId(element, delay)) {
             /*eslint-disable no-loop-func*/
-            timeoutId = setTimeout(function() {
-              if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
-                storeCompletion(element, delay);
-                triggerCompleteEvent(element, delay);
-              }
-            }, delay);
+            timeoutId = (function(element, delay) {
+              return setTimeout(function() {
+                if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
+                  storeCompletion(element, delay);
+                  triggerCompleteEvent(element, delay);
+                }
+              }, delay);
+            })(element, delay);
             /*eslint-enable no-loop-func*/
 
             storeTimeoutId(element, delay, timeoutId);

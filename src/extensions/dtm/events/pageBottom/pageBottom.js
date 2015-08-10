@@ -12,6 +12,8 @@ var triggers = [];
  */
 var called = false;
 
+window._satellite = window._satellite || {};
+
 /**
  * Public function intended to be called by the user at the bottom of the page.
  */

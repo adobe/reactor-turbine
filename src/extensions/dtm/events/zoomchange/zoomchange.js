@@ -1,5 +1,6 @@
 'use strict';
 
+var window = require('window');
 var triggers = [];
 
 function getCurrentZoom() {

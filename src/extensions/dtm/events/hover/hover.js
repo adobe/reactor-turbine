@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('bubbly')();
+var bubbly = require('createBubbly')();
 var liveQuerySelector = require('liveQuerySelector');
 var dataStash = require('createDataStash')('hover');
 var DELAYS = 'delays';
@@ -52,6 +52,16 @@ function getPseudoEvent(target, delay) {
   };
 }
 
+function watchElement(element, trackedDelays) {
+  element.addEventListener('mouseenter', function(event) {
+    trackedDelays.forEach(function(trackedDelay) {
+      delayHover(event, trackedDelay, function() {
+        bubbly.evaluateEvent(getPseudoEvent(event.target, trackedDelay));
+      });
+    });
+  });
+}
+
 /**
  * The hover event. This event occurs when a user has moved the pointer to be on top of an element.
  * @param {Object} config
@@ -91,13 +101,7 @@ module.exports = function(config, trigger) {
     } else {
       trackedDelays = [delay];
       dataStash(element, DELAYS, trackedDelays);
-      element.addEventListener('mouseenter', function(event) {
-        trackedDelays.forEach(function(trackedDelay) {
-          delayHover(event, trackedDelay, function() {
-            bubbly.evaluateEvent(getPseudoEvent(event.target, trackedDelay));
-          });
-        });
-      });
+      watchElement(element, trackedDelays);
     }
   });
 };

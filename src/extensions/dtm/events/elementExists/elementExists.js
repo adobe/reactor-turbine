@@ -1,8 +1,8 @@
 'use strict';
 
 var poll = require('poll');
-var bubbly = require('bubbly')();
 var dataStash = require('createDataStash')('elementExists');
+var bubbly = require('createBubbly')();
 var SEEN = 'seen';
 
 /**

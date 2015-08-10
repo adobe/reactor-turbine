@@ -1,17 +1,13 @@
 'use strict';
 
 describe('loadeddata event type', function() {
-  var options = {
-    nativeEventType: 'loadeddata',
-    extensionEventType: 'dtm.loadeddata'
-  };
+  var standardEventHelper = require('../../__tests__/helpers/standardEventHelper');
+  var publicRequire = require('../../../../../engine/publicRequire');
+  var delegateInjector = require('inject!../loadeddata');
+  var delegate = delegateInjector({
+    createBubbly: publicRequire('createBubbly')
+  });
 
-  runTestPage(
-    'triggers rule when element already added and listener added to document',
-    '../../__tests__/helpers/preAddElementWithHandlerOnDocument.html',
-    options);
-  runTestPage(
-    'triggers rule when element added later with listener added to document',
-    '../../__tests__/helpers/postAddElementWithHandlerOnDocument.html',
-    options);
+  var helper = standardEventHelper(delegate, 'loadeddata');
+  helper.testListenerAddedToDocument();
 });

@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('bubbly')();
+var bubbly = require('createBubbly')();
 var dataStash = require('createDataStash')('timePlayed');
 
 var LAST_TRIGGERED = 'lastTriggered';

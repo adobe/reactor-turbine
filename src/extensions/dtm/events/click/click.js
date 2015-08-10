@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('bubbly')();
+var bubbly = require('createBubbly')();
 var liveQuerySelector = require('liveQuerySelector');
 var dataStash = require('createDataStash')('click');
 var WATCHED = 'watched';

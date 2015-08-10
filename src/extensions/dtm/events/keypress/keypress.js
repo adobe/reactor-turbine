@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('bubbly')();
+var bubbly = require('createBubbly')();
 
 document.addEventListener('keypress', bubbly.evaluateEvent, true);
 

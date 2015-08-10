@@ -1,4 +1,4 @@
-var createDataStash = require('./../createDataStash');
+var dataStash = require('./../createDataStash')('liveQuerySelector');
 var globalPoll = require('../communication/globalPoll');
 var SEEN = 'seen';
 
@@ -30,6 +30,8 @@ function initializePolling() {
   }
 }
 
+var callbackIdIncrementor = 0;
+
 /**
  * Polls for elements added to the DOM matching a given selector.
  * @param {String} selector The CSS selector used to find elements.
@@ -37,18 +39,19 @@ function initializePolling() {
  * will be passed to the callback.
  */
 module.exports = function(selector, callback) {
-  var dataStash = createDataStash('liveQuery');
   var callbacks = callbacksBySelector[selector];
 
   if (!callbacks) {
     callbacks = callbacksBySelector[selector] = [];
   }
 
+  var callbackId = callbackIdIncrementor++;
+
   // This function will be called for every element found matching the selector but we will only
   // call the consumer's callback if it has not already been called for the element.
   callbacks.push(function(element) {
-    if (!dataStash(element, SEEN)) {
-      dataStash(element, SEEN, true);
+    if (!dataStash(element, SEEN + callbackId)) {
+      dataStash(element, SEEN + callbackId, true);
       callback(element);
     }
   });

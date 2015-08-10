@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('bubbly')();
+var bubbly = require('createBubbly')();
 
 document.addEventListener('pause', bubbly.evaluateEvent, true);
 

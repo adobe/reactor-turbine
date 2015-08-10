@@ -22,9 +22,15 @@ var resources = {
   'getCookie': require('./utils/cookie/getCookie'),
   'setCookie': require('./utils/cookie/setCookie'),
   'getObjectProperty': require('./utils/dataElement/getObjectProperty'),
-  'bubbly': require('./utils/bubbly'),
+  'createBubbly': require('./utils/createBubbly'),
   'liveQuerySelector': require('./utils/dom/liveQuerySelector'),
-  'logger': require('./utils/logger')
+  'logger': require('./utils/logger'),
+  'window': function() { // Used so that window can be mocked in tests.
+    return window;
+  },
+  'document': function() { // Used so that document can be mocked in tests.
+    return document;
+  }
 };
 
 module.exports = function(key) {

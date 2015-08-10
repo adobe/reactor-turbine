@@ -1,4 +1,4 @@
-'use strict';
+  'use strict';
 
 var logger = require('logger');
 
@@ -8,6 +8,8 @@ var logger = require('logger');
  * @type {Object}
  */
 var triggersByCallName = {};
+
+window._satellite = window.satellite || {};
 
 /**
  * Public function intended to be called by the user.

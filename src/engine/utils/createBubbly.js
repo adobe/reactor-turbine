@@ -28,8 +28,8 @@ module.exports = function() {
      * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should fire if the
      * same event has already triggered a rule targeting a descendant element.
      * @param {boolean} [config.bubbleStop=false] Whether the event should not trigger rules on
-     * @param {Function} callback The function to be called when a matching event is seen.
      * ancestor elements.
+     * @param {Function} callback The function to be called when a matching event is seen.
      */
     addListener: function(config, callback) {
       listeners.push({

@@ -9,7 +9,20 @@ function assertTriggerCall(options) {
   expect(options.call.args[1]).toBe(options.relatedElement);
 }
 
-module.exports = function(delegate, type) {
+function triggerCustomEvent(element, type) {
+  var event = document.createEvent('Event');
+  event.initEvent(type, true, true);
+  element.dispatchEvent(event);
+  return event;
+}
+
+describe('custom event type', function() {
+  var publicRequire = require('../../../../../engine/publicRequire');
+  var delegateInjector = require('inject!../custom');
+  var delegate = delegateInjector({
+    createBubbly: publicRequire('createBubbly')
+  });
+
   beforeAll(function() {
     testElement = document.createElement('div');
     testElement.id = 'test';
@@ -26,27 +39,23 @@ module.exports = function(delegate, type) {
   });
 
   it('triggers rule when event occurs', function() {
+    var CUSTOM_EVENT_TYPE = 'foo';
+
     var trigger = jasmine.createSpy();
 
     delegate({
       eventConfig: {
         selector: '#test',
+        type: CUSTOM_EVENT_TYPE,
         bubbleFireIfParent: true
       }
     }, trigger);
 
-    // We're overloading our usage of Simulate here. The second arg is a character which only
-    // applies for simulating keyboard events but doesn't really do anything in the case of
-    // mouse events.
-    Simulate[type](nestedElement, 'A');
+    var event = triggerCustomEvent(nestedElement, CUSTOM_EVENT_TYPE);
 
     expect(trigger.calls.count()).toBe(1);
-
-    assertTriggerCall({
-      call: trigger.calls.mostRecent(),
-      type: type,
-      target: nestedElement,
-      relatedElement: testElement
-    });
+    var call = trigger.calls.mostRecent();
+    expect(call.args[0]).toBe(event);
+    expect(call.args[1]).toBe(testElement);
   });
-};
+});

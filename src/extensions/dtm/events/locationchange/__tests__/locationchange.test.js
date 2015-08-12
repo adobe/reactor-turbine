@@ -2,6 +2,7 @@
 
 describe('locationchange event type', function() {
   var delegate;
+  var origHref = window.location.href;
 
   function assertTriggerCall(call) {
     expect(call.args[0].type).toBe('locationchange');
@@ -19,7 +20,9 @@ describe('locationchange event type', function() {
   });
 
   afterEach(function() {
-    window.location.hash = '';
+    // Just so the URL goes back to what it was. That way when we refresh the browser when
+    // debugging it actually loads the correct url.
+    window.history.replaceState(null, null, origHref);
   });
 
   it('triggers rule on the hash change event', function(done) {

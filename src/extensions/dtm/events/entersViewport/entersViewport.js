@@ -148,11 +148,27 @@ function isComplete(element, delay) {
 /**
  * Stores that the process has been completed for detecting when the element has entered the
  * viewport for a particular element + delay combo.
- * @param element
- * @param delay
+ * @param {HTMLElement} element
+ * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
+ * the viewport.
  */
 function storeCompletion(element, delay) {
   dataStash(element, COMPLETE + delay, true);
+}
+
+/**
+ * Delays the checking of whether an element is in the viewport.
+ * @param {HTMLElement} element
+ * @param {Number} delay The amount of time, in milliseconds, the check should be delayed.
+ * @returns {*|number}
+ */
+function delayInViewportCheck(element, delay) {
+  return setTimeout(function() {
+    if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
+      storeCompletion(element, delay);
+      triggerCompleteEvent(element, delay);
+    }
+  }, delay);
 }
 
 /**
@@ -182,17 +198,7 @@ var checkIfElementsInViewport = function() {
       if (elementIsInView(element, viewportHeight, scrollTop)) {
         if (delay) { // Element is in view, has delay
           if (!getTimeoutId(element, delay)) {
-            /*eslint-disable no-loop-func*/
-            timeoutId = (function(element, delay) {
-              return setTimeout(function() {
-                if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
-                  storeCompletion(element, delay);
-                  triggerCompleteEvent(element, delay);
-                }
-              }, delay);
-            })(element, delay);
-            /*eslint-enable no-loop-func*/
-
+            timeoutId = delayInViewportCheck(element, delay);
             storeTimeoutId(element, delay, timeoutId);
           }
         } else { // Element is in view, has no delay

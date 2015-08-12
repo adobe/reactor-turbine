@@ -1,7 +1,5 @@
 'use strict';
 
-var rewire = require('rewire');
-
 function assertTriggerCall(options) {
   expect(options.call.args[0].type).toBe('zoomchange');
   expect(options.call.args[0].target).toBe(document);

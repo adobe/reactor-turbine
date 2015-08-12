@@ -54,7 +54,7 @@ describe('timePlayed event type', function() {
   });
 
   it('triggers multiple rules with the same amount using second unit targeting the ' +
-      'same element',  function() {
+      'same element', function() {
     var aTrigger = jasmine.createSpy();
     var a2Trigger = jasmine.createSpy();
 
@@ -169,7 +169,7 @@ describe('timePlayed event type', function() {
     bElement.currentTime = 34;
 
     Simulate.timeupdate(bElement);
-    
+
     expect(aTrigger.calls.count()).toEqual(0);
     expect(bTrigger.calls.count()).toEqual(0);
 
@@ -398,21 +398,21 @@ describe('timePlayed event type', function() {
     bElement.seekable = seekable;
     bElement.currentTime = 31; // 1%, 1s complete.
 
-    Simulate.timeupdate(b);
+    Simulate.timeupdate(bElement);
 
     expect(aTrigger.calls.count()).toEqual(0);
     expect(bTrigger.calls.count()).toEqual(0);
 
     bElement.currentTime = 35; // 7%, 5s complete.
 
-    Simulate.timeupdate(b);
+    Simulate.timeupdate(bElement);
 
     expect(aTrigger.calls.count()).toEqual(1);
     expect(bTrigger.calls.count()).toEqual(0);
 
     bElement.currentTime = 60; // 43%, 30s complete
 
-    Simulate.timeupdate(b);
+    Simulate.timeupdate(bElement);
 
     expect(aTrigger.calls.count()).toEqual(1);
     expect(bTrigger.calls.count()).toEqual(1);

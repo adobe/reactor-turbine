@@ -9,10 +9,11 @@
  */
 module.exports = function(fn, delay) {
   var timeoutId = null;
-  return function () {
-    var context = this, args = arguments;
+  return function() {
+    var context = this;
+    var args = arguments;
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(function () {
+    timeoutId = setTimeout(function() {
       fn.apply(context, args);
     }, delay);
   };

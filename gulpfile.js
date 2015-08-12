@@ -6,6 +6,7 @@ var gzip = require('gulp-gzip');
 var fs = require('fs');
 var path = require('path');
 var karma = require('karma').server;
+var webpack = require('webpack-stream');
 
 var $ = require('gulp-load-plugins')();
 
@@ -112,7 +113,7 @@ gulp.task('compressContainer', ['buildContainer'], function() {
 
 gulp.task('buildEngine', function() {
   return gulp.src('./src/engine/bootstrap.js')
-    .pipe($.webpack({
+    .pipe(webpack({
       output: {
         filename: 'engine.js'
       },

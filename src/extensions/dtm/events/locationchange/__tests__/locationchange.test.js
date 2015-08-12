@@ -45,18 +45,23 @@ describe('locationchange event type', function() {
 
     // Typically would use a jasmine clock but part of this is waiting for the browser to
     // asynchronously trigger the event which can't be sped up.
-    setTimeout(function() {
+    waitUntil(function() {
+      return trigger.calls.count() > 0;
+    }).then(function() {
       expect(trigger.calls.count()).toBe(1);
+
       assertTriggerCall(trigger.calls.mostRecent());
 
       window.history.back(); // This causes the popstate event.
 
-      setTimeout(function() {
+      waitUntil(function() {
+        return trigger.calls.count() > 1;
+      }).then(function() {
         expect(trigger.calls.count()).toBe(2);
         assertTriggerCall(trigger.calls.mostRecent());
         done();
-      }, 5);
-    }, 5);
+      });
+    });
   });
 
   it('triggers rule when replaceState is called', function(done) {
@@ -65,10 +70,12 @@ describe('locationchange event type', function() {
 
     window.history.replaceState({some: 'state'}, null, 'replaceStateTest.html');
 
-    setTimeout(function() {
+    waitUntil(function() {
+      return trigger.calls.count() > 0;
+    }).then(function() {
       expect(trigger.calls.count()).toBe(1);
       assertTriggerCall(trigger.calls.mostRecent());
       done();
-    }, 5);
+    });
   });
 });

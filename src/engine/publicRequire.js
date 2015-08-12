@@ -24,13 +24,11 @@ var resources = {
   'getObjectProperty': require('./utils/dataElement/getObjectProperty'),
   'createBubbly': require('./utils/createBubbly'),
   'liveQuerySelector': require('./utils/dom/liveQuerySelector'),
+  'debounce': require('./utils/debounce'),
+  'once': require('./utils/once'),
   'logger': require('./utils/logger'),
-  'window': function() { // Used so that window can be mocked in tests.
-    return window;
-  },
-  'document': function() { // Used so that document can be mocked in tests.
-    return document;
-  }
+  'window': window,
+  'document': document
 };
 
 module.exports = function(key) {

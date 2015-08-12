@@ -47,8 +47,8 @@ module.exports = function(config) {
             callback();
           }
         }
-      ],
-      devtool: 'inline-source-map'
+      ]
+      //devtool: 'inline-source-map'
     },
 
     webpackServer: {
@@ -57,7 +57,7 @@ module.exports = function(config) {
       }
     },
 
-    reporters: ['nyan'],
+    reporters: ['progress'],
 
     port: 9876,
 
@@ -84,7 +84,6 @@ module.exports = function(config) {
       require("karma-safari-launcher"),
       require("karma-webpack"),
       require("karma-sourcemap-loader"),
-      require("karma-nyan-reporter")
     ]
   });
 };

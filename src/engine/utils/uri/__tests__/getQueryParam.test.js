@@ -1,28 +1,20 @@
 'use strict';
 
-var rewire = require('rewire');
-var getQueryParam = rewire('../getQueryParam');
-var setSearch;
-var revert;
+var mockWindow = {
+  location: {
+    search: ''
+  }
+};
+
+var getQueryParam = require('inject!../getQueryParam')({
+  window: mockWindow
+});
+
+function setSearch(search) {
+  mockWindow.location.search = search;
+}
 
 describe('getQueryParam', function() {
-
-  beforeEach(function() {
-    setSearch = function(search) {
-      revert = getQueryParam.__set__({
-        window: {
-          location: {
-            search: search
-          }
-        }
-      });
-    };
-  });
-
-  afterEach(function() {
-    revert();
-  });
-
   it('returns null if the queryString is empty', function() {
     setSearch('');
     expect(getQueryParam('fly')).toBeNull();

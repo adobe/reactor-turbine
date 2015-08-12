@@ -1,10 +1,9 @@
 'use strict';
 
-var rewire = require('rewire');
-var includes = rewire('../includes');
-
-includes.__set__('indexOf', function(arr, obj) {
-  return arr.indexOf(obj);
+var includes = require('inject!../includes')({
+  './indexOf': function(arr, obj) {
+    return arr.indexOf(obj);
+  }
 });
 
 var letters = ['A', 'B', 'C'];

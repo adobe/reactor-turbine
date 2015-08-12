@@ -1,9 +1,10 @@
 'use strict';
 
-var rewire = require('rewire');
-var dataElementDelegate = rewire('../cookie');
-
-dataElementDelegate.__set__('getCookie', function() { return 'bar'; });
+var dataElementDelegate = require('inject!../cookie')({
+  getCookie: function() {
+    return 'bar';
+  }
+});
 
 describe('cookie data element delegate', function() {
   it('should return the value of a cookie', function() {

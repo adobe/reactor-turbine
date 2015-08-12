@@ -128,6 +128,11 @@ gulp.task('buildEngine', function() {
             loader: 'strict'
           }
         ]
+      },
+      externals: {
+        // So that modules can require('window') and then tests can mock it.
+        window: 'window',
+        document: 'document'
       }
     }))
     .pipe(gulp.dest('./dist'));

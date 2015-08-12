@@ -1,16 +1,15 @@
 'use strict';
 
-var rewire = require('rewire');
-var initRules = rewire('../initRules');
-
 var preprocessConfig = function(config) {
   return config;
 };
 
 var logger = {};
 
-initRules.__set__('preprocessConfig', preprocessConfig);
-initRules.__set__('logger', logger);
+var initRules = require('inject!../initRules')({
+  './utils/preprocessConfig': preprocessConfig,
+  './utils/logger': logger
+});
 
 var eventDelegatesWithImmediateTriggerCall = {
   get: function() {

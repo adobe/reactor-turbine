@@ -1,3 +1,5 @@
+var window = require('window');
+
 /**
  * Retrieves a variable value from the current URL querystring.
  * @param name The name of the querystring parameter.

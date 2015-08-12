@@ -1,11 +1,11 @@
 'use strict';
 
-var rewire = require('rewire');
-var conditionDelegate = rewire('../urlParameter');
-
-conditionDelegate.__set__('textMatch', require('../../../../engine/utils/string/textMatch'));
-conditionDelegate.__set__('getQueryParam', function() {
-  return 'foo';
+var publicRequire = require('../../../../engine/publicRequire');
+var conditionDelegate = require('inject!../urlParameter')({
+  textMatch: publicRequire('textMatch'),
+  getQueryParam: function() {
+    return 'foo';
+  }
 });
 
 describe('url parameter condition delegate', function() {

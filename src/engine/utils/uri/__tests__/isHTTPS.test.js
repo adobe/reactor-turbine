@@ -1,18 +1,20 @@
 'use strict';
 
-var rewire = require('rewire');
-var isHTTPS = rewire('../isHTTPS');
-var setProtocol = function(protocol) {
-  isHTTPS.__set__({
-    document: {
-      location: {
-        pathname: '/flyFishers.php',
-        search: '',
-        protocol: protocol
-      }
-    }
-  });
+var mockDocument = {
+  location: {
+    pathname: '/flyFishers.php',
+    search: '',
+    protocol: 'http'
+  }
 };
+
+var isHTTPS = require('inject!../isHTTPS')({
+  document: mockDocument
+});
+
+function setProtocol(protocol) {
+  mockDocument.location.protocol = protocol;
+}
 
 describe('isHTTPS', function() {
   it('returns true if the protocol is https', function() {

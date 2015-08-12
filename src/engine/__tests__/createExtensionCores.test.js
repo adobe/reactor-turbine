@@ -1,8 +1,5 @@
 'use strict';
 
-var rewire = require('rewire');
-var createExtensionCores = rewire('../createExtensionCores');
-
 var preprocessConfig = function(config) {
   return config;
 };
@@ -20,9 +17,11 @@ var logger = {
   error: jasmine.createSpy()
 };
 
-createExtensionCores.__set__('preprocessConfig', preprocessConfig);
-createExtensionCores.__set__('Promise', Promise);
-createExtensionCores.__set__('logger', logger);
+var createExtensionCores = require('inject!../createExtensionCores')({
+  './utils/preprocessConfig': preprocessConfig,
+  './utils/communication/Promise': Promise,
+  './utils/logger': logger
+});
 
 var coreRegistry = {
   register: jasmine.createSpy()

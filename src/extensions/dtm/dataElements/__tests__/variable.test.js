@@ -1,10 +1,9 @@
 'use strict';
 
-var rewire = require('rewire');
-var dataElementDelegate = rewire('../variable');
-
 var getObjectPropertySpy = jasmine.createSpy().and.returnValue('bar');
-dataElementDelegate.__set__('getObjectProperty', getObjectPropertySpy);
+var dataElementDelegate = require('inject!../variable')({
+  getObjectProperty: getObjectPropertySpy
+});
 
 describe('variable data element delegate', function() {
   it('should return an object property value', function() {

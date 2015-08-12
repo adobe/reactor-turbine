@@ -1,5 +1,3 @@
-var RewirePlugin = require('rewire-webpack');
-
 module.exports = function(config) {
   config.set({
 
@@ -24,9 +22,6 @@ module.exports = function(config) {
     },
 
     webpack: {
-      plugins: [
-        new RewirePlugin()
-      ],
       externals: [
         // For extensions we expose a "require" function that extension developers can use to
         // require in utilities that we specifically expose. This require function is custom
@@ -47,6 +42,11 @@ module.exports = function(config) {
           } else {
             callback();
           }
+        },
+        {
+          // So that modules can require('window') and then tests can mock it.
+          window: 'window',
+          document: 'document'
         }
       ]
       //devtool: 'inline-source-map'

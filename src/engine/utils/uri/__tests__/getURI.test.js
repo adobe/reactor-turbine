@@ -1,29 +1,23 @@
 'use strict';
 
-var rewire = require('rewire');
-var getURI = rewire('../getURI');
-var setLocation;
-var revert;
+var mockDocument = {
+  location: {
+    pathname: '',
+    search: '',
+    protocol: 'http:'
+  }
+};
+
+var getURI = require('inject!../getURI')({
+  document: mockDocument
+});
+
+function setLocation(pathname, search) {
+  mockDocument.location.pathname = pathname;
+  mockDocument.location.search = search;
+}
 
 describe('getURI', function() {
-
-  beforeEach(function() {
-    setLocation = function(pathname, search) {
-      revert = getURI.__set__({
-        document: {
-          location: {
-            pathname: pathname,
-            search: search,
-            protocol: 'http:'
-          }
-        }
-      });
-    };
-  });
-
-  afterEach(function() {
-    revert();
-  });
 
   it('returns the correct path with no search parameters', function() {
     setLocation('/flyFishers.php', '');

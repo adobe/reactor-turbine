@@ -1,13 +1,12 @@
 'use strict';
 
 describe('pause event type', function() {
-  var standardEventHelper = require('../../__tests__/helpers/standardEventHelper');
+  var testStandardEvent = require('../../__tests__/helpers/testStandardEvent');
   var publicRequire = require('../../../../../engine/publicRequire');
   var delegateInjector = require('inject!../pause');
   var delegate = delegateInjector({
     createBubbly: publicRequire('createBubbly')
   });
 
-  var helper = standardEventHelper(delegate, 'pause');
-  helper.testListenerAddedToDocument();
+  testStandardEvent(delegate, 'pause');
 });

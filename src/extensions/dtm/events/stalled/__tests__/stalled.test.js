@@ -1,13 +1,12 @@
 'use strict';
 
 describe('stalled event type', function() {
-  var standardEventHelper = require('../../__tests__/helpers/standardEventHelper');
+  var testStandardEvent = require('../../__tests__/helpers/testStandardEvent');
   var publicRequire = require('../../../../../engine/publicRequire');
   var delegateInjector = require('inject!../stalled');
   var delegate = delegateInjector({
     createBubbly: publicRequire('createBubbly')
   });
 
-  var helper = standardEventHelper(delegate, 'stalled');
-  helper.testListenerAddedToDocument();
+  testStandardEvent(delegate, 'stalled');
 });

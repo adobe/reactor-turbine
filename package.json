@@ -13,15 +13,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "gulp-coverage": "^0.3.34",
-    "gulp-load-plugins": "^1.0.0-rc.1",
-    "gulp-mocha": "^2.0.0",
-    "webpack-stream": "^2.1.0",
-    "webpack": "^1.11.0",
     "gulp": "^3.8.11",
     "gulp-concat": "^2.5.2",
+    "gulp-coverage": "^0.3.34",
     "gulp-eslint": "^1.0.0",
     "gulp-gzip": "^1.2.0",
+    "gulp-load-plugins": "^1.0.0-rc.1",
+    "gulp-mocha": "^2.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.3",
     "gulp-uglify": "^1.2.0",
@@ -30,11 +28,14 @@
     "karma": "^0.13.4",
     "karma-chrome-launcher": "^0.2.0",
     "karma-firefox-launcher": "^0.1.6",
+    "karma-ievms": "0.0.4",
     "karma-jasmine": "^0.3.5",
     "karma-safari-launcher": "^0.1.1",
     "karma-sourcemap-loader": "^0.3.5",
     "karma-webpack": "^1.7.0",
     "simulate": "git+https://github.com/Aaronius/simulate.js.git#d8538a34fb85b513ae76a9def5d2615c0b702bbc",
-    "strict-loader": "^0.1.2"
+    "strict-loader": "^0.1.2",
+    "webpack": "^1.11.0",
+    "webpack-stream": "^2.1.0"
   }
 }

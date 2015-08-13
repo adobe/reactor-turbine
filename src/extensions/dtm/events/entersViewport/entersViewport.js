@@ -78,7 +78,7 @@ var getScrollTop = function() {
 var elementIsInView = function(element, viewportHeight, scrollTop) {
   var top = offset(element).top;
   var height = element.offsetHeight;
-  return document.contains(element) &&
+  return document.body.contains(element) &&
     !(scrollTop > (top + height) || scrollTop + viewportHeight < top);
 };
 

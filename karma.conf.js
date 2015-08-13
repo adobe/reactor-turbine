@@ -70,7 +70,14 @@ module.exports = function(config) {
     autoWatch: true,
 
     //browsers: ['Chrome', 'Firefox', 'Safari'],
-    browsers: ['Chrome'],
+    browsers: [
+      'Chrome',
+      'Firefox',
+      'Safari',
+      'IE9 - Win7',
+      'IE10 - Win7',
+      'IE11 - Win7'
+    ],
 
     captureTimeout: 60000,
 
@@ -86,6 +93,7 @@ module.exports = function(config) {
       require("karma-safari-launcher"),
       require("karma-webpack"),
       require("karma-sourcemap-loader"),
+      require("karma-ievms")
     ]
   });
 };

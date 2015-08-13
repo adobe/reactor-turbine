@@ -69,14 +69,13 @@ module.exports = function(config) {
 
     autoWatch: true,
 
-    //browsers: ['Chrome', 'Firefox', 'Safari'],
     browsers: [
       'Chrome',
-      'Firefox',
-      'Safari',
-      'IE9 - Win7',
-      'IE10 - Win7',
-      'IE11 - Win7'
+      //'Firefox',
+      //'Safari',
+      //'IE9 - Win7',
+      //'IE10 - Win7',
+      //'IE11 - Win7'
     ],
 
     captureTimeout: 60000,

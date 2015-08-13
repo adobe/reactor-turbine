@@ -147,13 +147,32 @@ gulp.task('compressEngine', ['buildEngine'], function() {
     .pipe(gulp.dest('./dist'));
 });
 
-// Typically we wouldn't be dependent upon building the full engine and config since Karma
-// would dynamically compile the pieces under test, but because we have functional tests
-// that work within iframes and are dependent upon the full engine and config, this is necessary.
-gulp.task('test', ['default'], function() {
+function startKarma(browsers) {
   karma.start({
-    configFile: path.join(__dirname, 'karma.conf.js')
+    configFile: path.join(__dirname, 'karma.conf.js'),
+    browsers: browsers
   });
+}
+
+// Typically we wouldn't be dependent upon building the full engine and config (by running the
+// "default" task first) since Karma would dynamically compile the pieces under test, but because
+// we have functional tests that work within iframes and are dependent upon the full engine and
+// config, this is necessary.
+gulp.task('test', ['default'], function() {
+  startKarma([
+      'Chrome'
+    ]);
+});
+
+gulp.task('testall', ['default'], function() {
+  startKarma([
+      'Chrome',
+      'Firefox',
+      'Safari',
+      'IE9 - Win7',
+      'IE10 - Win7',
+      'IE11 - Win7'
+    ]);
 });
 
 gulp.task('watch', function() {

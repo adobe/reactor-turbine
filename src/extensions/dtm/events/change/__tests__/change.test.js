@@ -20,23 +20,23 @@ describe('change event type', function() {
   });
 
   describe('with value defined', function() {
-    var testElement;
-    var nestedElement;
+    var outerElement;
+    var innerElement;
 
     beforeAll(function() {
-      testElement = document.createElement('div');
-      testElement.id = 'test';
+      outerElement = document.createElement('div');
+      outerElement.id = 'outer';
 
-      nestedElement = document.createElement('input');
-      nestedElement.setAttribute('type', 'text');
-      nestedElement.id = 'nested';
-      testElement.appendChild(nestedElement);
+      innerElement = document.createElement('input');
+      innerElement.setAttribute('type', 'text');
+      innerElement.id = 'inner';
+      outerElement.appendChild(innerElement);
 
-      document.body.insertBefore(testElement, document.body.firstChild);
+      document.body.insertBefore(outerElement, document.body.firstChild);
     });
 
     afterAll(function() {
-      document.body.removeChild(testElement);
+      document.body.removeChild(outerElement);
     });
 
     it('triggers rule when a string value matches', function() {
@@ -44,21 +44,21 @@ describe('change event type', function() {
 
       delegate({
         eventConfig: {
-          selector: '#test',
+          selector: '#outer',
           value: 'foo',
           bubbleFireIfParent: true
         }
       }, trigger);
 
-      nestedElement.value = 'foo';
-      Simulate.change(nestedElement);
+      innerElement.value = 'foo';
+      Simulate.change(innerElement);
 
       expect(trigger.calls.count()).toBe(1);
 
       assertTriggerCall({
         call: trigger.calls.mostRecent(),
-        target: nestedElement,
-        relatedElement: testElement
+        target: innerElement,
+        relatedElement: outerElement
       });
     });
 
@@ -67,14 +67,14 @@ describe('change event type', function() {
 
       delegate({
         eventConfig: {
-          selector: '#test',
+          selector: '#outer',
           value: 'foo',
           bubbleFireIfParent: true
         }
       }, trigger);
 
-      nestedElement.value = 'bar';
-      Simulate.change(nestedElement);
+      innerElement.value = 'bar';
+      Simulate.change(innerElement);
 
       expect(trigger.calls.count()).toBe(0);
     });
@@ -84,21 +84,21 @@ describe('change event type', function() {
 
       delegate({
         eventConfig: {
-          selector: '#test',
+          selector: '#outer',
           value: /^f/,
           bubbleFireIfParent: true
         }
       }, trigger);
 
-      nestedElement.value = 'foo';
-      Simulate.change(nestedElement);
+      innerElement.value = 'foo';
+      Simulate.change(innerElement);
 
       expect(trigger.calls.count()).toBe(1);
 
       assertTriggerCall({
         call: trigger.calls.mostRecent(),
-        target: nestedElement,
-        relatedElement: testElement
+        target: innerElement,
+        relatedElement: outerElement
       });
     });
 
@@ -107,14 +107,14 @@ describe('change event type', function() {
 
       delegate({
         eventConfig: {
-          selector: '#test',
+          selector: '#outer',
           value: /^f/,
           bubbleFireIfParent: true
         }
       }, trigger);
 
-      nestedElement.value = 'bar';
-      Simulate.change(nestedElement);
+      innerElement.value = 'bar';
+      Simulate.change(innerElement);
 
       expect(trigger.calls.count()).toBe(0);
     });

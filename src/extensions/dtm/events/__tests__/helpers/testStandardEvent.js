@@ -1,7 +1,7 @@
 'use strict';
 
-var testElement;
-var nestedElement;
+var outerElement;
+var innerElement;
 
 function assertTriggerCall(options) {
   expect(options.call.args[0].type).toBe(options.type);
@@ -11,18 +11,18 @@ function assertTriggerCall(options) {
 
 module.exports = function(delegate, type) {
   beforeAll(function() {
-    testElement = document.createElement('div');
-    testElement.id = 'test';
+    outerElement = document.createElement('div');
+    outerElement.id = 'outer';
 
-    nestedElement = document.createElement('div');
-    nestedElement.id = 'nested';
-    testElement.appendChild(nestedElement);
+    innerElement = document.createElement('div');
+    innerElement.id = 'inner';
+    outerElement.appendChild(innerElement);
 
-    document.body.insertBefore(testElement, document.body.firstChild);
+    document.body.insertBefore(outerElement, document.body.firstChild);
   });
 
   afterAll(function() {
-    document.body.removeChild(testElement);
+    document.body.removeChild(outerElement);
   });
 
   it('triggers rule when event occurs', function() {
@@ -30,7 +30,7 @@ module.exports = function(delegate, type) {
 
     delegate({
       eventConfig: {
-        selector: '#test',
+        selector: '#outer',
         bubbleFireIfParent: true
       }
     }, trigger);
@@ -38,15 +38,15 @@ module.exports = function(delegate, type) {
     // We're overloading our usage of Simulate here. The second arg is a character which only
     // applies for simulating keyboard events but doesn't really do anything in the case of
     // mouse events.
-    Simulate[type](nestedElement, 'A');
+    Simulate[type](innerElement, 'A');
 
     expect(trigger.calls.count()).toBe(1);
 
     assertTriggerCall({
       call: trigger.calls.mostRecent(),
       type: type,
-      target: nestedElement,
-      relatedElement: testElement
+      target: innerElement,
+      relatedElement: outerElement
     });
   });
 };

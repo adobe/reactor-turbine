@@ -51,14 +51,14 @@ describe('createExtensionCores', function() {
 
     expect(function() {
       createExtensionCores({
-            extensions: {
-              testExtension: {
-                name: 'Test Extension'
-              }
-            }
-          },
-          coreRegistry,
-          coreDelegates);
+        extensions: {
+          testExtension: {
+            name: 'Test Extension'
+          }
+        }
+      },
+      coreRegistry,
+      coreDelegates);
     }).not.toThrowError();
 
     expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -103,14 +103,14 @@ describe('createExtensionCores', function() {
     };
 
     createExtensionCores({
-        extensions: {
-          testExtension: {
-            name: 'TestExtension'
-          }
+      extensions: {
+        testExtension: {
+          name: 'TestExtension'
         }
-      },
-      coreRegistry,
-      coreDelegates);
+      }
+    },
+    coreRegistry,
+    coreDelegates);
 
     expect(coreRegistry.register.calls.mostRecent().args).toEqual(['testExtension', corePromise]);
   });
@@ -125,14 +125,14 @@ describe('createExtensionCores', function() {
     };
 
     createExtensionCores({
-        extensions: {
-          testExtension: {
-            name: 'TestExtension'
-          }
+      extensions: {
+        testExtension: {
+          name: 'TestExtension'
         }
-      },
-      coreRegistry,
-      coreDelegates);
+      }
+    },
+    coreRegistry,
+    coreDelegates);
 
     expect(coreRegistry.register.calls.mostRecent().args[0]).toBe('testExtension');
     expect(coreRegistry.register.calls.mostRecent().args[1] instanceof Promise).toBe(true);

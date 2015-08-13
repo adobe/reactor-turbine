@@ -36,18 +36,18 @@ describe('initRules', function() {
 
     expect(function() {
       initRules({
-          rules: [
-            {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ]
-            }
-          ]
-        },
-        eventDelegates);
+        rules: [
+          {
+            name: 'Test Rule',
+            events: [
+              {
+                type: 'testEvent'
+              }
+            ]
+          }
+        ]
+      },
+      eventDelegates);
     }).not.toThrowError();
 
     expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -63,18 +63,18 @@ describe('initRules', function() {
 
     expect(function() {
       initRules({
-          rules: [
-            {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ]
-            }
-          ]
-        },
-        eventDelegates);
+        rules: [
+          {
+            name: 'Test Rule',
+            events: [
+              {
+                type: 'testEvent'
+              }
+            ]
+          }
+        ]
+      },
+      eventDelegates);
     }).not.toThrowError();
 
     expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -92,24 +92,24 @@ describe('initRules', function() {
 
     expect(function() {
       initRules({
-          rules: [
-            {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ],
-              conditions: [
-                {
-                  type: 'testCondition'
-                }
-              ]
-            }
-          ]
-        },
-        eventDelegatesWithImmediateTriggerCall,
-        conditionDelegates);
+        rules: [
+          {
+            name: 'Test Rule',
+            events: [
+              {
+                type: 'testEvent'
+              }
+            ],
+            conditions: [
+              {
+                type: 'testCondition'
+              }
+            ]
+          }
+        ]
+      },
+      eventDelegatesWithImmediateTriggerCall,
+      conditionDelegates);
     }).not.toThrowError();
 
     expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -125,24 +125,24 @@ describe('initRules', function() {
 
     expect(function() {
       initRules({
-          rules: [
-            {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ],
-              conditions: [
-                {
-                  type: 'testCondition'
-                }
-              ]
-            }
-          ]
-        },
-        eventDelegatesWithImmediateTriggerCall,
-        conditionDelegates);
+        rules: [
+          {
+            name: 'Test Rule',
+            events: [
+              {
+                type: 'testEvent'
+              }
+            ],
+            conditions: [
+              {
+                type: 'testCondition'
+              }
+            ]
+          }
+        ]
+      },
+      eventDelegatesWithImmediateTriggerCall,
+      conditionDelegates);
     }).not.toThrowError();
 
     expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -160,24 +160,24 @@ describe('initRules', function() {
 
     expect(function() {
       initRules({
-          rules: [
-            {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ],
-              conditions: [
-                {
-                  type: 'testCondition'
-                }
-              ]
-            }
-          ]
-        },
-        eventDelegatesWithImmediateTriggerCall,
-        conditionDelegates);
+        rules: [
+          {
+            name: 'Test Rule',
+            events: [
+              {
+                type: 'testEvent'
+              }
+            ],
+            conditions: [
+              {
+                type: 'testCondition'
+              }
+            ]
+          }
+        ]
+      },
+      eventDelegatesWithImmediateTriggerCall,
+      conditionDelegates);
     }).not.toThrowError();
 
     expect(logger.log.calls.mostRecent().args[0]).toEqual(
@@ -195,26 +195,26 @@ describe('initRules', function() {
 
     expect(function() {
       initRules({
-          rules: [
-            {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ],
-              actions: [
-                {
-                  type: 'testAction'
-                }
-              ]
-            }
-          ]
-        },
-        eventDelegatesWithImmediateTriggerCall,
-        null,
-        actionDelegates,
-        true);
+        rules: [
+          {
+            name: 'Test Rule',
+            events: [
+              {
+                type: 'testEvent'
+              }
+            ],
+            actions: [
+              {
+                type: 'testAction'
+              }
+            ]
+          }
+        ]
+      },
+      eventDelegatesWithImmediateTriggerCall,
+      null,
+      actionDelegates,
+      true);
     }).not.toThrowError();
 
     expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -230,26 +230,26 @@ describe('initRules', function() {
 
     expect(function() {
       initRules({
-          rules: [
-            {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ],
-              actions: [
-                {
-                  type: 'testAction'
-                }
-              ]
-            }
-          ]
-        },
-        eventDelegatesWithImmediateTriggerCall,
-        null,
-        actionDelegates,
-        true);
+        rules: [
+          {
+            name: 'Test Rule',
+            events: [
+              {
+                type: 'testEvent'
+              }
+            ],
+            actions: [
+              {
+                type: 'testAction'
+              }
+            ]
+          }
+        ]
+      },
+      eventDelegatesWithImmediateTriggerCall,
+      null,
+      actionDelegates,
+      true);
     }).not.toThrowError();
 
     expect(logger.error.calls.mostRecent().args[0]).toEqual(

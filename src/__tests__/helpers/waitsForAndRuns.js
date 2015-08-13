@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Polls an escape function. Once the escape function returns true, executes a run function.
  * @param {Function} escapeFunction A function that will be repeatedly executed and should return

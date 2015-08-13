@@ -101,9 +101,9 @@ function getPseudoEventType(delay) {
  */
 function triggerCompleteEvent(element, delay) {
   var event = {
-    type: getPseudoEventType(delay),
+    type: 'inview',
     target: element,
-    // If the user did not configure a delay, inviewDelay should be undefined. Probably not
+    // If the user did not configure a delay, inviewDelay should be undefined.
     inviewDelay: delay
   };
 
@@ -239,29 +239,16 @@ poll('enters viewport event delegate', checkIfElementsInViewport);
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  // Bubbling for this event is dependent upon the delay configured for rules.
-  // An event can "bubble up" to other rules with the same delay but not to rules with
-  // different delays. See the tests for how this plays out.
 
-  // Re-use the event config object for configuring the bubbly listener since it has most
-  // everything needed. Use Object.create so we can add a type attribute without modifying the
-  // original object.
-  var bubblyEventConfig = Object.create(config.eventConfig);
-  bubblyEventConfig.type = getPseudoEventType(config.eventConfig.delay);
-
-  bubbly.addListener(bubblyEventConfig, function(event, relatedElement) {
-    // The psuedo event going through bubbly has a type that looks like "inview(40)" so that only
-    // listeners watching for a delay of 40 would be called. However, the event that gets passed
-    // to the engine which later get passed to conditions don't have the parenthesis. Oddly,
-    // this is different than other similar event types like hover and time played (they use the
-    // parenthesis). We maintain this difference for backward compatibility in case users are
-    // referencing the type in their conditions, etc.
-    var eventForRule = {
-      type: 'inview',
-      target: event.target,
-      inviewDelay: event.inviewDelay
-    };
-    trigger(eventForRule, relatedElement);
+  bubbly.addListener(config.eventConfig, function(event, relatedElement) {
+    // Bubbling for this event is dependent upon the delay configured for rules.
+    // An event can "bubble up" to other rules with the same delay but not to rules with
+    // different delays. See the tests for how this plays out.
+    if (event.inviewDelay === config.eventConfig.delay) {
+      trigger(event, relatedElement);
+    } else {
+      return false;
+    }
   });
 
   listeners.push(config.eventConfig);

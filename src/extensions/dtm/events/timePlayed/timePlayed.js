@@ -91,10 +91,16 @@ module.exports = function(config, trigger) {
     });
   }
 
-  // Re-use the event config object for configuring the bubbly listener since it has most
-  // everything needed. Use Object.create so we can add a type attribute without modifying the
-  // original object.
-  var bubblyEventConfig = Object.create(config.eventConfig);
-  bubblyEventConfig.type = getPseudoEventType(config.eventConfig.amount, config.eventConfig.unit);
-  bubbly.addListener(bubblyEventConfig, trigger);
+  var pseudoEventType = getPseudoEventType(config.eventConfig.amount, config.eventConfig.unit);
+
+  bubbly.addListener(config.eventConfig, function(event, relatedElement) {
+    // Bubbling for this event is dependent upon the amount and unit configured for rules.
+    // An event can "bubble up" to other rules with the same amount and unit but not to rules with
+    // a different amount or unit. See the tests for how this plays out.
+    if (event.type === pseudoEventType) {
+      trigger(event, relatedElement);
+    } else {
+      return false;
+    }
+  });
 };

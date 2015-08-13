@@ -1,13 +1,9 @@
-// `textMatch(str, str_or_regex)`
-// ------------------------------
-//
-// Perform a string match based on another string or a regex.
-//
-// Parameters:
-//
-// `str` - the input string to be matched
-// `str_or_regex` - the pattern to match against, if this is a string, it requires exact match, if
-//      it's a regex, then it will do regex match
+/**
+ * Performs a string match based on another string or a regex.
+ * @param {string} str The string to be evaluate.
+ * @param {string|RegExp} pattern The pattern to match against.
+ * @returns {boolean} Whether the string matches the pattern.
+ */
 module.exports = function(str, pattern) {
   if (pattern == null) {
     throw new Error('Illegal Argument: Pattern is not present');

@@ -21,15 +21,14 @@ module.exports = function() {
      * should be executed. If it should be executed, the callback function will be called.
      * @param {Object} config The event config object.
      * @param {string} selector The selector the rule is matching on.
-     * @param {string} [type] If specified, the callback will only be called if the event's type
-     * matches.
      * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire if the
      * event originated from a descendant element.
      * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should fire if the
      * same event has already triggered a rule targeting a descendant element.
      * @param {boolean} [config.bubbleStop=false] Whether the event should not trigger rules on
      * ancestor elements.
-     * @param {Function} callback The function to be called when a matching event is seen.
+     * @param {Function} callback The function to be called when a matching event is seen. If the
+     * callback does not end up triggering a rule, the callback should explicitly return false.
      */
     addListener: function(config, callback) {
       listeners.push({
@@ -79,21 +78,19 @@ module.exports = function() {
             continue;
           }
 
-          if (listener.config.type !== undefined && listener.config.type !== event.type) {
-            continue;
-          }
-
           if (!matchesCSS(listener.config.selector, node)) {
             continue;
           }
 
-          listener.callback(event, node);
+          // The callback should return false if it didn't end up triggering a rule.
+          var ruleTriggered = listener.callback(event, node) !== false;
 
-          nodeTriggeredRule = true;
+          if (ruleTriggered) {
+            nodeTriggeredRule = true;
 
-          // Note that bubbling is only stopped if the rule actually triggered!
-          if (listener.config.bubbleStop) {
-            preventEvaluationOnAncestors = true;
+            if (listener.config.bubbleStop) {
+              preventEvaluationOnAncestors = true;
+            }
           }
         }
 

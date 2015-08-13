@@ -79,17 +79,19 @@ function watchElement(element, trackedDelays) {
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  // Bubbling for this event is dependent upon the delay configured for rules.
-  // An event can "bubble up" to other rules with the same delay but not to rules with
-  // different delays. See the tests for how this plays out.
   var delay = config.eventConfig.delay || 0;
 
-  // Re-use the event config object for configuring the bubbly listener since it has most
-  // everything needed. Use Object.create so we can add a type attribute without modifying the
-  // original object.
-  var bubblyEventConfig = Object.create(config.eventConfig);
-  bubblyEventConfig.type = getPseudoEventType(delay);
-  bubbly.addListener(bubblyEventConfig, trigger);
+  var pseudoEventType = getPseudoEventType(delay);
+  bubbly.addListener(config.eventConfig, function(event, relatedElement) {
+    // Bubbling for this event is dependent upon the delay configured for rules.
+    // An event can "bubble up" to other rules with the same delay but not to rules with
+    // different delays. See the tests for how this plays out.
+    if (event.type === pseudoEventType) {
+      trigger(event, relatedElement);
+    } else {
+      return false;
+    }
+  });
 
   liveQuerySelector(config.eventConfig.selector, function(element) {
     var trackedDelays = dataStash(element, DELAYS);

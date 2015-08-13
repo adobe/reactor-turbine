@@ -1,6 +1,8 @@
 'use strict';
 
 var window = require('window');
+var once = require('once');
+
 var triggers = [];
 
 function getCurrentZoom() {
@@ -13,12 +15,7 @@ function callTriggers(event) {
   });
 }
 
-var watchingForZoom = false;
-function watchForZoom() {
-  if (watchingForZoom) {
-    return;
-  }
-
+var watchForZoom = once(function() {
   if (!('ongestureend' in window) || !('ontouchend' in window)) {
     return;
   }
@@ -95,9 +92,7 @@ function watchForZoom() {
       }, delayFire);
     }, 250);
   });
-
-  watchingForZoom = true;
-}
+});
 
 /**
  * The zoomchange event. This event occurs when the zoom level has changed on an iOS device.

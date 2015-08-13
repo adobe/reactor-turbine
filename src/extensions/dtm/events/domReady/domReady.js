@@ -1,5 +1,7 @@
 'use strict';
 
+var once = require('once');
+
 var triggers = [];
 
 function handleDOMContentLoaded() {
@@ -15,13 +17,9 @@ function handleDOMContentLoaded() {
   });
 }
 
-var watching = false;
-function watchForContentLoaded() {
-  if (!watching) {
-    document.addEventListener('DOMContentLoaded', handleDOMContentLoaded, true);
-  }
-  watching = true;
-}
+var watchForContentLoaded  = once(function() {
+  document.addEventListener('DOMContentLoaded', handleDOMContentLoaded, true);
+});
 
 /**
  * DOM ready event. This event occurs as soon as HTML document has been completely loaded and

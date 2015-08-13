@@ -1,27 +1,25 @@
 'use strict';
 
+var once = require('once');
+
 /**
  * All trigger methods registered for this event type.
  * @type {ruleTrigger[]}
  */
 var triggers = [];
 
-var watching = false;
-function watchForWindowLoad() {
-  if (!watching) {
-    window.addEventListener('load', function() {
-      var pseudoEvent = {
-        type: 'windowload',
-        target: document.location
-      };
+var watchForWindowLoad = once(function() {
+  window.addEventListener('load', function() {
+    var pseudoEvent = {
+      type: 'windowload',
+      target: document.location
+    };
 
-      triggers.forEach(function(trigger) {
-        trigger(pseudoEvent, document.location);
-      });
-    }, true);
-  }
-  watching = true;
-}
+    triggers.forEach(function(trigger) {
+      trigger(pseudoEvent, document.location);
+    });
+  }, true);
+});
 
 /**
  * Onload event. This event occurs at the end of the document loading process. At this point,

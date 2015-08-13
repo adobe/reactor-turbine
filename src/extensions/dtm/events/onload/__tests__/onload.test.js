@@ -2,7 +2,11 @@
 
 describe('onload event type', function() {
   it('triggers rule when the load event occurs', function() {
-    var delegate = require('../onload');
+    var publicRequire = require('../../../../../engine/publicRequire');
+    var delegateInjector = require('inject!../onload');
+    var delegate = delegateInjector({
+      once: publicRequire('once')
+    });
 
     var trigger = jasmine.createSpy();
 

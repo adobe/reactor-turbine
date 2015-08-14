@@ -3,11 +3,11 @@
   "conditionDelegates": [
     {
       "name": "Custom",
-      "path": "conditions/custom.js"
+      "path": "conditions/custom/custom.js"
     },
     {
       "name": "URL Parameter",
-      "path": "conditions/urlParameter.js"
+      "path": "conditions/urlParameter/urlParameter.js"
     }
   ],
   "eventDelegates": [

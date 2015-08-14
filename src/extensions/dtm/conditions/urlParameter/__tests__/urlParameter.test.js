@@ -1,6 +1,6 @@
 'use strict';
 
-var publicRequire = require('../../../../engine/publicRequire');
+var publicRequire = require('../../../../../engine/publicRequire');
 var conditionDelegate = require('inject!../urlParameter')({
   textMatch: publicRequire('textMatch'),
   getQueryParam: function() {

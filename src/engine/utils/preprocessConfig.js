@@ -51,7 +51,7 @@ preprocessArray = function(arr, element, event) {
  */
 var preprocessConfig = function(config, element, event) {
   if (!config) {
-    return config;
+    return {};
   }
 
   return preprocessObject(config, element, event);

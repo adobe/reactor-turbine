@@ -24,9 +24,13 @@ var logger = require('./utils/logger');
 var _satellite = window._satellite;
 var container = _satellite.container;
 
-// Will get replaced by the pageBottom event delegate.
+// Will get replaced by the pageBottom event delegate. Exists here in case there are no page bottom
+// rules (and therefore the pageBottom event delegate won't get included) and our customers
+// are still calling the method.
 _satellite.pageBottom = function() {};
-// Will get replaced by the directCall event delegate.
+// Will get replaced by the directCall event delegate. Exists here in case there are no direct
+// call rules (and therefore the directCall event delegate won't get included) and our customers
+// are still calling the method.
 _satellite.track = function() {};
 _satellite.appVersion = container.appVersion;
 _satellite.notify = logger.notify.bind(logger);
@@ -47,7 +51,7 @@ _satellite.setDebug = function(value) {
 // This setting is primarily used by browser plugins.
 logger.outputEnabled = getLocalStorageItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';
 
-// TODO: For use during development in order to see errors. Remove or handle in some other way.
+// TODO: For use during development in order to see errors in the console from rule execution.
 //logger.outputEnabled = true;
 
 preprocessConfig.init(container.config.undefinedVarsReturnEmpty);

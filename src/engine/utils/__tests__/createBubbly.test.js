@@ -283,4 +283,37 @@ describe('createBubbly', function() {
 
     scenarios.forEach(testScenario);
   });
+
+  it('considers a rule not triggered when the listener callback returns false', function() {
+    var bubbly = createBubbly();
+    var aCallback = jasmine.createSpy();
+    var bCallback = jasmine.createSpy().and.callFake(function() {
+      return false;
+    });
+
+    bubbly.addListener({
+      selector: '#a',
+      bubbleFireIfParent: true,
+      // This would typically prevent aCallback from being executed, but since the bCallback
+      // returned false that means b's rule didn't trigger, which allows a's rule to execute.
+      bubbleFireIfChildFired: false,
+      bubbleStop: false
+    }, aCallback);
+
+    bubbly.addListener({
+      selector: '#b',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      // This would typically prevent aCallback from being executed, but since the bCallback
+      // returned false that means b's rule didn't trigger, which allows a's rule to execute.
+      bubbleStop: true
+    }, bCallback);
+
+    bubbly.evaluateEvent({
+      target: bElement
+    });
+
+    expect(aCallback.calls.count()).toBe(1);
+    expect(bCallback.calls.count()).toBe(1);
+  });
 });

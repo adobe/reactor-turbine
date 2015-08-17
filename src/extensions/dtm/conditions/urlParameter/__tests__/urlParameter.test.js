@@ -20,17 +20,6 @@ describe('url parameter condition delegate', function() {
     expect(conditionDelegate(config)).toBe(true);
   });
 
-  it('returns true when value matches using regex', function() {
-    var config = {
-      conditionConfig: {
-        name: 'testParam',
-        value: /^f[ojd]o$/
-      }
-    };
-
-    expect(conditionDelegate(config)).toBe(true);
-  });
-
   it('returns false when value does not match using regular string', function() {
     var config = {
       conditionConfig: {
@@ -40,6 +29,17 @@ describe('url parameter condition delegate', function() {
     };
 
     expect(conditionDelegate(config)).toBe(false);
+  });
+
+  it('returns true when value matches using regex', function() {
+    var config = {
+      conditionConfig: {
+        name: 'testParam',
+        value: /^f[ojd]o$/
+      }
+    };
+
+    expect(conditionDelegate(config)).toBe(true);
   });
 
   it('returns false when value does not match using regex', function() {

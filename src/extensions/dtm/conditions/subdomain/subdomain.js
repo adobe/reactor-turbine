@@ -4,7 +4,7 @@ var textMatch = require('textMatch');
 var document = require('document');
 
 /**
- * Subdomain condition. Determines if the current location is an matching subdomain.
+ * Subdomain condition. Determines if the current location is a matching subdomain.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
  * @param {(RegEx|string)[]} [config.conditionConfig.include] An array of subdomains. If specified,

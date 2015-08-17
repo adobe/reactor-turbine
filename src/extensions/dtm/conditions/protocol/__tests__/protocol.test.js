@@ -13,7 +13,7 @@ describe('protocol condition delegate', function() {
     expect(conditionDelegate(config)).toBe(true);
   });
 
-  it('returns true when the browser protocol does not match', function() {
+  it('returns false when the browser protocol does not match', function() {
     var config = {
       conditionConfig: {
         protocols: [/bogus:/i, /foo:/i]

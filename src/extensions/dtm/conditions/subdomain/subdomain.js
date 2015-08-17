@@ -20,8 +20,8 @@ module.exports = function(config) {
   var foundMatch;
 
   if (include) {
-    foundMatch = include.some(function(subdomain) {
-      return textMatch(hostname, subdomain);
+    foundMatch = include.some(function(includeSubdomain) {
+      return textMatch(hostname, includeSubdomain);
     });
 
     if (!foundMatch) {
@@ -30,8 +30,8 @@ module.exports = function(config) {
   }
 
   if (exclude) {
-    foundMatch = exclude.some(function(subdomain) {
-      return textMatch(hostname, subdomain);
+    foundMatch = exclude.some(function(excludeSubdomain) {
+      return textMatch(hostname, excludeSubdomain);
     });
 
     if (foundMatch) {

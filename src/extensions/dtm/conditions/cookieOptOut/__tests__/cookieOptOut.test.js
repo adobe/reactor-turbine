@@ -98,7 +98,6 @@ describe('cookie opt-out condition delegate', function() {
     });
   };
 
-
   runTests();
   runTests('sat_custom_track');
 });

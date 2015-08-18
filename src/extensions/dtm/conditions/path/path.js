@@ -18,28 +18,11 @@ module.exports = function(config) {
   var path = document.location.pathname + document.location.search;
   var include = config.conditionConfig.include;
   var exclude = config.conditionConfig.exclude;
-  var foundMatch;
 
-  if (include) {
-    foundMatch = include.some(function(includePath) {
-      return textMatch(path, includePath);
-    });
+  var compare = function(pathOption) {
+    return textMatch(path, pathOption);
+  };
 
-    if (!foundMatch) {
-      return false;
-    }
-  }
-
-  if (exclude) {
-    foundMatch = exclude.some(function(excludePath) {
-      return textMatch(path, excludePath);
-    });
-
-    if (foundMatch) {
-      return false;
-    }
-  }
-
-  return true;
+  return (!include || include.some(compare)) && (!exclude || !exclude.some(compare));
 };
 

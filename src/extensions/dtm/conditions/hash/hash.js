@@ -16,28 +16,11 @@ module.exports = function(config) {
   var hash = document.location.hash;
   var include = config.conditionConfig.include;
   var exclude = config.conditionConfig.exclude;
-  var foundMatch;
 
-  if (include) {
-    foundMatch = include.some(function(includeHash) {
-      return textMatch(hash, includeHash);
-    });
+  var compare = function(hashOption) {
+    return textMatch(hash, hashOption);
+  };
 
-    if (!foundMatch) {
-      return false;
-    }
-  }
-
-  if (exclude) {
-    foundMatch = exclude.some(function(excludeHash) {
-      return textMatch(hash, excludeHash);
-    });
-
-    if (foundMatch) {
-      return false;
-    }
-  }
-
-  return true;
+  return (!include || include.some(compare)) && (!exclude || !exclude.some(compare));
 };
 

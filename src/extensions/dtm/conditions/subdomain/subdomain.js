@@ -17,28 +17,11 @@ module.exports = function(config) {
   var hostname = document.location.hostname;
   var include = config.conditionConfig.include;
   var exclude = config.conditionConfig.exclude;
-  var foundMatch;
 
-  if (include) {
-    foundMatch = include.some(function(includeSubdomain) {
-      return textMatch(hostname, includeSubdomain);
-    });
+  var compare = function(subdomainOption) {
+    return textMatch(hostname, subdomainOption);
+  };
 
-    if (!foundMatch) {
-      return false;
-    }
-  }
-
-  if (exclude) {
-    foundMatch = exclude.some(function(excludeSubdomain) {
-      return textMatch(hostname, excludeSubdomain);
-    });
-
-    if (foundMatch) {
-      return false;
-    }
-  }
-
-  return true;
+  return (!include || include.some(compare)) && (!exclude || !exclude.some(compare));
 };
 

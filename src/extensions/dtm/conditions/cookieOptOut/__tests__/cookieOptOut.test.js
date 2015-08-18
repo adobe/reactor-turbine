@@ -19,7 +19,7 @@ describe('cookie opt-out condition delegate', function() {
       cookieName = customCookieName;
     }
 
-    it('returns true when the sat_cookie is set to "true" and acceptsCookies is true', function() {
+    it('returns true when the cookie is set to "true" and acceptsCookies is true', function() {
       setCookie(cookieName, 'true');
 
       var config = {
@@ -33,7 +33,7 @@ describe('cookie opt-out condition delegate', function() {
       removeCookie(cookieName);
     });
 
-    it('returns false when the sat_cookie is set to "false" and acceptsCookies is true', function() {
+    it('returns false when the cookie is set to "false" and acceptsCookies is true', function() {
       setCookie(cookieName, 'false');
 
       var config = {
@@ -47,7 +47,7 @@ describe('cookie opt-out condition delegate', function() {
       removeCookie(cookieName);
     });
 
-    it('returns false when the sat_cookie is set to "true" and acceptsCookies is false', function() {
+    it('returns false when the cookie is set to "true" and acceptsCookies is false', function() {
       setCookie(cookieName, 'true');
 
       var config = {
@@ -61,7 +61,7 @@ describe('cookie opt-out condition delegate', function() {
       removeCookie(cookieName);
     });
 
-    it('returns true when the sat_cookie is set to "false" and acceptsCookies is false', function() {
+    it('returns true when the cookie is set to "false" and acceptsCookies is false', function() {
       setCookie(cookieName, 'false');
 
       var config = {
@@ -75,7 +75,7 @@ describe('cookie opt-out condition delegate', function() {
       removeCookie(cookieName);
     });
 
-    it('returns false when the sat_cookie has not been set and acceptsCookies is true', function() {
+    it('returns false when the cookie has not been set and acceptsCookies is true', function() {
       var config = {
         conditionConfig: {
           acceptsCookies: true
@@ -86,7 +86,7 @@ describe('cookie opt-out condition delegate', function() {
       expect(conditionDelegate(config)).toBe(false);
     });
 
-    it('returns false when the sat_cookie has not been set and acceptsCookies is false', function() {
+    it('returns false when the cookie has not been set and acceptsCookies is false', function() {
       var config = {
         conditionConfig: {
           acceptsCookies: false

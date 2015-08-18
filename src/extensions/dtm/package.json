@@ -143,23 +143,23 @@
   "dataElementDelegates": [
     {
       "name": "Cookie",
-      "path": "dataElements/cookie.js"
+      "path": "dataElements/cookie/cookie.js"
     },
     {
       "name": "Custom",
-      "path": "dataElements/custom.js"
+      "path": "dataElements/custom/custom.js"
     },
     {
       "name": "DOM Attribute",
-      "path": "dataElements/dom.js"
+      "path": "dataElements/dom/dom.js"
     },
     {
       "name": "Querystring Parameter",
-      "path": "dataElements/queryParam.js"
+      "path": "dataElements/queryParam/queryParam.js"
     },
     {
       "name": "Variable",
-      "path": "dataElements/variable.js"
+      "path": "dataElements/variable/variable.js"
     }
   ]
 }

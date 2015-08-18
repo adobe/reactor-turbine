@@ -38,6 +38,10 @@
       "path": "conditions/protocol/protocol.js"
     },
     {
+      "name": "Screen Resolution",
+      "path": "conditions/screenResolution/screenResolution.js"
+    },
+    {
       "name": "Subdomain",
       "path": "conditions/subdomain/subdomain.js"
     },

@@ -7,7 +7,7 @@ var clientInfo = require('clientInfo');
  * selected options.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
- * @param {string[]} [config.conditionConfig.deviceTypes] An array of device type
+ * @param {string[]} config.conditionConfig.deviceTypes An array of device type
  * names. The condition will return true if the current device type matches one of these
  * device type names.
  * @returns {boolean}

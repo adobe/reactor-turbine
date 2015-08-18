@@ -7,7 +7,7 @@ var clientInfo = require('clientInfo');
  * selected options.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
- * @param {string[]} [config.conditionConfig.operatingSystems] An array of operating system
+ * @param {string[]} config.conditionConfig.operatingSystems An array of operating system
  * names. The condition will return true if the current operating system matches one of these
  * operating system names.
  * @returns {boolean}

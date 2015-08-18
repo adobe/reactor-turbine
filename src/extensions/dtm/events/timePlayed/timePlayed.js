@@ -10,13 +10,13 @@ var relevantMarkers = [];
  * Unit string values.
  * @enum {string}
  */
-var TIME_PLAYED_UNIT = {
+var timePlayedUnit = {
   SECOND: 'second',
   PERCENT: 'percent'
 };
 
 function getPseudoEventType(amount, unit) {
-  var unitSuffix = unit === TIME_PLAYED_UNIT.SECOND ? 's' : '%';
+  var unitSuffix = unit === timePlayedUnit.SECOND ? 's' : '%';
   return 'videoplayed(' + amount + unitSuffix + ')';
 }
 
@@ -46,7 +46,7 @@ function handleTimeUpdate(event) {
   var pseudoEvent;
 
   relevantMarkers.forEach(function(eventConfig) {
-    var configuredSeconds = eventConfig.unit === TIME_PLAYED_UNIT.SECOND ?
+    var configuredSeconds = eventConfig.unit === timePlayedUnit.SECOND ?
       eventConfig.amount : (endTime - startTime) * (eventConfig.amount / 100);
     if (configuredSeconds > secondsLastTriggered && configuredSeconds <= playedSeconds) {
       pseudoEvent = getPseudoEvent(eventConfig.amount, eventConfig.unit, target);
@@ -68,7 +68,7 @@ document.addEventListener('timeupdate', handleTimeUpdate, true);
  * @param {number} config.eventConfig.amount The amount of time the media must be played before
  * this event is fired. This value may either be number of seconds (20 for 20 seconds) or a
  * percent value (20 for 20%).
- * @param {TIME_PLAYED_UNIT} config.eventConfig.unit The unit of duration measurement.
+ * @param {timePlayedUnit} config.eventConfig.unit The unit of duration measurement.
  * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire if
  * the event originated from a descendant element.
  * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should fire

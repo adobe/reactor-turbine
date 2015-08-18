@@ -1,7 +1,7 @@
 'use strict';
 
 var mockClientInfo = {
-  browser: 'Some Browser'
+  browser: 'Foo'
 };
 
 var conditionDelegateInjector = require('inject!../browser');
@@ -11,8 +11,6 @@ var conditionDelegate = conditionDelegateInjector({
 
 describe('browser condition delegate', function() {
   it('returns true when the current browser matches one of the selected browsers', function() {
-    mockClientInfo.browser = 'Foo';
-
     var config = {
       conditionConfig: {
         browsers: ['Shoe', 'Goo', 'Foo', 'Moo']
@@ -24,8 +22,6 @@ describe('browser condition delegate', function() {
 
   it('returns false when the current browser does not match any of the ' +
       'selected browsers', function() {
-    mockClientInfo.browser = 'Foo';
-
     var config = {
       conditionConfig: {
         browsers: ['Shoe', 'Goo', 'Boo', 'Moo']

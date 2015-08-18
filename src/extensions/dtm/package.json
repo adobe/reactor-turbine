@@ -2,8 +2,44 @@
   "name": "dtm",
   "conditionDelegates": [
     {
+      "name": "Browser",
+      "path": "conditions/browser/browser.js"
+    },
+    {
+      "name": "Cookie Opt-out",
+      "path": "conditions/cookieOptOut/cookieOptOut.js"
+    },
+    {
       "name": "Custom",
       "path": "conditions/custom/custom.js"
+    },
+    {
+      "name": "Device Type",
+      "path": "conditions/deviceType/deviceType.js"
+    },
+    {
+      "name": "Domain",
+      "path": "conditions/domain/domain.js"
+    },
+    {
+      "name": "Hash",
+      "path": "conditions/hash/hash.js"
+    },
+    {
+      "name": "Operating System",
+      "path": "conditions/operatingSystem/operatingSystem.js"
+    },
+    {
+      "name": "Path",
+      "path": "conditions/path/path.js"
+    },
+    {
+      "name": "Protocol",
+      "path": "conditions/protocol/protocol.js"
+    },
+    {
+      "name": "Subdomain",
+      "path": "conditions/subdomain/subdomain.js"
     },
     {
       "name": "URL Parameter",

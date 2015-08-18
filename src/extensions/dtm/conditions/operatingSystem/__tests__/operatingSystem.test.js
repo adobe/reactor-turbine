@@ -1,7 +1,7 @@
 'use strict';
 
 var mockClientInfo = {
-  os: 'Some OS'
+  os: 'Foo'
 };
 
 var conditionDelegateInjector = require('inject!../operatingSystem');
@@ -11,8 +11,6 @@ var conditionDelegate = conditionDelegateInjector({
 
 describe('operating system condition delegate', function() {
   it('returns true when the current OS matches one of the selected OSs', function() {
-    mockClientInfo.os = 'Foo';
-
     var config = {
       conditionConfig: {
         operatingSystems: ['Shoe', 'Goo', 'Foo', 'Moo']
@@ -23,8 +21,6 @@ describe('operating system condition delegate', function() {
   });
 
   it('returns false when the current OS does not match any of the selected OSs', function() {
-    mockClientInfo.os = 'Foo';
-
     var config = {
       conditionConfig: {
         operatingSystems: ['Shoe', 'Goo', 'Boo', 'Moo']

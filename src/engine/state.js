@@ -1,6 +1,5 @@
 var createDelegateProvider = require('./createDelegateProvider');
-var extensionCoreProvider = require('./extensionCoreProvider');
-var dataElementDefinitionProvider = require('./dataElementDefinitionProvider');
+var getExtensionCore = require('./getExtensionCore');
 var dataElementSafe = require('./dataElementSafe');
 var preprocessConfig = require('./utils/preprocessConfig');
 var getLocalStorageItem = require('./utils/localStorage/getLocalStorageItem');
@@ -22,8 +21,7 @@ module.exports = {
     this.getActionDelegate = createDelegateProvider(container.actionDelegates);
     this.getDataElementDelegate = createDelegateProvider(container.dataElementDelegates);
     this.getCoreDelegate = createDelegateProvider(container.coreDelegates);
-    this.getDataElementDefinition = dataElementDefinitionProvider(container.dataElements);
-    this.getExtensionCore = extensionCoreProvider;
+    this.getExtensionCore = getExtensionCore;
   },
   customVars: {},
   getExtensionInfo: function() {
@@ -52,6 +50,9 @@ module.exports = {
   },
   getRules: function() {
     return _container.rules;
+  },
+  getDataElementDefinition: function(name) {
+    return _container.dataElements[name];
   },
   getShouldExecuteActions: function() {
     return getLocalStorageItem(HIDE_ACTIVITY_LOCAL_STORAGE_NAME) !== 'true';

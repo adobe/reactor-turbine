@@ -103,9 +103,8 @@
             };
           }
         },
-        dataElements: [
-          {
-            name: "treat",
+        dataElements: {
+          'treat': {
             type: "testExtension.static",
             config: {
               staticValue: "Ice   \n Cream  \n  ",
@@ -113,53 +112,47 @@
               cleanText: true
             }
           },
-          {
-            name: "vegetable",
+          'vegetable': {
             type: "testExtension.static",
             config: {
               staticValue: "carrot"
             }
           },
-          {
-            name: "meat",
+          'meat': {
             type: "testExtension.static",
             config: {
               default: "default meat"
             }
           },
-          {
-            name: 'bottlesofbeeronthewall',
+          'bottlesofbeeronthewall': {
             type: 'testExtension.static',
             config: {
               staticValue: 99,
               forceLowerCase: true
             }
           },
-          {
-            name: "beverage:pageview",
+          'beverage:pageview': {
             type: "testExtension.static",
             config: {
               staticValue: 'Piña Colada',
               storeLength: 'pageview'
             }
           },
-          {
-            name: "beverage:visitor",
+          'beverage:visitor': {
             type: "testExtension.static",
             config: {
               staticValue: 'Soda',
               storeLength: 'visitor'
             }
           },
-          {
-            name: "beverage:session",
+          'beverage:session': {
             type: "testExtension.static",
             config: {
               staticValue: 'Fruit Punch',
               storeLength: 'session'
             }
           }
-        ],
+        },
         config: {
           undefinedVarsReturnEmpty: true
         }

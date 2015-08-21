@@ -5,7 +5,7 @@ var uglify = require('gulp-uglify');
 var gzip = require('gulp-gzip');
 var fs = require('fs');
 var path = require('path');
-var karma = require('karma').server;
+var KarmaServer = require('karma').Server;
 var webpack = require('webpack-stream');
 
 var $ = require('gulp-load-plugins')();
@@ -171,10 +171,10 @@ gulp.task('compressEngine', ['buildEngine'], function() {
 });
 
 function startKarma(browsers) {
-  karma.start({
+  new KarmaServer({
     configFile: path.join(__dirname, 'karma.conf.js'),
     browsers: browsers
-  });
+  }).start();
 }
 
 // Typically we wouldn't be dependent upon building the full engine and config (by running the

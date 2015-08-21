@@ -7,6 +7,10 @@ var loadScript = require('loadScript');
 var Promise = require('Promise');
 
 module.exports = function(config) {
+  if (!config.integrationConfigs.length) {
+    return;
+  }
+
   // Only a single integration is supported primarily because the Facebook SDK only supports
   // a single app ID per page.
   var integrationConfig = config.integrationConfigs[0];

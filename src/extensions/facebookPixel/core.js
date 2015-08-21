@@ -3,6 +3,10 @@
 var loadScript = require('loadScript');
 
 module.exports = function(config) {
+  if (!config.integrationConfigs.length) {
+    return;
+  }
+
   // Can only have one integration.
   var integrationConfig = config.integrationConfigs[0];
 

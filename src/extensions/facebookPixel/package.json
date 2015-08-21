@@ -1,4 +1,5 @@
 {
   "name": "facebookPixel",
+  "displayName": "Facebook Pixel",
   "core": "core.js"
 }

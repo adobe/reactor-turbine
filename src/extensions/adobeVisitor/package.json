@@ -1,4 +1,5 @@
 {
   "name": "adobeVisitor",
+  "displayName": "Adobe Visitor",
   "core": "core.js"
 }

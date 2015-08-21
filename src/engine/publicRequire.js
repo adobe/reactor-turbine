@@ -1,9 +1,6 @@
+var EXTENSIONS_PREFIX = 'extensions/';
+
 var resources = {
-  'extensionCores': {
-    get: function(extensionType) {
-      return require('./stores/coreRegistry').get(extensionType);
-    }
-  },
   'Promise': require('./utils/communication/Promise'),
   'poll': require('./utils/communication/globalPoll'),
   'createDataStash': require('./utils/createDataStash'),
@@ -32,7 +29,12 @@ var resources = {
 };
 
 module.exports = function(key) {
-  if (resources.hasOwnProperty(key)) {
+  if (key.indexOf(EXTENSIONS_PREFIX) === 0) {
+    var extensionType = key.substr(EXTENSIONS_PREFIX.length);
+    // We can't require in coreRegistry before here (e.g., at the top of this file) because it
+    // would cause a circular dependency at load time.
+    return require('./state').getExtensionCore(extensionType);
+  } else if (resources.hasOwnProperty(key)) {
     return resources[key];
   } else {
     throw new Error('Cannot resolve module "' + key + '".');

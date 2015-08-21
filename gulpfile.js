@@ -73,10 +73,9 @@ function getDelegates(baseDir) {
   }
 
   extensionDirectories.forEach(function(extensionDir) {
-    var packagePath = path.join(baseDir, extensionDir, 'package.json');
+    var pkg = getPackageForExtensionDir(baseDir, extensionDir);
 
-    if (fs.existsSync(packagePath)) {
-      var pkg = JSON.parse(fs.readFileSync(packagePath, { encoding: 'utf8' }));
+    if (pkg) {
       populateFeatureDelegates('eventDelegates', pkg, extensionDir);
       populateFeatureDelegates('conditionDelegates', pkg, extensionDir);
       populateFeatureDelegates('actionDelegates', pkg, extensionDir);
@@ -88,9 +87,32 @@ function getDelegates(baseDir) {
   return delegates;
 }
 
+function getPackageForExtensionDir(baseDir, extensionDir) {
+  var packagePath = path.join(baseDir, extensionDir, 'package.json');
+
+  if (fs.existsSync(packagePath)) {
+    return JSON.parse(fs.readFileSync(packagePath, {encoding: 'utf8'}));
+  }
+}
+
+function getExtensionMeta(baseDir) {
+  var extensionDirectories = getExtensionDirectories(baseDir);
+  var extensionMeta = {};
+  extensionDirectories.forEach(function(extensionDir) {
+    var pkg = getPackageForExtensionDir(baseDir, extensionDir);
+    if (pkg) {
+      extensionMeta[extensionDir] = {
+        name: pkg.name
+      };
+    }
+  });
+  return extensionMeta;
+}
+
 gulp.task('buildContainer', function() {
   var extensionsDir = './src/extensions';
   var delegates = getDelegates(extensionsDir);
+  var extensionMeta = getExtensionMeta(extensionsDir);
 
   return gulp.src(['container.txt'])
     .pipe(replace('{{eventDelegates}}', shallowStringifyWithFunctionValues(delegates.eventDelegates)))
@@ -98,6 +120,7 @@ gulp.task('buildContainer', function() {
     .pipe(replace('{{actionDelegates}}', shallowStringifyWithFunctionValues(delegates.actionDelegates)))
     .pipe(replace('{{dataElementDelegates}}', shallowStringifyWithFunctionValues(delegates.dataElementDelegates)))
     .pipe(replace('{{coreDelegates}}', shallowStringifyWithFunctionValues(delegates.coreDelegates)))
+    .pipe(replace('{{extensions}}', JSON.stringify(extensionMeta)))
     .pipe(rename('container.js'))
     .pipe(gulp.dest('./dist'));
 });
@@ -176,8 +199,8 @@ gulp.task('testall', ['default'], function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch(['./src/extensions/**/!(__tests__)/*', './container.txt'], ['buildContainer']);
-  gulp.watch(['./src/engine/**/!(__tests__)/*.js'], ['buildEngine']);
+  gulp.watch(['./src/extensions/{,**/!(__tests__)}/*', './container.txt'], ['buildContainer']);
+  gulp.watch(['./src/engine/{,**/!(__tests__)}/*.js'], ['buildEngine']);
 });
 
 gulp.task('lint', function() {

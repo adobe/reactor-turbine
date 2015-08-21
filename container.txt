@@ -6,7 +6,7 @@
     'actionDelegates': {{actionDelegates}},
     'dataElementDelegates': {{dataElementDelegates}},
     'coreDelegates': {{coreDelegates}},
-    'extensions': {},
+    'extensions': {{extensions}},
     'integrations': {},
     'rules': [],
     'config': {},

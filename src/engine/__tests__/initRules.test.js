@@ -2,86 +2,31 @@
 
 describe('initRules', function() {
   describe('rule execution', function() {
-    var initRules = require('../initRules');
+    var initRulesInjector = require('inject?./state!../initRules');
+    var initRules;
 
+    var state;
     var event;
     var relatedElement;
-    var container;
+    var integrations;
     var eventDelegates;
-    var eventDelegateProvider;
     var conditionDelegates;
-    var conditionDelegateProvider;
     var actionDelegates;
-    var actionDelegateProvider;
+    var rules;
+    var propertyConfig;
 
     beforeEach(function() {
-      container = {
-        extensions: {
-          testExtension: {
-            name: 'Test Extension'
-          },
-        },
-        integrations: {
-          abc: {
-            type: 'testExtension',
-            config: {
-              testIntegrationFoo: 'bar'
-            }
-          }
-        },
-        rules: [
-          {
-            name: 'Test Rule',
-            events: [
-              {
-                integrationIds: ['abc'],
-                type: 'testEvent',
-                config: {
-                  testEventFoo: 'bar'
-                }
-              }
-            ],
-            conditions: [
-              {
-                integrationIds: ['abc'],
-                type: 'testCondition1',
-                config: {
-                  testCondition1Foo: 'bar'
-                }
-              },
-              {
-                integrationIds: ['abc'],
-                type:'testCondition2',
-                config: {
-                  testCondition2Foo: 'bar'
-                }
-              }
-            ],
-            actions: [
-              {
-                integrationIds: ['abc'],
-                type: 'testAction1',
-                config: {
-                  testAction1Foo: 'bar'
-                }
-              },
-              {
-                integrationIds: ['abc'],
-                type: 'testAction2',
-                config: {
-                  testAction2Foo: 'bar'
-                }
-              }
-            ]
-          }
-        ],
-        config: {
-          propertyFoo: 'bar'
-        }
-      };
-
       event = {};
       relatedElement = {};
+
+      integrations = {
+        abc: {
+          type: 'testExtension',
+          config: {
+            testIntegrationFoo: 'bar'
+          }
+        }
+      };
 
       eventDelegates = {
         testEvent: jasmine.createSpy().and.callFake(function(config, trigger) {
@@ -89,21 +34,9 @@ describe('initRules', function() {
         })
       };
 
-      eventDelegateProvider = {
-        get: function(type) {
-          return eventDelegates[type];
-        }
-      };
-
       conditionDelegates = {
         testCondition1: jasmine.createSpy().and.returnValue(true),
         testCondition2: jasmine.createSpy().and.returnValue(true)
-      };
-
-      conditionDelegateProvider = {
-        get: function(type) {
-          return conditionDelegates[type];
-        }
       };
 
       actionDelegates = {
@@ -111,20 +44,88 @@ describe('initRules', function() {
         testAction2: jasmine.createSpy()
       };
 
-      actionDelegateProvider = {
-        get: function(type) {
+      rules = [
+        {
+          name: 'Test Rule',
+          events: [
+            {
+              integrationIds: ['abc'],
+              type: 'testEvent',
+              config: {
+                testEventFoo: 'bar'
+              }
+            }
+          ],
+          conditions: [
+            {
+              integrationIds: ['abc'],
+              type: 'testCondition1',
+              config: {
+                testCondition1Foo: 'bar'
+              }
+            },
+            {
+              integrationIds: ['abc'],
+              type:'testCondition2',
+              config: {
+                testCondition2Foo: 'bar'
+              }
+            }
+          ],
+          actions: [
+            {
+              integrationIds: ['abc'],
+              type: 'testAction1',
+              config: {
+                testAction1Foo: 'bar'
+              }
+            },
+            {
+              integrationIds: ['abc'],
+              type: 'testAction2',
+              config: {
+                testAction2Foo: 'bar'
+              }
+            }
+          ]
+        }
+      ];
+
+      propertyConfig = {
+        propertyFoo: 'bar'
+      };
+
+      state = {
+        getShouldExecuteActions: function() {
+          return true;
+        },
+        getIntegrationConfigById: function(type) {
+          return integrations[type].config;
+        },
+        getEventDelegate: function(type) {
+          return eventDelegates[type];
+        },
+        getConditionDelegate: function(type) {
+          return conditionDelegates[type];
+        },
+        getActionDelegate: function(type) {
           return actionDelegates[type];
+        },
+        getPropertyConfig: function() {
+          return propertyConfig;
+        },
+        getRules: function() {
+          return rules;
         }
       };
+
+      initRules = initRulesInjector({
+        './state': state
+      });
     });
 
     it('evaluates all conditions and, when all pass, executes all actions', function() {
-      initRules(
-        container,
-        eventDelegateProvider,
-        conditionDelegateProvider,
-        actionDelegateProvider,
-        true);
+      initRules();
 
       expect(eventDelegates.testEvent.calls.count()).toBe(1);
 
@@ -228,12 +229,7 @@ describe('initRules', function() {
     it('ceases to execute remaining conditions and any actions when condition fails', function() {
       conditionDelegates.testCondition1 = jasmine.createSpy().and.returnValue(false);
 
-      initRules(
-        container,
-        eventDelegateProvider,
-        conditionDelegateProvider,
-        actionDelegateProvider,
-        true);
+      initRules();
 
       expect(conditionDelegates.testCondition1.calls.count()).toBe(1);
       expect(conditionDelegates.testCondition2.calls.count()).toBe(0);
@@ -242,122 +238,99 @@ describe('initRules', function() {
     });
 
     it('does not throw error when there are no events for a rule', function() {
-      delete container.rules[0].events;
+      delete rules[0].events;
 
-      initRules(
-        container,
-        eventDelegateProvider,
-        conditionDelegateProvider,
-        actionDelegateProvider,
-        true);
+      initRules();
     });
 
     it('does not throw error when there are no conditions for a rule', function() {
-      delete container.rules[0].conditions;
+      delete rules[0].conditions;
 
-      initRules(
-        container,
-        eventDelegateProvider,
-        conditionDelegateProvider,
-        actionDelegateProvider,
-        true);
+      initRules();
     });
 
     it('does not throw error when there are no actions for a rule', function() {
-      delete container.rules[0].actions;
+      delete rules[0].actions;
 
-      initRules(
-        container,
-        eventDelegateProvider,
-        conditionDelegateProvider,
-        actionDelegateProvider,
-        true);
+      initRules();
     });
 
     it('does not execute actions when actionsEnabled is false', function() {
-      initRules(
-        container,
-        eventDelegateProvider,
-        conditionDelegateProvider,
-        actionDelegateProvider,
-        false);
+      state.getShouldExecuteActions = function() { return false };
+
+      initRules();
 
       expect(actionDelegates.testAction1.calls.count()).toBe(0);
       expect(actionDelegates.testAction2.calls.count()).toBe(0);
     });
-
-    it('fills out the config argument if configs don\'t exist in the container', function() {
-      delete container.integrations.abc.config;
-      delete container.rules[0].events[0].config;
-      delete container.rules[0].conditions[0].config;
-      delete container.rules[0].actions[0].config;
-      delete container.config;
-
-      initRules(
-        container,
-        eventDelegateProvider,
-        conditionDelegateProvider,
-        actionDelegateProvider,
-        true);
-
-      var eventDelegateCall = eventDelegates.testEvent.calls.mostRecent();
-
-      expect(eventDelegateCall.args[0]).toEqual({
-        eventConfig: {},
-        integrationConfigs: [{}],
-        propertyConfig: {}
-      });
-    });
   });
 
   describe('logging', function() {
-    var preprocessConfig = function(config) {
-      return config;
-    };
-
-    var logger = {};
-
-    var initRules = require('inject!../initRules')({
-      './utils/preprocessConfig': preprocessConfig,
-      './utils/logger': logger
-    });
-
-    var eventDelegatesWithImmediateTriggerCall = {
-      get: function() {
-        return function(config, trigger) {
-          trigger();
-        };
-      }
-    };
+    var logger;
+    var eventDelegate;
+    var conditionDelegate;
+    var actionDelegate;
+    var rules;
+    var initRules;
 
     beforeEach(function() {
-      logger.log = jasmine.createSpy();
-      logger.error = jasmine.createSpy();
-    });
+      logger = {
+        log: jasmine.createSpy(),
+        error: jasmine.createSpy()
+      };
 
-    it('logs an error when the event delegate throws an error', function() {
-      var eventDelegates = {
-        get: function() {
-          return function() {
-            throw new Error('noob tried to divide by zero');
-          };
+      eventDelegate = function(config, trigger) {
+        trigger();
+      };
+
+      var state = {
+        getEventDelegate: function() {
+          return eventDelegate;
+        },
+        getConditionDelegate: function() {
+          return conditionDelegate;
+        },
+        getActionDelegate: function() {
+          return actionDelegate;
+        },
+        getRules: function() {
+          return rules;
+        },
+        getIntegrationConfigById: function() {
+          return null;
+        },
+        getPropertyConfig: function() {
+          return null;
+        },
+        getShouldExecuteActions: function() {
+          return true;
         }
       };
 
-      expect(function() {
-        initRules({
-          rules: [
+      initRules = require('inject?./utils/logger&./state!../initRules')({
+        './utils/logger': logger,
+        './state': state
+      });
+    });
+
+    it('logs an error when the event delegate throws an error', function() {
+      eventDelegate = function() {
+        throw new Error('noob tried to divide by zero');
+      };
+
+      rules = [
+        {
+          name: 'Test Rule',
+          events: [
             {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ]
+              type: 'testEvent'
             }
           ]
-        },
-        eventDelegates);
+        }
+      ];
+
+      expect(function() {
+        initRules();
       }).not.toThrowError();
 
       expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -365,26 +338,21 @@ describe('initRules', function() {
     });
 
     it('logs an error when the event delegate is not found', function() {
-      var eventDelegates = {
-        get: function() {
-          return null;
-        }
-      };
+      eventDelegate = null;
 
-      expect(function() {
-        initRules({
-          rules: [
+      rules = [
+        {
+          name: 'Test Rule',
+          events: [
             {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ]
+              type: 'testEvent'
             }
           ]
-        },
-        eventDelegates);
+        }
+      ];
+
+      expect(function() {
+        initRules();
       }).not.toThrowError();
 
       expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -392,34 +360,28 @@ describe('initRules', function() {
     });
 
     it('logs an error when the condition delegate throws an error', function() {
-      var conditionDelegates = {
-        get: function() {
-          return function() {
-            throw new Error('noob tried to divide by zero');
-          };
-        }
+      conditionDelegate = function() {
+        throw new Error('noob tried to divide by zero');
       };
 
-      expect(function() {
-        initRules({
-          rules: [
+      rules = [
+        {
+          name: 'Test Rule',
+          events: [
             {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ],
-              conditions: [
-                {
-                  type: 'testCondition'
-                }
-              ]
+              type: 'testEvent'
+            }
+          ],
+          conditions: [
+            {
+              type: 'testCondition'
             }
           ]
-        },
-        eventDelegatesWithImmediateTriggerCall,
-        conditionDelegates);
+        }
+      ];
+
+      expect(function() {
+        initRules();
       }).not.toThrowError();
 
       expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -427,32 +389,26 @@ describe('initRules', function() {
     });
 
     it('logs an error when the condition delegate is not found', function() {
-      var conditionDelegates = {
-        get: function() {
-          return null;
-        }
-      };
+      conditionDelegate = null;
 
-      expect(function() {
-        initRules({
-          rules: [
+      rules = [
+        {
+          name: 'Test Rule',
+          events: [
             {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ],
-              conditions: [
-                {
-                  type: 'testCondition'
-                }
-              ]
+              type: 'testEvent'
+            }
+          ],
+          conditions: [
+            {
+              type: 'testCondition'
             }
           ]
-        },
-        eventDelegatesWithImmediateTriggerCall,
-        conditionDelegates);
+        }
+      ];
+
+      expect(function() {
+        initRules();
       }).not.toThrowError();
 
       expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -460,34 +416,28 @@ describe('initRules', function() {
     });
 
     it('logs an error when the condition doesn\'t pass', function() {
-      var conditionDelegates = {
-        get: function() {
-          return function() {
-            return false;
-          };
-        }
+      conditionDelegate = function() {
+        return false;
       };
 
-      expect(function() {
-        initRules({
-          rules: [
+      rules = [
+        {
+          name: 'Test Rule',
+          events: [
             {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ],
-              conditions: [
-                {
-                  type: 'testCondition'
-                }
-              ]
+              type: 'testEvent'
+            }
+          ],
+          conditions: [
+            {
+              type: 'testCondition'
             }
           ]
-        },
-        eventDelegatesWithImmediateTriggerCall,
-        conditionDelegates);
+        }
+      ];
+
+      expect(function() {
+        initRules();
       }).not.toThrowError();
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
@@ -495,36 +445,28 @@ describe('initRules', function() {
     });
 
     it('logs an error when the action delegate throws an error', function() {
-      var actionDelegates = {
-        get: function() {
-          return function() {
-            throw new Error('noob tried to divide by zero');
-          };
-        }
+      actionDelegate = function() {
+        throw new Error('noob tried to divide by zero');
       };
 
-      expect(function() {
-        initRules({
-          rules: [
+      rules = [
+        {
+          name: 'Test Rule',
+          events: [
             {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ],
-              actions: [
-                {
-                  type: 'testAction'
-                }
-              ]
+              type: 'testEvent'
+            }
+          ],
+          actions: [
+            {
+              type: 'testAction'
             }
           ]
-        },
-        eventDelegatesWithImmediateTriggerCall,
-        null,
-        actionDelegates,
-        true);
+        }
+      ];
+
+      expect(function() {
+        initRules();
       }).not.toThrowError();
 
       expect(logger.error.calls.mostRecent().args[0]).toEqual(
@@ -532,34 +474,26 @@ describe('initRules', function() {
     });
 
     it('logs an error when the action delegate is not found', function() {
-      var actionDelegates = {
-        get: function() {
-          return null;
-        }
-      };
+      actionDelegate = null;
 
-      expect(function() {
-        initRules({
-          rules: [
+      rules = [
+        {
+          name: 'Test Rule',
+          events: [
             {
-              name: 'Test Rule',
-              events: [
-                {
-                  type: 'testEvent'
-                }
-              ],
-              actions: [
-                {
-                  type: 'testAction'
-                }
-              ]
+              type: 'testEvent'
+            }
+          ],
+          actions: [
+            {
+              type: 'testAction'
             }
           ]
-        },
-        eventDelegatesWithImmediateTriggerCall,
-        null,
-        actionDelegates,
-        true);
+        }
+      ];
+
+      expect(function() {
+        initRules();
       }).not.toThrowError();
 
       expect(logger.error.calls.mostRecent().args[0]).toEqual(

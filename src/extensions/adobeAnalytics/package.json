@@ -1,5 +1,6 @@
 {
   "name": "adobeAnalytics",
+  "displayName": "Adobe Analytics",
   "actionDelegates": [
     {
       "name": "Send Tracking Beacon",

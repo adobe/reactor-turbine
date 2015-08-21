@@ -1,6 +1,5 @@
 var getObjectProperty = require('./getObjectProperty');
-var customVars = require('../../stores/customVars');
-var dataElementDefinitions = require('../../stores/dataElementDefinitions');
+var state = require('../../state');
 var getDataElement = require('./getDataElement');
 var getURI = require('./../uri/getURI');
 var getQueryParam = require('./../uri/getQueryParam');
@@ -27,7 +26,7 @@ module.exports = function(variable, element, event) {
     protocol: document.location.protocol,
     hostname: document.location.hostname
   };
-  if (dataElementDefinitions.getByName(variable)) {
+  if (state.getDataElementDefinition(variable)) {
     return getDataElement(variable);
   }
   value = map[variable];
@@ -60,7 +59,7 @@ module.exports = function(variable, element, event) {
         var s = (Math.random() * (Math.pow(10, len) - 1)).toFixed(0);
         value = Array(len - s.length + 1).join('0') + s;
       } else {
-        value = getObjectProperty(customVars, variable);
+        value = getObjectProperty(state.customVars, variable);
       }
     }
   }

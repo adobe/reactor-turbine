@@ -1,5 +1,6 @@
 {
   "name": "facebookConnect",
+  "displayName": "Facebook Connect",
   "core": "core.js",
   "eventDelegates": [
     {

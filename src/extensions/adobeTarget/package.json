@@ -1,5 +1,6 @@
 {
   "name": "adobeTarget",
+  "displayName": "Adobe Target",
   "actionDelegates": [
     {
       "name": "Add Mbox",

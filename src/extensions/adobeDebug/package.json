@@ -1,5 +1,6 @@
 {
   "name": "adobeDebug",
+  "displayName": "Adobe Debug",
   "actionDelegates": [
     {
       "name": "Alert",

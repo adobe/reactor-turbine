@@ -1,4 +1,4 @@
-var customVars = require('../../stores/customVars');
+var customVars = require('../../state').customVars;
 
 module.exports = function() {
   if (typeof arguments[0] === 'string') {

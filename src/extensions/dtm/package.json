@@ -1,5 +1,6 @@
 {
   "name": "dtm",
+  "displayName": "DTM",
   "conditionDelegates": [
     {
       "name": "Browser",
@@ -48,6 +49,10 @@
     {
       "name": "URL Parameter",
       "path": "conditions/urlParameter/urlParameter.js"
+    },
+    {
+      "name": "New/Returning Visitor",
+      "path": "conditions/newReturning/newReturning.js"
     }
   ],
   "eventDelegates": [
@@ -165,5 +170,6 @@
       "name": "Variable",
       "path": "dataElements/variable/variable.js"
     }
-  ]
+  ],
+  "core": "core.js"
 }

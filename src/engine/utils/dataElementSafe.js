@@ -1,5 +1,5 @@
-var setCookie = require('./utils/cookie/setCookie');
-var getCookie = require('./utils/cookie/getCookie');
+var setCookie = require('./cookie/setCookie');
+var getCookie = require('./cookie/getCookie');
 
 var COOKIE_PREFIX = '_sdsat_';
 

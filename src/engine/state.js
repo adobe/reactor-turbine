@@ -1,6 +1,6 @@
 var createDelegateProvider = require('./createDelegateProvider');
 var getExtensionCore = require('./getExtensionCore');
-var dataElementSafe = require('./dataElementSafe');
+var dataElementSafe = require('./utils/dataElementSafe');
 var preprocessConfig = require('./utils/preprocessConfig');
 var getLocalStorageItem = require('./utils/localStorage/getLocalStorageItem');
 var setLocalStorageItem = require('./utils/localStorage/setLocalStorageItem');

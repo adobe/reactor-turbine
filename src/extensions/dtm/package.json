@@ -171,5 +171,7 @@
       "path": "dataElements/variable/variable.js"
     }
   ],
-  "core": "core.js"
+  "core": {
+    "path": "core.js"
+  }
 }

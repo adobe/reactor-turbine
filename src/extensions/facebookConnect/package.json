@@ -1,7 +1,9 @@
 {
   "name": "facebookConnect",
   "displayName": "Facebook Connect",
-  "core": "core.js",
+  "core": {
+    "path": "core.js"
+  },
   "eventDelegates": [
     {
       "name": "Auth Response Changed",

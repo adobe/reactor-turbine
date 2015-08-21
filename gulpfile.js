@@ -66,7 +66,7 @@ function getDelegates(baseDir) {
 
   function populateCoreDelegates(pkg, extensionDir) {
     if (pkg.hasOwnProperty('core')) {
-      var script = getScriptContent(baseDir, extensionDir, pkg.core);
+      var script = getScriptContent(baseDir, extensionDir, pkg.core.path);
       delegates.coreDelegates = delegates.coreDelegates || {};
       delegates.coreDelegates[extensionDir] = wrapInFunction(script, ['module', 'require']);
     }

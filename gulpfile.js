@@ -176,7 +176,7 @@ gulp.task('testall', ['default'], function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch(['./src/extensions/**/!(__tests__)/*'], ['buildContainer']);
+  gulp.watch(['./src/extensions/**/!(__tests__)/*', './container.txt'], ['buildContainer']);
   gulp.watch(['./src/engine/**/!(__tests__)/*.js'], ['buildEngine']);
 });
 

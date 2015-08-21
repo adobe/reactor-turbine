@@ -1,4 +1,5 @@
-require('./state').init(window._satellite.container); // Must come first.
+var state = require('./state');
+state.init(window._satellite.container); // Must come first.
 require('./hydrateSatelliteObject')();
 require('./utils/preprocessConfig').init(state.getPropertyConfig().undefinedVarsReturnEmpty);
 require('./utils/logger').outputEnabled = state.getDebugOutputEnabled();

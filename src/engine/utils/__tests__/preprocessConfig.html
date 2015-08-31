@@ -118,29 +118,26 @@
             };
           }
         },
-        dataElements: [
-          {
-            name: "account",
+        dataElements: {
+          account: {
             type: "testExtension.appendText",
             config: {
               value: "ABC123"
             }
           },
-          {
-            name: "firstName",
+          firstName: {
             type: "testExtension.appendText",
             config: {
               value: "John"
             }
           },
-          {
-            name: "lastName",
+          lastName: {
             type: "testExtension.appendText",
             config: {
               value: "Doe"
             }
           }
-        ],
+        },
         config: unprocessedConfig
       };
 
@@ -182,10 +179,10 @@
             eventCheck: 'apple'
           };
 
-          expect(coreDelegateSpy.calls.argsFor(0)[0]).toEqual({
-            integrationConfigs: [ firstProcessedConfig ],
-            propertyConfig: firstProcessedConfig
-          });
+//          expect(coreDelegateSpy.calls.argsFor(0)[0]).toEqual({
+//            integrationConfigs: [ firstProcessedConfig ],
+//            propertyConfig: firstProcessedConfig
+//          });
 
           expect(eventDelegateSpy.calls.argsFor(0)[0]).toEqual({
             eventConfig: firstProcessedConfig,

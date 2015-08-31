@@ -1,5 +1,5 @@
 'use strict';
 
 describe('preprocessConfig', function() {
-  //runTestPage('preprocesses configuration objects', 'preprocessConfig.html');
+  runTestPage('preprocesses configuration objects', 'preprocessConfig.html');
 });

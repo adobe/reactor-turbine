@@ -20,13 +20,15 @@ module.exports = {
     this.getConditionDelegate = createExtensionModuleProvider(container.conditionDelegates);
     this.getActionDelegate = createExtensionModuleProvider(container.actionDelegates);
     this.getDataElementDelegate = createExtensionModuleProvider(container.dataElementDelegates);
-
-    // The resource modules should be initialized even when they aren't required by anything. This
+    var getResourceModule = createExtensionModuleProvider(container.resources);
+    this.getResource = require('./getResourceProvider')(getResourceModule);
+    // The resource modules should be called for even when they aren't required by anything. This
     // is so extensions can have logic that runs even when there are no event, condition, action,
     // or data element types configured. One example is DTM's visitor tracking which needs to
     // run regardless of whether conditions are configured to use them.
-    var getResourceModule = createExtensionModuleProvider(container.resources, true);
-    this.getResource = require('./getResourceProvider')(getResourceModule);
+    for (var resourceId in container.resources) {
+      this.getResource(resourceId);
+    }
   },
   customVars: {},
   getExtensionInfo: function() {

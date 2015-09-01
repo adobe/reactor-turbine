@@ -1,9 +1,9 @@
 var publicRequire = require('./publicRequire');
 
-module.exports = function(moduleById, immediatelyInitModules) {
+module.exports = function(moduleById) {
   var exportsById = {};
 
-  var getModule = function(id) {
+  return function(id) {
     var exports = exportsById[id];
 
     if (!exports && moduleById.hasOwnProperty(id)) {
@@ -24,12 +24,4 @@ module.exports = function(moduleById, immediatelyInitModules) {
 
     return exports;
   };
-
-  if (immediatelyInitModules) {
-    for (var id in moduleById) {
-      getModule(id);
-    }
-  }
-
-  return getModule;
 };

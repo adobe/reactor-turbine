@@ -1,11 +1,6 @@
 'use strict';
 
-var document = require('document');
-var getCookie = require('getCookie');
-var setCookie = require('setCookie');
-var textMatch = require('textMatch');
-
-var dtm = require('extensions/dtm');
+var visitorTracking = require('dtm/visitorTracking');
 
 /**
  * New vs. returning visitor condition. Determines if the visitor came from a particular traffic source.
@@ -16,14 +11,7 @@ var dtm = require('extensions/dtm');
  * @returns {boolean}
  */
 module.exports = function(config) {
-  if (dtm) {
-    if (config.conditionConfig.isNew) {
-      return dtm.visitor.isNew();
-    } else {
-      return !dtm.visitor.isNew();
-    }
-  } else {
-    return false;
-  }
+  var isNewVisitor = visitorTracking.isNewVisitor();
+  return config.conditionConfig.isNew ? isNewVisitor : !isNewVisitor;
 };
 

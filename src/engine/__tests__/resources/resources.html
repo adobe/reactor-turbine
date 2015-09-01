@@ -16,9 +16,9 @@
               return testResource;
             };
           },
-          'otherExtension/neverRequired': neverRequiredResourceSpy.and.callFake(function(module) {
-            module.exports = function() {};
-          })
+          'otherExtension/neverRequired': function(module) {
+            module.exports = neverRequiredResourceSpy;
+          }
         },
         actionDelegates: {
           testAction: function(module, require) {
@@ -67,7 +67,7 @@
         window.triggerTestEvent();
         expect(receivedResource).toBe(testResource);
 
-        // The module should be initialized even when it isn't required by anything. This is so
+        // The module should be called for even when it isn't required by anything. This is so
         // extensions can have logic that runs even when there are no event, condition, action,
         // or data element types configured. One example is DTM's visitor tracking which needs to
         // run regardless of whether conditions are configured to use them.

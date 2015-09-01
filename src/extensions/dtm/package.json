@@ -171,7 +171,10 @@
       "path": "dataElements/variable/variable.js"
     }
   ],
-  "core": {
-    "path": "core.js"
-  }
+  "resources": [
+    {
+      "name": "visitorTracking",
+      "path": "resources/visitorTracking.js"
+    }
+  ]
 }

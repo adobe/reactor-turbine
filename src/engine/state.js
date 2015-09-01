@@ -1,5 +1,4 @@
-var createDelegateProvider = require('./createDelegateProvider');
-var getExtensionCore = require('./getExtensionCore');
+var createExtensionModuleProvider = require('./createExtensionModuleProvider');
 var dataElementSafe = require('./utils/dataElementSafe');
 var getLocalStorageItem = require('./utils/localStorage/getLocalStorageItem');
 var setLocalStorageItem = require('./utils/localStorage/setLocalStorageItem');
@@ -11,21 +10,23 @@ var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
 var _container;
 
 module.exports = {
-  _initExtensionCores: function() {
-
-  },
   init: function(container) {
     // We pull in preprocessConfig here and not at the top of the file to prevent a
     // circular reference since getVar, which is used by preprocessConfig, requires this state
     // module.
     preprocessConfig = require('./utils/preprocessConfig');
     _container = container;
-    this.getEventDelegate = createDelegateProvider(container.eventDelegates);
-    this.getConditionDelegate = createDelegateProvider(container.conditionDelegates);
-    this.getActionDelegate = createDelegateProvider(container.actionDelegates);
-    this.getDataElementDelegate = createDelegateProvider(container.dataElementDelegates);
-    this.getCoreDelegate = createDelegateProvider(container.coreDelegates);
-    this.getExtensionCore = getExtensionCore;
+    this.getEventDelegate = createExtensionModuleProvider(container.eventDelegates);
+    this.getConditionDelegate = createExtensionModuleProvider(container.conditionDelegates);
+    this.getActionDelegate = createExtensionModuleProvider(container.actionDelegates);
+    this.getDataElementDelegate = createExtensionModuleProvider(container.dataElementDelegates);
+
+    // The resource modules should be initialized even when they aren't required by anything. This
+    // is so extensions can have logic that runs even when there are no event, condition, action,
+    // or data element types configured. One example is DTM's visitor tracking which needs to
+    // run regardless of whether conditions are configured to use them.
+    var getResourceModule = createExtensionModuleProvider(container.resources, true);
+    this.getResource = require('./getResourceProvider')(getResourceModule);
   },
   customVars: {},
   getExtensionInfo: function() {
@@ -38,7 +39,7 @@ module.exports = {
     var integrationConfigs = [];
     for (var integrationId in _container.integrations) {
       var integration = _container.integrations[integrationId];
-      if (integration.type === extensionId) {
+      if (integration.extensionId === extensionId) {
         var preprocessedIntegrationConfig = preprocessConfig(integration.config || {});
         integrationConfigs.push(preprocessedIntegrationConfig);
       }

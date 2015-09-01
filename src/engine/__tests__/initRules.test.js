@@ -21,7 +21,7 @@ describe('initRules', function() {
 
       integrations = {
         abc: {
-          type: 'testExtension',
+          extensionId: 'testExtension',
           config: {
             testIntegrationFoo: 'bar'
           }
@@ -99,8 +99,8 @@ describe('initRules', function() {
         getShouldExecuteActions: function() {
           return true;
         },
-        getIntegrationConfigById: function(type) {
-          return integrations[type].config;
+        getIntegrationConfigById: function(id) {
+          return integrations[id].config;
         },
         getEventDelegate: function(type) {
           return eventDelegates[type];

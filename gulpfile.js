@@ -21,70 +21,50 @@ function getExtensionDirectories(baseDir) {
   });
 }
 
-function shallowStringifyWithFunctionValues(obj) {
-  var output = '{';
-
-  for (var key in obj) {
-    var value = obj[key];
-    output += '\n"' + key + '": ' + value + ',';
-  }
-
-  output = output.slice(0, -1);
-
-  output += '}';
-
-  return output;
-}
-
 function getDelegates(baseDir) {
-  var extensionDirectories = getExtensionDirectories(baseDir);
-
   var delegates = {};
 
-  function getScriptContent(baseDir, extensionDir, scriptPath) {
-    var featurePath = path.join(baseDir, extensionDir, scriptPath);
-
-    if (fs.existsSync(featurePath)) {
-      return fs.readFileSync(featurePath, {encoding: 'utf8'});
-    }
-  }
-
-  function populateFeatureDelegates(delegateType, pkg, extensionDir) {
+  var populateFeatureDelegates = function(delegateType, pkg, extensionDir) {
     if (pkg.hasOwnProperty(delegateType)) {
       var featureSet = pkg[delegateType];
       featureSet.forEach(function(feature) {
         var script = getScriptContent(baseDir, extensionDir, feature.path);
 
         if (script) {
-          var id = extensionDir + '.' + path.basename(feature.path, '.js');
+          var id = pkg.name + '.' + path.basename(feature.path, '.js');
           delegates[delegateType] = delegates[delegateType] || {};
           delegates[delegateType][id] = wrapInFunction(script, ['module', 'require']);
         }
       });
     }
-  }
+  };
 
-  function populateCoreDelegates(pkg, extensionDir) {
-    if (pkg.hasOwnProperty('core')) {
-      var script = getScriptContent(baseDir, extensionDir, pkg.core.path);
-      delegates.coreDelegates = delegates.coreDelegates || {};
-      delegates.coreDelegates[extensionDir] = wrapInFunction(script, ['module', 'require']);
-    }
-  }
-
-  extensionDirectories.forEach(function(extensionDir) {
-    var pkg = getPackageForExtensionDir(baseDir, extensionDir);
-
-    if (pkg) {
-      populateFeatureDelegates('eventDelegates', pkg, extensionDir);
-      populateFeatureDelegates('conditionDelegates', pkg, extensionDir);
-      populateFeatureDelegates('actionDelegates', pkg, extensionDir);
-      populateFeatureDelegates('dataElementDelegates', pkg, extensionDir);
-      populateCoreDelegates(pkg, extensionDir);
-    }
+  iterateExtensionPackages(baseDir, function(pkg, extensionDir) {
+    populateFeatureDelegates('eventDelegates', pkg, extensionDir);
+    populateFeatureDelegates('conditionDelegates', pkg, extensionDir);
+    populateFeatureDelegates('actionDelegates', pkg, extensionDir);
+    populateFeatureDelegates('dataElementDelegates', pkg, extensionDir);
+    populateFeatureDelegates('resources', pkg, extensionDir);
   });
 
   return delegates;
+}
+
+function getResources(baseDir) {
+  var resources = {};
+
+  iterateExtensionPackages(baseDir, function(pkg, extensionDir) {
+    if (pkg.hasOwnProperty('resources')) {
+      var descriptors = pkg.resources;
+      descriptors.forEach(function(descriptor) {
+        var resourceId = pkg.name + '/' + descriptor.name;
+        var script = getScriptContent(baseDir, extensionDir, descriptor.path);
+        resources[resourceId] = wrapInFunction(script, ['module', 'require']);
+      });
+    }
+  });
+
+  return resources;
 }
 
 function getPackageForExtensionDir(baseDir, extensionDir) {
@@ -96,30 +76,53 @@ function getPackageForExtensionDir(baseDir, extensionDir) {
 }
 
 function getExtensionMeta(baseDir) {
-  var extensionDirectories = getExtensionDirectories(baseDir);
   var extensionMeta = {};
-  extensionDirectories.forEach(function(extensionDir) {
+
+  iterateExtensionPackages(baseDir, function(pkg) {
+    extensionMeta[pkg.name] = {
+      name: pkg.displayName
+    };
+  });
+
+  return extensionMeta;
+}
+
+function getScriptContent(baseDir, extensionDir, scriptPath) {
+  var featurePath = path.join(baseDir, extensionDir, scriptPath);
+
+  if (fs.existsSync(featurePath)) {
+    return fs.readFileSync(featurePath, {encoding: 'utf8'});
+  }
+}
+
+function iterateExtensionPackages(baseDir, callback) {
+  getExtensionDirectories(baseDir).forEach(function(extensionDir) {
     var pkg = getPackageForExtensionDir(baseDir, extensionDir);
+
     if (pkg) {
-      extensionMeta[extensionDir] = {
-        name: pkg.name
-      };
+      callback(pkg, extensionDir);
     }
   });
-  return extensionMeta;
+}
+
+function stringifyWithLiteralFunctions(delegates) {
+  return JSON.stringify(delegates)
+    .replace(/(".+?":)"(function.+?}\\n)"/g, '$1$2')
+    .replace(/\\n/g, '\n');
 }
 
 gulp.task('buildContainer', function() {
   var extensionsDir = './src/extensions';
   var delegates = getDelegates(extensionsDir);
+  var resources = getResources(extensionsDir);
   var extensionMeta = getExtensionMeta(extensionsDir);
 
   return gulp.src(['container.txt'])
-    .pipe(replace('{{eventDelegates}}', shallowStringifyWithFunctionValues(delegates.eventDelegates)))
-    .pipe(replace('{{conditionDelegates}}', shallowStringifyWithFunctionValues(delegates.conditionDelegates)))
-    .pipe(replace('{{actionDelegates}}', shallowStringifyWithFunctionValues(delegates.actionDelegates)))
-    .pipe(replace('{{dataElementDelegates}}', shallowStringifyWithFunctionValues(delegates.dataElementDelegates)))
-    .pipe(replace('{{coreDelegates}}', shallowStringifyWithFunctionValues(delegates.coreDelegates)))
+    .pipe(replace('{{eventDelegates}}', stringifyWithLiteralFunctions(delegates.eventDelegates)))
+    .pipe(replace('{{conditionDelegates}}', stringifyWithLiteralFunctions(delegates.conditionDelegates)))
+    .pipe(replace('{{actionDelegates}}', stringifyWithLiteralFunctions(delegates.actionDelegates)))
+    .pipe(replace('{{dataElementDelegates}}', stringifyWithLiteralFunctions(delegates.dataElementDelegates)))
+    .pipe(replace('{{resources}}', stringifyWithLiteralFunctions(resources)))
     .pipe(replace('{{extensions}}', JSON.stringify(extensionMeta)))
     .pipe(rename('container.js'))
     .pipe(gulp.dest('./dist'));

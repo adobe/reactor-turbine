@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script>
+      var testResource = {};
+      var receivedResource;
+      var neverRequiredResourceSpy = jasmine.createSpy();
+
+      _satellite = {};
+
+      _satellite.container = {
+        resources: {
+          'testExtension/testResource': function(module) {
+            console.log('test resource init');
+            module.exports = function() {
+              return testResource;
+            };
+          },
+          'otherExtension/neverRequired': neverRequiredResourceSpy.and.callFake(function(module) {
+            module.exports = function() {};
+          })
+        },
+        actionDelegates: {
+          testAction: function(module, require) {
+            receivedResource = require('testExtension/testResource');
+            module.exports = function() {};
+          }
+        },
+        eventDelegates: {
+          testEvent: function(module) {
+            var allTriggers = [];
+
+            window.triggerTestEvent = function() {
+              allTriggers.forEach(function(trigger) {
+                trigger();
+              });
+            };
+
+            module.exports = function(config, trigger) {
+              allTriggers.push(trigger);
+            };
+          }
+        },
+        rules: [
+          {
+            events: [
+              {
+                type: 'testEvent'
+              }
+            ],
+            actions: [
+              {
+                type: 'testAction'
+              }
+            ]
+          }
+        ]
+      };
+    </script>
+    <script src="/base/dist/engine.js"></script>
+  </head>
+  <body>
+    <script>
+      _satellite.pageBottom();
+
+      TestPage.execute(function() {
+        window.triggerTestEvent();
+        expect(receivedResource).toBe(testResource);
+
+        // The module should be initialized even when it isn't required by anything. This is so
+        // extensions can have logic that runs even when there are no event, condition, action,
+        // or data element types configured. One example is DTM's visitor tracking which needs to
+        // run regardless of whether conditions are configured to use them.
+        expect(neverRequiredResourceSpy.calls.count()).toBe(1);
+      }).start();
+    </script>
+  </body>
+</html>

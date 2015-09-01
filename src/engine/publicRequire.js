@@ -29,11 +29,10 @@ var resources = {
 };
 
 module.exports = function(key) {
-  if (key.indexOf(EXTENSIONS_PREFIX) === 0) {
-    var extensionType = key.substr(EXTENSIONS_PREFIX.length);
+  if (key.indexOf('/') !== -1) {
     // We can't require in coreRegistry before here (e.g., at the top of this file) because it
     // would cause a circular dependency at load time.
-    return require('./state').getExtensionCore(extensionType);
+    return require('./state').getResource(key);
   } else if (resources.hasOwnProperty(key)) {
     return resources[key];
   } else {

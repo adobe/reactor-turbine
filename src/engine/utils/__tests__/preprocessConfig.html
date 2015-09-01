@@ -1,10 +1,10 @@
 <html>
   <head>
     <script>
-      var coreDelegateSpy = jasmine.createSpy();
       var eventDelegateSpy = jasmine.createSpy();
       var conditionDelegateSpy = jasmine.createSpy();
       var actionDelegateSpy = jasmine.createSpy();
+      var resourceSpy = jasmine.createSpy();
 
       // This text is appended onto data element values. This can be changed to determine
       // whether a configuration object is preprocessed each time rather than being saved to
@@ -39,13 +39,13 @@
         },
         integrations: {
           'abc': {
-            type: 'testExtension',
+            extensionId: 'testExtension',
             config: unprocessedConfig
           }
         },
-        coreDelegates: {
-          testExtension: function(module) {
-            module.exports = coreDelegateSpy;
+        resources: {
+          'testExtension/testResource': function(module) {
+            module.exports = resourceSpy.and.returnValue({});
           }
         },
         eventDelegates: {
@@ -78,7 +78,8 @@
           }
         },
         actionDelegates: {
-          testAction: function(module) {
+          testAction: function(module, require) {
+            var testResource = require('testExtension/testResource');
             module.exports = actionDelegateSpy;
           }
         },
@@ -179,10 +180,10 @@
             eventCheck: 'apple'
           };
 
-//          expect(coreDelegateSpy.calls.argsFor(0)[0]).toEqual({
-//            integrationConfigs: [ firstProcessedConfig ],
-//            propertyConfig: firstProcessedConfig
-//          });
+          expect(resourceSpy.calls.argsFor(0)[0]).toEqual({
+            integrationConfigs: [ firstProcessedConfig ],
+            propertyConfig: firstProcessedConfig
+          });
 
           expect(eventDelegateSpy.calls.argsFor(0)[0]).toEqual({
             eventConfig: firstProcessedConfig,

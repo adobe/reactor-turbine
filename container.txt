@@ -5,7 +5,7 @@
     'conditionDelegates': {{conditionDelegates}},
     'actionDelegates': {{actionDelegates}},
     'dataElementDelegates': {{dataElementDelegates}},
-    'coreDelegates': {{coreDelegates}},
+    'resources': {{resources}},
     'extensions': {{extensions}},
     'integrations': {},
     'rules': [],

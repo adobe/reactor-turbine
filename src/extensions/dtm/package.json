@@ -175,6 +175,10 @@
     {
       "name": "visitorTracking",
       "path": "resources/visitorTracking.js"
+    },
+    {
+      "name": "compareNumbers",
+      "path": "resources/compareNumbers.js"
     }
   ]
 }

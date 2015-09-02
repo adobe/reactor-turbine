@@ -9,7 +9,8 @@ var mockWindow = {
 
 var conditionDelegateInjector = require('inject!../screenResolution');
 var conditionDelegate = conditionDelegateInjector({
-  window: mockWindow
+  window: mockWindow,
+  'dtm/compareNumbers': require('../../../resources/compareNumbers')()
 });
 
 describe('screen resolution condition delegate', function() {

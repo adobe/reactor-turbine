@@ -9,7 +9,8 @@ var mockDocument = {
 
 var conditionDelegateInjector = require('inject!../windowSize');
 var conditionDelegate = conditionDelegateInjector({
-  document: mockDocument
+  document: mockDocument,
+  'dtm/compareNumbers': require('../../../resources/compareNumbers')()
 });
 
 describe('window size condition delegate', function() {

@@ -8,7 +8,7 @@ var visitorTracking = require('dtm/visitorTracking');
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
  * @param {(RegEx|string)[]} config.conditionConfig.sources An array of traffic sources. The
- * condition will return true if the actual traffic source must match one of the sources in
+ * condition will return true if the actual traffic source matches one of the sources in
  * the array.
  * @returns {boolean}
  */

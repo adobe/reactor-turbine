@@ -7,16 +7,16 @@ var compareNumbers = require('dtm/compareNumbers');
  * Sessions condition. Determines if the number of sessions matches constraints.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
- * @param {number} config.conditionConfig.sessionCount The number of sessions to compare against.
+ * @param {number} config.conditionConfig.count The number of sessions to compare against.
  * @param {comparisonOperator} config.conditionConfig.operator The comparison operator to use to
- * compare against sessionCount.
+ * compare against count.
  * @returns {boolean}
  */
 module.exports = function(config) {
   return compareNumbers(
     visitorTracking.getSessionCount(),
     config.conditionConfig.operator,
-    config.conditionConfig.sessionCount
+    config.conditionConfig.count
   );
 };
 

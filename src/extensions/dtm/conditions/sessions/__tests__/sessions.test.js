@@ -14,7 +14,7 @@ describe('sessions condition delegate', function() {
   it('returns true when number of sessions is above "greater than" constraint', function() {
     var config = {
       conditionConfig: {
-        sessionCount: 4,
+        count: 4,
         operator: '>'
       }
     };
@@ -25,7 +25,7 @@ describe('sessions condition delegate', function() {
   it('returns false when number of sessions is below "greater than" constraint', function() {
     var config = {
       conditionConfig: {
-        sessionCount: 6,
+        count: 6,
         operator: '>'
       }
     };
@@ -36,7 +36,7 @@ describe('sessions condition delegate', function() {
   it('returns true when number of sessions is below "less than" constraint', function() {
     var config = {
       conditionConfig: {
-        sessionCount: 6,
+        count: 6,
         operator: '<'
       }
     };
@@ -47,7 +47,7 @@ describe('sessions condition delegate', function() {
   it('returns false when number of sessions is above "less than" constraint', function() {
     var config = {
       conditionConfig: {
-        sessionCount: 4,
+        count: 4,
         operator: '<'
       }
     };
@@ -58,7 +58,7 @@ describe('sessions condition delegate', function() {
   it('returns true when number of sessions matches "equals" constraint', function() {
     var config = {
       conditionConfig: {
-        sessionCount: 5,
+        count: 5,
         operator: '='
       }
     };
@@ -69,7 +69,7 @@ describe('sessions condition delegate', function() {
   it('returns false when number of sessions does not match "equals" constraint', function() {
     var config = {
       conditionConfig: {
-        sessionCount: 11,
+        count: 11,
         operator: '='
       }
     };

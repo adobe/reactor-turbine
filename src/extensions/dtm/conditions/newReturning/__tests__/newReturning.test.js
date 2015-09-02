@@ -9,7 +9,7 @@ var conditionDelegate = conditionDelegateInjector({
 
 describe('new vs. returning condition delegate', function() {
   it('returns true when isNew = true and the visitor is new', function() {
-    mockVisitorTracking.isNewVisitor = function() {
+    mockVisitorTracking.getIsNewVisitor = function() {
       return true;
     };
 
@@ -23,7 +23,7 @@ describe('new vs. returning condition delegate', function() {
   });
 
   it('returns true when isNew = false and the visitor is returning', function() {
-    mockVisitorTracking.isNewVisitor = function() {
+    mockVisitorTracking.getIsNewVisitor = function() {
       return false;
     };
 
@@ -37,7 +37,7 @@ describe('new vs. returning condition delegate', function() {
   });
 
   it('returns false when isNew = false and the visitor is new', function() {
-    mockVisitorTracking.isNewVisitor = function() {
+    mockVisitorTracking.getIsNewVisitor = function() {
       return true;
     };
 
@@ -51,7 +51,7 @@ describe('new vs. returning condition delegate', function() {
   });
 
   it('returns false when isNew = true and the visitor is returning', function() {
-    mockVisitorTracking.isNewVisitor = function() {
+    mockVisitorTracking.getIsNewVisitor = function() {
       return false;
     };
 

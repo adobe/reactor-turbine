@@ -1,5 +1,7 @@
 var getCookie = require('getCookie');
 var setCookie = require('setCookie');
+var document = require('document');
+var window = require('window');
 
 function key(name){
   return '_sdsat_' + name;
@@ -12,55 +14,57 @@ var trackLandingPage = function() {
   var existingLanding = getCookie(landingPageKey);
 
   if (!existingLanding || existingLanding.split('|').length < 2) {
-    setCookie(landingPageKey, location.href + '|' + (new Date().getTime()));
+    setCookie(landingPageKey, window.location.href + '|' + (new Date().getTime()));
   }
 
   return !existingLanding;
 };
 
-var visitorLandingPage = function() {
+var getLandingPage = function() {
   var value = getCookie(key('landing_page'));
   return value ? value.split('|')[0] : null;
 };
 
-var visitorLandingTime = function() {
+var getLandingTime = function() {
   var value = getCookie(key('landing_page'));
   return value ? Number(value.split('|')[1]) : null;
 };
 
-var minutesOnSite = function() {
+var getMinutesOnSite = function() {
   var now = new Date().getTime();
-  return Math.floor((now - visitorLandingTime()) / 1000 / 60);
+  return Math.floor((now - getLandingTime()) / 1000 / 60);
 };
 
 var trackSessionCount = function(newSession){
-  if (!newSession) return;
-  var session = SL.visitorSessionCount();
+  if (!newSession) {
+    return;
+  }
+  var session = getSessionCount();
   setCookie(key('session_count'), session + 1, 365 * 2 /* two years */);
 };
 
-var visitorSessionCount = function() {
+var getSessionCount = function() {
   return Number(getCookie(key('session_count')) || '0');
-}
+};
 
-var isNewVisitor = function() {
-  return visitorSessionCount() == 1;
+var getIsNewVisitor = function() {
+  return getSessionCount() == 1;
 };
 
 var trackSessionPagesViewed = function() {
-  setCookie(key('pages_viewed'), visitorSessionPagesViewed() + 1);
+  setCookie(key('pages_viewed'), getSessionPagesViewed() + 1);
 };
 
 var trackLifetimePagesViewed = function() {
-  setCookie(key('lt_pages_viewed'), visitorLifetimePagesViewed() + 1, 365 * 2);
+  setCookie(key('lt_pages_viewed'), getLifetimePagesViewed() + 1, 365 * 2);
 };
 
-var visitorLifetimePagesViewed = function() {
+var getLifetimePagesViewed = function() {
   return Number(getCookie(key('lt_pages_viewed')) || 0);
 };
 
-var visitorSessionPagesViewed = function() {
-  return Number(getCookie(key('pages_viewed')) || '0');
+var getSessionPagesViewed = function() {
+  return Number(getCookie(key('pages_viewed')) || 0);
 };
 
 var trackTrafficSource = function() {
@@ -82,12 +86,30 @@ var trackVisitor = function() {
   trackTrafficSource();
 };
 
+var throwDisabledError = function() {
+  throw new Error('Visitor tracking not enabled.');
+};
+
 module.exports = function(config) {
-  if (config.propertyConfig.trackVisitor) {
+  var trackingEnabled = config.propertyConfig.trackVisitor;
+
+  if (trackingEnabled) {
     trackVisitor();
   }
 
+  var wrapForEnablement = function(fn) {
+    return trackingEnabled ? fn : throwDisabledError;
+  };
+
   return {
-    isNewVisitor: isNewVisitor
+    getLandingPage: wrapForEnablement(getLandingPage),
+    getLandingTime: wrapForEnablement(getLandingTime),
+    getMinutesOnSite: wrapForEnablement(getMinutesOnSite),
+    getSessionCount: wrapForEnablement(getSessionCount),
+    getLifetimePagesViewed: wrapForEnablement(getLifetimePagesViewed),
+    getSessionPagesViewed: wrapForEnablement(getSessionPagesViewed),
+    getTrafficSource: wrapForEnablement(trafficSource),
+    getIsNewVisitor: wrapForEnablement(getIsNewVisitor),
+    trackingEnabled: trackingEnabled
   };
 };

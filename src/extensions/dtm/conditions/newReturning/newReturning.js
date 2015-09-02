@@ -11,7 +11,7 @@ var visitorTracking = require('dtm/visitorTracking');
  * @returns {boolean}
  */
 module.exports = function(config) {
-  var isNewVisitor = visitorTracking.isNewVisitor();
+  var isNewVisitor = visitorTracking.getIsNewVisitor();
   return config.conditionConfig.isNew ? isNewVisitor : !isNewVisitor;
 };
 

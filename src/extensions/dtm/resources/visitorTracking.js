@@ -74,7 +74,7 @@ var trackTrafficSource = function() {
   }
 };
 
-var trafficSource = function() {
+var getTrafficSource = function() {
   return getCookie(key('traffic_source'));
 };
 
@@ -108,7 +108,7 @@ module.exports = function(config) {
     getSessionCount: wrapForEnablement(getSessionCount),
     getLifetimePagesViewed: wrapForEnablement(getLifetimePagesViewed),
     getSessionPagesViewed: wrapForEnablement(getSessionPagesViewed),
-    getTrafficSource: wrapForEnablement(trafficSource),
+    getTrafficSource: wrapForEnablement(getTrafficSource),
     getIsNewVisitor: wrapForEnablement(getIsNewVisitor),
     trackingEnabled: trackingEnabled
   };

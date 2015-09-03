@@ -7,14 +7,21 @@ function key(name){
   return '_sdsat_' + name;
 }
 
+var PAGE_TIME_DELIMITER = '|';
+
 // returns whether this is a new visitor session
 var trackLandingPage = function() {
-  // landing page
   var landingPageKey = key('landing_page');
   var existingLanding = getCookie(landingPageKey);
 
-  if (!existingLanding || existingLanding.split('|').length < 2) {
-    setCookie(landingPageKey, window.location.href + '|' + (new Date().getTime()));
+  // I suppose we check if the stored value ends in a timestamp for backward-compatibility?
+  // Maybe we weren't storing the timestamp at the end previously?
+  // Regardless, this isn't entirely foolproof. If the landing page URL ended in a pipe + a number
+  // then we would incorrectly assume that the number after the pipe is the timestamp we saved
+  // previously. :/
+  var endsInTimestampRegex = new RegExp('\\|\\d+$');
+  if (!existingLanding || !endsInTimestampRegex.test(existingLanding)) {
+    setCookie(landingPageKey, window.location.href + PAGE_TIME_DELIMITER + (new Date().getTime()));
   }
 
   return !existingLanding;
@@ -22,12 +29,12 @@ var trackLandingPage = function() {
 
 var getLandingPage = function() {
   var value = getCookie(key('landing_page'));
-  return value ? value.split('|')[0] : null;
+  return value ? value.substr(0, value.lastIndexOf(PAGE_TIME_DELIMITER)) : null;
 };
 
 var getLandingTime = function() {
   var value = getCookie(key('landing_page'));
-  return value ? Number(value.split('|')[1]) : null;
+  return value ? Number(value.substr(value.lastIndexOf(PAGE_TIME_DELIMITER) + 1)) : null;
 };
 
 var getMinutesOnSite = function() {

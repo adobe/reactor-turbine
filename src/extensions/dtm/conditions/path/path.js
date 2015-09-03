@@ -4,13 +4,12 @@ var textMatch = require('textMatch');
 var document = require('document');
 
 /**
- * Path condition. Determines if the current location is an matching path.
+ * Path condition. Determines if the actual path matches at least one acceptable path and does not
+ * match any unacceptable path.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
- * @param {(RegEx|string)[]} [config.conditionConfig.include] An array of paths. If specified,
- * the current path must match at least one of the listed paths.
- * @param {(RegEx|string)[]} [config.conditionConfig.exclude] An array of paths. If specified,
- * the current path must not match any of the listed paths.
+ * @param {(RegEx|string)[]} [config.conditionConfig.include] An array of acceptable paths.
+ * @param {(RegEx|string)[]} [config.conditionConfig.exclude] An array of unacceptable paths.
  * @returns {boolean}
  */
 module.exports = function(config) {

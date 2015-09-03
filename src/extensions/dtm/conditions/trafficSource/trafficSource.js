@@ -4,7 +4,8 @@ var textMatch = require('textMatch');
 var visitorTracking = require('dtm/visitorTracking');
 
 /**
- * Traffic source condition. Determines if the visitor came from a particular traffic source.
+ * Traffic source condition. Determines if the actual traffic source matches at least one
+ * acceptable traffic source.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
  * @param {(RegEx|string)[]} config.conditionConfig.sources An array of traffic sources. The

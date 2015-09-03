@@ -4,8 +4,7 @@ var document = require('document');
 var compareNumbers = require('dtm/compareNumbers');
 
 /**
- * Window size condition. Determines if the current window size is within a given
- * range.
+ * Window size condition. Determines if the current window size matches constraints.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
  * @param {number} config.conditionConfig.width

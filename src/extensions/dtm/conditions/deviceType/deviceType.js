@@ -3,13 +3,11 @@
 var clientInfo = require('clientInfo');
 
 /**
- * Device type condition. Determines if the current device type matches one of the
- * selected options.
+ * Device type condition. Determines if the actual device type matches at least one acceptable
+ * device type.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
- * @param {string[]} config.conditionConfig.deviceTypes An array of device type
- * names. The condition will return true if the current device type matches one of these
- * device type names.
+ * @param {string[]} config.conditionConfig.deviceTypes An array of device types.
  * @returns {boolean}
  */
 module.exports = function(config) {

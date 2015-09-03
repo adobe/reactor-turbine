@@ -3,11 +3,12 @@
 var visitorTracking = require('dtm/visitorTracking');
 
 /**
- * New vs. returning visitor condition. Determines if the visitor came from a particular traffic source.
+ * New vs. returning visitor condition. Determines if the visitor is a new or returning visitor.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
  * @param {string} config.conditionConfig.isNew When true, the condition returns true if the
- * visitor is a new visitor.
+ * visitor is a new visitor. When false, the condition returns true if the visitor is a returning
+ * visitor.
  * @returns {boolean}
  */
 module.exports = function(config) {

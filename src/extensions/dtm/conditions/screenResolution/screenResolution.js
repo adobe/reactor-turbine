@@ -4,8 +4,7 @@ var window = require('window');
 var compareNumbers = require('dtm/compareNumbers');
 
 /**
- * Screen resolution condition. Determines if the current screen resolution is within a given
- * range.
+ * Screen resolution condition. Determines if the current screen resolution matches constraints.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
  * @param {number} config.conditionConfig.width

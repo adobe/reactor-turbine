@@ -3,11 +3,10 @@
 var clientInfo = require('clientInfo');
 
 /**
- * Browser condition. Determines if the current browser matches one of the selected options.
+ * Browser condition. Determines if the actual browser matches at least one acceptable browser.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
- * @param {string[]} config.conditionConfig.browsers An array of browser names. The condition
- * will return true if the current browser matches one of these browser names.
+ * @param {string[]} config.conditionConfig.browsers An array of acceptable browsers.
  * @returns {boolean}
  */
 module.exports = function(config) {

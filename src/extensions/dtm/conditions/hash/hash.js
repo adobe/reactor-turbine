@@ -3,13 +3,12 @@
 var textMatch = require('textMatch');
 
 /**
- * Hash condition. Determines if the current hash (URL fragment identifier) is a matching hash.
+ * Hash condition. Determines if the actual hash (URL fragment identifier) matches at least one
+ * acceptable hash and does not match any unacceptable hash.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
- * @param {(RegEx|string)[]} [config.conditionConfig.include] An array of hashes. If specified,
- * the current hash must match at least one of the listed hashes.
- * @param {(RegEx|string)[]} [config.conditionConfig.exclude] An array of hashes. If specified,
- * the current domain must not match any of the listed hashes.
+ * @param {(RegEx|string)[]} [config.conditionConfig.include] An array of acceptable hashes.
+ * @param {(RegEx|string)[]} [config.conditionConfig.exclude] An array of unacceptable hashes.
  * @returns {boolean}
  */
 module.exports = function(config) {

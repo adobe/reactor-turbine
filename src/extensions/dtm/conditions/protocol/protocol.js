@@ -1,11 +1,11 @@
 'use strict';
 
 /**
- * Protocol condition. Determines if the browser is using the specified protocol.
+ * Protocol condition. Determines if the actual protocol matches at least one acceptable
+ * protocol.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
- * @param {RegEx[]} config.conditionConfig.protocols An array of possible protocols. The current
- * browser protocol must match one of the entries in order for the condition to pass.
+ * @param {RegEx[]} config.conditionConfig.protocols An array of acceptable protocols.
  * @returns {boolean}
  */
 module.exports = function(config) {

@@ -4,8 +4,8 @@ var textMatch = require('textMatch');
 var getQueryParam = require('getQueryParam');
 
 /**
- * URL parameter condition. Determines if there is a querystring parameter with a matching name
- * and value.
+ * URL parameter condition. Determines if a querystring parameter exists with a name and value that
+ * matches the acceptable name and value.
  * @param {Object} config
  * @param {Object} config.conditionConfig Condition config.
  * @param {string} config.conditionConfig.name The name of the querystring parameter.

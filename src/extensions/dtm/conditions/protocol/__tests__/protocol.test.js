@@ -2,24 +2,22 @@
 
 var conditionDelegate = require('../protocol');
 
+function getConfig(protocols) {
+  return {
+    conditionConfig: {
+      protocols: protocols
+    }
+  };
+}
+
 describe('protocol condition delegate', function() {
   it('returns true when the browser protocol matches', function() {
-    var config = {
-      conditionConfig: {
-        protocols: [/bogus:/i, /http:/i]
-      }
-    };
-
+    var config = getConfig([/bogus:/i, /http:/i]);
     expect(conditionDelegate(config)).toBe(true);
   });
 
   it('returns false when the browser protocol does not match', function() {
-    var config = {
-      conditionConfig: {
-        protocols: [/bogus:/i, /foo:/i]
-      }
-    };
-
+    var config = getConfig([/bogus:/i, /foo:/i]);
     expect(conditionDelegate(config)).toBe(false);
   });
 });

@@ -7,18 +7,21 @@ var conditionDelegate = conditionDelegateInjector({
   'dtm/visitorTracking': mockVisitorTracking
 });
 
+function getConfig(isNew) {
+  return {
+    conditionConfig: {
+      isNew: isNew
+    }
+  };
+}
+
 describe('new vs. returning condition delegate', function() {
   it('returns true when isNew = true and the visitor is new', function() {
     mockVisitorTracking.getIsNewVisitor = function() {
       return true;
     };
 
-    var config = {
-      conditionConfig: {
-        isNew: true
-      }
-    };
-
+    var config = getConfig(true);
     expect(conditionDelegate(config)).toBe(true);
   });
 
@@ -27,12 +30,7 @@ describe('new vs. returning condition delegate', function() {
       return false;
     };
 
-    var config = {
-      conditionConfig: {
-        isNew: false
-      }
-    };
-
+    var config = getConfig(false);
     expect(conditionDelegate(config)).toBe(true);
   });
 
@@ -41,12 +39,7 @@ describe('new vs. returning condition delegate', function() {
       return true;
     };
 
-    var config = {
-      conditionConfig: {
-        isNew: false
-      }
-    };
-
+    var config = getConfig(false);
     expect(conditionDelegate(config)).toBe(false);
   });
 
@@ -55,12 +48,7 @@ describe('new vs. returning condition delegate', function() {
       return false;
     };
 
-    var config = {
-      conditionConfig: {
-        isNew: true
-      }
-    };
-
+    var config = getConfig(true);
     expect(conditionDelegate(config)).toBe(false);
   });
 });

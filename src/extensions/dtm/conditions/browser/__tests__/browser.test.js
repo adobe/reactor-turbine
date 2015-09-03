@@ -9,25 +9,23 @@ var conditionDelegate = conditionDelegateInjector({
   clientInfo: mockClientInfo
 });
 
+function getConfig(browsers) {
+  return {
+    conditionConfig: {
+      browsers: browsers
+    }
+  };
+}
+
 describe('browser condition delegate', function() {
   it('returns true when the current browser matches one of the selected browsers', function() {
-    var config = {
-      conditionConfig: {
-        browsers: ['Shoe', 'Goo', 'Foo', 'Moo']
-      }
-    };
-
+    var config = getConfig(['Shoe', 'Goo', 'Foo', 'Moo']);
     expect(conditionDelegate(config)).toBe(true);
   });
 
   it('returns false when the current browser does not match any of the ' +
       'selected browsers', function() {
-    var config = {
-      conditionConfig: {
-        browsers: ['Shoe', 'Goo', 'Boo', 'Moo']
-      }
-    };
-
+    var config = getConfig(['Shoe', 'Goo', 'Boo', 'Moo']);
     expect(conditionDelegate(config)).toBe(false);
   });
 });

@@ -15,8 +15,8 @@ var visitorTracking = require('dtm/visitorTracking');
  */
 module.exports = function(config) {
   var source = visitorTracking.getTrafficSource();
-  return config.conditionConfig.sources.some(function(acceptableSource) {
-    return textMatch(source, acceptableSource);
+  return config.conditionConfig.sources.some(function(sourceCriterion) {
+    return textMatch(source, sourceCriterion);
   });
 };
 

@@ -16,8 +16,8 @@ module.exports = function(config) {
   var include = config.conditionConfig.include;
   var exclude = config.conditionConfig.exclude;
 
-  var compare = function(hashOption) {
-    return textMatch(hash, hashOption);
+  var compare = function(hashCriterion) {
+    return textMatch(hash, hashCriterion);
   };
 
   return (!include || include.some(compare)) && (!exclude || !exclude.some(compare));

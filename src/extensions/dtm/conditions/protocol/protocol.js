@@ -9,10 +9,10 @@
  * @returns {boolean}
  */
 module.exports = function(config) {
-  var documentProtocol = document.location.protocol;
+  var protocol = document.location.protocol;
 
-  return config.conditionConfig.protocols.some(function(protocol) {
-    return documentProtocol.match(protocol);
+  return config.conditionConfig.protocols.some(function(protocolCriterion) {
+    return protocol.match(protocolCriterion);
   });
 };
 

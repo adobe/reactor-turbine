@@ -18,8 +18,8 @@ module.exports = function(config) {
   var include = config.conditionConfig.include;
   var exclude = config.conditionConfig.exclude;
 
-  var compare = function(pathOption) {
-    return textMatch(path, pathOption);
+  var compare = function(pathCriterion) {
+    return textMatch(path, pathCriterion);
   };
 
   return (!include || include.some(compare)) && (!exclude || !exclude.some(compare));

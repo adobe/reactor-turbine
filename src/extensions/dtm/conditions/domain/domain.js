@@ -10,10 +10,10 @@ var document = require('document');
  * @returns {boolean}
  */
 module.exports = function(config) {
-  var hostname = document.location.hostname;
+  var domain = document.location.hostname;
 
-  return config.conditionConfig.domains.some(function(domain) {
-    return hostname.match(domain);
+  return config.conditionConfig.domains.some(function(domainCriterion) {
+    return domain.match(domainCriterion);
   });
 };
 

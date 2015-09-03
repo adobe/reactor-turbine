@@ -17,8 +17,8 @@ module.exports = function(config) {
   var include = config.conditionConfig.include;
   var exclude = config.conditionConfig.exclude;
 
-  var compare = function(subdomainOption) {
-    return textMatch(hostname, subdomainOption);
+  var compare = function(subdomainCriterion) {
+    return textMatch(hostname, subdomainCriterion);
   };
 
   return (!include || include.some(compare)) && (!exclude || !exclude.some(compare));

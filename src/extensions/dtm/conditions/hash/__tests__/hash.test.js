@@ -6,6 +6,12 @@ var conditionDelegate = conditionDelegateInjector({
   textMatch: publicRequire('textMatch')
 });
 
+function getConfig(options) {
+  return {
+    conditionConfig: options
+  };
+}
+
 describe('hash condition delegate', function() {
 
   beforeAll(function() {
@@ -18,84 +24,44 @@ describe('hash condition delegate', function() {
 
   describe('include', function() {
     it('returns true when the hash matches one of the string options', function() {
-      var config = {
-        conditionConfig: {
-          include: ['#foo', '#hashtest']
-        }
-      };
-
+      var config = getConfig({ include: ['#foo', '#hashtest'] });
       expect(conditionDelegate(config)).toBe(true);
     });
 
     it('returns false when the hash does not match one of the string options', function() {
-      var config = {
-        conditionConfig: {
-          include: ['#foo', '#goo']
-        }
-      };
-
+      var config = getConfig({ include: ['#foo', '#goo'] });
       expect(conditionDelegate(config)).toBe(false);
     });
 
     it('returns true when the hash matches one of the regex options', function() {
-      var config = {
-        conditionConfig: {
-          include: ['#foo', /has.test/i]
-        }
-      };
-
+      var config = getConfig({ include: ['#foo', /has.test/i] });
       expect(conditionDelegate(config)).toBe(true);
     });
 
     it('returns false when the hash does not match one of the regex options', function() {
-      var config = {
-        conditionConfig: {
-          include: ['#foo', /#g.o/i]
-        }
-      };
-
+      var config = getConfig({ include: ['#foo', /#g.o/i] });
       expect(conditionDelegate(config)).toBe(false);
     });
   });
 
   describe('exclude', function() {
     it('returns true when the hash does not match one of the string options', function() {
-      var config = {
-        conditionConfig: {
-          exclude: ['#foo', '#goo']
-        }
-      };
-
+      var config = getConfig({ exclude: ['#foo', '#goo'] });
       expect(conditionDelegate(config)).toBe(true);
     });
 
     it('returns false when the hash matches one of the string options', function() {
-      var config = {
-        conditionConfig: {
-          exclude: ['#foo', '#hashtest']
-        }
-      };
-
+      var config = getConfig({ exclude: ['#foo', '#hashtest'] });
       expect(conditionDelegate(config)).toBe(false);
     });
 
     it('returns true when the hash does not match one of the regex options', function() {
-      var config = {
-        conditionConfig: {
-          exclude: ['#foo', /#g.o/i]
-        }
-      };
-
+      var config = getConfig({ exclude: ['#foo', /#g.o/i] });
       expect(conditionDelegate(config)).toBe(true);
     });
 
     it('returns false when the hash matches one of the regex options', function() {
-      var config = {
-        conditionConfig: {
-          exclude: ['#foo', '#hashtest']
-        }
-      };
-
+      var config = getConfig({ exclude: ['#foo', '#hashtest'] });
       expect(conditionDelegate(config)).toBe(false);
     });
   });
@@ -103,37 +69,19 @@ describe('hash condition delegate', function() {
   describe('mixed', function() {
     it('returns true when the hash matches an include option and does not match ' +
         'an exclude option', function() {
-      var config = {
-        conditionConfig: {
-          include: ['#foo', '#hashtest'],
-          exclude: ['#goo']
-        }
-      };
-
+      var config = getConfig({ include: ['#foo', '#hashtest'], exclude: ['#goo'] });
       expect(conditionDelegate(config)).toBe(true);
     });
 
     it('returns false when the hash does not match an include option and does not match ' +
         'an exclude option', function() {
-      var config = {
-        conditionConfig: {
-          include: ['#foo', '#goo'],
-          exclude: ['#shoo']
-        }
-      };
-
+      var config = getConfig({ include: ['#foo', '#goo'], exclude: ['#shoo'] });
       expect(conditionDelegate(config)).toBe(false);
     });
 
     it('returns false when the hash matches an include option and matches ' +
         'an exclude option', function() {
-      var config = {
-        conditionConfig: {
-          include: ['#foo', '#hashtest'],
-          exclude: ['#hashtest']
-        }
-      };
-
+      var config = getConfig({ include: ['#foo', '#hashtest'], exclude: ['#hashtest'] });
       expect(conditionDelegate(config)).toBe(false);
     });
   });

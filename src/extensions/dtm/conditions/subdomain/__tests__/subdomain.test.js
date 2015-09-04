@@ -13,87 +13,53 @@ var conditionDelegate = conditionDelegateInjector({
   document: mockDocument
 });
 
+function getConfig(options) {
+  return {
+    conditionConfig: options
+  };
+}
+
 describe('subdomain condition delegate', function() {
   describe('include', function() {
     it('returns true when the subdomain matches one of the string options', function() {
-      var config = {
-        conditionConfig: {
-          include: ['basketball.espn.com', 'foo.adobe.com']
-        }
-      };
-
+      var config = getConfig({ include: ['basketball.espn.com', 'foo.adobe.com'] });
       expect(conditionDelegate(config)).toBe(true);
     });
 
     it('returns false when the subdomain does not match one of the string options', function() {
-      var config = {
-        conditionConfig: {
-          include: ['basketball.espn.com', 'my.yahoo.com']
-        }
-      };
-
+      var config = getConfig({ include: ['basketball.espn.com', 'my.yahoo.com'] });
       expect(conditionDelegate(config)).toBe(false);
     });
 
     it('returns true when the subdomain matches one of the regex options', function() {
-      var config = {
-        conditionConfig: {
-          include: ['basketball.espn.com', /f.o\.adobe\.com/i]
-        }
-      };
-
+      var config = getConfig({ include: ['basketball.espn.com', /f.o\.adobe\.com/i] });
       expect(conditionDelegate(config)).toBe(true);
     });
 
     it('returns false when the subdomain does not match one of the regex options', function() {
-      var config = {
-        conditionConfig: {
-          include: ['basketball.espn.com', /my\.yahoo\.com/i]
-        }
-      };
-
+      var config = getConfig({ include: ['basketball.espn.com', /my\.yahoo\.com/i] });
       expect(conditionDelegate(config)).toBe(false);
     });
   });
 
   describe('exclude', function() {
     it('returns true when the subdomain does not match one of the string options', function() {
-      var config = {
-        conditionConfig: {
-          exclude: ['basketball.espn.com', 'my.yahoo.com']
-        }
-      };
-
+      var config = getConfig({ exclude: ['basketball.espn.com', 'my.yahoo.com'] });
       expect(conditionDelegate(config)).toBe(true);
     });
 
     it('returns false when the subdomain matches one of the string options', function() {
-      var config = {
-        conditionConfig: {
-          exclude: ['basketball.espn.com', 'foo.adobe.com']
-        }
-      };
-
+      var config = getConfig({ exclude: ['basketball.espn.com', 'foo.adobe.com'] });
       expect(conditionDelegate(config)).toBe(false);
     });
 
     it('returns true when the subdomain does not match one of the regex options', function() {
-      var config = {
-        conditionConfig: {
-          exclude: ['basketball.espn.com', /my\.yahoo\.com/i]
-        }
-      };
-
+      var config = getConfig({ exclude: ['basketball.espn.com', /my\.yahoo\.com/i] });
       expect(conditionDelegate(config)).toBe(true);
     });
 
     it('returns false when the subdomain matches one of the regex options', function() {
-      var config = {
-        conditionConfig: {
-          exclude: ['basketball.espn.com', /f.o\.adobe\.com/i]
-        }
-      };
-
+      var config = getConfig({ exclude: ['basketball.espn.com', /f.o\.adobe\.com/i] });
       expect(conditionDelegate(config)).toBe(false);
     });
   });
@@ -101,36 +67,30 @@ describe('subdomain condition delegate', function() {
   describe('mixed', function() {
     it('returns true when the subdomain matches an include option and does not match ' +
         'an exclude option', function() {
-      var config = {
-        conditionConfig: {
-          include: ['basketball.espn.com', 'foo.adobe.com'],
-          exclude: ['my.yahoo.com']
-        }
-      };
+      var config = getConfig({
+        include: ['basketball.espn.com', 'foo.adobe.com'],
+        exclude: ['my.yahoo.com']
+      });
 
       expect(conditionDelegate(config)).toBe(true);
     });
 
     it('returns false when the subdomain does not match an include option and does not match ' +
         'an exclude option', function() {
-      var config = {
-        conditionConfig: {
-          include: ['basketball.espn.com', 'bar.adobe.com'],
-          exclude: ['my.yahoo.com']
-        }
-      };
+      var config = getConfig({
+        include: ['basketball.espn.com', 'bar.adobe.com'],
+        exclude: ['my.yahoo.com']
+      });
 
       expect(conditionDelegate(config)).toBe(false);
     });
 
     it('returns false when the subdomain matches an include option and matches ' +
         'an exclude option', function() {
-      var config = {
-        conditionConfig: {
-          include: ['basketball.espn.com', 'foo.adobe.com'],
-          exclude: ['foo.adobe.com']
-        }
-      };
+      var config = getConfig({
+        include: ['basketball.espn.com', 'foo.adobe.com'],
+        exclude: ['foo.adobe.com']
+      });
 
       expect(conditionDelegate(config)).toBe(false);
     });

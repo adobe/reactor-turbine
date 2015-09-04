@@ -13,44 +13,32 @@ var conditionDelegate = conditionDelegateInjector({
   'dtm/visitorTracking': mockVisitorTracking
 });
 
+function getConfig(sources) {
+  return {
+    conditionConfig: {
+      sources: sources
+    }
+  };
+}
+
 describe('traffic source condition delegate', function() {
   it('returns true when the traffic source matches one of the string options', function() {
-    var config = {
-      conditionConfig: {
-        sources: ['http://foo.com', 'http://trafficsource.com']
-      }
-    };
-
+    var config = getConfig(['http://foo.com', 'http://trafficsource.com']);
     expect(conditionDelegate(config)).toBe(true);
   });
 
   it('returns false when the traffic source does not match one of the string options', function() {
-    var config = {
-      conditionConfig: {
-        sources: ['http://foo.com', 'http://bar.com']
-      }
-    };
-
+    var config = getConfig(['http://foo.com', 'http://bar.com']);
     expect(conditionDelegate(config)).toBe(false);
   });
 
   it('returns true when the traffic source matches a regex options', function() {
-    var config = {
-      conditionConfig: {
-        sources: ['http://foo.com', /traffic.ource/i]
-      }
-    };
-
+    var config = getConfig(['http://foo.com', /traffic.ource/i]);
     expect(conditionDelegate(config)).toBe(true);
   });
 
   it('returns false when the traffic source does not match the regex option', function() {
-    var config = {
-      conditionConfig: {
-        sources: ['http://foo.com', /my\.yahoo\.com/i]
-      }
-    };
-
+    var config = getConfig(['http://foo.com', /my\.yahoo\.com/i]);
     expect(conditionDelegate(config)).toBe(false);
   });
 });

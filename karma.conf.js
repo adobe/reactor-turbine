@@ -32,12 +32,13 @@ module.exports = function(config) {
         // each time webpack finds a require call that is:
         // 1. inside src/extensions
         // 2. outside any tests
-        // 3. begins with an alpha character (not '../' or './')
+        // 3. does not contain a period (in other words, doesn't have ./ or ../ like a
+        //    normal require
         // it will create a mock module that just returns null instead of throwing an error
         // saying it can't find the referenced module on the file system.
         function(context, request, callback) {
           if (/^(?!.*__tests__$).*\/src\/extensions\/.*$/.test(context) &&
-              /^[a-zA-Z]/.test(request)) {
+              request.indexOf('.') === -1) {
             callback(null, 'var null');
           } else {
             callback();

@@ -29,9 +29,9 @@ var resourceModuleProviders = {
  * bootstrap process, this allows us to simulate that portion of the process and create a
  * publicRequire function that behaves similar to the real one. For anything that is not an
  * extension resource, this delegates to the real publicRequire.
- * @param config
- * @param {Object[]} config.integrationConfigs Integration configurations for the extension.
- * @param {Object[]} config.propertyConfig Property configuration.
+ * @param [config]
+ * @param {Object[]} [config.integrationConfigs] Integration configurations for the extension.
+ * @param {Object[]} [config.propertyConfig] Property configuration.
  * @returns {Function}
  */
 module.exports = function(config) {

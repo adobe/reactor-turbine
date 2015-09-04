@@ -14,13 +14,7 @@ var trackLandingPage = function() {
   var landingPageKey = key('landing_page');
   var existingLanding = getCookie(landingPageKey);
 
-  // I suppose we check if the stored value ends in a timestamp for backward-compatibility?
-  // Maybe we weren't storing the timestamp at the end previously?
-  // Regardless, this isn't entirely foolproof. If the landing page URL ended in a pipe + a number
-  // then we would incorrectly assume that the number after the pipe is the timestamp we saved
-  // previously. :/
-  var endsInTimestampRegex = new RegExp('\\|\\d+$');
-  if (!existingLanding || !endsInTimestampRegex.test(existingLanding)) {
+  if (!existingLanding) {
     setCookie(landingPageKey, window.location.href + PAGE_TIME_DELIMITER + (new Date().getTime()));
   }
 

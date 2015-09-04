@@ -123,21 +123,21 @@ describe('visitor tracking', function() {
 
   it('tracks lifetime pages viewed', function() {
     var tracker = visitorTracking(getTrackingConfig(true));
-    expect(tracker.getLifetimePagesViewed()).toBe(1);
+    expect(tracker.getLifetimePageViewCount()).toBe(1);
     expect(mockSetCookie).toHaveBeenCalledWith(key('lt_pages_viewed'), 1, 365 * 2);
 
     tracker = visitorTracking(getTrackingConfig(true));
-    expect(tracker.getLifetimePagesViewed()).toBe(2);
+    expect(tracker.getLifetimePageViewCount()).toBe(2);
     expect(mockSetCookie).toHaveBeenCalledWith(key('lt_pages_viewed'), 2, 365 * 2);
   });
 
   it('tracks session pages viewed', function() {
     var tracker = visitorTracking(getTrackingConfig(true));
-    expect(tracker.getSessionPagesViewed()).toBe(1);
+    expect(tracker.getSessionPageViewCount()).toBe(1);
     expect(mockSetCookie).toHaveBeenCalledWith(key('pages_viewed'), 1);
 
     tracker = visitorTracking(getTrackingConfig(true));
-    expect(tracker.getSessionPagesViewed()).toBe(2);
+    expect(tracker.getSessionPageViewCount()).toBe(2);
     expect(mockSetCookie).toHaveBeenCalledWith(key('pages_viewed'), 2);
   });
 

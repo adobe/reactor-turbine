@@ -7,14 +7,15 @@ function key(name){
   return '_sdsat_' + name;
 }
 
+var PAGE_TIME_DELIMITER = '|';
+
 // returns whether this is a new visitor session
 var trackLandingPage = function() {
-  // landing page
   var landingPageKey = key('landing_page');
   var existingLanding = getCookie(landingPageKey);
 
-  if (!existingLanding || existingLanding.split('|').length < 2) {
-    setCookie(landingPageKey, window.location.href + '|' + (new Date().getTime()));
+  if (!existingLanding) {
+    setCookie(landingPageKey, window.location.href + PAGE_TIME_DELIMITER + (new Date().getTime()));
   }
 
   return !existingLanding;
@@ -22,12 +23,12 @@ var trackLandingPage = function() {
 
 var getLandingPage = function() {
   var value = getCookie(key('landing_page'));
-  return value ? value.split('|')[0] : null;
+  return value ? value.substr(0, value.lastIndexOf(PAGE_TIME_DELIMITER)) : null;
 };
 
 var getLandingTime = function() {
   var value = getCookie(key('landing_page'));
-  return value ? Number(value.split('|')[1]) : null;
+  return value ? Number(value.substr(value.lastIndexOf(PAGE_TIME_DELIMITER) + 1)) : null;
 };
 
 var getMinutesOnSite = function() {

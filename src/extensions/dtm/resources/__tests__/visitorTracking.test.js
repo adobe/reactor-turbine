@@ -16,7 +16,10 @@ var mockDocument = {
 
 var mockWindow = {
   location: {
-    href: 'http://visitortracking.com/test.html'
+    // We use a querystring with a pipe here because visitor tracking stores the landing
+    // page + a timestamp as the cookie value using a pipe delimiter. We want to make sure
+    // if our landing page URL has a pipe that it doesn't mess things up.
+    href: 'http://visitortracking.com/test.html?p=123|456'
   }
 };
 
@@ -56,7 +59,7 @@ describe('visitor tracking', function() {
   it('tracks the landing page if the current page is the landing page', function() {
     var url1 = mockWindow.location.href;
     var url2 = 'http://visitortracking.com/somethingelse.html';
-    var url1CookieRegex = /http:\/\/visitortracking\.com\/test\.html\|\d+$/;
+    var url1CookieRegex = /http:\/\/visitortracking\.com\/test\.html?p=123|456\|\d+$/;
 
     var tracker = visitorTracking(getTrackingConfig(true));
     var cookieValue = cookieValues[key('landing_page')];

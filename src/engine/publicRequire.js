@@ -26,7 +26,6 @@ module.exports = function(key) {
     'getCookie': require('./utils/cookie/getCookie'),
     'setCookie': require('./utils/cookie/setCookie'),
     'getObjectProperty': require('./utils/dataElement/getObjectProperty'),
-    'createBubbly': require('./utils/createBubbly'),
     'liveQuerySelector': require('./utils/dom/liveQuerySelector'),
     'debounce': require('./utils/debounce'),
     'once': require('./utils/once'),

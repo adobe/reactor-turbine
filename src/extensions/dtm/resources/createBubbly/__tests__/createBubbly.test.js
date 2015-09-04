@@ -2,7 +2,12 @@
 'use strict';
 
 describe('createBubbly', function() {
-  var createBubbly = require('../createBubbly');
+  var createBubblyInjector = require('inject!../createBubbly');
+  var publicRequire = require('../../../../../engine/publicRequire');
+  var createBubbly = createBubblyInjector({
+    createDataStash: publicRequire('createDataStash'),
+    matchesCSS: publicRequire('matchesCSS')
+  })();
 
   var aElement;
   var bElement;

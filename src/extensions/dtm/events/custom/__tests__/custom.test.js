@@ -17,10 +17,10 @@ function triggerCustomEvent(element, type) {
 }
 
 describe('custom event type', function() {
-  var publicRequire = require('../../../../../engine/publicRequire');
+  var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
   var delegateInjector = require('inject!../custom');
   var delegate = delegateInjector({
-    createBubbly: publicRequire('createBubbly')
+    'dtm/createBubbly': publicRequire('dtm/createBubbly')
   });
 
   beforeAll(function() {

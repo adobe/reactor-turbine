@@ -199,6 +199,10 @@
     {
       "name": "compareNumbers",
       "path": "resources/compareNumbers/compareNumbers.js"
+    },
+    {
+      "name": "createBubbly",
+      "path": "resources/createBubbly/createBubbly.js"
     }
   ]
 }

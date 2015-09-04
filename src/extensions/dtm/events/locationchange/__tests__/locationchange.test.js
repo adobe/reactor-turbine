@@ -11,7 +11,7 @@ describe('locationchange event type', function() {
   }
 
   beforeAll(function() {
-    var publicRequire = require('../../../../../engine/publicRequire');
+    var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
     var delegateInjector = require('inject!../locationchange');
     delegate = delegateInjector({
       debounce: publicRequire('debounce'),

@@ -33,10 +33,10 @@ describe('timePlayed event type', function() {
 
   beforeAll(function() {
     jasmine.clock().install();
-    var publicRequire = require('../../../../../engine/publicRequire');
+    var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
     var delegateInjector = require('inject!../timePlayed');
     delegate = delegateInjector({
-      createBubbly: publicRequire('createBubbly'),
+      'dtm/createBubbly': publicRequire('dtm/createBubbly'),
       createDataStash: publicRequire('createDataStash')
     });
   });

@@ -10,7 +10,7 @@ var mockVisitorTracking = {
 var conditionDelegateInjector = require('inject!../pageViews');
 var conditionDelegate = conditionDelegateInjector({
   'dtm/visitorTracking': mockVisitorTracking,
-  'dtm/compareNumbers': require('../../../resources/compareNumbers')()
+  'dtm/compareNumbers': require('../../../resources/compareNumbers/compareNumbers')()
 });
 
 var DURATIONS = [

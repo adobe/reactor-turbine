@@ -7,7 +7,7 @@ var mockVisitorTracking = {
 var conditionDelegateInjector = require('inject!../timeOnSite');
 var conditionDelegate = conditionDelegateInjector({
   'dtm/visitorTracking': mockVisitorTracking,
-  'dtm/compareNumbers': require('../../../resources/compareNumbers')()
+  'dtm/compareNumbers': require('../../../resources/compareNumbers/compareNumbers')()
 });
 
 function getConfig(minutes, operator) {

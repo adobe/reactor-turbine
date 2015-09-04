@@ -10,7 +10,7 @@ var mockDocument = {
 var conditionDelegateInjector = require('inject!../windowSize');
 var conditionDelegate = conditionDelegateInjector({
   document: mockDocument,
-  'dtm/compareNumbers': require('../../../resources/compareNumbers')()
+  'dtm/compareNumbers': require('../../../resources/compareNumbers/compareNumbers')()
 });
 
 function getConfig(width, widthOperator, height, heightOperator) {

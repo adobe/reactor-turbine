@@ -27,6 +27,14 @@
       "path": "conditions/hash/hash.js"
     },
     {
+      "name": "Landing Page",
+      "path": "conditions/landingPage/landingPage.js"
+    },
+    {
+      "name": "New/Returning Visitor",
+      "path": "conditions/newReturning/newReturning.js"
+    },
+    {
       "name": "Operating System",
       "path": "conditions/operatingSystem/operatingSystem.js"
     },
@@ -43,16 +51,28 @@
       "path": "conditions/screenResolution/screenResolution.js"
     },
     {
+      "name": "Sessions",
+      "path": "conditions/sessions/sessions.js"
+    },
+    {
       "name": "Subdomain",
       "path": "conditions/subdomain/subdomain.js"
+    },
+    {
+      "name": "Time On Site",
+      "path": "conditions/timeOnSite/timeOnSite.js"
+    },
+    {
+      "name": "Traffic Source",
+      "path": "conditions/trafficSource/trafficSource.js"
     },
     {
       "name": "URL Parameter",
       "path": "conditions/urlParameter/urlParameter.js"
     },
     {
-      "name": "New/Returning Visitor",
-      "path": "conditions/newReturning/newReturning.js"
+      "name": "Window Size",
+      "path": "conditions/windowSize/windowSize.js"
     }
   ],
   "eventDelegates": [
@@ -174,11 +194,11 @@
   "resources": [
     {
       "name": "visitorTracking",
-      "path": "resources/visitorTracking.js"
+      "path": "resources/visitorTracking/visitorTracking.js"
     },
     {
       "name": "compareNumbers",
-      "path": "resources/compareNumbers.js"
+      "path": "resources/compareNumbers/compareNumbers.js"
     }
   ]
 }

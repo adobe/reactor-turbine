@@ -3,8 +3,12 @@ var cleanText = require('./../string/cleanText');
 
 module.exports = function(variable, suppressDefault, dataDef) {
   dataDef = dataDef || state.getDataElementDefinition(variable);
-  var storeLength = dataDef.config.storeLength;
 
+  if (!dataDef) {
+    return state.getPropertyConfig().undefinedVarsReturnEmpty ? '' : null;
+  }
+
+  var storeLength = dataDef.config.storeLength;
   var delegate = state.getDataElementDelegate(dataDef.type);
   var value = delegate(dataDef.config);
 
@@ -14,10 +18,11 @@ module.exports = function(variable, suppressDefault, dataDef) {
   }
 
   if (value === undefined && storeLength) {
-    value = state.getDataElement(variable, storeLength);
+    value = state.getCachedDataElement(variable, storeLength);
   } else if (value !== undefined && storeLength) {
-    state.setDataElement(variable, storeLength, value);
+    state.cacheDataElement(variable, storeLength, value);
   }
+
   if (value === undefined && !suppressDefault) {
     // Have to wrap "default" in quotes since it is a keyword.
     /*eslint-disable dot-notation*/
@@ -29,5 +34,6 @@ module.exports = function(variable, suppressDefault, dataDef) {
   if (dataDef.config.forceLowerCase && value.toLowerCase) {
     value = value.toLowerCase();
   }
+
   return value;
 };

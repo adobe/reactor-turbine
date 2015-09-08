@@ -9,7 +9,7 @@ var logger = require('logger');
  */
 var triggersByCallName = {};
 
-window._satellite = window.satellite || {};
+window._satellite = window._satellite || {};
 
 /**
  * Public function intended to be called by the user.

@@ -1,29 +1,23 @@
 var getVar = require('./getVar');
 
-// Perform variable subtitutions substitute to a string where subtitions are
-// specified in the form `"%foo%"`. Variables are lookup either in `SL.data.customVars`, or
-// if the `elm` parameter is passed it, and the variable spec is of the form `"%this.tagName%"`, it
-// is subsituted with the properties on `elm`, *i.e. `elm.tagName`.
-//
-// Parameters:
-//
-// - `str` - string to apply substitutions to
-// - `elm`(optional) - object or element to use for substitutions of the form `%this.property%`
-// - `target`(optional) - element to use for subsitution of the form `%target.property%`
-module.exports = function(str, undefinedVarsReturnEmpty, elm, evt) {
+/**
+ * Perform variable substitutions to a string where tokens are specified in the form %foo%.
+ * @param str {string} The string to which substitutions should be applied.
+ * @param undefinedVarsReturnEmpty {boolean} When true, an empty string will be returned if a
+ * variable is not found matching the token string.
+ * @param element {HTMLElement} The element to use for tokens in the form of %this.property%.
+ * @param event {Object} The event object to use for tokens in the form of %target.property%.
+ * @returns {string}
+ */
+module.exports = function(str, undefinedVarsReturnEmpty, element, event) {
   if (typeof str !== 'string') {
     return str;
   }
   return str
     .replace(/%(.*?)%/g, function(m, variable) {
-      var val = getVar(variable, elm, evt);
+      var val = getVar(variable, element, event);
       if (val == null) {
-        if (undefinedVarsReturnEmpty) {
-          return '';
-        } else {
-          return val;
-        }
-        return m;
+        return undefinedVarsReturnEmpty ? '' : m;
       } else {
         return val;
       }

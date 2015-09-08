@@ -8,9 +8,10 @@ var mockVisitorTracking = {
 };
 
 var conditionDelegateInjector = require('inject!../pageViews');
+var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
 var conditionDelegate = conditionDelegateInjector({
   'dtm/visitorTracking': mockVisitorTracking,
-  'dtm/compareNumbers': require('../../../resources/compareNumbers/compareNumbers')()
+  'dtm/compareNumbers': publicRequire('dtm/compareNumbers')
 });
 
 var DURATIONS = [

@@ -3,7 +3,7 @@
 
 describe('createBubbly', function() {
   var createBubblyInjector = require('inject!../createBubbly');
-  var publicRequire = require('../../../../../engine/publicRequire');
+  var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
   var createBubbly = createBubblyInjector({
     createDataStash: publicRequire('createDataStash'),
     matchesCSS: publicRequire('matchesCSS')

@@ -1,7 +1,7 @@
 'use strict';
 
 var conditionDelegateInjector = require('inject!../hash');
-var publicRequire = require('../../../../../engine/publicRequire');
+var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
 var conditionDelegate = conditionDelegateInjector({
   textMatch: publicRequire('textMatch')
 });

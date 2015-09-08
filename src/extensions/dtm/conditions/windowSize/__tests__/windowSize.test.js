@@ -8,9 +8,10 @@ var mockDocument = {
 };
 
 var conditionDelegateInjector = require('inject!../windowSize');
+var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
 var conditionDelegate = conditionDelegateInjector({
   document: mockDocument,
-  'dtm/compareNumbers': require('../../../resources/compareNumbers/compareNumbers')()
+  'dtm/compareNumbers': publicRequire('dtm/compareNumbers')
 });
 
 function getConfig(width, widthOperator, height, heightOperator) {

@@ -8,9 +8,10 @@ var mockWindow = {
 };
 
 var conditionDelegateInjector = require('inject!../screenResolution');
+var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
 var conditionDelegate = conditionDelegateInjector({
   window: mockWindow,
-  'dtm/compareNumbers': require('../../../resources/compareNumbers/compareNumbers')()
+  'dtm/compareNumbers': publicRequire('dtm/compareNumbers')
 });
 
 function getConfig(width, widthOperator, height, heightOperator) {

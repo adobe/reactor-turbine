@@ -7,7 +7,7 @@ var mockVisitorTracking = {
 };
 
 var conditionDelegateInjector = require('inject!../trafficSource');
-var publicRequire = require('../../../../../engine/publicRequire');
+var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
 var conditionDelegate = conditionDelegateInjector({
   'textMatch': publicRequire('textMatch'),
   'dtm/visitorTracking': mockVisitorTracking

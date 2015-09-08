@@ -24,6 +24,9 @@ describe('registered user condition delegate', function() {
     dataElementValue = false;
     expect(conditionDelegate(config)).toBe(false);
 
+    dataElementValue = undefined;
+    expect(conditionDelegate(config)).toBe(false);
+
     expect(getDataElement).toHaveBeenCalledWith('foo', true);
   });
 });

@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('createBubbly')();
+var bubbly = require('dtm/createBubbly')();
 
 var typesWatched = [];
 

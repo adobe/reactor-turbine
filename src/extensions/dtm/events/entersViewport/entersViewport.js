@@ -2,7 +2,7 @@
 
 var poll = require('poll');
 var createDataStash = require('createDataStash');
-var createBubbly = require('createBubbly');
+var createBubbly = require('dtm/createBubbly');
 var dataStash = createDataStash('entersViewport');
 var bubbly = createBubbly();
 var TIMEOUT_ID = 'timeoutId';

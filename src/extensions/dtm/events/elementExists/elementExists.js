@@ -2,7 +2,7 @@
 
 var poll = require('poll');
 var dataStash = require('createDataStash')('elementExists');
-var bubbly = require('createBubbly')();
+var bubbly = require('dtm/createBubbly')();
 var SEEN = 'seen';
 
 /**

@@ -11,6 +11,6 @@ var getDataElement = require('getDataElement');
  * @returns {boolean}
  */
 module.exports = function(config) {
-  return getDataElement(config.conditionConfig.dataElementName, true);
+  return Boolean(getDataElement(config.conditionConfig.dataElementName, true));
 };
 

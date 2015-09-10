@@ -1,3 +1,5 @@
+'use strict';
+
 var compareNumbers = require('../compareNumbers');
 
 describe('compare numbers', function() {

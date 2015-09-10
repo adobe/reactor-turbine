@@ -1,3 +1,5 @@
+'use strict';
+
 var conditionDelegateInjector = require('inject!../loggedIn');
 
 describe('logged in condition delegate', function() {

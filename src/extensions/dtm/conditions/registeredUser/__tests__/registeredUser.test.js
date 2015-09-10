@@ -1,3 +1,5 @@
+'use strict';
+
 var conditionDelegateInjector = require('inject!../registeredUser');
 
 describe('registered user condition delegate', function() {

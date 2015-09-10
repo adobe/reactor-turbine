@@ -1,3 +1,5 @@
+'use strict';
+
 var mockVisitorTracking = {
   getMinutesOnSite: function() {
     return 5;

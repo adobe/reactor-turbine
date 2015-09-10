@@ -188,7 +188,9 @@ describe('initRules', function() {
     });
 
     it('does not execute actions when actionsEnabled is false', function() {
-      state.getShouldExecuteActions = function() { return false };
+      state.getShouldExecuteActions = function() {
+        return false;
+      };
 
       initRules();
 

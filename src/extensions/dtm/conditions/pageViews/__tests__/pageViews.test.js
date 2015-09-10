@@ -1,3 +1,5 @@
+'use strict';
+
 var mockVisitorTracking = {
   getLifetimePageViewCount: jasmine.createSpy().and.callFake(function() {
     return 5;

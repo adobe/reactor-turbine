@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Stubs publicRequire. Resources are typically initialized with integration and property
  * configuration during the engine bootstrap process. Since most of our tests don't run the

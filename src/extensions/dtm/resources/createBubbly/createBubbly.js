@@ -1,3 +1,5 @@
+'use strict';
+
 var createDataStash = require('createDataStash');
 var matchesCSS = require('matchesCSS');
 var PROCESSED = 'processed';

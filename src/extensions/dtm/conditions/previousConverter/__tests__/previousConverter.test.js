@@ -1,3 +1,5 @@
+'use strict';
+
 var conditionDelegateInjector = require('inject!../previousConverter');
 
 describe('previous converter condition delegate', function() {

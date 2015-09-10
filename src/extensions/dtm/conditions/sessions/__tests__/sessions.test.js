@@ -1,3 +1,5 @@
+'use strict';
+
 var mockVisitorTracking = {
   getSessionCount: function() {
     return 5;

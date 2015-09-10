@@ -1,10 +1,12 @@
+'use strict';
+
 var getCookie = require('getCookie');
 var setCookie = require('setCookie');
 var document = require('document');
 var window = require('window');
 var property = require('property');
 
-function key(name){
+function key(name) {
   return '_sdsat_' + name;
 }
 
@@ -37,7 +39,7 @@ var getMinutesOnSite = function() {
   return Math.floor((now - getLandingTime()) / 1000 / 60);
 };
 
-var trackSessionCount = function(newSession){
+var trackSessionCount = function(newSession) {
   if (!newSession) {
     return;
   }
@@ -50,7 +52,7 @@ var getSessionCount = function() {
 };
 
 var getIsNewVisitor = function() {
-  return getSessionCount() == 1;
+  return getSessionCount() === 1;
 };
 
 var trackSessionPageViewCount = function() {
@@ -71,7 +73,7 @@ var getSessionPageViewCount = function() {
 
 var trackTrafficSource = function() {
   var k = key('traffic_source');
-  if (!getCookie(k)){
+  if (!getCookie(k)) {
     setCookie(k, document.referrer);
   }
 };

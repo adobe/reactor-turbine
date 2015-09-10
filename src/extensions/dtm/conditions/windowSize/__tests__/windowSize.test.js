@@ -11,7 +11,7 @@ var conditionDelegateInjector = require('inject!../windowSize');
 var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
 var conditionDelegate = conditionDelegateInjector({
   document: mockDocument,
-  resources: publicRequire('resources')
+  resourceProvider: publicRequire('resourceProvider')
 });
 
 function getConfig(width, widthOperator, height, heightOperator) {

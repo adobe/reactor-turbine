@@ -2,7 +2,7 @@
 
 var poll = require('poll');
 var createDataStash = require('createDataStash');
-var bubbly = require('resources').get('dtm', 'createBubbly')();
+var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
 var dataStash = createDataStash('entersViewport');
 var TIMEOUT_ID = 'timeoutId';
 var COMPLETE = 'complete';

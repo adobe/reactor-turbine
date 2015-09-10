@@ -19,7 +19,7 @@
         },
         actionDelegates: {
           testAction: function(module, require) {
-            receivedResource = require('resources').get('testExtension', 'testResource');
+            receivedResource = require('resourceProvider').get('testExtension', 'testResource');
             module.exports = function() {};
           }
         },

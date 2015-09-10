@@ -11,7 +11,7 @@ var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')({
   }
 });
 var conditionDelegate = conditionDelegateInjector({
-  resources: publicRequire('resources')
+  resourceProvider: publicRequire('resourceProvider')
 });
 
 function getConfig(minutes, operator) {

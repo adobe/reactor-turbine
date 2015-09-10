@@ -37,7 +37,7 @@ describe('elementExists event type', function() {
     delegate = delegateInjector({
       poll: publicRequire('poll'),
       createDataStash: publicRequire('createDataStash'),
-      resources: publicRequire('resources')
+      resourceProvider: publicRequire('resourceProvider')
     });
   });
 

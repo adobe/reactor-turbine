@@ -1,6 +1,6 @@
 'use strict';
 
-var visitorTracking = require('resources').get('dtm', 'visitorTracking');
+var visitorTracking = require('resourceProvider').get('dtm', 'visitorTracking');
 
 /**
  * New vs. returning visitor condition. Determines if the visitor is a new or returning visitor.

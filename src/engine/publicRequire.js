@@ -31,7 +31,7 @@ module.exports = function(key) {
     'debounce': require('./utils/debounce'),
     'once': require('./utils/once'),
     'logger': require('./utils/logger'),
-    'resources': {
+    'resourceProvider': {
       get: function(extensionName, resourceName) {
         return state.getResource(extensionName + '/' + resourceName);
       }

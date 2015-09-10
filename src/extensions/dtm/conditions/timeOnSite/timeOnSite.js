@@ -1,8 +1,8 @@
 'use strict';
 
-var resources = require('resources');
-var visitorTracking = resources.get('dtm', 'visitorTracking');
-var compareNumbers = resources.get('dtm', 'compareNumbers');
+var resourceProvider = require('resourceProvider');
+var visitorTracking = resourceProvider.get('dtm', 'visitorTracking');
+var compareNumbers = resourceProvider.get('dtm', 'compareNumbers');
 
 /**
  * Time on site condition. Determines if the user has been on the site for a certain amount

@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('resources').get('dtm', 'createBubbly')();
+var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
 
 document.addEventListener('volumechange', bubbly.evaluateEvent, true);
 

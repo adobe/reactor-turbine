@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('resources').get('dtm', 'createBubbly')();
+var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
 var liveQuerySelector = require('liveQuerySelector');
 var dataStash = require('createDataStash')('hover');
 var DELAYS = 'delays';

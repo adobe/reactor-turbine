@@ -1,7 +1,7 @@
 'use strict';
 
 var textMatch = require('textMatch');
-var visitorTracking = require('resources').get('dtm', 'visitorTracking');
+var visitorTracking = require('resourceProvider').get('dtm', 'visitorTracking');
 
 /**
  * Traffic source condition. Determines if the actual traffic source matches at least one

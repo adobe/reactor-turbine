@@ -14,7 +14,7 @@ var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')({
 });
 var conditionDelegate = conditionDelegateInjector({
   textMatch: publicRequire('textMatch'),
-  resources: publicRequire('resources')
+  resourceProvider: publicRequire('resourceProvider')
 });
 
 function getConfig(pages) {

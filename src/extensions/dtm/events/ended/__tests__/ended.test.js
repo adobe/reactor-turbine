@@ -5,7 +5,7 @@ describe('ended event type', function() {
   var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
   var delegateInjector = require('inject!../ended');
   var delegate = delegateInjector({
-    resources: publicRequire('resources')
+    resourceProvider: publicRequire('resourceProvider')
   });
 
   testStandardEvent(delegate, 'ended');

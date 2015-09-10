@@ -1,7 +1,7 @@
 'use strict';
 
 var textMatch = require('textMatch');
-var visitorTracking = require('resources').get('dtm', 'visitorTracking');
+var visitorTracking = require('resourceProvider').get('dtm', 'visitorTracking');
 
 /**
  * Landing page condition. Determines if the actual landing page matches at least one acceptable

@@ -13,9 +13,7 @@ describe('previous converter condition delegate', function() {
     });
 
     var config = {
-      conditionConfig: {
-        dataElementName: 'foo'
-      }
+      dataElementName: 'foo'
     };
 
     dataElementValue = true;

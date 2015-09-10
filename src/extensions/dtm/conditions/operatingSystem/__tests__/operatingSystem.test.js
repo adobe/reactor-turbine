@@ -11,9 +11,7 @@ var conditionDelegate = conditionDelegateInjector({
 
 function getConfig(operatingSystems) {
   return {
-    conditionConfig: {
-      operatingSystems: operatingSystems
-    }
+    operatingSystems: operatingSystems
   };
 }
 

@@ -31,6 +31,4 @@ var compareNumbers = function(num1, op, num2) {
  * Utility for comparing two numbers.
  * @returns {Function}
  */
-module.exports = function() {
-  return compareNumbers;
-};
+module.exports = compareNumbers;

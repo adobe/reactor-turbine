@@ -10,10 +10,8 @@ var conditionDelegate = require('inject!../urlParameter')({
 
 function getConfig(name, value) {
   return {
-    conditionConfig: {
-      name: name,
-      value: value
-    }
+    name: name,
+    value: value
   };
 }
 

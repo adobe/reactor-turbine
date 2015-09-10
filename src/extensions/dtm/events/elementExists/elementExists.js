@@ -2,7 +2,7 @@
 
 var poll = require('poll');
 var dataStash = require('createDataStash')('elementExists');
-var bubbly = require('dtm/createBubbly')();
+var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
 var SEEN = 'seen';
 
 /**
@@ -39,21 +39,20 @@ poll('element exists event delegate', function() {
 /**
  * Element exists event. This event occurs when an element has been added to the DOM. The rule
  * should only run once per targeted element.
- * @param {Object} config
- * @param {Object} config.eventConfig The event config object.
- * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.
- * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire if
+ * @param {Object} config The event config object.
+ * @param {string} config.selector The CSS selector for elements the rule is targeting.
+ * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire if
  * the event originated from a descendant element.
- * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should fire
+ * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should fire
  * if the same event has already triggered a rule targeting a descendant element.
- * @param {boolean} [config.eventConfig.bubbleStop=false] Whether the event should not trigger
+ * @param {boolean} [config.bubbleStop=false] Whether the event should not trigger
  * rules on ancestor elements.
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  bubbly.addListener(config.eventConfig, trigger);
+  bubbly.addListener(config, trigger);
 
-  if (selectors.indexOf(config.eventConfig.selector) === -1) {
-    selectors.push(config.eventConfig.selector);
+  if (selectors.indexOf(config.selector) === -1) {
+    selectors.push(config.selector);
   }
 };

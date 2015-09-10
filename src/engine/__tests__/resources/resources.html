@@ -11,18 +11,15 @@
       _satellite.container = {
         resources: {
           'testExtension/testResource': function(module) {
-            console.log('test resource init');
-            module.exports = function() {
-              return testResource;
-            };
+            module.exports = testResource;
           },
-          'otherExtension/neverRequired': function(module) {
-            module.exports = neverRequiredResourceSpy;
-          }
+          'otherExtension/neverRequired': neverRequiredResourceSpy.and.callFake(function(module) {
+            module.exports = {};
+          })
         },
         actionDelegates: {
           testAction: function(module, require) {
-            receivedResource = require('testExtension/testResource');
+            receivedResource = require('resourceProvider').get('testExtension', 'testResource');
             module.exports = function() {};
           }
         },

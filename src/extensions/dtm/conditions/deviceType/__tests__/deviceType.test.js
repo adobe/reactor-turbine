@@ -11,9 +11,7 @@ var conditionDelegate = conditionDelegateInjector({
 
 function getConfig(deviceTypes) {
   return {
-    conditionConfig: {
-      deviceTypes: deviceTypes
-    }
+    deviceTypes: deviceTypes
   };
 }
 

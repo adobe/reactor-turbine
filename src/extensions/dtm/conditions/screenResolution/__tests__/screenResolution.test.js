@@ -11,17 +11,15 @@ var conditionDelegateInjector = require('inject!../screenResolution');
 var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
 var conditionDelegate = conditionDelegateInjector({
   window: mockWindow,
-  'dtm/compareNumbers': publicRequire('dtm/compareNumbers')
+  resourceProvider: publicRequire('resourceProvider')
 });
 
 function getConfig(width, widthOperator, height, heightOperator) {
   return {
-    conditionConfig: {
-      width: width,
-      widthOperator: widthOperator,
-      height: height,
-      heightOperator: heightOperator
-    }
+    width: width,
+    widthOperator: widthOperator,
+    height: height,
+    heightOperator: heightOperator
   };
 }
 

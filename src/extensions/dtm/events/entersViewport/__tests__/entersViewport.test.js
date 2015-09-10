@@ -39,7 +39,7 @@ describe('entersViewport event type', function() {
     delegate = delegateInjector({
       poll: publicRequire('poll'),
       createDataStash: publicRequire('createDataStash'),
-      'dtm/createBubbly': publicRequire('dtm/createBubbly')
+      resourceProvider: publicRequire('resourceProvider')
     });
   });
 
@@ -62,21 +62,17 @@ describe('entersViewport event type', function() {
       var a2Trigger = jasmine.createSpy();
 
       delegate({
-        eventConfig: {
-          selector: '#a',
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#a',
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, aTrigger);
 
       delegate({
-        eventConfig: {
-          selector: '#a',
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#a',
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, a2Trigger);
 
       // Give time for the poller to cycle.
@@ -103,23 +99,19 @@ describe('entersViewport event type', function() {
       var a2Trigger = jasmine.createSpy();
 
       delegate({
-        eventConfig: {
-          selector: '#a',
-          delay: 100000,
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#a',
+        delay: 100000,
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, aTrigger);
 
       delegate({
-        eventConfig: {
-          selector: '#a',
-          delay: 100000,
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#a',
+        delay: 100000,
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, a2Trigger);
 
       // Give time for the poller to cycle.
@@ -153,23 +145,19 @@ describe('entersViewport event type', function() {
       var a2Trigger = jasmine.createSpy();
 
       delegate({
-        eventConfig: {
-          selector: '#a',
-          delay: 100000,
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#a',
+        delay: 100000,
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, aTrigger);
 
       delegate({
-        eventConfig: {
-          selector: '#a',
-          delay: 200000,
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#a',
+        delay: 200000,
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, a2Trigger);
 
       // Give time for the poller to cycle.
@@ -210,21 +198,17 @@ describe('entersViewport event type', function() {
       var bTrigger = jasmine.createSpy();
 
       delegate({
-        eventConfig: {
-          selector: '#a',
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#a',
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, aTrigger);
 
       delegate({
-        eventConfig: {
-          selector: '#b',
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#b',
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, bTrigger);
 
       // Give time for the poller to cycle.
@@ -258,23 +242,19 @@ describe('entersViewport event type', function() {
       var bTrigger = jasmine.createSpy();
 
       delegate({
-        eventConfig: {
-          selector: '#a',
-          delay: 100000,
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#a',
+        delay: 100000,
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, aTrigger);
 
       delegate({
-        eventConfig: {
-          selector: '#b',
-          delay: 200000,
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#b',
+        delay: 200000,
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, bTrigger);
 
       expect(aTrigger.calls.count()).toBe(0);
@@ -310,23 +290,19 @@ describe('entersViewport event type', function() {
       var bTrigger = jasmine.createSpy();
 
       delegate({
-        eventConfig: {
-          selector: '#a',
-          delay: 100000,
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#a',
+        delay: 100000,
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, aTrigger);
 
       delegate({
-        eventConfig: {
-          selector: '#b',
-          delay: 100000,
-          bubbleFireIfParent: true,
-          bubbleFireIfChildFired: true,
-          bubbleStop: false
-        }
+        selector: '#b',
+        delay: 100000,
+        bubbleFireIfParent: true,
+        bubbleFireIfChildFired: true,
+        bubbleStop: false
       }, bTrigger);
 
       jasmine.clock().tick(150000);
@@ -372,9 +348,7 @@ describe('entersViewport event type', function() {
         var aTrigger = jasmine.createSpy();
 
         delegate({
-          eventConfig: {
-            selector: '#a'
-          }
+          selector: '#a'
         }, aTrigger);
 
         // Give time for the poller to cycle.
@@ -406,23 +380,17 @@ describe('entersViewport event type', function() {
         var b2Trigger = jasmine.createSpy();
 
         delegate({
-          eventConfig: {
-            selector: '#a'
-          }
+          selector: '#a'
         }, aTrigger);
 
         delegate({
-          eventConfig: {
-            selector: '#b',
-            delay: 50000
-          }
+          selector: '#b',
+          delay: 50000
         }, bTrigger);
 
         delegate({
-          eventConfig: {
-            selector: '#b',
-            delay: 200000
-          }
+          selector: '#b',
+          delay: 200000
         }, b2Trigger);
 
         // Give time for the poller to cycle.

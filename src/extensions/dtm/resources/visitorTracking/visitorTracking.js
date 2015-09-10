@@ -2,6 +2,7 @@ var getCookie = require('getCookie');
 var setCookie = require('setCookie');
 var document = require('document');
 var window = require('window');
+var property = require('property');
 
 function key(name){
   return '_sdsat_' + name;
@@ -91,26 +92,24 @@ var throwDisabledError = function() {
   throw new Error('Visitor tracking not enabled.');
 };
 
-module.exports = function(config) {
-  var trackingEnabled = config.propertyConfig.trackVisitor;
+var trackingEnabled = property.trackVisitor;
 
-  if (trackingEnabled) {
-    trackVisitor();
-  }
+if (trackingEnabled) {
+  trackVisitor();
+}
 
-  var wrapForEnablement = function(fn) {
-    return trackingEnabled ? fn : throwDisabledError;
-  };
+var wrapForEnablement = function(fn) {
+  return trackingEnabled ? fn : throwDisabledError;
+};
 
-  return {
-    getLandingPage: wrapForEnablement(getLandingPage),
-    getLandingTime: wrapForEnablement(getLandingTime),
-    getMinutesOnSite: wrapForEnablement(getMinutesOnSite),
-    getSessionCount: wrapForEnablement(getSessionCount),
-    getLifetimePageViewCount: wrapForEnablement(getLifetimePageViewCount),
-    getSessionPageViewCount: wrapForEnablement(getSessionPageViewCount),
-    getTrafficSource: wrapForEnablement(getTrafficSource),
-    getIsNewVisitor: wrapForEnablement(getIsNewVisitor),
-    trackingEnabled: trackingEnabled
-  };
+module.exports = {
+  getLandingPage: wrapForEnablement(getLandingPage),
+  getLandingTime: wrapForEnablement(getLandingTime),
+  getMinutesOnSite: wrapForEnablement(getMinutesOnSite),
+  getSessionCount: wrapForEnablement(getSessionCount),
+  getLifetimePageViewCount: wrapForEnablement(getLifetimePageViewCount),
+  getSessionPageViewCount: wrapForEnablement(getSessionPageViewCount),
+  getTrafficSource: wrapForEnablement(getTrafficSource),
+  getIsNewVisitor: wrapForEnablement(getIsNewVisitor),
+  trackingEnabled: trackingEnabled
 };

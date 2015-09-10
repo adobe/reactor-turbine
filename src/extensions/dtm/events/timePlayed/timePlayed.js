@@ -1,6 +1,6 @@
 'use strict';
 
-var bubbly = require('dtm/createBubbly')();
+var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
 var dataStash = require('createDataStash')('timePlayed');
 
 var LAST_TRIGGERED = 'lastTriggered';
@@ -45,11 +45,11 @@ function handleTimeUpdate(event) {
   var secondsLastTriggered = dataStash(target, LAST_TRIGGERED) || 0;
   var pseudoEvent;
 
-  relevantMarkers.forEach(function(eventConfig) {
-    var configuredSeconds = eventConfig.unit === timePlayedUnit.SECOND ?
-      eventConfig.amount : (endTime - startTime) * (eventConfig.amount / 100);
+  relevantMarkers.forEach(function(relevantMarker) {
+    var configuredSeconds = relevantMarker.unit === timePlayedUnit.SECOND ?
+      relevantMarker.amount : (endTime - startTime) * (relevantMarker.amount / 100);
     if (configuredSeconds > secondsLastTriggered && configuredSeconds <= playedSeconds) {
-      pseudoEvent = getPseudoEvent(eventConfig.amount, eventConfig.unit, target);
+      pseudoEvent = getPseudoEvent(relevantMarker.amount, relevantMarker.unit, target);
       bubbly.evaluateEvent(pseudoEvent);
     }
   });
@@ -62,38 +62,37 @@ document.addEventListener('timeupdate', handleTimeUpdate, true);
 /**
  * The time played event. This event occurs when the media has been played for a specified amount
  * of time.
- * @param {Object} config
- * @param {Object} config.eventConfig The event config object.
- * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.
- * @param {number} config.eventConfig.amount The amount of time the media must be played before
+ * @param {Object} config The event config object.
+ * @param {string} config.selector The CSS selector for elements the rule is targeting.
+ * @param {number} config.amount The amount of time the media must be played before
  * this event is fired. This value may either be number of seconds (20 for 20 seconds) or a
  * percent value (20 for 20%).
- * @param {timePlayedUnit} config.eventConfig.unit The unit of duration measurement.
- * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire if
+ * @param {timePlayedUnit} config.unit The unit of duration measurement.
+ * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire if
  * the event originated from a descendant element.
- * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should fire
+ * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should fire
  * if the same event has already triggered a rule targeting a descendant element.
- * @param {boolean} [config.eventConfig.bubbleStop=false] Whether the event should not trigger
+ * @param {boolean} [config.bubbleStop=false] Whether the event should not trigger
  * rules on ancestor elements.
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
   var doesMarkerMatch = function(marker) {
-    return marker.amount === config.eventConfig.amount && marker.unit === config.eventConfig.unit;
+    return marker.amount === config.amount && marker.unit === config.unit;
   };
 
   var markerRegistered = relevantMarkers.some(doesMarkerMatch);
 
   if (!markerRegistered) {
     relevantMarkers.push({
-      amount: config.eventConfig.amount,
-      unit: config.eventConfig.unit
+      amount: config.amount,
+      unit: config.unit
     });
   }
 
-  var pseudoEventType = getPseudoEventType(config.eventConfig.amount, config.eventConfig.unit);
+  var pseudoEventType = getPseudoEventType(config.amount, config.unit);
 
-  bubbly.addListener(config.eventConfig, function(event, relatedElement) {
+  bubbly.addListener(config, function(event, relatedElement) {
     // Bubbling for this event is dependent upon the amount and unit configured for rules.
     // An event can "bubble up" to other rules with the same amount and unit but not to rules with
     // a different amount or unit. See the tests for how this plays out.

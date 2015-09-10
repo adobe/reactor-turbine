@@ -1,4 +1,4 @@
-var compareNumbers = require('../compareNumbers')();
+var compareNumbers = require('../compareNumbers');
 
 describe('compare numbers', function() {
   describe('with "greater than" constraint', function() {

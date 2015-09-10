@@ -1,22 +1,21 @@
 'use strict';
 
-var bubbly = require('dtm/createBubbly')();
+var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
 
 document.addEventListener('volumechange', bubbly.evaluateEvent, true);
 
 /**
  * The volumechange event. This event occurs when the volume has changed.
- * @param {Object} config
- * @param {Object} config.eventConfig The event config object.
- * @param {string} config.eventConfig.selector The CSS selector for elements the rule is targeting.
- * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire if
+ * @param {Object} config The event config object.
+ * @param {string} config.selector The CSS selector for elements the rule is targeting.
+ * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire if
  * the event originated from a descendant element.
- * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should fire
+ * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should fire
  * if the same event has already triggered a rule targeting a descendant element.
- * @param {boolean} [config.eventConfig.bubbleStop=false] Whether the event should not trigger
+ * @param {boolean} [config.bubbleStop=false] Whether the event should not trigger
  * rules on ancestor elements.
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  bubbly.addListener(config.eventConfig, trigger);
+  bubbly.addListener(config, trigger);
 };

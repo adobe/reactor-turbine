@@ -29,10 +29,8 @@ module.exports = function(delegate, type) {
     var trigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#outer',
-        bubbleFireIfParent: true
-      }
+      selector: '#outer',
+      bubbleFireIfParent: true
     }, trigger);
 
     // We're overloading our usage of Simulate here. The second arg is a character which only

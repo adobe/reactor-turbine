@@ -97,7 +97,6 @@ var watchForZoom = once(function() {
 /**
  * The zoomchange event. This event occurs when the zoom level has changed on an iOS device.
  * This is unsupported on Android.
- * @param {Object} config
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {

@@ -8,9 +8,7 @@ var dataElementDelegate = require('inject!../variable')({
 describe('variable data element delegate', function() {
   it('should return an object property value', function() {
     var config = {
-      dataElementConfig: {
-        path: 'my.path.var'
-      }
+      path: 'my.path.var'
     };
 
     var value = dataElementDelegate(config);

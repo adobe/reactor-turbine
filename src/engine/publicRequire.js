@@ -36,7 +36,7 @@ module.exports = function(key) {
         return state.getResource(extensionName + '/' + resourceName);
       }
     },
-    'integrations': {
+    'integrationProvider': {
       getById: state.getIntegrationConfigById,
       getByExtension: state.getIntegrationConfigsByExtensionId
     },

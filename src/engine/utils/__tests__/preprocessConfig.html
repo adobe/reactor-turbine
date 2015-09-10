@@ -50,7 +50,7 @@
         },
         eventDelegates: {
           testEvent: function(module, require) {
-            var integrations = require('integrations');
+            var integrationProvider = require('integrationProvider');
             eventRequiredProperty = require('property');
 
             var allTriggers = [];
@@ -71,29 +71,29 @@
             };
 
             module.exports = eventDelegateSpy.and.callFake(function(config, trigger) {
-              eventRequiredIntegration = integrations.getById('abc');
+              eventRequiredIntegration = integrationProvider.getById('abc');
               allTriggers.push(trigger);
             });
           }
         },
         conditionDelegates: {
           testCondition: function(module, require) {
-            var integrations = require('integrations');
+            var integrationProvider = require('integrationProvider');
             conditionRequiredProperty = require('property');
 
             module.exports = conditionDelegateSpy.and.callFake(function() {
-              conditionRequiredIntegration = integrations.getById('abc');
+              conditionRequiredIntegration = integrationProvider.getById('abc');
               return true;
             });
           }
         },
         actionDelegates: {
           testAction: function(module, require) {
-            var integrations = require('integrations');
+            var integrationProvider = require('integrationProvider');
             actionRequiredProperty = require('property');
 
             module.exports = actionDelegateSpy.and.callFake(function() {
-              actionRequiredIntegration = integrations.getById('abc');
+              actionRequiredIntegration = integrationProvider.getById('abc');
             });
           }
         },

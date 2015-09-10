@@ -7,6 +7,14 @@
       "path": "conditions/browser/browser.js"
     },
     {
+      "name": "Cart Amount",
+      "path": "conditions/cartAmount/cartAmount.js"
+    },
+    {
+      "name": "Cart Item Quantity",
+      "path": "conditions/cartItemQuantity/cartItemQuantity.js"
+    },
+    {
       "name": "Cookie Opt-out",
       "path": "conditions/cookieOptOut/cookieOptOut.js"
     },
@@ -31,6 +39,10 @@
       "path": "conditions/landingPage/landingPage.js"
     },
     {
+      "name": "Logged In",
+      "path": "conditions/loggedIn/loggedIn.js"
+    },
+    {
       "name": "New/Returning Visitor",
       "path": "conditions/newReturning/newReturning.js"
     },
@@ -39,12 +51,24 @@
       "path": "conditions/operatingSystem/operatingSystem.js"
     },
     {
+      "name": "Page Views",
+      "path": "conditions/pageViews/pageViews.js"
+    },
+    {
       "name": "Path",
       "path": "conditions/path/path.js"
     },
     {
+      "name": "Previous Converter",
+      "path": "conditions/previousConverter/previousConverter.js"
+    },
+    {
       "name": "Protocol",
       "path": "conditions/protocol/protocol.js"
+    },
+    {
+      "name": "Registered User",
+      "path": "conditions/registeredUser/registeredUser.js"
     },
     {
       "name": "Screen Resolution",

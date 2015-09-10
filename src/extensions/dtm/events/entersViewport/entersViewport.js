@@ -2,9 +2,8 @@
 
 var poll = require('poll');
 var createDataStash = require('createDataStash');
-var createBubbly = require('dtm/createBubbly');
+var bubbly = require('resources').get('dtm', 'createBubbly')();
 var dataStash = createDataStash('entersViewport');
-var bubbly = createBubbly();
 var TIMEOUT_ID = 'timeoutId';
 var COMPLETE = 'complete';
 
@@ -224,32 +223,31 @@ poll('enters viewport event delegate', checkIfElementsInViewport);
 /**
  * Enters viewport event. This event occurs when an element has entered the viewport. The rule
  * should only run once per targeted element.
- * @param {Object} config
- * @param {Object} config.eventConfig The event config object.
- * @param {string} config.eventConfig.selector The CSS selector for elements the rule is
+ * @param {Object} config The event config object.
+ * @param {string} config.selector The CSS selector for elements the rule is
  * targeting.
- * @param {Number} [config.eventConfig.delay] The number of milliseconds the element must be
+ * @param {Number} [config.delay] The number of milliseconds the element must be
  * within the viewport before declaring that the event has occurred.
- * @param {boolean} [config.eventConfig.bubbleFireIfParent=false] Whether the rule should fire
+ * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire
  * if the event originated from a descendant element.
- * @param {boolean} [config.eventConfig.bubbleFireIfChildFired=false] Whether the rule should
+ * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should
  * fire if the same event has already triggered a rule targeting a descendant element.
- * @param {boolean} [config.eventConfig.bubbleStop=false] Whether the event should not trigger
+ * @param {boolean} [config.bubbleStop=false] Whether the event should not trigger
  * rules on ancestor elements.
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
 
-  bubbly.addListener(config.eventConfig, function(event, relatedElement) {
+  bubbly.addListener(config, function(event, relatedElement) {
     // Bubbling for this event is dependent upon the delay configured for rules.
     // An event can "bubble up" to other rules with the same delay but not to rules with
     // different delays. See the tests for how this plays out.
-    if (event.inviewDelay === config.eventConfig.delay) {
+    if (event.inviewDelay === config.delay) {
       trigger(event, relatedElement);
     } else {
       return false;
     }
   });
 
-  listeners.push(config.eventConfig);
+  listeners.push(config);
 };

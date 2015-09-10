@@ -31,13 +31,24 @@ module.exports = function(key) {
     'debounce': require('./utils/debounce'),
     'once': require('./utils/once'),
     'logger': require('./utils/logger'),
+    'resources': {
+      get: function(extensionName, resourceName) {
+        return state.getResource(extensionName + '/' + resourceName);
+      }
+    },
+    'integrations': {
+      getById: state.getIntegrationConfigById,
+      getByExtension: state.getIntegrationConfigsByExtensionId
+    },
+    // TODO: The property config is "preprocessed" at the time getPropertyConfig is called.
+    // Will this be too early? Should we expose the module as "getPropertyConfig"
+    // so that extension developers can retrieve the config + have it preprocessed at any time?
+    'property': state.getPropertyConfig(),
     'window': window,
     'document': document
   };
 
-  if (key.indexOf('/') !== -1) {
-    return state.getResource(key);
-  } else if (modules.hasOwnProperty(key)) {
+  if (modules.hasOwnProperty(key)) {
     return modules[key];
   } else {
     throw new Error('Cannot resolve module "' + key + '".');

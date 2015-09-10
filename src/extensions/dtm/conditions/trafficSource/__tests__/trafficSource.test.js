@@ -7,17 +7,19 @@ var mockVisitorTracking = {
 };
 
 var conditionDelegateInjector = require('inject!../trafficSource');
-var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
+var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')({
+  resourceStubs: {
+    'dtm/visitorTracking': mockVisitorTracking
+  }
+});
 var conditionDelegate = conditionDelegateInjector({
-  'textMatch': publicRequire('textMatch'),
-  'dtm/visitorTracking': mockVisitorTracking
+  textMatch: publicRequire('textMatch'),
+  resources: publicRequire('resources')
 });
 
 function getConfig(sources) {
   return {
-    conditionConfig: {
-      sources: sources
-    }
+    sources: sources
   };
 }
 

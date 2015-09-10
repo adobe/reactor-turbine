@@ -11,9 +11,7 @@ describe('directCall event type', function() {
     var trigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        name: 'foo'
-      }
+      name: 'foo'
     }, trigger);
 
     expect(trigger.calls.count()).toBe(0);

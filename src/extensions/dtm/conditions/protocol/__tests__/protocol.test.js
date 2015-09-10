@@ -4,9 +4,7 @@ var conditionDelegate = require('../protocol');
 
 function getConfig(protocols) {
   return {
-    conditionConfig: {
-      protocols: protocols
-    }
+    protocols: protocols
   };
 }
 

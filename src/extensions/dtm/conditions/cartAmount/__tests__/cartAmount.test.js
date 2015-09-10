@@ -3,16 +3,14 @@
 var conditionDelegateInjector = require('inject!../cartAmount');
 var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
 var conditionDelegate = conditionDelegateInjector({
-  'dtm/compareNumbers': publicRequire('dtm/compareNumbers')
+  'resources': publicRequire('resources')
 });
 
 function getConfig(dataElementName, operator, amount) {
   return {
-    conditionConfig: {
-      dataElementName: dataElementName,
-      operator: operator,
-      amount: amount
-    }
+    dataElementName: dataElementName,
+    operator: operator,
+    amount: amount
   };
 }
 

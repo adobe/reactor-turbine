@@ -36,7 +36,7 @@ describe('hover event type', function() {
     var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
     var delegateInjector = require('inject!../hover');
     delegate = delegateInjector({
-      'dtm/createBubbly': publicRequire('dtm/createBubbly'),
+      resources: publicRequire('resources'),
       liveQuerySelector: publicRequire('liveQuerySelector'),
       createDataStash: publicRequire('createDataStash')
     });
@@ -61,21 +61,17 @@ describe('hover event type', function() {
     var bTrigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#b',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#b',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, bTrigger);
 
     // Give the poller time to pick up on the target elements.
@@ -119,21 +115,17 @@ describe('hover event type', function() {
     var a2Trigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, a2Trigger);
 
     // Give the poller time to pick up on the target elements.
@@ -165,23 +157,19 @@ describe('hover event type', function() {
     var bTrigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false,
-        delay: 1000
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false,
+      delay: 1000
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#b',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false,
-        delay: 1000
-      }
+      selector: '#b',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false,
+      delay: 1000
     }, bTrigger);
 
     // Give the poller time to pick up on the target elements.
@@ -236,23 +224,19 @@ describe('hover event type', function() {
     var bTrigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false,
-        delay: 2000
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false,
+      delay: 2000
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#b',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false,
-        delay: 1000
-      }
+      selector: '#b',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false,
+      delay: 1000
     }, bTrigger);
 
 
@@ -305,23 +289,19 @@ describe('hover event type', function() {
     var a2Trigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false,
-        delay: 1000
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false,
+      delay: 1000
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false,
-        delay: 1000
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false,
+      delay: 1000
     }, a2Trigger);
 
     // Give the poller time to pick up on the target elements.
@@ -364,23 +344,19 @@ describe('hover event type', function() {
     var a2Trigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false,
-        delay: 1000
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false,
+      delay: 1000
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false,
-        delay: 2000
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false,
+      delay: 2000
     }, a2Trigger);
 
     // Give the poller time to pick up on the target elements.

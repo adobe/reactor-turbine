@@ -37,7 +37,7 @@ describe('elementExists event type', function() {
     delegate = delegateInjector({
       poll: publicRequire('poll'),
       createDataStash: publicRequire('createDataStash'),
-      'dtm/createBubbly': publicRequire('dtm/createBubbly')
+      resources: publicRequire('resources')
     });
   });
 
@@ -58,21 +58,17 @@ describe('elementExists event type', function() {
     var a2Trigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, a2Trigger);
 
     // Give time for the poller to cycle.
@@ -98,21 +94,17 @@ describe('elementExists event type', function() {
     var bTrigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#b',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#b',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, bTrigger);
 
     // Give time for the poller to cycle.

@@ -7,17 +7,19 @@ var mockVisitorTracking = {
 };
 
 var conditionDelegateInjector = require('inject!../landingPage');
-var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
+var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')({
+  resourceStubs: {
+    'dtm/visitorTracking': mockVisitorTracking
+  }
+});
 var conditionDelegate = conditionDelegateInjector({
   textMatch: publicRequire('textMatch'),
-  'dtm/visitorTracking': mockVisitorTracking
+  resources: publicRequire('resources')
 });
 
 function getConfig(pages) {
   return {
-    conditionConfig: {
-      pages: pages
-    }
+    pages: pages
   };
 }
 

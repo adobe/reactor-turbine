@@ -5,10 +5,8 @@ var dataElementDelegate = require('../custom');
 describe('custom data element delegate', function() {
   it('should return the return value of a user-defined script', function() {
     var config = {
-      dataElementConfig: {
-        script: function() {
-          return 'foo';
-        }
+      script: function() {
+        return 'foo';
       }
     };
 

@@ -3,15 +3,18 @@
 var mockVisitorTracking = {};
 
 var conditionDelegateInjector = require('inject!../newReturning');
+var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')({
+  resourceStubs: {
+    'dtm/visitorTracking': mockVisitorTracking
+  }
+});
 var conditionDelegate = conditionDelegateInjector({
-  'dtm/visitorTracking': mockVisitorTracking
+  resources: publicRequire('resources')
 });
 
 function getConfig(isNew) {
   return {
-    conditionConfig: {
-      isNew: isNew
-    }
+    isNew: isNew
   };
 }
 

@@ -5,18 +5,19 @@ var mockVisitorTracking = {
 };
 
 var conditionDelegateInjector = require('inject!../sessions');
-var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
+var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')({
+  resourceStubs: {
+    'dtm/visitorTracking': mockVisitorTracking
+  }
+});
 var conditionDelegate = conditionDelegateInjector({
-  'dtm/visitorTracking': mockVisitorTracking,
-  'dtm/compareNumbers': publicRequire('dtm/compareNumbers')
+  resources: publicRequire('resources')
 });
 
 function getConfig(count, operator) {
   return {
-    conditionConfig: {
-      count: count,
-      operator: operator
-    }
+    count: count,
+    operator: operator
   };
 }
 

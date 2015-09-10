@@ -8,10 +8,13 @@ var mockVisitorTracking = {
 };
 
 var conditionDelegateInjector = require('inject!../pageViews');
-var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
+var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')({
+  resourceStubs: {
+    'dtm/visitorTracking': mockVisitorTracking
+  }
+});
 var conditionDelegate = conditionDelegateInjector({
-  'dtm/visitorTracking': mockVisitorTracking,
-  'dtm/compareNumbers': publicRequire('dtm/compareNumbers')
+  resources: publicRequire('resources')
 });
 
 var DURATIONS = [
@@ -21,11 +24,9 @@ var DURATIONS = [
 
 function getConfig(count, operator, duration) {
   return {
-    conditionConfig: {
-      count: count,
-      operator: operator,
-      duration: duration
-    }
+    count: count,
+    operator: operator,
+    duration: duration
   };
 }
 

@@ -24,7 +24,6 @@ var watchForContentLoaded  = once(function() {
 /**
  * DOM ready event. This event occurs as soon as HTML document has been completely loaded and
  * parsed, without waiting for stylesheets, images, and subframes to finish loading.
- * @oaran {Object} config
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {

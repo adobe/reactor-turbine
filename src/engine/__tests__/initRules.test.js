@@ -8,7 +8,6 @@ describe('initRules', function() {
     var state;
     var event;
     var relatedElement;
-    var integrations;
     var eventDelegates;
     var conditionDelegates;
     var actionDelegates;
@@ -18,15 +17,6 @@ describe('initRules', function() {
     beforeEach(function() {
       event = {};
       relatedElement = {};
-
-      integrations = {
-        abc: {
-          extensionId: 'testExtension',
-          config: {
-            testIntegrationFoo: 'bar'
-          }
-        }
-      };
 
       eventDelegates = {
         testEvent: jasmine.createSpy().and.callFake(function(config, trigger) {
@@ -49,7 +39,6 @@ describe('initRules', function() {
           name: 'Test Rule',
           events: [
             {
-              integrationIds: ['abc'],
               type: 'testEvent',
               config: {
                 testEventFoo: 'bar'
@@ -58,14 +47,12 @@ describe('initRules', function() {
           ],
           conditions: [
             {
-              integrationIds: ['abc'],
               type: 'testCondition1',
               config: {
                 testCondition1Foo: 'bar'
               }
             },
             {
-              integrationIds: ['abc'],
               type:'testCondition2',
               config: {
                 testCondition2Foo: 'bar'
@@ -74,14 +61,12 @@ describe('initRules', function() {
           ],
           actions: [
             {
-              integrationIds: ['abc'],
               type: 'testAction1',
               config: {
                 testAction1Foo: 'bar'
               }
             },
             {
-              integrationIds: ['abc'],
               type: 'testAction2',
               config: {
                 testAction2Foo: 'bar'
@@ -98,9 +83,6 @@ describe('initRules', function() {
       state = {
         getShouldExecuteActions: function() {
           return true;
-        },
-        getIntegrationConfigById: function(id) {
-          return integrations[id].config;
         },
         getEventDelegate: function(type) {
           return eventDelegates[type];
@@ -132,17 +114,7 @@ describe('initRules', function() {
       var eventDelegateCall = eventDelegates.testEvent.calls.mostRecent();
 
       expect(eventDelegateCall.args[0]).toEqual({
-        eventConfig: {
-          testEventFoo: 'bar'
-        },
-        integrationConfigs: [
-          {
-            testIntegrationFoo: 'bar'
-          }
-        ],
-        propertyConfig: {
-          propertyFoo: 'bar'
-        }
+        testEventFoo: 'bar'
       });
 
       expect(typeof eventDelegateCall.args[1]).toBe('function');
@@ -152,17 +124,7 @@ describe('initRules', function() {
       var conditionDelegate1Call = conditionDelegates.testCondition1.calls.mostRecent();
 
       expect(conditionDelegate1Call.args[0]).toEqual({
-        conditionConfig: {
-          testCondition1Foo: 'bar'
-        },
-        integrationConfigs: [
-          {
-            testIntegrationFoo: 'bar'
-          }
-        ],
-        propertyConfig: {
-          propertyFoo: 'bar'
-        }
+        testCondition1Foo: 'bar'
       });
 
       expect(conditionDelegate1Call.args[1]).toBe(event);
@@ -173,17 +135,7 @@ describe('initRules', function() {
       var conditionDelegate2Call = conditionDelegates.testCondition2.calls.mostRecent();
 
       expect(conditionDelegate2Call.args[0]).toEqual({
-        conditionConfig: {
-          testCondition2Foo: 'bar'
-        },
-        integrationConfigs: [
-          {
-            testIntegrationFoo: 'bar'
-          }
-        ],
-        propertyConfig: {
-          propertyFoo: 'bar'
-        }
+        testCondition2Foo: 'bar'
       });
 
       expect(conditionDelegate2Call.args[1]).toBe(event);
@@ -194,17 +146,7 @@ describe('initRules', function() {
       var actionDelegate1Call = actionDelegates.testAction1.calls.mostRecent();
 
       expect(actionDelegate1Call.args[0]).toEqual({
-        actionConfig: {
-          testAction1Foo: 'bar'
-        },
-        integrationConfigs: [
-          {
-            testIntegrationFoo: 'bar'
-          }
-        ],
-        propertyConfig: {
-          propertyFoo: 'bar'
-        }
+        testAction1Foo: 'bar'
       });
 
       expect(actionDelegates.testAction2.calls.count()).toBe(1);
@@ -212,17 +154,7 @@ describe('initRules', function() {
       var actionDelegate2Call = actionDelegates.testAction2.calls.mostRecent();
 
       expect(actionDelegate2Call.args[0]).toEqual({
-        actionConfig: {
-          testAction2Foo: 'bar'
-        },
-        integrationConfigs: [
-          {
-            testIntegrationFoo: 'bar'
-          }
-        ],
-        propertyConfig: {
-          propertyFoo: 'bar'
-        }
+        testAction2Foo: 'bar'
       });
     });
 
@@ -295,9 +227,6 @@ describe('initRules', function() {
         },
         getRules: function() {
           return rules;
-        },
-        getIntegrationConfigById: function() {
-          return null;
         },
         getPropertyConfig: function() {
           return null;

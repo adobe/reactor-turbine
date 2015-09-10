@@ -11,9 +11,7 @@ var conditionDelegate = conditionDelegateInjector({
 
 function getConfig(browsers) {
   return {
-    conditionConfig: {
-      browsers: browsers
-    }
+    browsers: browsers
   };
 }
 

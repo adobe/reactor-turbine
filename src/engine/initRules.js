@@ -6,7 +6,6 @@ function runActions(rule, event, relatedElement) {
   if (state.getShouldExecuteActions() && rule.actions) {
     rule.actions.forEach(function(action) {
       action.config = action.config || {};
-      action.integrationIds = action.integrationIds || [];
 
       var delegate = state.getActionDelegate(action.type);
 
@@ -15,11 +14,7 @@ function runActions(rule, event, relatedElement) {
         return;
       }
 
-      var config = {
-        actionConfig: preprocessConfig(action.config, relatedElement, event),
-        integrationConfigs: action.integrationIds.map(state.getIntegrationConfigById),
-        propertyConfig: state.getPropertyConfig()
-      };
+      var config = preprocessConfig(action.config, relatedElement, event);
 
       try {
         delegate(config);
@@ -38,7 +33,6 @@ function checkConditions(rule, event, relatedElement) {
     for (var i = 0; i < rule.conditions.length; i++) {
       var condition = rule.conditions[i];
       condition.config = condition.config || {};
-      condition.integrationIds = condition.integrationIds || [];
 
       var delegate = state.getConditionDelegate(condition.type);
 
@@ -49,11 +43,7 @@ function checkConditions(rule, event, relatedElement) {
         return;
       }
 
-      var config = {
-        conditionConfig: preprocessConfig(condition.config, relatedElement, event),
-        integrationConfigs: condition.integrationIds.map(state.getIntegrationConfigById),
-        propertyConfig: state.getPropertyConfig()
-      };
+      var config = preprocessConfig(condition.config, relatedElement, event);
 
       try {
         if (!delegate(config, event, relatedElement)) {
@@ -88,7 +78,6 @@ function initEventDelegate(rule) {
 
     rule.events.forEach(function(event) {
       event.config = event.config || {};
-      event.integrationIds = event.integrationIds || [];
 
       var delegate = state.getEventDelegate(event.type);
 
@@ -97,11 +86,7 @@ function initEventDelegate(rule) {
         return;
       }
 
-      var config = {
-        eventConfig: preprocessConfig(event.config),
-        integrationConfigs: event.integrationIds.map(state.getIntegrationConfigById),
-        propertyConfig: state.getPropertyConfig()
-      };
+      var config = preprocessConfig(event.config);
 
       try {
         delegate(config, trigger);

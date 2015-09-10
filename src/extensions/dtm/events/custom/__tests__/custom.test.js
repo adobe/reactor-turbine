@@ -20,7 +20,7 @@ describe('custom event type', function() {
   var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
   var delegateInjector = require('inject!../custom');
   var delegate = delegateInjector({
-    'dtm/createBubbly': publicRequire('dtm/createBubbly')
+    resources: publicRequire('resources')
   });
 
   beforeAll(function() {
@@ -44,11 +44,9 @@ describe('custom event type', function() {
     var trigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#outer',
-        type: CUSTOM_EVENT_TYPE,
-        bubbleFireIfParent: true
-      }
+      selector: '#outer',
+      type: CUSTOM_EVENT_TYPE,
+      bubbleFireIfParent: true
     }, trigger);
 
     var event = triggerCustomEvent(innerElement, CUSTOM_EVENT_TYPE);

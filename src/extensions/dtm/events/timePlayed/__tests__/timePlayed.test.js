@@ -36,7 +36,7 @@ describe('timePlayed event type', function() {
     var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
     var delegateInjector = require('inject!../timePlayed');
     delegate = delegateInjector({
-      'dtm/createBubbly': publicRequire('dtm/createBubbly'),
+      resources: publicRequire('resources'),
       createDataStash: publicRequire('createDataStash')
     });
   });
@@ -59,25 +59,21 @@ describe('timePlayed event type', function() {
     var a2Trigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        amount: 5,
-        unit: 'second',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      amount: 5,
+      unit: 'second',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        amount: 5,
-        unit: 'second',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      amount: 5,
+      unit: 'second',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, a2Trigger);
 
     expect(aTrigger.calls.count()).toEqual(0);
@@ -131,25 +127,21 @@ describe('timePlayed event type', function() {
     var bTrigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        amount: 5,
-        unit: 'second',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      amount: 5,
+      unit: 'second',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#b',
-        amount: 5,
-        unit: 'second',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#b',
+      amount: 5,
+      unit: 'second',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, bTrigger);
 
     expect(aTrigger.calls.count()).toEqual(0);
@@ -203,25 +195,21 @@ describe('timePlayed event type', function() {
     var bTrigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        amount: 5,
-        unit: 'second',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      amount: 5,
+      unit: 'second',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#b',
-        amount: 10,
-        unit: 'second',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#b',
+      amount: 10,
+      unit: 'second',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, bTrigger);
 
     expect(aTrigger.calls.count()).toEqual(0);
@@ -282,25 +270,21 @@ describe('timePlayed event type', function() {
     var a2Trigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        amount: 5,
-        unit: 'second',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      amount: 5,
+      unit: 'second',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        amount: 10,
-        unit: 'second',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      amount: 10,
+      unit: 'second',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, a2Trigger);
 
     expect(aTrigger.calls.count()).toEqual(0);
@@ -361,25 +345,21 @@ describe('timePlayed event type', function() {
     var bTrigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        amount: 5,
-        unit: 'percent',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      amount: 5,
+      unit: 'percent',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#b',
-        amount: 10,
-        unit: 'percent',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#b',
+      amount: 10,
+      unit: 'percent',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, bTrigger);
 
     expect(aTrigger.calls.count()).toEqual(0);
@@ -440,25 +420,21 @@ describe('timePlayed event type', function() {
     var a2Trigger = jasmine.createSpy();
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        amount: 5,
-        unit: 'second',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      amount: 5,
+      unit: 'second',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, aTrigger);
 
     delegate({
-      eventConfig: {
-        selector: '#a',
-        amount: 5,
-        unit: 'percent',
-        bubbleFireIfParent: true,
-        bubbleFireIfChildFired: true,
-        bubbleStop: false
-      }
+      selector: '#a',
+      amount: 5,
+      unit: 'percent',
+      bubbleFireIfParent: true,
+      bubbleFireIfChildFired: true,
+      bubbleStop: false
     }, a2Trigger);
 
     expect(aTrigger.calls.count()).toEqual(0);

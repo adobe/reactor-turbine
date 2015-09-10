@@ -5,7 +5,7 @@ describe('loadeddata event type', function() {
   var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
   var delegateInjector = require('inject!../loadeddata');
   var delegate = delegateInjector({
-    'dtm/createBubbly': publicRequire('dtm/createBubbly')
+    resources: publicRequire('resources')
   });
 
   testStandardEvent(delegate, 'loadeddata');

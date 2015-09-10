@@ -5,7 +5,7 @@ describe('change event type', function() {
   var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
   var delegateInjector = require('inject!../change');
   var delegate = delegateInjector({
-    'dtm/createBubbly': publicRequire('dtm/createBubbly'),
+    resources: publicRequire('resources'),
     textMatch: publicRequire('textMatch')
   });
 
@@ -43,11 +43,9 @@ describe('change event type', function() {
       var trigger = jasmine.createSpy();
 
       delegate({
-        eventConfig: {
-          selector: '#outer',
-          value: 'foo',
-          bubbleFireIfParent: true
-        }
+        selector: '#outer',
+        value: 'foo',
+        bubbleFireIfParent: true
       }, trigger);
 
       innerElement.value = 'foo';
@@ -66,11 +64,9 @@ describe('change event type', function() {
       var trigger = jasmine.createSpy();
 
       delegate({
-        eventConfig: {
-          selector: '#outer',
-          value: 'foo',
-          bubbleFireIfParent: true
-        }
+        selector: '#outer',
+        value: 'foo',
+        bubbleFireIfParent: true
       }, trigger);
 
       innerElement.value = 'bar';
@@ -83,11 +79,9 @@ describe('change event type', function() {
       var trigger = jasmine.createSpy();
 
       delegate({
-        eventConfig: {
-          selector: '#outer',
-          value: /^f/,
-          bubbleFireIfParent: true
-        }
+        selector: '#outer',
+        value: /^f/,
+        bubbleFireIfParent: true
       }, trigger);
 
       innerElement.value = 'foo';
@@ -106,11 +100,9 @@ describe('change event type', function() {
       var trigger = jasmine.createSpy();
 
       delegate({
-        eventConfig: {
-          selector: '#outer',
-          value: /^f/,
-          bubbleFireIfParent: true
-        }
+        selector: '#outer',
+        value: /^f/,
+        bubbleFireIfParent: true
       }, trigger);
 
       innerElement.value = 'bar';

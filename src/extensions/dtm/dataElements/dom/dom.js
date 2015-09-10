@@ -1,11 +1,11 @@
 'use strict';
 
 module.exports = function(config) {
-  var elements = document.querySelectorAll(config.dataElementConfig.selector);
+  var elements = document.querySelectorAll(config.selector);
   if (elements.length > 0) {
     var element = elements[0];
 
-    var property = config.dataElementConfig.property;
+    var property = config.property;
 
     // TODO Can we use getObjectProperty() here or at least getElementText()?
     if (property === 'text') {

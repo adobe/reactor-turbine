@@ -1,7 +1,7 @@
 'use strict';
-
-var visitorTracking = require('dtm/visitorTracking');
-var compareNumbers = require('dtm/compareNumbers');
+var resources = require('resources');
+var visitorTracking = resources.get('dtm', 'visitorTracking');
+var compareNumbers = resources.get('dtm', 'compareNumbers');
 
 /**
  * Enum for duration.
@@ -15,21 +15,20 @@ var duration = {
 
 /**
  * Page views condition. Determines if the number of page views matches constraints.
- * @param {Object} config
- * @param {Object} config.conditionConfig Condition config.
- * @param {number} config.conditionConfig.count The number of page views to compare against.
- * @param {comparisonOperator} config.conditionConfig.operator The comparison operator to use to
+ * @param {Object} config Condition config.
+ * @param {number} config.count The number of page views to compare against.
+ * @param {comparisonOperator} config.operator The comparison operator to use to
  * compare against count.
- * @param {duration} config.conditionConfig.duration The duration of time for which to include
+ * @param {duration} config.duration The duration of time for which to include
  * page views.
  * @returns {boolean}
  */
 module.exports = function(config) {
-  var methodName = config.conditionConfig.duration === duration.LIFETIME ?
+  var methodName = config.duration === duration.LIFETIME ?
     'getLifetimePageViewCount' : 'getSessionPageViewCount';
   return compareNumbers(
     visitorTracking[methodName](),
-    config.conditionConfig.operator,
-    config.conditionConfig.count
+    config.operator,
+    config.count
   );
 };

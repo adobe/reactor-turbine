@@ -13,9 +13,7 @@ var conditionDelegate = conditionDelegateInjector({
 
 function getConfig(domains) {
   return {
-    conditionConfig: {
-      domains: domains
-    }
+    domains: domains
   };
 }
 

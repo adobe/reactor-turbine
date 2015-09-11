@@ -73,7 +73,7 @@ module.exports = {
     return dataElementSafe(key, length);
   },
   cacheDataElement: function(key, length, value) {
-    dataElementSafe(key, value, length);
+    dataElementSafe(key, length, value);
   },
   getAppVersion: function() {
     return _container.appVersion;

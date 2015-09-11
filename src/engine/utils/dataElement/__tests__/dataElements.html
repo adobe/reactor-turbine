@@ -1,27 +1,12 @@
 <html>
   <head>
     <script>
-      var coreDelegateSpy = jasmine.createSpy();
       var actionDelegateSpy = jasmine.createSpy();
 
       var container = {
         extensions: {
           testExtension: {
             name: "Test Extension"
-          }
-        },
-        integrations: {
-          'abc': {
-            extensionId: 'testExtension',
-            config: {
-              mmmtreats: '%treat%',
-              accountId: 123
-            }
-          }
-        },
-        coreDelegates: {
-          testExtension: function(module, require) {
-            module.exports = coreDelegateSpy;
           }
         },
         actionDelegates: {
@@ -67,7 +52,6 @@
             }],
             actions: [
               {
-                integrationIds: ['abc'],
                 type: 'testAction',
                 config: {
                   dataElementBased: '%treat%',
@@ -176,17 +160,10 @@
           _satellite.setVar('instrument', 'piccolo');
           _satellite.setVar('vegetable', 'onion');
 
-          expect(coreDelegateSpy.calls.argsFor(0)[0].integrationConfigs).toEqual([
-            {
-              mmmtreats: 'ice cream',
-              accountId: 123
-            }
-          ]);
-
           window.triggerTestEvent();
 
           expect(actionDelegateSpy.calls.count()).toBe(1);
-          var actionConfig = actionDelegateSpy.calls.argsFor(0)[0].actionConfig;
+          var actionConfig = actionDelegateSpy.calls.argsFor(0)[0];
           expect(actionConfig.dataElementBased).toBe('ice cream');
           // Both a data element and a custom variable (set using setVar) named "vegetable" have
           // been set. The data element has a higher priority.

@@ -1,12 +1,12 @@
 var dataStash = require('./../createDataStash')('liveQuerySelector');
 var globalPoll = require('../communication/globalPoll');
+var once = require('../once');
 var SEEN = 'seen';
 
 // Create a naked object with no prototype so we can safely use it as a map.
 var callbacksBySelector = Object.create(null);
-var pollingInitialized = false;
 
-function findElements() {
+var findElements = function() {
   // Using for loops instead of forEach and functions because this will process a lot and we want
   // to be as efficient as possible.
   for (var selector in callbacksBySelector) {
@@ -23,12 +23,9 @@ function findElements() {
   }
 }
 
-function initializePolling() {
-  if (!pollingInitialized) {
-    globalPoll('liveFindElements', findElements);
-    pollingInitialized = true;
-  }
-}
+var initializePolling = once(function() {
+  globalPoll('liveFindElements', findElements);
+});
 
 var callbackIdIncrementor = 0;
 

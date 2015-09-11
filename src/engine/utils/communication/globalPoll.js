@@ -1,22 +1,19 @@
+var once = require('../once');
+
 var POLL_INTERVAL = 3000;
 
 var listeners = [];
 
-var pollingStarted = false;
-
-function executeListeners() {
+var executeListeners = function() {
   // This could be called a lot so for instead of forEach to squeak out a bit of speed
   for (var i = 0; i < listeners.length; i++) {
     listeners[i].callback();
   }
 }
 
-function startPolling() {
-  if (!pollingStarted) {
-    setInterval(executeListeners, POLL_INTERVAL);
-    pollingStarted = true;
-  }
-}
+var startPolling = once(function() {
+  setInterval(executeListeners, POLL_INTERVAL);
+});
 
 module.exports = function(name, callback) {
   var listener = {name: name, callback: callback};

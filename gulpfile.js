@@ -25,6 +25,8 @@ function getDelegates(baseDir) {
   var delegates = {};
 
   var populateFeatureDelegates = function(delegateType, pkg, extensionDir) {
+    delegates[delegateType] = delegates[delegateType] || {};
+
     if (pkg.hasOwnProperty(delegateType)) {
       var featureSet = pkg[delegateType];
       featureSet.forEach(function(feature) {
@@ -32,7 +34,6 @@ function getDelegates(baseDir) {
 
         if (script) {
           var id = pkg.name + '.' + path.basename(feature.path, '.js');
-          delegates[delegateType] = delegates[delegateType] || {};
           delegates[delegateType][id] = wrapInFunction(script, ['module', 'require']);
         }
       });
@@ -68,7 +69,7 @@ function getResources(baseDir) {
 }
 
 function getPackageForExtensionDir(baseDir, extensionDir) {
-  var packagePath = path.join(baseDir, extensionDir, 'package.json');
+  var packagePath = path.join(baseDir, extensionDir, 'extension.json');
 
   if (fs.existsSync(packagePath)) {
     return JSON.parse(fs.readFileSync(packagePath, {encoding: 'utf8'}));

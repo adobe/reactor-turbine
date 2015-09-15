@@ -3,215 +3,215 @@
   "displayName": "DTM",
   "conditionDelegates": [
     {
-      "name": "Browser",
+      "displayName": "Browser",
       "path": "conditions/browser/browser.js"
     },
     {
-      "name": "Cart Amount",
+      "displayName": "Cart Amount",
       "path": "conditions/cartAmount/cartAmount.js"
     },
     {
-      "name": "Cart Item Quantity",
+      "displayName": "Cart Item Quantity",
       "path": "conditions/cartItemQuantity/cartItemQuantity.js"
     },
     {
-      "name": "Cookie Opt-out",
+      "displayName": "Cookie Opt-out",
       "path": "conditions/cookieOptOut/cookieOptOut.js"
     },
     {
-      "name": "Custom",
+      "displayName": "Custom",
       "path": "conditions/custom/custom.js"
     },
     {
-      "name": "Device Type",
+      "displayName": "Device Type",
       "path": "conditions/deviceType/deviceType.js"
     },
     {
-      "name": "Domain",
+      "displayName": "Domain",
       "path": "conditions/domain/domain.js"
     },
     {
-      "name": "Hash",
+      "displayName": "Hash",
       "path": "conditions/hash/hash.js"
     },
     {
-      "name": "Landing Page",
+      "displayName": "Landing Page",
       "path": "conditions/landingPage/landingPage.js"
     },
     {
-      "name": "Logged In",
+      "displayName": "Logged In",
       "path": "conditions/loggedIn/loggedIn.js"
     },
     {
-      "name": "New/Returning Visitor",
+      "displayName": "New/Returning Visitor",
       "path": "conditions/newReturning/newReturning.js"
     },
     {
-      "name": "Operating System",
+      "displayName": "Operating System",
       "path": "conditions/operatingSystem/operatingSystem.js"
     },
     {
-      "name": "Page Views",
+      "displayName": "Page Views",
       "path": "conditions/pageViews/pageViews.js"
     },
     {
-      "name": "Path",
+      "displayName": "Path",
       "path": "conditions/path/path.js"
     },
     {
-      "name": "Previous Converter",
+      "displayName": "Previous Converter",
       "path": "conditions/previousConverter/previousConverter.js"
     },
     {
-      "name": "Protocol",
+      "displayName": "Protocol",
       "path": "conditions/protocol/protocol.js"
     },
     {
-      "name": "Registered User",
+      "displayName": "Registered User",
       "path": "conditions/registeredUser/registeredUser.js"
     },
     {
-      "name": "Screen Resolution",
+      "displayName": "Screen Resolution",
       "path": "conditions/screenResolution/screenResolution.js"
     },
     {
-      "name": "Sessions",
+      "displayName": "Sessions",
       "path": "conditions/sessions/sessions.js"
     },
     {
-      "name": "Subdomain",
+      "displayName": "Subdomain",
       "path": "conditions/subdomain/subdomain.js"
     },
     {
-      "name": "Time On Site",
+      "displayName": "Time On Site",
       "path": "conditions/timeOnSite/timeOnSite.js"
     },
     {
-      "name": "Traffic Source",
+      "displayName": "Traffic Source",
       "path": "conditions/trafficSource/trafficSource.js"
     },
     {
-      "name": "URL Parameter",
+      "displayName": "URL Parameter",
       "path": "conditions/urlParameter/urlParameter.js"
     },
     {
-      "name": "Window Size",
+      "displayName": "Window Size",
       "path": "conditions/windowSize/windowSize.js"
     }
   ],
   "eventDelegates": [
     {
-      "name": "Click",
+      "displayName": "Click",
       "path": "events/click/click.js"
     },
     {
-      "name": "Direct Call",
+      "displayName": "Direct Call",
       "path": "events/directCall/directCall.js"
     },
     {
-      "name": "DOM Ready",
+      "displayName": "DOM Ready",
       "path": "events/domReady/domReady.js"
     },
     {
-      "name": "Element Exists",
+      "displayName": "Element Exists",
       "path": "events/elementExists/elementExists.js"
     },
     {
-      "name": "Enters Viewport",
+      "displayName": "Enters Viewport",
       "path": "events/entersViewport/entersViewport.js"
     },
     {
-      "name": "Hover",
+      "displayName": "Hover",
       "path": "events/hover/hover.js"
     },
     {
-      "name": "On Load",
+      "displayName": "On Load",
       "path": "events/onload/onload.js"
     },
     {
-      "name": "Page Bottom",
+      "displayName": "Page Bottom",
       "path": "events/pageBottom/pageBottom.js"
     },
     {
-      "name": "Page Top",
+      "displayName": "Page Top",
       "path": "events/pageTop/pageTop.js"
     },
     {
-      "name": "Timeout",
+      "displayName": "Timeout",
       "path": "events/timeout/timeout.js"
     },
     {
-      "name": "Keypress",
+      "displayName": "Keypress",
       "path": "events/keypress/keypress.js"
     },
     {
-      "name": "Focus",
+      "displayName": "Focus",
       "path": "events/focus/focus.js"
     },
     {
-      "name": "Blur",
+      "displayName": "Blur",
       "path": "events/blur/blur.js"
     },
     {
-      "name": "Submit",
+      "displayName": "Submit",
       "path": "events/submit/submit.js"
     },
     {
-      "name": "Play",
+      "displayName": "Play",
       "path": "events/play/play.js"
     },
     {
-      "name": "Pause",
+      "displayName": "Pause",
       "path": "events/pause/pause.js"
     },
     {
-      "name": "Ended",
+      "displayName": "Ended",
       "path": "events/ended/ended.js"
     },
     {
-      "name": "Volume Change",
+      "displayName": "Volume Change",
       "path": "events/volumechange/volumechange.js"
     },
     {
-      "name": "Stalled",
+      "displayName": "Stalled",
       "path": "events/stalled/stalled.js"
     },
     {
-      "name": "Loaded Data",
+      "displayName": "Loaded Data",
       "path": "events/loadeddata/loadeddata.js"
     },
     {
-      "name": "Time Played",
+      "displayName": "Time Played",
       "path": "events/timePlayed/timePlayed.js"
     },
     {
-      "name": "Orientation Change",
+      "displayName": "Orientation Change",
       "path": "events/orientationchange/orientationchange.js"
     },
     {
-      "name": "Zoom Change",
+      "displayName": "Zoom Change",
       "path": "events/zoomchange/zoomchange.js"
     }
   ],
   "dataElementDelegates": [
     {
-      "name": "Cookie",
+      "displayName": "Cookie",
       "path": "dataElements/cookie/cookie.js"
     },
     {
-      "name": "Custom",
+      "displayName": "Custom",
       "path": "dataElements/custom/custom.js"
     },
     {
-      "name": "DOM Attribute",
+      "displayName": "DOM Attribute",
       "path": "dataElements/dom/dom.js"
     },
     {
-      "name": "Querystring Parameter",
+      "displayName": "Querystring Parameter",
       "path": "dataElements/queryParam/queryParam.js"
     },
     {
-      "name": "Variable",
+      "displayName": "Variable",
       "path": "dataElements/variable/variable.js"
     }
   ],

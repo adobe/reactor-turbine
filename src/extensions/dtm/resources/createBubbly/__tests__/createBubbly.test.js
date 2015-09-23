@@ -6,7 +6,8 @@ describe('createBubbly', function() {
   var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();
   var createBubbly = createBubblyInjector({
     createDataStash: publicRequire('createDataStash'),
-    matchesCSS: publicRequire('matchesCSS')
+    matchesSelector: publicRequire('matchesSelector'),
+    resourceProvider: publicRequire('resourceProvider')
   });
 
   var aElement;
@@ -57,7 +58,7 @@ describe('createBubbly', function() {
         selector: '#a',
         bubbleFireIfParent: true,
         bubbleFireIfChildFired: true,
-        bubbleStop: false,
+        bubbleStop: false
       }, aCallback);
 
       bubbly.addListener({
@@ -318,5 +319,41 @@ describe('createBubbly', function() {
 
     expect(aCallback.calls.count()).toBe(1);
     expect(bCallback.calls.count()).toBe(1);
+  });
+
+  it('calls the callback when the element matches elementProperties', function() {
+    var bubbly = createBubbly();
+    var callback = jasmine.createSpy();
+
+    bubbly.addListener({
+      selector: '#c',
+      elementProperties: {
+        innerHTML: 'C'
+      }
+    }, callback);
+
+    bubbly.evaluateEvent({
+      target: cElement
+    });
+
+    expect(callback.calls.count()).toBe(1);
+  });
+
+  it('does not call the callback when the element does not match elementProperties', function() {
+    var bubbly = createBubbly();
+    var callback = jasmine.createSpy();
+
+    bubbly.addListener({
+      selector: '#c',
+      elementProperties: {
+        innerHTML: 'no match'
+      }
+    }, callback);
+
+    bubbly.evaluateEvent({
+      target: cElement
+    });
+
+    expect(callback.calls.count()).toBe(0);
   });
 });

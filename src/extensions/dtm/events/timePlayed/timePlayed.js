@@ -70,6 +70,8 @@ document.addEventListener('timeupdate', handleTimeUpdate, true);
  * @param {timePlayedUnit} config.unit The unit of duration measurement.
  * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire if
  * the event originated from a descendant element.
+ * @param {Object} [config.elementProperties] Property names and values the element must have in order
+ * for the rule to fire.
  * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should fire
  * if the same event has already triggered a rule targeting a descendant element.
  * @param {boolean} [config.bubbleStop=false] Whether the event should not trigger

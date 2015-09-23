@@ -227,6 +227,10 @@
     {
       "name": "createBubbly",
       "path": "resources/createBubbly/createBubbly.js"
+    },
+    {
+      "name": "matchesProperties",
+      "path": "resources/matchesProperties/matchesProperties.js"
     }
   ]
 }

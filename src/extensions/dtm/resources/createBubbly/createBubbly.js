@@ -1,7 +1,8 @@
 'use strict';
 
 var createDataStash = require('createDataStash');
-var matchesCSS = require('matchesCSS');
+var matchesSelector = require('matchesSelector');
+var matchesProperties = require('resourceProvider').get('dtm', 'matchesProperties');
 var PROCESSED = 'processed';
 
 /**
@@ -21,6 +22,8 @@ module.exports = function() {
      * should be executed. If it should be executed, the callback function will be called.
      * @param {Object} config The event config object.
      * @param {string} selector The selector the rule is matching on.
+     * @param {Object} [elementProperties] Property names and values the element must have in order
+     * for the rule to fire.
      * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire if the
      * event originated from a descendant element.
      * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should fire if the
@@ -78,7 +81,11 @@ module.exports = function() {
             continue;
           }
 
-          if (!matchesCSS(listener.config.selector, node)) {
+          if (!matchesSelector(node, listener.config.selector)) {
+            continue;
+          }
+
+          if (!matchesProperties(node, listener.config.elementProperties)) {
             continue;
           }
 

@@ -1,6 +1,7 @@
 'use strict';
 
 var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
+var matchesProperties = require('resourceProvider').get('dtm', 'matchesProperties');
 var liveQuerySelector = require('liveQuerySelector');
 var dataStash = require('createDataStash')('hover');
 var DELAYS = 'delays';
@@ -67,6 +68,8 @@ function watchElement(element, trackedDelays) {
  * @param {Object} config The event config object.
  * @param {string} config.selector The CSS selector for elements the rule is
  * targeting.
+ * @param {Object} [config.elementProperties] Property names and values the element must have in order
+ * for the rule to fire.
  * @param {Number} [config.delay] The number of milliseconds the pointer must be on
  * top of the element before declaring that a hover has occurred.
  * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire
@@ -93,6 +96,10 @@ module.exports = function(config, trigger) {
   });
 
   liveQuerySelector(config.selector, function(element) {
+    if (!matchesProperties(element, config.elementProperties)) {
+      return;
+    }
+
     var trackedDelays = dataStash(element, DELAYS);
 
     if (trackedDelays) {

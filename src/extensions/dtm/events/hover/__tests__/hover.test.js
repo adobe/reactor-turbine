@@ -397,4 +397,41 @@ describe('hover event type', function() {
       delay: 2000
     });
   });
+
+  it('triggers a rule when the element matches elementProperties', function() {
+    var bTrigger = jasmine.createSpy();
+
+    delegate({
+      selector: '#b',
+      elementProperties: {
+        innerHTML: 'b'
+      }
+    }, bTrigger);
+
+    // Give the poller time to pick up on the target elements.
+    jasmine.clock().tick(10000);
+
+    Simulate.mouseenter(bElement);
+
+    expect(bTrigger.calls.count()).toEqual(1);
+  });
+
+  it('does not trigger rule when the element does not match elementProperties', function() {
+    var bTrigger = jasmine.createSpy();
+
+    delegate({
+      selector: '#b',
+      elementProperties: {
+        innerHTML: 'd'
+      }
+    }, bTrigger);
+
+    // Give the poller time to pick up on the target elements.
+    jasmine.clock().tick(10000);
+
+    Simulate.mouseenter(bElement);
+
+    expect(bTrigger.calls.count()).toEqual(0);
+  });
+
 });

@@ -1,12 +1,12 @@
 /**
  * Returns whether an element matches a selector.
- * @param {string} selector The CSS selector.
  * @param {HTMLElement} element The HTML element being tested.
+ * @param {string} selector The CSS selector.
  * @returns {boolean}
  */
 module.exports = (function(docEl) {
 
-  function simpleTagMatch(selector, elm) {
+  function simpleTagMatch(elm, selector) {
     var tagName = elm.tagName;
     if (!tagName) {
       return false;
@@ -21,7 +21,7 @@ module.exports = (function(docEl) {
     docEl.oMatchesSelector ||
     docEl.msMatchesSelector;
   if (matches) {
-    return function(selector, elm) {
+    return function(elm, selector) {
       if (elm === document || elm === window) {
         return false;
       }
@@ -32,13 +32,13 @@ module.exports = (function(docEl) {
       }
     };
   } else {
-    return function(selector, elm) {
+    return function(elm, selector) {
       var parent = elm.parentNode;
       if (!parent) {
         return false;
       }
       if (selector.match(/^[a-z]+$/i)) {
-        return simpleTagMatch(selector, elm);
+        return simpleTagMatch(elm, selector);
       }
       try {
         var nodeList = elm.parentNode.querySelectorAll(selector);

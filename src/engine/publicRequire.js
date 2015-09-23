@@ -22,7 +22,7 @@ module.exports = function(key) {
     'isLinked': function(element) { // For backward compatibility.
       require('./utils/dom/isAnchor')(element, true);
     },
-    'matchesCSS': require('./utils/dom/matchesCSS'),
+    'matchesSelector': require('./utils/dom/matchesSelector'),
     'getDataElement': require('./utils/dataElement/getDataElement'),
     'getCookie': require('./utils/cookie/getCookie'),
     'setCookie': require('./utils/cookie/setCookie'),

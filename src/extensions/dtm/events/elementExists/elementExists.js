@@ -14,6 +14,8 @@ var selectors = [];
 poll('element exists event delegate', function() {
   for (var i = 0; i < selectors.length; i++) {
     var selector = selectors[i];
+    // TODO: We should probably be checking config.elementProperties here as well:
+    // https://jira.corp.adobe.com/browse/DTM-6681
     var element = document.querySelector(selector);
 
     if (element) {

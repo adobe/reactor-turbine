@@ -226,8 +226,8 @@ poll('enters viewport event delegate', checkIfElementsInViewport);
  * @param {Object} config The event config object.
  * @param {string} config.selector The CSS selector for elements the rule is
  * targeting.
- * @param {Object} [config.elementProperties] Property names and values the element must have in order
- * for the rule to fire.
+ * @param {Object} [config.elementProperties] Property names and values the element must have in
+ * order for the rule to fire.
  * @param {Number} [config.delay] The number of milliseconds the element must be
  * within the viewport before declaring that the event has occurred.
  * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire

@@ -1,3 +1,5 @@
+'use strict';
+
 var textMatch = require('textMatch');
 
 var getElementProperty = function(element, property) {

@@ -9,7 +9,7 @@ var executeListeners = function() {
   for (var i = 0; i < listeners.length; i++) {
     listeners[i].callback();
   }
-}
+};
 
 var startPolling = once(function() {
   setInterval(executeListeners, POLL_INTERVAL);

@@ -9,7 +9,7 @@ module.exports = function(name) {
   // a try-catch should be avoided.
   try {
     return window.localStorage.getItem(name);
-  } catch(e) {
+  } catch (e) {
     return null;
   }
 };

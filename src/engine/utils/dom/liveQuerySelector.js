@@ -21,7 +21,7 @@ var findElements = function() {
       }
     }
   }
-}
+};
 
 var initializePolling = once(function() {
   globalPoll('liveFindElements', findElements);

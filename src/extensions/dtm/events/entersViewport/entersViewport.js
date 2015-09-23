@@ -82,17 +82,6 @@ var elementIsInView = function(element, viewportHeight, scrollTop) {
 };
 
 /**
- * Gets an event type specific to the delay to use in the pseudo event.
- * @param {number} delay The amount of time, in milliseconds, the element was required to be in
- * the viewport.
- * @returns {string}
- */
-function getPseudoEventType(delay) {
-  delay = delay || 0;
-  return 'inview(' + delay + ')';
-}
-
-/**
  * Notifies that an element as having been in the viewport for the specified delay.
  * @param {HTMLElement} element The element that is in the viewport.
  * @param {Number} delay The amount of time, in milliseconds, the element was required to be in

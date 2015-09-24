@@ -4,10 +4,11 @@ var POLL_INTERVAL = 3000;
 
 var listeners = [];
 
+var iterIndex = 0;
+
 var executeListeners = function() {
-  // This could be called a lot so for instead of forEach to squeak out a bit of speed
-  for (var i = 0; i < listeners.length; i++) {
-    listeners[i].callback();
+  for (iterIndex = 0; iterIndex < listeners.length; iterIndex++) {
+    listeners[iterIndex].callback();
   }
 };
 
@@ -22,9 +23,15 @@ module.exports = function(name, callback) {
   startPolling();
 
   return function() {
-    var index = listeners.indexOf(callback);
+    var index = listeners.indexOf(listener);
     if (index > -1) {
       listeners.splice(index, 1);
+
+      // If the listener is unsubscribed while we're iterating over listeners we need to
+      // adjust the iteration index accordingly.
+      if (index <= iterIndex) {
+        iterIndex--;
+      }
     }
   };
 };

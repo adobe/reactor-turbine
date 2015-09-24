@@ -2,40 +2,44 @@
 
 var poll = require('poll');
 var dataStash = require('createDataStash')('elementExists');
-var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
+var matchesProperties = require('resourceProvider').get('dtm', 'matchesProperties');
 var SEEN = 'seen';
 
-/**
- *
- * @type {string[]} Selectors from all the rules.
- */
-var selectors = [];
+var listenersBySelector = {};
 
 poll('element exists event delegate', function() {
-  for (var i = 0; i < selectors.length; i++) {
-    var selector = selectors[i];
-    // TODO: We should probably be checking config.elementProperties here as well:
-    // https://jira.corp.adobe.com/browse/DTM-6681
-    var element = document.querySelector(selector);
+  Object.keys(listenersBySelector).forEach(function(selector) {
+    var listeners = listenersBySelector[selector];
+    var elements = document.querySelectorAll(selector);
 
-    if (element) {
-      // If the element has been seen before, bubbly will have already run all rules that apply
-      // to it.
+    for (var i = 0; i < elements.length; i++) {
+      var element = elements[i];
+
       if (!dataStash(element, SEEN)) {
         dataStash(element, SEEN, true);
-        bubbly.evaluateEvent({
-          type: 'elementexists',
-          target: element
-        });
+
+        for (var k = 0; k < listeners.length; k++) {
+          var listener = listeners[k];
+          if (matchesProperties(element, listener.config.elementProperties)) {
+            listener.trigger({
+              type: 'elementexists',
+              target: element
+            }, element);
+            listeners.splice(k, 1);
+            k--;
+          }
+        }
       }
 
-      // No need to keep watching for the selector.
-      // While we could use a reverse loop to enable us to splice the array safely, we don't
-      // because all other DTM event types execute rules in the order they were registered and we
-      // like to be consistent.
-      selectors.splice(i--, 1);
+      // Listeners are removed from the array as their respective rules are fired.
+      // Once we have no more rules corresponding to the selector there is no need to
+      // continue scanning elements with the selector.
+      if (!listeners.length) {
+        delete listenersBySelector[selector];
+        break;
+      }
     }
-  }
+  });
 });
 
 /**
@@ -43,18 +47,19 @@ poll('element exists event delegate', function() {
  * should only run once per targeted element.
  * @param {Object} config The event config object.
  * @param {string} config.selector The CSS selector for elements the rule is targeting.
- * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire if
- * the event originated from a descendant element.
- * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should fire
- * if the same event has already triggered a rule targeting a descendant element.
- * @param {boolean} [config.bubbleStop=false] Whether the event should not trigger
- * rules on ancestor elements.
+ * @param {Object} [config.elementProperties] Property names and values the element must have in
+ * order for the rule to fire.
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
-  bubbly.addListener(config, trigger);
+  var listeners = listenersBySelector[config.selector];
 
-  if (selectors.indexOf(config.selector) === -1) {
-    selectors.push(config.selector);
+  if (!listeners) {
+    listeners = listenersBySelector[config.selector] = [];
   }
+
+  listeners.push({
+    config: config,
+    trigger: trigger
+  });
 };

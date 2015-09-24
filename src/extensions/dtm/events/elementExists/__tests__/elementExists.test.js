@@ -89,47 +89,67 @@ describe('elementExists event type', function() {
     });
   });
 
-  it('triggers rules appropriately for nested elements', function() {
-    var aTrigger = jasmine.createSpy();
-    var bTrigger = jasmine.createSpy();
-
-    delegate({
-      selector: '#a',
-      bubbleFireIfParent: true,
-      bubbleFireIfChildFired: true,
-      bubbleStop: false
-    }, aTrigger);
+  it('triggers a rule if elementProperties match', function() {
+    var trigger = jasmine.createSpy();
 
     delegate({
       selector: '#b',
-      bubbleFireIfParent: true,
-      bubbleFireIfChildFired: true,
-      bubbleStop: false
-    }, bTrigger);
+      elementProperties: {
+        'innerHTML': 'b'
+      }
+    }, trigger);
 
     // Give time for the poller to cycle.
     jasmine.clock().tick(10000);
 
-    expect(aTrigger.calls.count()).toEqual(2);
+    expect(trigger.calls.count()).toEqual(1);
+  });
 
-    assertTriggerCall({
-      call: aTrigger.calls.first(),
-      relatedElement: aElement,
-      target: aElement
-    });
+  it('does not trigger a rule if elementProperties do not match', function() {
+    var trigger = jasmine.createSpy();
 
-    assertTriggerCall({
-      call: aTrigger.calls.mostRecent(),
-      relatedElement: aElement,
-      target: bElement
-    });
+    delegate({
+      selector: '#b',
+      elementProperties: {
+        'innerHTML': 'no match'
+      }
+    }, trigger);
 
-    expect(bTrigger.calls.count()).toEqual(1);
+    // Give time for the poller to cycle.
+    jasmine.clock().tick(10000);
 
-    assertTriggerCall({
-      call: bTrigger.calls.mostRecent(),
-      relatedElement: bElement,
-      target: bElement
-    });
+    expect(trigger.calls.count()).toEqual(0);
+  });
+
+  it('continues evaluating elements until elementProperties is satisfied (DTM-6681)', function() {
+    var selectorOnlyTrigger = jasmine.createSpy();
+    var selectorAndPropsTrigger = jasmine.createSpy();
+
+    delegate({
+      selector: 'div'
+    }, selectorOnlyTrigger);
+
+    delegate({
+      selector: 'div',
+      elementProperties: {
+        'innerHTML': 'added later'
+      }
+    }, selectorAndPropsTrigger);
+
+    // Give time for the poller to cycle.
+    jasmine.clock().tick(10000);
+
+    expect(selectorOnlyTrigger.calls.count()).toBe(1);
+    expect(selectorAndPropsTrigger.calls.count()).toBe(0);
+
+    var addedLaterElement = document.createElement('div');
+    addedLaterElement.innerHTML = 'added later';
+    document.body.appendChild(addedLaterElement);
+
+    // Give time for the poller to cycle.
+    jasmine.clock().tick(10000);
+
+    expect(selectorOnlyTrigger.calls.count()).toBe(1);
+    expect(selectorAndPropsTrigger.calls.count()).toBe(1);
   });
 });

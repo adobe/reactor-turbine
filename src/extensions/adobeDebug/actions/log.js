@@ -1,5 +1,5 @@
 'use strict';
 
 module.exports = function(config) {
-  console.log('AdobeLog: ' + config.actionConfig.text);
+  console.log('AdobeLog: ' + config.text);
 };

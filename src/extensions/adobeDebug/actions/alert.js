@@ -2,5 +2,5 @@
 'use strict';
 
 module.exports = function(config) {
-  alert(config.actionConfig.text);
+  alert(config.text);
 };

@@ -1,0 +1,14 @@
+{
+  "name": "adobeDebug",
+  "displayName": "Adobe Debug",
+  "actionDelegates": [
+    {
+      "displayName": "Alert",
+      "path": "actions/alert.js"
+    },
+    {
+      "displayName": "Log",
+      "path": "actions/log.js"
+    }
+  ]
+}

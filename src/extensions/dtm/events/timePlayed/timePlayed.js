@@ -3,7 +3,6 @@
 var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
 var dataStash = require('createDataStash')('timePlayed');
 
-var LAST_TRIGGERED = 'lastTriggered';
 var relevantMarkers = [];
 
 /**
@@ -41,8 +40,9 @@ function handleTimeUpdate(event) {
   var endTime = seekable.end(0);
   var currentTime = target.currentTime;
   var playedSeconds = currentTime - startTime;
+  var targetDataStash = dataStash(target);
 
-  var secondsLastTriggered = dataStash(target, LAST_TRIGGERED) || 0;
+  var secondsLastTriggered = targetDataStash.lastTriggered || 0;
   var pseudoEvent;
 
   relevantMarkers.forEach(function(relevantMarker) {
@@ -54,7 +54,7 @@ function handleTimeUpdate(event) {
     }
   });
 
-  dataStash(event.target, LAST_TRIGGERED, playedSeconds);
+  targetDataStash.lastTriggered = playedSeconds;
 }
 
 document.addEventListener('timeupdate', handleTimeUpdate, true);

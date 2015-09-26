@@ -3,7 +3,6 @@
 var createDataStash = require('createDataStash');
 var matchesSelector = require('matchesSelector');
 var matchesProperties = require('resourceProvider').get('dtm', 'matchesProperties');
-var PROCESSED = 'processed';
 
 /**
  * Handles logic related to bubbling options provided for many event types.
@@ -51,11 +50,13 @@ module.exports = function() {
         return;
       }
 
+      var eventDataStash = dataStash(event);
+
       // When an event is handled it is evaluated a single time but checks out which rules are
       // targeting elements starting at the target node and looking all the way up the element
       // hierarchy. This should only happen once regardless of how many listeners exist for the
       // event.
-      if (dataStash(event, PROCESSED)) {
+      if (eventDataStash.processed) {
         return;
       }
 
@@ -112,7 +113,7 @@ module.exports = function() {
         node = node.parentNode;
       }
 
-      dataStash(event, PROCESSED, true);
+      eventDataStash.processed = true;
     }
   };
 };

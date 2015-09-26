@@ -107,7 +107,7 @@ function triggerCompleteEvent(element, delay) {
  * @returns {number}
  */
 function getTimeoutId(element, delay) {
-  return dataStash(element, TIMEOUT_ID + delay);
+  return dataStash(element)[TIMEOUT_ID + delay];
 }
 
 /**
@@ -118,7 +118,7 @@ function getTimeoutId(element, delay) {
  * @param {number} timeoutId
  */
 function storeTimeoutId(element, delay, timeoutId) {
-  dataStash(element, TIMEOUT_ID + delay, timeoutId);
+  dataStash(element)[TIMEOUT_ID + delay] = timeoutId;
 }
 
 /**
@@ -130,7 +130,7 @@ function storeTimeoutId(element, delay, timeoutId) {
  * @returns {boolean}
  */
 function isComplete(element, delay) {
-  return dataStash(element, COMPLETE + delay);
+  return dataStash(element)[COMPLETE + delay];
 }
 
 /**
@@ -141,7 +141,7 @@ function isComplete(element, delay) {
  * the viewport.
  */
 function storeCompletion(element, delay) {
-  dataStash(element, COMPLETE + delay, true);
+  dataStash(element)[COMPLETE + delay] = true;
 }
 
 /**

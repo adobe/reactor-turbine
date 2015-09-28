@@ -60,6 +60,12 @@ var watchForLocationChange = once(function() {
   window.addEventListener('hashchange', callTriggersIfURIChanged);
 });
 
+/**
+ * Location change event. This event occurs when the URL hash is changed or the URL is changed
+ * through the <code>history</code> API.
+ * @param {Object} config The event config object.
+ * @param {ruleTrigger} trigger The trigger callback.
+ */
 module.exports = function(config, trigger) {
   watchForLocationChange();
   triggers.push(trigger);

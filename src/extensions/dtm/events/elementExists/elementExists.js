@@ -3,7 +3,6 @@
 var poll = require('poll');
 var dataStash = require('createDataStash')('elementExists');
 var matchesProperties = require('resourceProvider').get('dtm', 'matchesProperties');
-var SEEN = 'seen';
 
 var listenersBySelector = {};
 
@@ -14,9 +13,10 @@ poll('element exists event delegate', function() {
 
     for (var i = 0; i < elements.length; i++) {
       var element = elements[i];
+      var elementDataStash = dataStash(element);
 
-      if (!dataStash(element, SEEN)) {
-        dataStash(element, SEEN, true);
+      if (!elementDataStash.seen) {
+        elementDataStash.seen = true;
 
         for (var k = 0; k < listeners.length; k++) {
           var listener = listeners[k];

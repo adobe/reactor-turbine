@@ -1,7 +1,6 @@
 var isString = require('./../isType/isString');
 var classList = require('./classList');
 var dataStash = require('./../createDataStash')('hideElements');
-var NUM_LOCKS = 'numLocks';
 var hideStyleAdded = false;
 
 /**
@@ -23,7 +22,8 @@ module.exports = function(selectorOrElements) {
     document.querySelectorAll(selectorOrElements) : selectorOrElements;
 
   elements.forEach(function(element) {
-    var numLocks = dataStash(element, NUM_LOCKS);
+    var elementDataStash = dataStash(element);
+    var numLocks = elementDataStash.numLocks;
 
     if (numLocks === undefined) {
       numLocks = 1;
@@ -31,7 +31,7 @@ module.exports = function(selectorOrElements) {
       numLocks++;
     }
 
-    dataStash(element, NUM_LOCKS, numLocks);
+    elementDataStash.numLocks = numLocks;
 
     classList.add(element, 'dtm-hidden');
   });
@@ -45,8 +45,8 @@ module.exports = function(selectorOrElements) {
     }
 
     elements.forEach(function(element) {
-      var numLocks = dataStash(element, NUM_LOCKS);
-      dataStash(element, NUM_LOCKS, --numLocks);
+      var elementDataStash = dataStash(element);
+      elementDataStash.numLocks--;
 
       if (numLocks === 0) {
         classList.remove(element, 'dtm-hidden');

@@ -4,7 +4,6 @@ var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
 var matchesProperties = require('resourceProvider').get('dtm', 'matchesProperties');
 var liveQuerySelector = require('liveQuerySelector');
 var dataStash = require('createDataStash')('hover');
-var DELAYS = 'delays';
 
 /**
  * After a mouseenter has occurred, waits a given amount of time before declaring that a hover
@@ -100,7 +99,8 @@ module.exports = function(config, trigger) {
       return;
     }
 
-    var trackedDelays = dataStash(element, DELAYS);
+    var elementDataStash = dataStash(element);
+    var trackedDelays = elementDataStash.delays;
 
     if (trackedDelays) {
       if (trackedDelays.indexOf(delay) === -1) {
@@ -108,7 +108,7 @@ module.exports = function(config, trigger) {
       }
     } else {
       trackedDelays = [delay];
-      dataStash(element, DELAYS, trackedDelays);
+      elementDataStash.delays = trackedDelays;
       watchElement(element, trackedDelays);
     }
   });

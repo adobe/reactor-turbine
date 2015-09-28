@@ -47,8 +47,9 @@ module.exports = function(selector, callback) {
   // This function will be called for every element found matching the selector but we will only
   // call the consumer's callback if it has not already been called for the element.
   callbacks.push(function(element) {
-    if (!dataStash(element, SEEN + callbackId)) {
-      dataStash(element, SEEN + callbackId, true);
+    var elementDataStash = dataStash(element);
+    if (!elementDataStash[SEEN + callbackId]) {
+      elementDataStash[SEEN + callbackId] = true;
       callback(element);
     }
   });

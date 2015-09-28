@@ -53,40 +53,40 @@ describe('elementExists event type', function() {
     removeElements();
   });
 
+  it('calls trigger with event and related element', function() {
+    var aTrigger = jasmine.createSpy();
+
+    delegate({
+      selector: '#a'
+    }, aTrigger);
+
+    // Give time for the poller to cycle.
+    jasmine.clock().tick(10000);
+
+    assertTriggerCall({
+      call: aTrigger.calls.mostRecent(),
+      relatedElement: aElement,
+      target: aElement
+    });
+  });
+
   it('triggers multiple rules targeting the same element', function() {
     var aTrigger = jasmine.createSpy();
     var a2Trigger = jasmine.createSpy();
 
     delegate({
-      selector: '#a',
-      bubbleFireIfParent: true,
-      bubbleFireIfChildFired: true,
-      bubbleStop: false
+      selector: '#a'
     }, aTrigger);
 
     delegate({
-      selector: '#a',
-      bubbleFireIfParent: true,
-      bubbleFireIfChildFired: true,
-      bubbleStop: false
+      selector: '#a'
     }, a2Trigger);
 
     // Give time for the poller to cycle.
     jasmine.clock().tick(10000);
 
     expect(aTrigger.calls.count()).toEqual(1);
-    assertTriggerCall({
-      call: aTrigger.calls.mostRecent(),
-      relatedElement: aElement,
-      target: aElement
-    });
-
     expect(a2Trigger.calls.count()).toEqual(1);
-    assertTriggerCall({
-      call: a2Trigger.calls.mostRecent(),
-      relatedElement: aElement,
-      target: aElement
-    });
   });
 
   it('triggers a rule if elementProperties match', function() {

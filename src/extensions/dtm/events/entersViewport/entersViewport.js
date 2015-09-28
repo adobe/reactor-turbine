@@ -2,12 +2,10 @@
 
 var poll = require('poll');
 var createDataStash = require('createDataStash');
-var bubbly = require('resourceProvider').get('dtm', 'createBubbly')();
 var dataStash = createDataStash('entersViewport');
-var TIMEOUT_ID = 'timeoutId';
-var COMPLETE = 'complete';
+var matchesProperties = require('resourceProvider').get('dtm', 'matchesProperties');
 
-var listeners = [];
+var listenersBySelector = {};
 
 /**
  * Gets the offset of the element.
@@ -23,14 +21,12 @@ var offset = function(elem) {
     // ignore
   }
 
-  var doc = document;
-  var docElem = doc.documentElement;
-  var body = doc.body;
-  var win = window;
+  var docElem = document.documentElement;
+  var body = document.body;
   var clientTop = docElem.clientTop || body.clientTop || 0;
   var clientLeft = docElem.clientLeft || body.clientLeft || 0;
-  var scrollTop = win.pageYOffset || docElem.scrollTop || body.scrollTop;
-  var scrollLeft = win.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+  var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+  var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
   var top = box.top + scrollTop - clientTop;
   var left = box.left + scrollLeft - clientLeft;
 
@@ -81,133 +77,203 @@ var elementIsInView = function(element, viewportHeight, scrollTop) {
     !(scrollTop > (top + height) || scrollTop + viewportHeight < top);
 };
 
+var dataStashHelper = {
+  /**
+   * Stores a timeout ID for the target element. This timeout runs while the element is in the
+   * viewport and, when finished, potentially executes a rule that was waiting for the delay.
+   * @param element
+   * @param timeoutId
+   */
+  storeTimeoutId: function(element, timeoutId) {
+    var elementDataStash = dataStash(element);
+    var timeoutIds = elementDataStash.timeoutIds;
+
+    if (!timeoutIds) {
+      timeoutIds = elementDataStash.timeoutIds = [];
+    }
+
+    timeoutIds.push(timeoutId);
+  },
+
+  /**
+   * Returns all timeout IDs for the target element.
+   * @param element
+   * @returns {Array}
+   */
+  getTimeoutIds: function(element) {
+    return dataStash(element).timeoutIds || [];
+  },
+
+  /**
+   * Removes timeout IDs.
+   * @param element
+   */
+  removeTimeoutIds: function(element) {
+    dataStash(element).timeoutIds = null;
+  },
+
+  /**
+   * Stores listeners that are waiting for a delay while the element is in the viewport.
+   * @param element
+   * @param listener
+   */
+  storeDelayedListener: function(element, listener) {
+    var elementDataStash = dataStash(element);
+    var listeners = elementDataStash.delayedListeners;
+
+    if (!listeners) {
+      listeners = elementDataStash.delayedListeners = [];
+    }
+
+    listeners.push(listener);
+  },
+
+  /**
+   * Returns whether the given listener is waiting for a delay while the element is in the viewport.
+   * @param element
+   * @param listener
+   * @returns {boolean}
+   */
+  isListenerDelayed: function(element, listener) {
+    var delayedListeners = dataStash(element).delayedListeners;
+    return delayedListeners && delayedListeners.indexOf(listener) > -1;
+  },
+
+  /**
+   * Removes listeners that were waiting for a delay while the element was in the viewport.
+   * @param element
+   */
+  removeDelayedListeners: function(element) {
+    dataStash(element).delayedListeners = null;
+  },
+
+  /**
+   * Returns whether the a listener has been executed for the given target element.
+   * @param {HTMLElement} element
+   * @param {Object} listener
+   * @returns {boolean}
+   */
+  getIsListenerComplete: function(element, listener) {
+    var listeners = dataStash(element).completedListeners;
+    return listeners && listeners.indexOf(listener) > -1;
+  },
+
+  /**
+   * Stores that a listener has been executed for the given target element.
+   * @param {HTMLElement} element
+   * @param {Object} listener
+   */
+  storeCompleteListener: function(element, listener) {
+    var elementDataStash = dataStash(element);
+    var listeners = elementDataStash.completedListeners;
+
+    if (!listeners) {
+      listeners = elementDataStash.completedListeners = [];
+    }
+
+    listeners.push(listener);
+  }
+};
+
 /**
- * Notifies that an element as having been in the viewport for the specified delay.
- * @param {HTMLElement} element The element that is in the viewport.
- * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
- * the viewport.
+ * Handle when a targeted element enters the viewport.
+ * @param {HTMLElement} element
+ * @param {Number} delay
+ * @param {Object} listener
  */
-function triggerCompleteEvent(element, delay) {
-  var event = {
-    type: 'inview',
-    target: element,
-    // If the user did not configure a delay, inviewDelay should be undefined.
-    inviewDelay: delay
+var handleElementEnterViewport = function(element, delay, listener) {
+  var complete = function() {
+    dataStashHelper.storeCompleteListener(element, listener);
+
+    var event = {
+      type: 'inview',
+      target: element,
+      // If the user did not configure a delay, inviewDelay should be undefined.
+      inviewDelay: delay
+    };
+
+    listener.trigger(event, element);
   };
 
-  bubbly.evaluateEvent(event);
-}
+  if (delay) {
 
-
-/**
- * Gets the timeout ID for a particular element + delay combo.
- * @param {HTMLElement} element
- * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
- * the viewport.
- * @returns {number}
- */
-function getTimeoutId(element, delay) {
-  return dataStash(element)[TIMEOUT_ID + delay];
-}
-
-/**
- * Stored a timeout ID for ar particular element + delay combo.
- * @param {HTMLElement} element
- * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
- * the viewport.
- * @param {number} timeoutId
- */
-function storeTimeoutId(element, delay, timeoutId) {
-  dataStash(element)[TIMEOUT_ID + delay] = timeoutId;
-}
-
-/**
- * Returns whether the process is complete for detecting when the element has entered the
- * viewport for a particular element + delay combo.
- * @param {HTMLElement} element
- * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
- * the viewport.
- * @returns {boolean}
- */
-function isComplete(element, delay) {
-  return dataStash(element)[COMPLETE + delay];
-}
-
-/**
- * Stores that the process has been completed for detecting when the element has entered the
- * viewport for a particular element + delay combo.
- * @param {HTMLElement} element
- * @param {Number} delay The amount of time, in milliseconds, the element was required to be in
- * the viewport.
- */
-function storeCompletion(element, delay) {
-  dataStash(element)[COMPLETE + delay] = true;
-}
-
-/**
- * Delays the checking of whether an element is in the viewport.
- * @param {HTMLElement} element
- * @param {Number} delay The amount of time, in milliseconds, the check should be delayed.
- * @returns {*|number}
- */
-function delayInViewportCheck(element, delay) {
-  return setTimeout(function() {
-    if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
-      storeCompletion(element, delay);
-      triggerCompleteEvent(element, delay);
+    if (dataStashHelper.isListenerDelayed(element, listener)) {
+      return;
     }
-  }, delay);
-}
+
+    var timeoutId = setTimeout(function() {
+      if (elementIsInView(element, getViewportHeight(), getScrollTop())) {
+        complete();
+      }
+    }, delay);
+
+    dataStashHelper.storeTimeoutId(element, timeoutId);
+    dataStashHelper.storeDelayedListener(element, listener);
+  } else {
+    complete();
+  }
+};
+
+/**
+ * Handle when a targeted element exits the viewport.
+ * @param element
+ */
+var handleElementExitViewport = function(element) {
+  var timeoutIds = dataStashHelper.getTimeoutIds(element);
+
+  if (timeoutIds) {
+    timeoutIds.forEach(clearTimeout);
+  }
+
+  dataStashHelper.removeTimeoutIds(element);
+  dataStashHelper.removeDelayedListeners(element);
+};
 
 /**
  * Checks to see if a rule's target selector matches an element in the viewport. If that element
  * has not been in the viewport prior, either (a) trigger the rule immediately if the user has not
- * elected to delay for a period of time or (b) start the delay period of the user has elected
+ * elected to delay for a period of time or (b) start the delay period if the user has elected
  * to delay for a period of time. After an element being in the viewport triggers a rule, it
  * can't trigger the same rule again. If another element matching the same selector comes into
  * the viewport, it may trigger the same rule again.
  */
-var checkIfElementsInViewport = function() {
+var checkForElementsInViewport = function() {
   // Cached and re-used for optimization.
   var viewportHeight = getViewportHeight();
   var scrollTop = getScrollTop();
-  var timeoutId;
 
-  listeners.forEach(function(listener) {
-    var delay = listener.delay;
-    var elements = document.querySelectorAll(listener.selector);
-    for (var i = 0; i < elements.length; i++) {
-      var element = elements[i];
+  Object.keys(listenersBySelector).forEach(function(selector) {
+    var listeners = listenersBySelector[selector];
+    var elements = document.querySelectorAll(selector);
 
-      if (isComplete(element, delay)) {
-        continue;
-      }
+    listeners.forEach(function(listener) {
+      var delay = listener.config.delay;
 
-      if (elementIsInView(element, viewportHeight, scrollTop)) {
-        if (delay) { // Element is in view, has delay
-          if (!getTimeoutId(element, delay)) {
-            timeoutId = delayInViewportCheck(element, delay);
-            storeTimeoutId(element, delay, timeoutId);
-          }
-        } else { // Element is in view, has no delay
-          storeCompletion(element, delay);
-          triggerCompleteEvent(element, delay);
+      for (var i = 0; i < elements.length; i++) {
+        var element = elements[i];
+
+        if (dataStashHelper.getIsListenerComplete(element, listener)) {
+          return;
         }
-      } else if (delay) { // Element is not in view, has delay
-        timeoutId = getTimeoutId(element, delay);
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-          storeTimeoutId(element, delay, null);
+
+        if (!matchesProperties(element, listener.config.elementProperties)) {
+          return;
+        }
+
+        if (elementIsInView(element, viewportHeight, scrollTop)) {
+          handleElementEnterViewport(element, delay, listener);
+        } else { // Element is not in view, has delay
+          handleElementExitViewport(element);
         }
       }
-    }
+    });
   });
 };
 
 // TODO: Add debounce to the scroll event handling?
-window.addEventListener('scroll', checkIfElementsInViewport);
-window.addEventListener('load', checkIfElementsInViewport);
-poll('enters viewport event delegate', checkIfElementsInViewport);
+window.addEventListener('scroll', checkForElementsInViewport);
+window.addEventListener('load', checkForElementsInViewport);
+poll('enters viewport event delegate', checkForElementsInViewport);
 
 /**
  * Enters viewport event. This event occurs when an element has entered the viewport. The rule
@@ -219,26 +285,17 @@ poll('enters viewport event delegate', checkIfElementsInViewport);
  * order for the rule to fire.
  * @param {Number} [config.delay] The number of milliseconds the element must be
  * within the viewport before declaring that the event has occurred.
- * @param {boolean} [config.bubbleFireIfParent=false] Whether the rule should fire
- * if the event originated from a descendant element.
- * @param {boolean} [config.bubbleFireIfChildFired=false] Whether the rule should
- * fire if the same event has already triggered a rule targeting a descendant element.
- * @param {boolean} [config.bubbleStop=false] Whether the event should not trigger
- * rules on ancestor elements.
  * @param {ruleTrigger} trigger The trigger callback.
  */
 module.exports = function(config, trigger) {
+  var listeners = listenersBySelector[config.selector];
 
-  bubbly.addListener(config, function(event, relatedElement) {
-    // Bubbling for this event is dependent upon the delay configured for rules.
-    // An event can "bubble up" to other rules with the same delay but not to rules with
-    // different delays. See the tests for how this plays out.
-    if (event.inviewDelay === config.delay) {
-      trigger(event, relatedElement);
-    } else {
-      return false;
-    }
+  if (!listeners) {
+    listeners = listenersBySelector[config.selector] = [];
+  }
+
+  listeners.push({
+    config: config,
+    trigger: trigger
   });
-
-  listeners.push(config);
 };

@@ -86,13 +86,8 @@ var dataStashHelper = {
    */
   storeTimeoutId: function(element, timeoutId) {
     var elementDataStash = dataStash(element);
-    var timeoutIds = elementDataStash.timeoutIds;
-
-    if (!timeoutIds) {
-      timeoutIds = elementDataStash.timeoutIds = [];
-    }
-
-    timeoutIds.push(timeoutId);
+    elementDataStash.timeoutIds = elementDataStash.timeoutIds || [];
+    elementDataStash.timeoutIds.push(timeoutId);
   },
 
   /**
@@ -101,7 +96,9 @@ var dataStashHelper = {
    * @returns {Array}
    */
   getTimeoutIds: function(element) {
-    return dataStash(element).timeoutIds || [];
+    var elementDataStash = dataStash(element);
+    elementDataStash.timeoutIds = elementDataStash.timeoutIds || [];
+    return dataStash(element).timeoutIds;
   },
 
   /**
@@ -119,13 +116,8 @@ var dataStashHelper = {
    */
   storeDelayedListener: function(element, listener) {
     var elementDataStash = dataStash(element);
-    var listeners = elementDataStash.delayedListeners;
-
-    if (!listeners) {
-      listeners = elementDataStash.delayedListeners = [];
-    }
-
-    listeners.push(listener);
+    elementDataStash.delayedListeners = elementDataStash.delayedListeners || [];
+    elementDataStash.delayedListeners.push(listener);
   },
 
   /**
@@ -165,13 +157,8 @@ var dataStashHelper = {
    */
   storeCompleteListener: function(element, listener) {
     var elementDataStash = dataStash(element);
-    var listeners = elementDataStash.completedListeners;
-
-    if (!listeners) {
-      listeners = elementDataStash.completedListeners = [];
-    }
-
-    listeners.push(listener);
+    elementDataStash.completedListeners = elementDataStash.completedListeners || [];
+    elementDataStash.completedListeners.push(listener);
   }
 };
 
@@ -223,10 +210,9 @@ var handleElementExitViewport = function(element) {
 
   if (timeoutIds) {
     timeoutIds.forEach(clearTimeout);
+    dataStashHelper.removeTimeoutIds(element);
+    dataStashHelper.removeDelayedListeners(element);
   }
-
-  dataStashHelper.removeTimeoutIds(element);
-  dataStashHelper.removeDelayedListeners(element);
 };
 
 /**

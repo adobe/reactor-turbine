@@ -32,4 +32,10 @@ module.exports = function() {
     // TODO: Have state emit an event that logger listens to instead?
     logger.outputEnabled = value;
   };
+
+  if (ENV_TEST) {
+    _satellite.__test = {
+      domContentLoadedHasFired: require('./utils/dom/hasDomContentLoaded')
+    };
+  }
 };

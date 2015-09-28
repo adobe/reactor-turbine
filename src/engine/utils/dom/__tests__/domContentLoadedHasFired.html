@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="/base/src/__tests__/helpers/testpage.js"></script>
+  <script src="/base/dist/container.js"></script>
+  <script src="/base/dist/engine.js"></script>
+  <script>
+    TestPage
+      .waitForContentLoaded()
+      .execute(function() {
+        expect(_satellite.__test.domContentLoadedHasFired()).toBe(true);
+      })
+      .start();
+  </script>
+</head>
+<body>
+  <script>
+    _satellite.pageBottom();
+  </script>
+</body>
+</html>

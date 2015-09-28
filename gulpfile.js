@@ -7,6 +7,7 @@ var fs = require('fs');
 var path = require('path');
 var KarmaServer = require('karma').Server;
 var webpack = require('webpack-stream');
+var DefinePlugin = require('webpack').DefinePlugin;
 
 var $ = require('gulp-load-plugins')();
 
@@ -160,7 +161,12 @@ gulp.task('buildEngine', function() {
         // So that modules can require('window') and then tests can mock it.
         window: 'window',
         document: 'document'
-      }
+      },
+      plugins: [
+        new DefinePlugin({
+          ENV_TEST: true
+        })
+      ]
     }))
     .pipe(gulp.dest('./dist'));
 });

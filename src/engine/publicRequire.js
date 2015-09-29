@@ -18,6 +18,7 @@ module.exports = function(key) {
     'hideElements': require('./utils/dom/hideElements'),
     'loadScript': require('./utils/loadScript'),
     'textMatch': require('./utils/string/textMatch'),
+    'unique': require('./utils/array/unique'),
     'getQueryParam': require('./utils/uri/getQueryParam'),
     'isLinked': function(element) { // For backward compatibility.
       require('./utils/dom/isAnchor')(element, true);

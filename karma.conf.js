@@ -18,7 +18,7 @@ module.exports = function(config) {
     exclude: [],
 
     preprocessors: {
-      '**/__tests__/**/*.test.js': ['webpack', 'sourcemap']
+      '**/__tests__/**/*.test.js': ['webpack']
     },
 
     webpack: {
@@ -49,8 +49,8 @@ module.exports = function(config) {
           window: 'window',
           document: 'document'
         }
-      ]
-      //devtool: 'inline-source-map'
+      ],
+      devtool: '#inline-source-map'
     },
 
     webpackServer: {
@@ -88,13 +88,12 @@ module.exports = function(config) {
     singleRun: false,
 
     plugins: [
-      require("karma-jasmine"),
-      require("karma-chrome-launcher"),
-      require("karma-firefox-launcher"),
-      require("karma-safari-launcher"),
-      require("karma-webpack"),
-      require("karma-sourcemap-loader"),
-      require("karma-ievms")
+      require('karma-jasmine'),
+      require('karma-chrome-launcher'),
+      require('karma-firefox-launcher'),
+      require('karma-safari-launcher'),
+      require('karma-webpack'),
+      require('karma-ievms')
     ]
   });
 };

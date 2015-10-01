@@ -31,7 +31,6 @@
     "karma-ievms": "0.0.6",
     "karma-jasmine": "^0.3.6",
     "karma-safari-launcher": "^0.1.1",
-    "karma-sourcemap-loader": "^0.3.5",
     "karma-webpack": "^1.7.0",
     "simulate": "git+https://github.com/Aaronius/simulate.js.git#d8538a34fb85b513ae76a9def5d2615c0b702bbc",
     "strict-loader": "^0.1.2",

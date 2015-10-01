@@ -1,11 +1,6 @@
 'use strict';
 
-var includes = require('inject!../includes')({
-  './indexOf': function(arr, obj) {
-    return arr.indexOf(obj);
-  }
-});
-
+var includes = require('../includes');
 var letters = ['A', 'B', 'C'];
 
 describe('includes', function() {

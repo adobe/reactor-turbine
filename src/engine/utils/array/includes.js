@@ -1,5 +1,3 @@
-var indexOf = require('./indexOf');
-
 // `includes(arr, obj)`
 // -----------------------
 //

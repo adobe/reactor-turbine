@@ -54,10 +54,10 @@ module.exports = function(config) {
     },
 
     webpackServer: {
-      stats: false,
+      stats: true,
       debug: false,
-      progress: false,
-      quiet: true
+      progress: true,
+      quiet: false
     },
 
     reporters: ['progress'],

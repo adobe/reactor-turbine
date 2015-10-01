@@ -6,18 +6,28 @@
     <script>
       TestPage
         .execute(function() {
-          spyOn(window.console, 'log');
+          if (window.console) {
+            spyOn(window.console, 'log');
+          }
 
           expect(window.localStorage.getItem('sdsat_debug')).toBeNull();
 
           _satellite.setDebug(true);
           _satellite.notify('debug setting true');
-          expect(window.console.log).toHaveBeenCalledWith('SATELLITE: debug setting true');
+
+          if (window.console) {
+            expect(window.console.log).toHaveBeenCalledWith('SATELLITE: debug setting true');
+          }
+
           expect(window.localStorage.getItem('sdsat_debug')).toBe('true');
 
           _satellite.setDebug(false);
           _satellite.notify('debug setting false');
-          expect(window.console.log).not.toHaveBeenCalledWith('SATELLITE: debug setting false');
+
+          if (window.console) {
+            expect(window.console.log).not.toHaveBeenCalledWith('SATELLITE: debug setting false');
+          }
+
           expect(window.localStorage.getItem('sdsat_debug')).toBe('false');
         })
         .start();

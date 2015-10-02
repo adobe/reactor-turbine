@@ -23,12 +23,12 @@
 
   IFrameJasmine.prototype = jasmine;
 
-  function bustCache(url) {
+  var bustCache = function(url) {
     var cacheBustSeparator = url.indexOf('?') !== -1 ? '&' : '?';
     return url + cacheBustSeparator + 'cachebust=' + Date.now();
-  }
+  };
 
-  function loadIframe(url) {
+  var loadIframe = function(url) {
     var iframe = document.createElement('iframe');
     iframe.style.width = '600px';
     iframe.style.height = '400px';
@@ -43,16 +43,16 @@
     iframe.src = url;
     document.body.appendChild(iframe);
     return iframe;
-  }
+  };
 
-  function eraseLocalStorageConfig() {
+  var eraseLocalStorageConfig = function() {
     if (!window.localStorage) {
       return;
     }
 
     localStorage.removeItem('sdsat_debug');
     localStorage.removeItem('sdsat_hide_activity');
-  }
+  };
 
   /**
    * Run a test page within an iframe.
@@ -73,7 +73,7 @@
       absolutePath = currentScriptDir + path;
     }
 
-    function runTest(done) {
+    var runTest = function(done) {
       eraseLocalStorageConfig();
 
       var iframe = loadIframe(absolutePath);
@@ -89,7 +89,7 @@
       iwin.jasmine = new IFrameJasmine(iwin);
       iwin.testConfig = testConfig;
       iwin.spyOn = spyOn;
-    }
+    };
 
     if (focus) {
       fit(description, runTest);

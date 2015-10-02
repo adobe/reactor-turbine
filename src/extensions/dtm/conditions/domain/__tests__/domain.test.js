@@ -11,11 +11,11 @@ var conditionDelegate = conditionDelegateInjector({
   document: mockDocument
 });
 
-function getConfig(domains) {
+var getConfig = function(domains) {
   return {
     domains: domains
   };
-}
+};
 
 describe('domain condition delegate', function() {
   it('returns true when the domain matches', function() {

@@ -6,13 +6,13 @@
  */
 module.exports = (function(docEl) {
 
-  function simpleTagMatch(elm, selector) {
+  var simpleTagMatch = function(elm, selector) {
     var tagName = elm.tagName;
     if (!tagName) {
       return false;
     }
     return selector.toLowerCase() === tagName.toLowerCase();
-  }
+  };
 
   var matches =
     docEl.matchesSelector ||

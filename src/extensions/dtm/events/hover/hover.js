@@ -13,7 +13,7 @@ var dataStash = require('createDataStash')('hover');
  * called immediately.
  * @param {Function} handler The function that should be called
  */
-function delayHover(event, delay, handler) {
+var delayHover = function(event, delay, handler) {
   if (delay === 0) {
     handler(event);
     return;
@@ -38,21 +38,21 @@ function delayHover(event, delay, handler) {
   }, delay);
 
   event.target.addEventListener('mouseleave', handleMouseLeave);
-}
+};
 
-function getPseudoEventType(delay) {
+var getPseudoEventType = function(delay) {
   return 'hover(' + delay + ')';
-}
+};
 
-function getPseudoEvent(target, delay) {
+var getPseudoEvent = function(target, delay) {
   return {
     type: getPseudoEventType(delay),
     target: target,
     delay: delay
   };
-}
+};
 
-function watchElement(element, trackedDelays) {
+var watchElement = function(element, trackedDelays) {
   element.addEventListener('mouseenter', function(event) {
     trackedDelays.forEach(function(trackedDelay) {
       delayHover(event, trackedDelay, function() {
@@ -60,7 +60,7 @@ function watchElement(element, trackedDelays) {
       });
     });
   });
-}
+};
 
 /**
  * The hover event. This event occurs when a user has moved the pointer to be on top of an element.

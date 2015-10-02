@@ -14,7 +14,7 @@ describe('createBubbly', function() {
   var bElement;
   var cElement;
 
-  function createElements() {
+  var createElements = function() {
     aElement = document.createElement('div');
     aElement.innerHTML = 'A';
     aElement.id = 'a';
@@ -30,14 +30,14 @@ describe('createBubbly', function() {
     bElement.appendChild(cElement);
 
     document.body.appendChild(aElement);
-  }
+  };
 
-  function removeElements() {
+  var removeElements = function() {
     document.body.removeChild(aElement);
     aElement = null;
     bElement = null;
     cElement = null;
-  }
+  };
 
   beforeEach(function() {
     createElements();

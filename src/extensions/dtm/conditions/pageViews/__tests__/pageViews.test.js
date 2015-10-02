@@ -24,13 +24,13 @@ var DURATIONS = [
   'session'
 ];
 
-function getConfig(count, operator, duration) {
+var getConfig = function(count, operator, duration) {
   return {
     count: count,
     operator: operator,
     duration: duration
   };
-}
+};
 
 describe('page views condition delegate', function() {
   beforeEach(function() {

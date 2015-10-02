@@ -9,11 +9,11 @@ var conditionDelegate = conditionDelegateInjector({
   clientInfo: mockClientInfo
 });
 
-function getConfig(operatingSystems) {
+var getConfig = function(operatingSystems) {
   return {
     operatingSystems: operatingSystems
   };
-}
+};
 
 describe('operating system condition delegate', function() {
   it('returns true when the current OS matches one of the selected OSs', function() {

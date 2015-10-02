@@ -12,9 +12,9 @@ var isHTTPS = require('inject!../isHTTPS')({
   document: mockDocument
 });
 
-function setProtocol(protocol) {
+var setProtocol = function(protocol) {
   mockDocument.location.protocol = protocol;
-}
+};
 
 describe('isHTTPS', function() {
   it('returns true if the protocol is https', function() {

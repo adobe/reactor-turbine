@@ -9,11 +9,11 @@ var conditionDelegate = conditionDelegateInjector({
   clientInfo: mockClientInfo
 });
 
-function getConfig(deviceTypes) {
+var getConfig = function(deviceTypes) {
   return {
     deviceTypes: deviceTypes
   };
-}
+};
 
 describe('device type condition delegate', function() {
   it('returns true when the current device type matches one of the selected ' +

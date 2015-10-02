@@ -1,6 +1,6 @@
-function isAnchor(thing) {
+var isAnchor = function(thing) {
   return !!(thing && thing.nodeName && thing.nodeName.toLowerCase() === 'a');
-}
+};
 
 module.exports = function(element, searchAncestors) {
   if (searchAncestors) {

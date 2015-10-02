@@ -14,14 +14,14 @@
       , onreadystatechange = 'onreadystatechange'
       , loaded = /^loade|^c/.test(doc.readyState);
 
-    function flush() {
+    var flush = function() {
       loaded = 1;
 
       while (fns.length) {
         var fn = fns.shift();
         fn();
       }
-    }
+    };
 
     doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function() {
       doc.removeEventListener(domContentLoaded, fn, f);
@@ -67,33 +67,33 @@
 
   var page;
 
-  function waitForDOMLoaded() {
+  var waitForDOMLoaded = function() {
     page.queue.push(function(next) {
       domReady(function() {
         next();
       });
     });
     return page;
-  }
+  };
 
-  function waitForContentLoaded() {
+  var waitForContentLoaded = function() {
     page.queue.push(function(next) {
       addEventListener(window, 'load', next);
     });
     return page;
-  }
+  };
 
-  function execute(cb) {
+  var execute = function(cb) {
     page.queue.push(function(next) {
       cb(page);
       next();
     });
     return page;
-  }
+  };
 
   var queueStarted = false;
 
-  function start() {
+  var start = function() {
     if (queueStarted) {
       return;
     }
@@ -103,16 +103,16 @@
     var queue = page.queue;
     var idx = 0;
 
-    function next() {
+    var next = function() {
       var cb = queue[idx++];
       if (!cb) {
         return window.done();
       }
       cb(next);
-    }
+    };
 
     next();
-  }
+  };
 
   window.onerror = function(err, url, line) {
     window.fail(err + ' at ' + url + ' on line ' + line);

@@ -6,9 +6,9 @@ var document = require('document');
 var window = require('window');
 var property = require('property');
 
-function key(name) {
+var key = function(name) {
   return '_sdsat_' + name;
-}
+};
 
 var PAGE_TIME_DELIMITER = '|';
 

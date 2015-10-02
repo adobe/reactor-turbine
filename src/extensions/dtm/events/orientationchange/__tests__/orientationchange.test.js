@@ -14,7 +14,7 @@ describe('orientationchange event type', function() {
     }
   };
 
-  function triggerOrientationChange() {
+  var triggerOrientationChange = function() {
     // Act as though window triggered an orientationchange event.
     orientationChangeCallbacks.forEach(function(callback) {
       callback({
@@ -23,14 +23,14 @@ describe('orientationchange event type', function() {
         currentTarget: mockWindow
       });
     });
-  }
+  };
 
-  function assertTriggerCall(options) {
+  var assertTriggerCall = function(options) {
     expect(options.call.args[0].type).toBe('orientationchange');
     expect(options.call.args[0].target).toBe(mockWindow);
     expect(options.call.args[0].orientation).toBe(options.orientation);
     expect(options.call.args[1]).toBe(mockWindow);
-  }
+  };
 
   beforeAll(function() {
     var delegateInjector = require('inject!../orientationchange');

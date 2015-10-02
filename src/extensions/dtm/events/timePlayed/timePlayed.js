@@ -14,21 +14,21 @@ var timePlayedUnit = {
   PERCENT: 'percent'
 };
 
-function getPseudoEventType(amount, unit) {
+var getPseudoEventType = function(amount, unit) {
   var unitSuffix = unit === timePlayedUnit.SECOND ? 's' : '%';
   return 'videoplayed(' + amount + unitSuffix + ')';
-}
+};
 
-function getPseudoEvent(amount, unit, target) {
+var getPseudoEvent = function(amount, unit, target) {
   return {
     type: getPseudoEventType(amount, unit),
     target: target,
     amount: amount,
     unit: unit
   };
-}
+};
 
-function handleTimeUpdate(event) {
+var handleTimeUpdate = function(event) {
   var target = event.target;
 
   if (!target.seekable || !target.seekable.length) {
@@ -55,7 +55,7 @@ function handleTimeUpdate(event) {
   });
 
   targetDataStash.lastTriggered = playedSeconds;
-}
+};
 
 document.addEventListener('timeupdate', handleTimeUpdate, true);
 

@@ -17,11 +17,11 @@ var conditionDelegate = conditionDelegateInjector({
   resourceProvider: publicRequire('resourceProvider')
 });
 
-function getConfig(pages) {
+var getConfig = function(pages) {
   return {
     pages: pages
   };
-}
+};
 
 describe('landing page condition delegate', function() {
   it('returns true when the landing page matches one of the string options', function() {

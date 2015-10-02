@@ -5,7 +5,7 @@ describe('elementExists event type', function() {
   var aElement;
   var bElement;
 
-  function createElements() {
+  var createElements = function() {
     aElement = document.createElement('div');
     aElement.id = 'a';
     aElement.innerHTML = 'a';
@@ -15,20 +15,20 @@ describe('elementExists event type', function() {
     bElement.id = 'b';
     bElement.innerHTML = 'b';
     aElement.appendChild(bElement);
-  }
+  };
 
-  function removeElements() {
+  var removeElements = function() {
     if (aElement) {
       document.body.removeChild(aElement);
     }
     aElement = bElement = null;
-  }
+  };
 
-  function assertTriggerCall(options) {
+  var assertTriggerCall = function(options) {
     expect(options.call.args[0].type).toBe('elementexists');
     expect(options.call.args[0].target).toBe(options.target);
     expect(options.call.args[1]).toBe(options.relatedElement);
-  }
+  };
 
   beforeAll(function() {
     jasmine.clock().install();

@@ -38,7 +38,7 @@ module.exports = function(selectorOrElements) {
 
   var showCalled = false;
 
-  function show() {
+  var show = function() {
     // Don't allow this function to be called multiple times.
     if (showCalled) {
       return;
@@ -54,7 +54,7 @@ module.exports = function(selectorOrElements) {
     });
 
     showCalled = true;
-  }
+  };
 
   return show;
 };

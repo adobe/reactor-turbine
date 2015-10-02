@@ -17,11 +17,11 @@ var conditionDelegate = conditionDelegateInjector({
   resourceProvider: publicRequire('resourceProvider')
 });
 
-function getConfig(sources) {
+var getConfig = function(sources) {
   return {
     sources: sources
   };
-}
+};
 
 describe('traffic source condition delegate', function() {
   it('returns true when the traffic source matches one of the string options', function() {

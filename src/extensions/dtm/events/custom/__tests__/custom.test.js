@@ -3,18 +3,18 @@
 var outerElement;
 var innerElement;
 
-function assertTriggerCall(options) {
+var assertTriggerCall = function(options) {
   expect(options.call.args[0].type).toBe(options.type);
   expect(options.call.args[0].target).toBe(options.target);
   expect(options.call.args[1]).toBe(options.relatedElement);
-}
+};
 
-function triggerCustomEvent(element, type) {
+var triggerCustomEvent = function(element, type) {
   var event = document.createEvent('Event');
   event.initEvent(type, true, true);
   element.dispatchEvent(event);
   return event;
-}
+};
 
 describe('custom event type', function() {
   var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();

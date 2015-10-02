@@ -12,11 +12,11 @@ var conditionDelegate = conditionDelegateInjector({
   resourceProvider: publicRequire('resourceProvider')
 });
 
-function getConfig(isNew) {
+var getConfig = function(isNew) {
   return {
     isNew: isNew
   };
-}
+};
 
 describe('new vs. returning condition delegate', function() {
   it('returns true when isNew = true and the visitor is new', function() {

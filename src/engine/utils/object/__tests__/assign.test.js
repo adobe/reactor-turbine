@@ -5,9 +5,9 @@ var target = {a: 'apple', b: 'banana', c: 'cucumber'};
 describe('assigns', function() {
   it('returns new property list for own properties', function() {
 
-    function Apple() {
+    var Apple = function() {
       this.color = 'green';
-    }
+    };
 
     Apple.prototype = {a: 'honeycrisp'};
 

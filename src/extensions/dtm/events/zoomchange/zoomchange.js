@@ -5,15 +5,15 @@ var once = require('once');
 
 var triggers = [];
 
-function getCurrentZoom() {
+var getCurrentZoom = function() {
   return document.documentElement.clientWidth / window.innerWidth;
-}
+};
 
-function callTriggers(event) {
+var callTriggers = function(event) {
   triggers.forEach(function(trigger) {
     trigger(event, document);
   });
-}
+};
 
 var watchForZoom = once(function() {
   if (!('ongestureend' in window) || !('ontouchend' in window)) {

@@ -14,14 +14,14 @@ var conditionDelegate = conditionDelegateInjector({
   resourceProvider: publicRequire('resourceProvider')
 });
 
-function getConfig(width, widthOperator, height, heightOperator) {
+var getConfig = function(width, widthOperator, height, heightOperator) {
   return {
     width: width,
     widthOperator: widthOperator,
     height: height,
     heightOperator: heightOperator
   };
-}
+};
 
 describe('window size condition delegate', function() {
   it('returns true when dimension is above "greater than" constraint', function() {

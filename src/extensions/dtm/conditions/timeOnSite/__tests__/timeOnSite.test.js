@@ -16,12 +16,12 @@ var conditionDelegate = conditionDelegateInjector({
   resourceProvider: publicRequire('resourceProvider')
 });
 
-function getConfig(minutes, operator) {
+var getConfig = function(minutes, operator) {
   return {
     minutes: minutes,
     operator: operator
   };
-}
+};
 
 describe('time on site condition delegate', function() {
   it('returns true when number of minutes is above "greater than" constraint', function() {

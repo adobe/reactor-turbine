@@ -2,7 +2,7 @@ var preprocessConfig = require('./utils/preprocessConfig');
 var logger = require('./utils/logger');
 var state = require('./state');
 
-function runActions(rule, event, relatedElement) {
+var runActions = function(rule, event, relatedElement) {
   if (state.getShouldExecuteActions() && rule.actions) {
     rule.actions.forEach(function(action) {
       action.config = action.config || {};
@@ -26,9 +26,9 @@ function runActions(rule, event, relatedElement) {
   }
 
   logger.log('Rule "' + rule.name + '" fired.');
-}
+};
 
-function checkConditions(rule, event, relatedElement) {
+var checkConditions = function(rule, event, relatedElement) {
   if (rule.conditions) {
     for (var i = 0; i < rule.conditions.length; i++) {
       var condition = rule.conditions[i];
@@ -61,9 +61,9 @@ function checkConditions(rule, event, relatedElement) {
   }
 
   runActions(rule, event, relatedElement);
-}
+};
 
-function initEventDelegate(rule) {
+var initEventDelegate = function(rule) {
   if (rule.events) {
     /**
      * This is the callback that executes a particular rule when an event has occurred.
@@ -96,7 +96,7 @@ function initEventDelegate(rule) {
       }
     });
   }
-}
+};
 
 module.exports = function() {
   state.getRules().forEach(function(rule) {

@@ -14,14 +14,14 @@ var triggers = [];
  * @param {String} methodName The name of the method to replace with the proxy method.
  * @param {Function} fn A function that should be called after the original method is called.
  */
-function callThrough(object, methodName, fn) {
+var callThrough = function(object, methodName, fn) {
   var original = object[methodName];
   object[methodName] = function() {
     var returnValue = original.apply(object, arguments);
     fn.apply(null, arguments);
     return returnValue;
   };
-}
+};
 
 /**
  * Calls all the trigger methods if the URI has changed.

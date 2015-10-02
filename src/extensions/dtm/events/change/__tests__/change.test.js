@@ -9,11 +9,11 @@ describe('change event type', function() {
     textMatch: publicRequire('textMatch')
   });
 
-  function assertTriggerCall(options) {
+  var assertTriggerCall = function(options) {
     expect(options.call.args[0].type).toBe('change');
     expect(options.call.args[0].target).toBe(options.target);
     expect(options.call.args[1]).toBe(options.relatedElement);
-  }
+  };
 
   describe('without value defined', function() {
     testStandardEvent(delegate, 'change');

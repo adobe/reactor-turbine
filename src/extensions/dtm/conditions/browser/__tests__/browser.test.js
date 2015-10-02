@@ -9,11 +9,11 @@ var conditionDelegate = conditionDelegateInjector({
   clientInfo: mockClientInfo
 });
 
-function getConfig(browsers) {
+var getConfig = function(browsers) {
   return {
     browsers: browsers
   };
-}
+};
 
 describe('browser condition delegate', function() {
   it('returns true when the current browser matches one of the selected browsers', function() {

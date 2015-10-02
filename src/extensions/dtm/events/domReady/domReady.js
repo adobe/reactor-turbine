@@ -4,7 +4,7 @@ var once = require('once');
 
 var triggers = [];
 
-function handleDOMContentLoaded() {
+var handleDOMContentLoaded = function() {
   document.removeEventListener('DOMContentLoaded', handleDOMContentLoaded, true);
 
   triggers.forEach(function(trigger) {
@@ -15,7 +15,7 @@ function handleDOMContentLoaded() {
 
     trigger(pseudoEvent, document.location);
   });
-}
+};
 
 var watchForContentLoaded  = once(function() {
   document.addEventListener('DOMContentLoaded', handleDOMContentLoaded, true);

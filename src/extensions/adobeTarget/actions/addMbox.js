@@ -27,14 +27,14 @@ var adobeVisitor = require('extensionCores').get('adobeVisitor');
 
 var mboxes = [];
 
-function getMboxByName(name) {
+var getMboxByName = function(name) {
   for (var i = 0; i < mboxes.length; i++) {
     var mbox = mboxes[i];
     if (mbox.name === name) {
       return mbox;
     }
   }
-}
+};
 var mbox = function(name, setOfferCallback) {
   this.name = name;
   this.setOfferCallback = setOfferCallback;
@@ -89,15 +89,15 @@ window.mboxOfferAjax = function(content) {
 var MILLIS_IN_MINUTE = 60000;
 
 // TODO: Can we use an ID generator util provided by DTM?
-function generateId() {
+var generateId = function() {
   return (new Date()).getTime() + '-' + Math.floor(Math.random() * 999999);
-}
+};
 
 // TODO: Should this be a DTM util?
-function getTime() {
+var getTime = function() {
   var now = new Date();
   return now.getTime() - (now.getTimezoneOffset() * MILLIS_IN_MINUTE);
-}
+};
 
 // TODO: Should this be a DTM util?
 var browserTimeOffset = -new Date().getTimezoneOffset();

@@ -3,11 +3,11 @@
 var outerElement;
 var innerElement;
 
-function assertTriggerCall(options) {
+var assertTriggerCall = function(options) {
   expect(options.call.args[0].type).toBe(options.type);
   expect(options.call.args[0].target).toBe(options.target);
   expect(options.call.args[1]).toBe(options.relatedElement);
-}
+};
 
 module.exports = function(delegate, type) {
   beforeAll(function() {

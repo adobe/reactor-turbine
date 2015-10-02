@@ -12,10 +12,10 @@ var getURI = require('inject!../getURI')({
   document: mockDocument
 });
 
-function setLocation(pathname, search) {
+var setLocation = function(pathname, search) {
   mockDocument.location.pathname = pathname;
   mockDocument.location.search = search;
-}
+};
 
 describe('getURI', function() {
 

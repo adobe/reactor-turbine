@@ -10,9 +10,9 @@ var getQueryParam = require('inject!../getQueryParam')({
   window: mockWindow
 });
 
-function setSearch(search) {
+var setSearch = function(search) {
   mockWindow.location.search = search;
-}
+};
 
 describe('getQueryParam', function() {
   it('returns null if the queryString is empty', function() {

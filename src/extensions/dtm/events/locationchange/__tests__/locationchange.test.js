@@ -4,11 +4,11 @@ describe('locationchange event type', function() {
   var delegate;
   var origHref = window.location.href;
 
-  function assertTriggerCall(call) {
+  var assertTriggerCall = function(call) {
     expect(call.args[0].type).toBe('locationchange');
     expect(call.args[0].target).toBe(document);
     expect(call.args[1]).toBe(document);
-  }
+  };
 
   beforeAll(function() {
     var publicRequire = require('../../../__tests__/helpers/stubPublicRequire')();

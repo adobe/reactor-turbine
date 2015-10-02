@@ -6,13 +6,13 @@ var conditionDelegate = conditionDelegateInjector({
   'resourceProvider': publicRequire('resourceProvider')
 });
 
-function getConfig(dataElementName, operator, amount) {
+var getConfig = function(dataElementName, operator, amount) {
   return {
     dataElementName: dataElementName,
     operator: operator,
     amount: amount
   };
-}
+};
 
 describe('cart amount condition delegate', function() {
   var previousGetVar;

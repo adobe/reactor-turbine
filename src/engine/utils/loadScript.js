@@ -1,11 +1,11 @@
 var onLoad = function(url, script, callback) {
-  function cb(error) {
+  var cb = function(error) {
     // TODO: Add logging.
     //if (error) SL.logError(error)
     if (callback) {
       callback(error);
     }
-  }
+  };
 
   if ('onload' in script) {
     script.onload = function() {

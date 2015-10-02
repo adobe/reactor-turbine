@@ -2,11 +2,11 @@
 
 var conditionDelegate = require('../protocol');
 
-function getConfig(protocols) {
+var getConfig = function(protocols) {
   return {
     protocols: protocols
   };
-}
+};
 
 describe('protocol condition delegate', function() {
   it('returns true when the browser protocol matches', function() {

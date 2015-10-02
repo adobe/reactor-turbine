@@ -16,12 +16,12 @@ var conditionDelegate = conditionDelegateInjector({
   resourceProvider: publicRequire('resourceProvider')
 });
 
-function getConfig(count, operator) {
+var getConfig = function(count, operator) {
   return {
     count: count,
     operator: operator
   };
-}
+};
 
 describe('sessions condition delegate', function() {
   it('returns true when number of sessions is above "greater than" constraint', function() {

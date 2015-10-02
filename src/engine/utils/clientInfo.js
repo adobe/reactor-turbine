@@ -142,7 +142,7 @@ var connectionType = (function() {
 // TODO: Can we get rid of this? It's used by the Analytics extension but is a
 // deprecated browser API.
 var isHomePage = (function() {
-  function getTopFrameSet() {
+  var getTopFrameSet = function() {
     // Get the top frame set
     var topFrameSet = window;
     var parent;
@@ -165,7 +165,7 @@ var isHomePage = (function() {
     }
 
     return topFrameSet;
-  }
+  };
 
   try {
     document.body.addBehavior('#default#homePage');

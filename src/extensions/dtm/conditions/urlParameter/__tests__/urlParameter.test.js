@@ -8,12 +8,12 @@ var conditionDelegate = require('inject!../urlParameter')({
   }
 });
 
-function getConfig(name, value) {
+var getConfig = function(name, value) {
   return {
     name: name,
     value: value
   };
-}
+};
 
 describe('url parameter condition delegate', function() {
   it('returns true when value matches using regular string', function() {

@@ -9,16 +9,16 @@ var _undefinedVarsReturnEmpty;
 
 preprocessObject = function(obj, element, event) {
   var ret = {};
-  for (var key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      var value = obj[key];
-      if (isObject(value)) {
-        ret[key] = preprocessObject(value, element, event);
-      } else if (isArray(value)) {
-        ret[key] = preprocessArray(value, element, event);
-      } else {
-        ret[key] = replaceVarTokens(value, _undefinedVarsReturnEmpty, element, event);
-      }
+  var keys = Object.keys(obj);
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    var value = obj[key];
+    if (isObject(value)) {
+      ret[key] = preprocessObject(value, element, event);
+    } else if (isArray(value)) {
+      ret[key] = preprocessArray(value, element, event);
+    } else {
+      ret[key] = replaceVarTokens(value, _undefinedVarsReturnEmpty, element, event);
     }
   }
   return ret;

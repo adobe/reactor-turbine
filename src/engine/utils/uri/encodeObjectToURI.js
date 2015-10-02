@@ -6,11 +6,9 @@ module.exports = function(obj) {
   }
 
   var uri = [];
-  for (var key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      uri.push(encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]));
-    }
-  }
+  Object.keys(obj).forEach(function(key) {
+    uri.push(encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]));
+  });
 
   return uri.join('&');
 };

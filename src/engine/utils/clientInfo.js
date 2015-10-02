@@ -3,10 +3,11 @@ var assign = require('./object/assign');
 
 var matchUserAgent = function(regexs) {
   return function(userAgent) {
-    for (var key in regexs) {
+    var keys = Object.keys(regexs);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
       var regex = regexs[key];
-      var match = regex.test(userAgent);
-      if (match) {
+      if (regex.test(userAgent)) {
         return key;
       }
     }

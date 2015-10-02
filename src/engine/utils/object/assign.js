@@ -4,10 +4,10 @@ module.exports = function(target) {
     if (from === null || from === undefined) {
       continue;
     }
-    for (var key in from) {
-      if (from.hasOwnProperty(key)) {
-        target[key] = from[key];
-      }
+    var keys = Object.keys(from);
+    for (var j = 0; j < keys.length; j++) {
+      var key = keys[j];
+      target[key] = from[key];
     }
   }
   return target;

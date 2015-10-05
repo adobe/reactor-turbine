@@ -47,7 +47,7 @@ describe('isAnchor', function() {
     });
 
     it('returns false if searchAncestors is true', function() {
-      expect(isAnchor(innerSpan, false)).toBe(false);
+      expect(isAnchor(innerSpan, true)).toBe(false);
     });
 
     it('returns false if searchAncestors is false', function() {

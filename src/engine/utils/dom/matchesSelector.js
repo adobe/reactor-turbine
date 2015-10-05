@@ -4,10 +4,10 @@
  * @param {string} selector The CSS selector.
  * @returns {boolean}
  */
-module.exports = (function(docEl) {
+module.exports = (function(documentElement) {
 
-  var simpleTagMatch = function(elm, selector) {
-    var tagName = elm.tagName;
+  var simpleTagMatch = function(element, selector) {
+    var tagName = element.tagName;
     if (!tagName) {
       return false;
     }
@@ -15,35 +15,36 @@ module.exports = (function(docEl) {
   };
 
   var matches =
-    docEl.matchesSelector ||
-    docEl.mozMatchesSelector ||
-    docEl.webkitMatchesSelector ||
-    docEl.oMatchesSelector ||
-    docEl.msMatchesSelector;
+    documentElement.matchesSelector ||
+    documentElement.mozMatchesSelector ||
+    documentElement.webkitMatchesSelector ||
+    documentElement.oMatchesSelector ||
+    documentElement.msMatchesSelector;
+
   if (matches) {
-    return function(elm, selector) {
-      if (elm === document || elm === window) {
+    return function(element, selector) {
+      if (element === document || element === window) {
         return false;
       }
       try {
-        return matches.call(elm, selector);
+        return matches.call(element, selector);
       } catch (e) {
         return false;
       }
     };
   } else {
-    return function(elm, selector) {
-      var parent = elm.parentNode;
+    return function(element, selector) {
+      var parent = element.parentNode;
       if (!parent) {
         return false;
       }
       if (selector.match(/^[a-z]+$/i)) {
-        return simpleTagMatch(elm, selector);
+        return simpleTagMatch(element, selector);
       }
       try {
-        var nodeList = elm.parentNode.querySelectorAll(selector);
+        var nodeList = element.parentNode.querySelectorAll(selector);
         for (var i = nodeList.length; i--; ) {
-          if (nodeList[i] === elm) {
+          if (nodeList[i] === element) {
             return true;
           }
         }

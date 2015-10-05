@@ -1,7 +1,6 @@
 var dataStash = require('./../createDataStash')('liveQuerySelector');
 var globalPoll = require('../communication/globalPoll');
 var once = require('../once');
-var SEEN = 'seen';
 
 // Create a naked object with no prototype so we can safely use it as a map.
 var callbacksBySelector = Object.create(null);
@@ -34,8 +33,8 @@ var callbackIdIncrementor = 0;
 /**
  * Polls for elements added to the DOM matching a given selector.
  * @param {String} selector The CSS selector used to find elements.
- * @param {Function} callback A function that will be called for each element found. The element
- * will be passed to the callback.
+ * @param {Function} callback A function that will be called once and only once for each element
+ * found. The element will be passed to the callback.
  */
 module.exports = function(selector, callback) {
   var callbacks = callbacksBySelector[selector];
@@ -50,8 +49,8 @@ module.exports = function(selector, callback) {
   // call the consumer's callback if it has not already been called for the element.
   callbacks.push(function(element) {
     var elementDataStash = dataStash(element);
-    if (!elementDataStash[SEEN + callbackId]) {
-      elementDataStash[SEEN + callbackId] = true;
+    if (!elementDataStash[callbackId]) {
+      elementDataStash[callbackId] = true;
       callback(element);
     }
   });

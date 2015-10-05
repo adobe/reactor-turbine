@@ -1,0 +1,50 @@
+<html>
+  <head>
+    <script src="/base/src/__tests__/helpers/testpage.js"></script>
+    <script src="/base/src/__tests__/helpers/testEventDelegate.js"></script>
+    <script>
+      var actionSpy = jasmine.createSpy();
+      var _satellite = {
+        container: {}
+      };
+
+      _satellite.container.eventDelegates = {
+        'testEvent': getTestEventDelegate()
+      };
+
+      _satellite.container.actionDelegates = {
+        testAction: function(module) {
+          module.exports = actionSpy;
+        }
+      };
+
+      _satellite.container.rules = [
+        {
+          events: [
+            {
+              type: 'testEvent'
+            }
+          ],
+          actions: [
+            {
+              type: 'testAction'
+            }
+          ]
+        }
+      ];
+    </script>
+    <script src="/base/dist/engine.js"></script>
+  </head>
+  <body>
+    <script>
+      _satellite.pageBottom();
+
+      TestPage
+        .execute(function() {
+          _satellite.triggerTestEvent();
+          expect(actionSpy).toHaveBeenCalled();
+        })
+        .start();
+    </script>
+  </body>
+</html>

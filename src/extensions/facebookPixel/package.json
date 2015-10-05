@@ -1,7 +1,0 @@
-{
-  "name": "facebookPixel",
-  "displayName": "Facebook Pixel",
-  "core": {
-    "path": "core.js"
-  }
-}

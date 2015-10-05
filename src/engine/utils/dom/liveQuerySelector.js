@@ -9,15 +9,17 @@ var callbacksBySelector = Object.create(null);
 var findElements = function() {
   // Using for loops instead of forEach and functions because this will process a lot and we want
   // to be as efficient as possible.
-  for (var selector in callbacksBySelector) {
+  var selectors = Object.keys(callbacksBySelector);
+  for (var i = 0; i < selectors.length; i++) {
+    var selector = selectors[i];
     var callbacks = callbacksBySelector[selector];
+    var elements = document.querySelectorAll(selector);
 
-    for (var i = 0; i < callbacks.length; i++) {
-      var callback = callbacks[i];
-      var elements = document.querySelectorAll(selector);
+    for (var j = 0; j < callbacks.length; j++) {
+      var callback = callbacks[j];
 
-      for (var j = 0; j < elements.length; j++) {
-        callback(elements[j]);
+      for (var k = 0; k < elements.length; k++) {
+        callback(elements[k]);
       }
     }
   }

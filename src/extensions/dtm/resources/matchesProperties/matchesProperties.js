@@ -23,7 +23,9 @@ var getElementProperty = function(element, property) {
  */
 module.exports = function(element, properties) {
   if (properties) {
-    for (var propertyName in properties) {
+    var propertyNames = Object.keys(properties);
+    for (var i = 0; i < propertyNames.length; i++) {
+      var propertyName = propertyNames[i];
       var criterionValue = properties[propertyName];
       var actualValue = getElementProperty(element, propertyName);
       if (!textMatch(actualValue, criterionValue)) {

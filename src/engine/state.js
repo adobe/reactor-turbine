@@ -25,8 +25,8 @@ module.exports = {
     // is so extensions can have logic that runs even when there are no event, condition, action,
     // or data element types configured. One example is DTM's visitor tracking which needs to
     // run regardless of whether conditions are configured to use them.
-    for (var resourceId in container.resources) {
-      this.getResource(resourceId);
+    if (container.resources) {
+      Object.keys(container.resources).forEach(this.getResource);
     }
   },
   customVars: {},

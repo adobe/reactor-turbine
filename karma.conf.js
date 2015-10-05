@@ -6,9 +6,10 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
     files: [
+      { pattern: '**/__tests__/**/objectPrototypeProperties.js', watched: true, included: true, served: true },
       { pattern: '**/__tests__/**/loadTestpage.js', watched: true, included: true, served: true },
       { pattern: '**/__tests__/**/testpage.js', watched: true, included: false, served: true },
-      { pattern: '**/__tests__/**/waitsForAndRuns.js', watched: true, included: true, served: true },
+      { pattern: '**/__tests__/**/waitUntil.js', watched: true, included: true, served: true },
       { pattern: '**/__tests__/**/*.test.js', watched: true, included: true, served: true },
       { pattern: 'node_modules/simulate/simulate.js', watched: false, included: true, served: true },
       { pattern: 'dist/**/*', watched: true, included: false, served: true },

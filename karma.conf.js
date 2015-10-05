@@ -6,31 +6,17 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
     files: [
-      { pattern: '**/__tests__/**/objectPrototypeProperties.js', watched: true, included: true, served: true },
-      { pattern: '**/__tests__/**/loadTestpage.js', watched: true, included: true, served: true },
-      { pattern: '**/__tests__/**/testpage.js', watched: true, included: false, served: true },
-      { pattern: '**/__tests__/**/waitUntil.js', watched: true, included: true, served: true },
-      { pattern: '**/__tests__/**/*.test.js', watched: true, included: true, served: true },
+      { pattern: 'src/__tests__/helpers/*.js', watched: true, included: true, served: true },
+      { pattern: 'src/**/__tests__/**/*.test.js', watched: true, included: true, served: true },
       { pattern: 'node_modules/simulate/simulate.js', watched: false, included: true, served: true },
       { pattern: 'dist/**/*', watched: true, included: false, served: true },
-      { pattern: '**/__tests__/**/*!(.test)*', watched: true, included: false, served: true }
+      { pattern: 'src/**/__tests__/**/*!(.test)*', watched: true, included: false, served: true }
     ],
 
     exclude: [],
 
     preprocessors: {
       '**/__tests__/**/*.test.js': ['webpack']
-    },
-
-    webpack: {
-      externals: [
-        {
-          // So that modules can require('window') and then tests can mock it.
-          window: 'window',
-          document: 'document'
-        }
-      ],
-      devtool: '#inline-source-map'
     },
 
     webpackServer: {
@@ -51,14 +37,9 @@ module.exports = function(config) {
     autoWatch: true,
 
     // Browsers passed in via gulp.
-    //browsers: [
-      //'Chrome',
-      //'Firefox',
-      //'Safari',
-      //'IE9 - Win7',
-      //'IE10 - Win7',
-      //'IE11 - Win7'
-    //],
+    browsers: [
+      'Chrome'
+    ],
 
     captureTimeout: 60000,
 
@@ -73,6 +54,7 @@ module.exports = function(config) {
       require('karma-firefox-launcher'),
       require('karma-safari-launcher'),
       require('karma-webpack'),
+      require('karma-coverage'),
       require('karma-ievms')
     ]
   });

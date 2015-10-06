@@ -2,7 +2,6 @@
   "name": "turbine",
   "version": "1.0.0",
   "description": "",
-  "main": "gulpfile.js",
   "scripts": {
     "test": "gulp test"
   },
@@ -17,6 +16,7 @@
     "gulp-gzip": "^1.2.0",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.2.0",
+    "strict-loader": "^0.1.2",
     "turbine-gulp-testrunner": "git+ssh://git@git.corp.adobe.com:Activation/turbine-gulp-testrunner.git"
   }
 }

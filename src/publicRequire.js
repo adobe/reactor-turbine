@@ -43,16 +43,14 @@ module.exports = function(key) {
       getById: state.getIntegrationConfigById,
       getByExtension: state.getIntegrationConfigsByExtensionId
     },
-    // TODO: The property config is "preprocessed" at the time getPropertyConfig is called.
-    // Will this be too early? Should we expose the module as "getPropertyConfig"
-    // so that extension developers can retrieve the config + have it preprocessed at any time?
-    'property': state.getPropertyConfig(),
     'window': window,
     'document': document
   };
 
   if (modules.hasOwnProperty(key)) {
     return modules[key];
+  } else if (key === 'property') {
+    return state.getPropertyConfig();
   } else {
     throw new Error('Cannot resolve module "' + key + '".');
   }

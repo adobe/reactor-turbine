@@ -20,6 +20,7 @@ module.exports = function(key) {
     'textMatch': require('./utils/string/textMatch'),
     'unique': require('./utils/array/unique'),
     'getQueryParam': require('./utils/uri/getQueryParam'),
+    'isString': require('./utils/isType/isString'),
     'isLinked': function(element) { // For backward compatibility.
       require('./utils/dom/isAnchor')(element, true);
     },

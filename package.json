@@ -22,6 +22,6 @@
   },
   "devDependencies": {
     "turbine-gulp-testrunner": "git+ssh://git@git.corp.adobe.com:Activation/turbine-gulp-testrunner.git",
-    "turbine-gulp-builder": "git+ssh://git@git.corp.adobe.com:Activation/turbine-gulp-builder.git",
+    "turbine-gulp-builder": "git+ssh://git@git.corp.adobe.com:Activation/turbine-gulp-builder.git"
   }
 }

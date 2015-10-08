@@ -18,6 +18,7 @@
     "gulp-uglify": "^1.2.0",
     "strict-loader": "^0.1.2",
     "turbine-gulp-testrunner": "git+ssh://git@git.corp.adobe.com:Activation/turbine-gulp-testrunner.git",
+    "turbine-gulp-builder": "git+ssh://git@git.corp.adobe.com:Activation/turbine-gulp-builder.git",
     "webpack": "^1.12.2",
     "webpack-stream": "^2.1.1"
   }

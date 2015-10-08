@@ -1,7 +1,0 @@
-{
-  "name": "adobeVisitor",
-  "displayName": "Adobe Visitor",
-  "core": {
-    "path": "core.js"
-  }
-}

@@ -19,7 +19,10 @@ var runActions = function(rule, event, relatedElement) {
       try {
         delegate(config);
       } catch (e) {
-        logger.error('Error when executing action for rule ' + rule.name);
+        var message = 'Error when executing action for rule ' + rule.name +
+          '. Error message: ' + e.message;
+
+        logger.error(message);
         // Don't re-throw the error because we want to continue execution.
       }
     });
@@ -51,7 +54,10 @@ var checkConditions = function(rule, event, relatedElement) {
           return;
         }
       } catch (e) {
-        logger.error('Error when executing condition for rule ' + rule.name);
+        var message = 'Error when executing condition for rule ' + rule.name +
+          '. Error message: ' + e.message;
+
+        logger.error(message);
         // Don't re-throw the error because we want to continue execution. We do return
         // however because we want to assume the condition would have failed and therefore
         // we don't want to run the rule's actions.
@@ -91,7 +97,10 @@ var initEventDelegate = function(rule) {
       try {
         delegate(config, trigger);
       } catch (e) {
-        logger.error('Error when executing event listener for rule ' + rule.name);
+        var message = 'Error when executing event listener for rule ' + rule.name +
+          '. Error message: ' + e.message;
+
+        logger.error(message);
         // Don't re-throw the error because we want to continue execution.
       }
     });

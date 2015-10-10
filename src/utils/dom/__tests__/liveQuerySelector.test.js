@@ -17,7 +17,7 @@ describe('liveQuerySelector', function() {
     var callback = jasmine.createSpy();
     liveQuerySelector('.foo', callback);
 
-    jasmine.clock().tick(5000);
+    __tickGlobalPoll();
 
     expect(callback.calls.count()).toBe(1);
 
@@ -36,7 +36,7 @@ describe('liveQuerySelector', function() {
     var callback = jasmine.createSpy();
     liveQuerySelector('.foo', callback);
 
-    jasmine.clock().tick(5000);
+    __tickGlobalPoll();
 
     expect(callback.calls.count()).toBe(1);
 
@@ -55,7 +55,7 @@ describe('liveQuerySelector', function() {
     var callback = jasmine.createSpy();
     liveQuerySelector('.foo', callback);
 
-    jasmine.clock().tick(5000);
+    __tickGlobalPoll();
 
     expect(callback.calls.count()).toBe(2);
 
@@ -73,7 +73,7 @@ describe('liveQuerySelector', function() {
     var callback2 = jasmine.createSpy();
     liveQuerySelector('.foo', callback2);
 
-    jasmine.clock().tick(5000);
+    __tickGlobalPoll();
 
     expect(callback1.calls.count()).toBe(1);
     expect(callback2.calls.count()).toBe(1);
@@ -89,17 +89,17 @@ describe('liveQuerySelector', function() {
     var callback = jasmine.createSpy();
     liveQuerySelector('.foo', callback);
 
-    jasmine.clock().tick(5000);
+    __tickGlobalPoll();
 
     expect(callback.calls.count()).toBe(1);
 
     document.body.removeChild(div);
 
-    jasmine.clock().tick(5000);
+    __tickGlobalPoll();
 
     document.body.appendChild(div);
 
-    jasmine.clock().tick(5000);
+    __tickGlobalPoll();
 
     expect(callback.calls.count()).toBe(1);
 

@@ -13,7 +13,12 @@ var executeListeners = function() {
 };
 
 var startPolling = once(function() {
-  setInterval(executeListeners, POLL_INTERVAL);
+  // When testing we'll let the tests tick the poller manually.
+  if (ENV_TEST) {
+    __tickGlobalPoll = executeListeners;
+  } else {
+    intervalId = setInterval(executeListeners, POLL_INTERVAL);
+  }
 });
 
 module.exports = function(name, callback) {

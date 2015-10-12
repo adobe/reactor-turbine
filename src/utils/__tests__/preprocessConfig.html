@@ -22,6 +22,9 @@
           firstName: '%firstName%',
           lastName: '%lastName%',
           arrayCheck: ['%firstName%', '%lastName%'],
+          nestedArrayCheck: [
+            ['%apple%', '%pear%']
+          ]
         }
       };
 
@@ -31,6 +34,9 @@
           firstName: '%firstName%',
           lastName: '%lastName%',
           arrayCheck: ['%firstName%', '%lastName%'],
+          nestedArrayCheck: [
+            ['%apple%', '%pear%']
+          ]
         },
         elementCheck: '%this.id%',
         eventCheck: '%event.fruit%'
@@ -148,6 +154,18 @@
             config: {
               value: "Doe"
             }
+          },
+          apple: {
+            type: "testExtension.appendText",
+            config: {
+              value: "apple"
+            }
+          },
+          pear: {
+            type: "testExtension.appendText",
+            config: {
+              value: "pear"
+            }
           }
         },
         config: unprocessedConfig
@@ -174,7 +192,10 @@
             nestedObjectCheck: {
               firstName: 'John:first',
               lastName: 'Doe:first',
-              arrayCheck: ['John:first', 'Doe:first']
+              arrayCheck: ['John:first', 'Doe:first'],
+              nestedArrayCheck: [
+                ['apple:first', 'pear:first']
+              ]
             }
           };
 
@@ -184,7 +205,10 @@
             nestedObjectCheck: {
               firstName: 'John:first',
               lastName: 'Doe:first',
-              arrayCheck: ['John:first', 'Doe:first']
+              arrayCheck: ['John:first', 'Doe:first'],
+              nestedArrayCheck: [
+                ['apple:first', 'pear:first']
+              ]
             },
             elementCheck: 'kazoo',
             eventCheck: 'apple'
@@ -213,7 +237,10 @@
             nestedObjectCheck: {
               firstName: 'John:second',
               lastName: 'Doe:second',
-              arrayCheck: ['John:second', 'Doe:second']
+              arrayCheck: ['John:second', 'Doe:second'],
+              nestedArrayCheck: [
+                ['apple:second', 'pear:second']
+              ]
             }
           };
 
@@ -223,7 +250,10 @@
             nestedObjectCheck: {
               firstName: 'John:second',
               lastName: 'Doe:second',
-              arrayCheck: ['John:second', 'Doe:second']
+              arrayCheck: ['John:second', 'Doe:second'],
+              nestedArrayCheck: [
+                ['apple:second', 'pear:second']
+              ]
             },
             elementCheck: 'kazoo',
             eventCheck: 'apple'

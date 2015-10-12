@@ -1,16 +1,37 @@
 var isObject = require('../isObject');
 
 describe('isObject', function() {
-  it('returns true if the object is an object', function() {
-    var Funk = function() {};
-    expect(isObject(new Funk())).toBe(true);
+  it('returns true when the item is a regular object', function() {
+    var objects = [
+      Object.create({}),
+      Object.create(Object.prototype),
+      {foo: 'bar'},
+      {}
+    ];
+
+    objects.forEach(function(item) {
+      expect(isObject(item)).toBe(true);
+    });
   });
 
-  it('returns false if the object is a string', function() {
-    expect(isObject('I need help')).toBe(false);
-  });
+  it('returns false when the item is not a regular object', function() {
+    var Foo = function() {
+      this.abc = {};
+    };
 
-  it('returns false if the object is a function', function() {
-    expect(isObject(['A', 'B', 'C'])).toBe(false);
+    var nonObjects = [
+      /foo/,
+      function() {},
+      1,
+      ['foo', 'bar'],
+      [],
+      new Foo,
+      null,
+      Object.create(null)
+    ];
+
+    nonObjects.forEach(function(item) {
+      expect(isObject(item)).toBe(false);
+    });
   });
 });

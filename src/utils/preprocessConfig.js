@@ -13,7 +13,9 @@ preprocessObject = function(obj, element, event) {
   for (var i = 0; i < keys.length; i++) {
     var key = keys[i];
     var value = obj[key];
-    if (isObject(value)) {
+    if (value instanceof RegExp) {
+      ret[key] = value;
+    } else if (isObject(value)) {
       ret[key] = preprocessObject(value, element, event);
     } else if (isArray(value)) {
       ret[key] = preprocessArray(value, element, event);

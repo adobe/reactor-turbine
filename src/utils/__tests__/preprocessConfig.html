@@ -24,7 +24,8 @@
           arrayCheck: ['%firstName%', '%lastName%'],
           nestedArrayCheck: [
             ['%apple%', '%pear%']
-          ]
+          ],
+          regexCheck: /test/i
         }
       };
 
@@ -36,7 +37,8 @@
           arrayCheck: ['%firstName%', '%lastName%'],
           nestedArrayCheck: [
             ['%apple%', '%pear%']
-          ]
+          ],
+          regexCheck: /test/i
         },
         elementCheck: '%this.id%',
         eventCheck: '%event.fruit%'
@@ -195,7 +197,8 @@
               arrayCheck: ['John:first', 'Doe:first'],
               nestedArrayCheck: [
                 ['apple:first', 'pear:first']
-              ]
+              ],
+              regexCheck: /test/i
             }
           };
 
@@ -208,7 +211,8 @@
               arrayCheck: ['John:first', 'Doe:first'],
               nestedArrayCheck: [
                 ['apple:first', 'pear:first']
-              ]
+              ],
+              regexCheck: /test/i
             },
             elementCheck: 'kazoo',
             eventCheck: 'apple'
@@ -240,7 +244,8 @@
               arrayCheck: ['John:second', 'Doe:second'],
               nestedArrayCheck: [
                 ['apple:second', 'pear:second']
-              ]
+              ],
+              regexCheck: /test/i
             }
           };
 
@@ -253,7 +258,8 @@
               arrayCheck: ['John:second', 'Doe:second'],
               nestedArrayCheck: [
                 ['apple:second', 'pear:second']
-              ]
+              ],
+              regexCheck: /test/i
             },
             elementCheck: 'kazoo',
             eventCheck: 'apple'

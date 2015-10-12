@@ -265,7 +265,8 @@ describe('initRules', function() {
       }).not.toThrowError();
 
       expect(logger.error.calls.mostRecent().args[0]).toEqual(
-          'Error when executing event listener for rule Test Rule');
+        'Error when executing event listener for rule Test Rule. ' +
+        'Error message: noob tried to divide by zero');
     });
 
     it('logs an error when the event delegate is not found', function() {
@@ -316,7 +317,8 @@ describe('initRules', function() {
       }).not.toThrowError();
 
       expect(logger.error.calls.mostRecent().args[0]).toEqual(
-          'Error when executing condition for rule Test Rule');
+        'Error when executing condition for rule Test Rule. ' +
+        'Error message: noob tried to divide by zero');
     });
 
     it('logs an error when the condition delegate is not found', function() {
@@ -401,7 +403,8 @@ describe('initRules', function() {
       }).not.toThrowError();
 
       expect(logger.error.calls.mostRecent().args[0]).toEqual(
-          'Error when executing action for rule Test Rule');
+        'Error when executing action for rule Test Rule. ' +
+        'Error message: noob tried to divide by zero');
     });
 
     it('logs an error when the action delegate is not found', function() {

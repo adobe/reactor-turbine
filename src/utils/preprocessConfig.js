@@ -30,6 +30,8 @@ preprocessArray = function(arr, element, event) {
     var value = arr[i];
     if (isString(value)) {
       value = replaceVarTokens(value, element, event);
+    } else if (isArray(value)) {
+      value = preprocessArray(value, element, event);
     } else if (value && value.constructor === Object) { // TODO: Can we use isObject here?
       value = preprocessObject(value, element, event);
     }

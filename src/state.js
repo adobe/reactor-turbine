@@ -11,11 +11,10 @@ var _container;
 
 module.exports = {
   init: function(container) {
-    // We pull in preprocessConfig here and not at the top of the file to prevent a
-    // circular reference since getVar, which is used by preprocessConfig, requires this state
-    // module.
-    preprocessConfig = require('./utils/preprocessConfig');
     _container = container;
+    // We pull in preprocessConfig here and not at the top of the file to prevent a
+    // circular reference since dependencies of preprocessConfig require this state module.
+    preprocessConfig = require('./utils/preprocessConfig');
     this.getEventDelegate = createExtensionModuleProvider(container.eventDelegates);
     this.getConditionDelegate = createExtensionModuleProvider(container.conditionDelegates);
     this.getActionDelegate = createExtensionModuleProvider(container.actionDelegates);
@@ -30,11 +29,8 @@ module.exports = {
     }
   },
   customVars: {},
-  getExtensionInfo: function() {
-    return _container.extensions;
-  },
   getPropertyConfig: function() {
-    return preprocessConfig(_container.config || {});
+    return _container.config || {};
   },
   getIntegrationConfigsByExtensionId: function(extensionId) {
     var integrationConfigs = [];

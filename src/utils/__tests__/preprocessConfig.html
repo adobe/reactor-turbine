@@ -8,8 +8,6 @@
       var conditionRequiredIntegration;
       var actionRequiredIntegration;
       var eventRequiredProperty;
-      var conditionRequiredProperty;
-      var actionRequiredProperty;
 
       // This text is appended onto data element values. This can be changed to determine
       // whether a configuration object is preprocessed each time rather than being saved to
@@ -59,7 +57,6 @@
         eventDelegates: {
           testEvent: function(module, require) {
             var integrationProvider = require('integrationProvider');
-            eventRequiredProperty = require('property');
 
             var allTriggers = [];
 
@@ -87,7 +84,6 @@
         conditionDelegates: {
           testCondition: function(module, require) {
             var integrationProvider = require('integrationProvider');
-            conditionRequiredProperty = require('property');
 
             module.exports = conditionDelegateSpy.and.callFake(function() {
               conditionRequiredIntegration = integrationProvider.getById('abc');
@@ -98,7 +94,6 @@
         actionDelegates: {
           testAction: function(module, require) {
             var integrationProvider = require('integrationProvider');
-            actionRequiredProperty = require('property');
 
             module.exports = actionDelegateSpy.and.callFake(function() {
               actionRequiredIntegration = integrationProvider.getById('abc');
@@ -169,8 +164,7 @@
               value: "pear"
             }
           }
-        },
-        config: unprocessedConfig
+        }
       };
 
       _satellite = {
@@ -221,17 +215,14 @@
           expect(eventDelegateSpy.calls.argsFor(0)[0])
               .toEqual(firstProcessedConfig);
           expect(eventRequiredIntegration).toEqual(firstProcessedConfig);
-          expect(eventRequiredProperty).toEqual(firstProcessedConfig);
 
           expect(conditionDelegateSpy.calls.argsFor(0)[0])
               .toEqual(firstProcessedConfigWithElementAndEvent);
           expect(conditionRequiredIntegration).toEqual(firstProcessedConfig);
-          expect(conditionRequiredProperty).toEqual(firstProcessedConfig);
 
           expect(actionDelegateSpy.calls.argsFor(0)[0])
               .toEqual(firstProcessedConfigWithElementAndEvent);
           expect(actionRequiredIntegration).toEqual(firstProcessedConfig);
-          expect(actionRequiredProperty).toEqual(firstProcessedConfig);
 
           // Test that configurations are being preprocessed each time a condition or action is
           // called and not just the first time.
@@ -272,13 +263,11 @@
               .toEqual(secondProcessedConfigWithElementAndEvent);
           expect(conditionRequiredIntegration).toEqual(secondProcessedConfig);
           // Right now the property config isn't reprocessed each time it's required.
-          expect(conditionRequiredProperty).toEqual(firstProcessedConfig);
 
           expect(actionDelegateSpy.calls.argsFor(1)[0])
               .toEqual(secondProcessedConfigWithElementAndEvent);
           expect(actionRequiredIntegration).toEqual(secondProcessedConfig);
           // Right now the property config isn't reprocessed each time it's required.
-          expect(actionRequiredProperty).toEqual(firstProcessedConfig);
         })
         .start();
     </script>

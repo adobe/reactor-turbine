@@ -5,7 +5,6 @@ var replaceVarTokens = require('./dataElement/replaceVarTokens');
 
 var preprocessObject;
 var preprocessArray;
-var _undefinedVarsReturnEmpty;
 
 preprocessObject = function(obj, element, event) {
   var ret = {};
@@ -18,7 +17,7 @@ preprocessObject = function(obj, element, event) {
     } else if (isArray(value)) {
       ret[key] = preprocessArray(value, element, event);
     } else {
-      ret[key] = replaceVarTokens(value, _undefinedVarsReturnEmpty, element, event);
+      ret[key] = replaceVarTokens(value, element, event);
     }
   }
   return ret;
@@ -57,16 +56,6 @@ var preprocessConfig = function(config, element, event) {
   }
 
   return preprocessObject(config, element, event);
-};
-
-/**
- * Initialize the preprocessor with any property-wide settings.
- * @param [boolean] undefinedVarsReturnEmpty=false Whether to return an empty string if the
- * preprocessor finds a data element token (%myDataElement%) in a configuration object that doesn't
- * match any existing data element.
- */
-preprocessConfig.init = function(undefinedVarsReturnEmpty) {
-  _undefinedVarsReturnEmpty = undefinedVarsReturnEmpty;
 };
 
 module.exports = preprocessConfig;

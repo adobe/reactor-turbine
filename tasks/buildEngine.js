@@ -41,6 +41,6 @@ module.exports = function(gulp) {
           root: path.join(__dirname, '../node_modules')
         }
       }))
-      .pipe(gulp.dest('dist'));
+      .pipe(gulp.dest(path.join(__dirname, '../dist')));
   });
 };

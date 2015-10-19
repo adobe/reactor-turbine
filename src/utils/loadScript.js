@@ -1,35 +1,34 @@
-var onLoad = function(url, script, callback) {
-  var cb = function(error) {
-    // TODO: Add logging.
-    //if (error) SL.logError(error)
-    if (callback) {
-      callback(error);
-    }
-  };
+var Promise = require('Promise');
 
-  if ('onload' in script) {
-    script.onload = function() {
-      cb();
-    };
-    script.onerror = function() {
-      cb(new Error('Failed to load script ' + url));
-    };
-  } else if ('readyState' in script) {
-    script.onreadystatechange = function() {
-      var rs = script.readyState;
-      if (rs === 'loaded' || rs === 'complete') {
-        script.onreadystatechange = null;
-        cb();
-      }
-    };
-  }
+var getPromise = function(url, script) {
+  return new Promise(function (resolve, reject) {
+    if ('onload' in script) {
+      script.onload = function() {
+        resolve(script);
+      };
+
+      script.onerror = function() {
+        reject(new Error('Failed to load script ' + url));
+      };
+    } else if ('readyState' in script) {
+      script.onreadystatechange = function() {
+        var rs = script.readyState;
+        if (rs === 'loaded' || rs === 'complete') {
+          script.onreadystatechange = null;
+          resolve(script);
+        }
+      };
+    }
+  });
 };
 
-module.exports = function(url, callback) {
+module.exports = function(url) {
   var script = document.createElement('script');
-  onLoad(url, script, callback);
   script.src = url;
   script.async = true;
+
+  var promise = getPromise(url, script);
+
   document.getElementsByTagName('head')[0].appendChild(script);
-  return script;
+  return promise;
 };

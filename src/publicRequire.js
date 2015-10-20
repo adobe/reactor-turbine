@@ -21,6 +21,7 @@ module.exports = function(key) {
     'unique': require('./utils/array/unique'),
     'getQueryParam': require('./utils/uri/getQueryParam'),
     'isString': require('./utils/isType/isString'),
+    'isObject': require('./utils/isType/isObject'),
     'isLinked': function(element) { // For backward compatibility.
       require('./utils/dom/isAnchor')(element, true);
     },

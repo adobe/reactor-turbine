@@ -1,7 +1,6 @@
 'use strict';
 
-// We expose these tasks to be used by the turbine-gulp-builder project.
+// We expose this task to be used by other projects.
 module.exports = function(gulp) {
-  require('./tasks/buildEngine')(gulp);
-  require('./tasks/compressEngine')(gulp);
+  require('./tasks/build')(gulp);
 };

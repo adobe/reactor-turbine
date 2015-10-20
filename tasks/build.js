@@ -5,7 +5,7 @@ var DefinePlugin = require('webpack').DefinePlugin;
 var path = require('path');
 
 module.exports = function(gulp) {
-  gulp.task('buildEngine', function() {
+  gulp.task('turbine:build', function() {
     return gulp.src(path.join(__dirname, '../src/bootstrap.js'))
       .pipe(webpack({
         output: {

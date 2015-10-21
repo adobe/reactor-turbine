@@ -21,7 +21,8 @@ describe('writeHtml', function() {
     beforeAll(function() {
       var delegateInjector = require('inject!../writeHtml');
       writeHtml = delegateInjector({
-        './dom/hasDomContentLoaded': jasmine.createSpy().and.returnValue(true)
+        './dom/hasDomContentLoaded': jasmine.createSpy().and.returnValue(true),
+        './logger': jasmine.createSpyObj('logger', ['error'])
       });
     });
 

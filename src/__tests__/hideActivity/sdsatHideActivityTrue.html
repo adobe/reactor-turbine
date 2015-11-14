@@ -5,33 +5,35 @@
 
       var actionSpy = jasmine.createSpy();
       var _satellite = {
-        container: {}
-      };
-
-      _satellite.container.eventDelegates = {
-        'testEvent': getTestEventDelegate()
-      };
-
-      _satellite.container.actionDelegates = {
-        testAction: function(module) {
-          module.exports = actionSpy;
-        }
-      };
-
-      _satellite.container.rules = [
-        {
-          events: [
-            {
-              type: 'testEvent'
+        container: {
+          extensions: {
+            testExtension: {
+              events: {
+                'testEvent': getTestEventDelegate()
+              },
+              actions: {
+                testAction: function(module) {
+                  module.exports = actionSpy;
+                }
+              }
             }
-          ],
-          actions: [
+          },
+          rules: [
             {
-              type: 'testAction'
+              events: [
+                {
+                  type: 'testEvent'
+                }
+              ],
+              actions: [
+                {
+                  type: 'testAction'
+                }
+              ]
             }
           ]
         }
-      ];
+      };
     </script>
     <script src="/base/testrunner/engine.js"></script>
   </head>

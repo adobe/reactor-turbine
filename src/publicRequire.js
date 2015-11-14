@@ -38,12 +38,12 @@ module.exports = function(key) {
     'writeHtml': require('./utils/writeHtml'),
     'resourceProvider': {
       get: function(extensionName, resourceName) {
-        return state.getResource(extensionName + '/' + resourceName);
+        return state.getResource(extensionName, resourceName);
       }
     },
-    'integrationProvider': {
-      getById: state.getIntegrationConfigById,
-      getByExtension: state.getIntegrationConfigsByExtensionId
+    'extensionConfigProvider': {
+      getById: state.getExtensionConfigById,
+      getByExtension: state.getExtensionConfigsByExtensionId
     },
     'window': window,
     'document': document
@@ -51,7 +51,7 @@ module.exports = function(key) {
 
   if (modules.hasOwnProperty(key)) {
     return modules[key];
-  } else if (key === 'property') {
+  } else if (key === 'propertyConfig') {
     return state.getPropertyConfig();
   } else {
     throw new Error('Cannot resolve module "' + key + '".');

@@ -15,40 +15,92 @@ module.exports = {
     // We pull in preprocessConfig here and not at the top of the file to prevent a
     // circular reference since dependencies of preprocessConfig require this state module.
     preprocessConfig = require('./utils/preprocessConfig');
-    this.getEventDelegate = createExtensionModuleProvider(container.eventDelegates);
-    this.getConditionDelegate = createExtensionModuleProvider(container.conditionDelegates);
-    this.getActionDelegate = createExtensionModuleProvider(container.actionDelegates);
-    this.getDataElementDelegate = createExtensionModuleProvider(container.dataElementDelegates);
-    this.getResource = createExtensionModuleProvider(container.resources);
-    // The resource modules should be called for even when they aren't required by anything. This
-    // is so extensions can have logic that runs even when there are no event, condition, action,
-    // or data element types configured. One example is DTM's visitor tracking which needs to
-    // run regardless of whether conditions are configured to use them.
-    if (container.resources) {
-      Object.keys(container.resources).forEach(this.getResource);
+
+    var moduleProvidersByCapability = {
+      'events': createExtensionModuleProvider(),
+      'conditions': createExtensionModuleProvider(),
+      'actions': createExtensionModuleProvider(),
+      'dataElements': createExtensionModuleProvider(),
+      'resources': createExtensionModuleProvider()
+    };
+
+    var getUniqueResourceId = function(extensionId, resourceId) {
+      return extensionId + '.' + resourceId;
+    };
+
+    // Loop through all extensions and add their module scripts to the appropriate module provider.
+    if (container.extensions) {
+      for (var extensionId in container.extensions) {
+        var extension = container.extensions[extensionId];
+        for (var capability in moduleProvidersByCapability) {
+          var provider = moduleProvidersByCapability[capability];
+
+          if (extension[capability]) {
+            var moduleScriptById = extension[capability];
+
+            for (var id in moduleScriptById) {
+              // Everything other than resources should already have a unique ID produced by
+              // the library emitter. Resources do not because delegate code needs to be able to
+              // refer to them by extension name + resource name.
+              var uniqueId = capability === 'resources' ? getUniqueResourceId(extensionId, id) : id;
+              provider.addModuleScript(uniqueId, moduleScriptById[id]);
+            }
+          }
+        }
+      }
+    }
+
+    this.getEventDelegate = moduleProvidersByCapability.events.getExports;
+    this.getConditionDelegate = moduleProvidersByCapability.conditions.getExports;
+    this.getActionDelegate = moduleProvidersByCapability.actions.getExports;
+    this.getDataElementDelegate = moduleProvidersByCapability.dataElements.getExports;
+    this.getResource = function(extensionId, resourceId) {
+      var uniqueResourceId = getUniqueResourceId(extensionId, resourceId);
+      return moduleProvidersByCapability.resources.getExports(uniqueResourceId);
+    };
+
+    // We want to run the module logic immediately. This allows for resource modules to provide
+    // behavior even when there are no event, condition, action, or data element types configured
+    // for the extension.
+    // One example is DTM's visitor tracking which needs to run regardless of whether conditions
+    // are configured to use them.
+    // Also, this allows logic in the delegates to run immediately which can be important
+    // if, for example, an action delegate needs to do some setup immediately rather than waiting
+    // until a rule with the action is triggered.
+    for (var capability in moduleProvidersByCapability) {
+      moduleProvidersByCapability[capability].primeCache();
     }
   },
   customVars: {},
   getPropertyConfig: function() {
-    return _container.config || {};
+    return _container.propertyConfig || {};
   },
-  getIntegrationConfigsByExtensionId: function(extensionId) {
-    var integrationConfigs = [];
-    for (var integrationId in _container.integrations) {
-      var integration = _container.integrations[integrationId];
-      if (integration.extensionId === extensionId) {
-        var preprocessedIntegrationConfig = preprocessConfig(integration.config || {});
-        integrationConfigs.push(preprocessedIntegrationConfig);
+  getExtensionConfigsByExtensionId: function(extensionId) {
+    var preprocessedConfigs = [];
+    if (_container.extensions[extensionId]) {
+      var extensionConfigsById = _container.extensions[extensionId].configs;
+
+      if (extensionConfigsById) {
+        for (var id in extensionConfigsById) {
+          preprocessedConfigs.push(preprocessConfig(extensionConfigsById[id]));
+        }
       }
     }
-    return integrationConfigs;
+    return preprocessedConfigs;
   },
-  getIntegrationConfigById: function(integrationId) {
-    var integration = _container.integrations[integrationId];
+  getExtensionConfigById: function(configId) {
+    // Possibly cache map of configurations by configuration id?
+    var config;
 
-    if (integration) {
-      return preprocessConfig(integration.config || {});
+    for (var extensionId in _container.extensions) {
+      var extension = _container.extensions[extensionId];
+      if (extension.configs && extension.configs[configId]) {
+        config = extension.configs[configId];
+        break;
+      }
     }
+
+    return config ? preprocessConfig(config) : null;
   },
   getRules: function() {
     return _container.rules;

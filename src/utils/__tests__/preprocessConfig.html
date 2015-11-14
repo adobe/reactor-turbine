@@ -4,10 +4,9 @@
       var eventDelegateSpy = jasmine.createSpy();
       var conditionDelegateSpy = jasmine.createSpy();
       var actionDelegateSpy = jasmine.createSpy();
-      var eventRequiredIntegration;
-      var conditionRequiredIntegration;
-      var actionRequiredIntegration;
-      var eventRequiredProperty;
+      var eventRequiredExtensionConfig;
+      var conditionRequiredExtensionConfig;
+      var actionRequiredExtensionConfig;
 
       // This text is appended onto data element values. This can be changed to determine
       // whether a configuration object is preprocessed each time rather than being saved to
@@ -45,59 +44,65 @@
       var container = {
         extensions: {
           testExtension: {
-            name: "Test Extension"
-          }
-        },
-        integrations: {
-          'abc': {
-            extensionId: 'testExtension',
-            config: unprocessedConfig
-          }
-        },
-        eventDelegates: {
-          testEvent: function(module, require) {
-            var integrationProvider = require('integrationProvider');
+            configs: {
+              abc: unprocessedConfig
+            },
+            events: {
+              testEvent: function(module, require) {
+                var extensionConfigProvider = require('extensionConfigProvider');
+                console.log('asdfasdf', extensionConfigProvider);
 
-            var allTriggers = [];
+                var allTriggers = [];
 
-            window.triggerTestEvent = function() {
-              allTriggers.forEach(function(trigger) {
-                var pseudoEvent = {
-                  type: 'fruitParty',
-                  target: document.createElement('div'),
-                  fruit: 'apple'
+                window.triggerTestEvent = function() {
+                  allTriggers.forEach(function(trigger) {
+                    var pseudoEvent = {
+                      type: 'fruitParty',
+                      target: document.createElement('div'),
+                      fruit: 'apple'
+                    };
+
+                    var relatedElement = document.createElement('span');
+                    relatedElement.id = 'kazoo';
+
+                    trigger(pseudoEvent, relatedElement);
+                  });
                 };
 
-                var relatedElement = document.createElement('span');
-                relatedElement.id = 'kazoo';
+                module.exports = eventDelegateSpy.and.callFake(function(config, trigger) {
+                  eventRequiredExtensionConfig = extensionConfigProvider.getById('abc');
+                  allTriggers.push(trigger);
+                });
+              }
+            },
+            conditions: {
+              testCondition: function(module, require) {
+                var extensionConfigProvider = require('extensionConfigProvider');
 
-                trigger(pseudoEvent, relatedElement);
-              });
-            };
+                module.exports = conditionDelegateSpy.and.callFake(function() {
+                  conditionRequiredExtensionConfig = extensionConfigProvider.getById('abc');
+                  return true;
+                });
+              }
+            },
+            actions: {
+              testAction: function(module, require) {
+                var extensionConfigProvider = require('extensionConfigProvider');
 
-            module.exports = eventDelegateSpy.and.callFake(function(config, trigger) {
-              eventRequiredIntegration = integrationProvider.getById('abc');
-              allTriggers.push(trigger);
-            });
-          }
-        },
-        conditionDelegates: {
-          testCondition: function(module, require) {
-            var integrationProvider = require('integrationProvider');
-
-            module.exports = conditionDelegateSpy.and.callFake(function() {
-              conditionRequiredIntegration = integrationProvider.getById('abc');
-              return true;
-            });
-          }
-        },
-        actionDelegates: {
-          testAction: function(module, require) {
-            var integrationProvider = require('integrationProvider');
-
-            module.exports = actionDelegateSpy.and.callFake(function() {
-              actionRequiredIntegration = integrationProvider.getById('abc');
-            });
+                module.exports = actionDelegateSpy.and.callFake(function() {
+                  actionRequiredExtensionConfig = extensionConfigProvider.getById('abc');
+                });
+              }
+            },
+            dataElements: {
+              'testExtension.appendText': function(module) {
+                module.exports = function(config) {
+                  // Append some text. This allows us to change the text that is appended in order to
+                  // test that configurations are processed each time a condition or action is called.
+                  return config.value + dataElementAppendText;
+                };
+              }
+            }
           }
         },
         rules: [
@@ -124,15 +129,6 @@
             ]
           }
         ],
-        dataElementDelegates: {
-          'testExtension.appendText': function(module) {
-            module.exports = function(config) {
-              // Append some text. This allows us to change the text that is appended in order to
-              // test that configurations are processed each time a condition or action is called.
-              return config.value + dataElementAppendText;
-            };
-          }
-        },
         dataElements: {
           account: {
             type: "testExtension.appendText",
@@ -214,15 +210,15 @@
 
           expect(eventDelegateSpy.calls.argsFor(0)[0])
               .toEqual(firstProcessedConfig);
-          expect(eventRequiredIntegration).toEqual(firstProcessedConfig);
+          expect(eventRequiredExtensionConfig).toEqual(firstProcessedConfig);
 
           expect(conditionDelegateSpy.calls.argsFor(0)[0])
               .toEqual(firstProcessedConfigWithElementAndEvent);
-          expect(conditionRequiredIntegration).toEqual(firstProcessedConfig);
+          expect(conditionRequiredExtensionConfig).toEqual(firstProcessedConfig);
 
           expect(actionDelegateSpy.calls.argsFor(0)[0])
               .toEqual(firstProcessedConfigWithElementAndEvent);
-          expect(actionRequiredIntegration).toEqual(firstProcessedConfig);
+          expect(actionRequiredExtensionConfig).toEqual(firstProcessedConfig);
 
           // Test that configurations are being preprocessed each time a condition or action is
           // called and not just the first time.
@@ -261,12 +257,12 @@
 
           expect(conditionDelegateSpy.calls.argsFor(1)[0])
               .toEqual(secondProcessedConfigWithElementAndEvent);
-          expect(conditionRequiredIntegration).toEqual(secondProcessedConfig);
+          expect(conditionRequiredExtensionConfig).toEqual(secondProcessedConfig);
           // Right now the property config isn't reprocessed each time it's required.
 
           expect(actionDelegateSpy.calls.argsFor(1)[0])
               .toEqual(secondProcessedConfigWithElementAndEvent);
-          expect(actionRequiredIntegration).toEqual(secondProcessedConfig);
+          expect(actionRequiredExtensionConfig).toEqual(secondProcessedConfig);
           // Right now the property config isn't reprocessed each time it's required.
         })
         .start();

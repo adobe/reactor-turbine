@@ -15,7 +15,7 @@ var executeListeners = function() {
 var startPolling = once(function() {
   // When testing we'll let the tests tick the poller manually.
   if (ENV_TEST) {
-    __tickGlobalPoll = executeListeners;
+    window.__tickGlobalPoll = executeListeners;
   } else {
     intervalId = setInterval(executeListeners, POLL_INTERVAL);
   }

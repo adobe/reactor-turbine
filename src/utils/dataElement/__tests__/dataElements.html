@@ -7,39 +7,46 @@
         extensions: {
           testExtension: {
             name: "Test Extension"
-          }
-        },
-        actionDelegates: {
-          testAction: function(module) {
-            module.exports = actionDelegateSpy;
-          }
-        },
-        eventDelegates: {
-          testEvent: function(module, require) {
-            var allTriggers = [];
+          },
+          actions: {
+            testAction: function(module) {
+              module.exports = actionDelegateSpy;
+            }
+          },
+          events: {
+            testEvent: function(module, require) {
+              var allTriggers = [];
 
-            window.triggerTestEvent = function() {
-              allTriggers.forEach(function(trigger) {
-                var targetElement = document.createElement('div');
-                targetElement.id = 'fruitPartyBowl';
+              window.triggerTestEvent = function() {
+                allTriggers.forEach(function(trigger) {
+                  var targetElement = document.createElement('div');
+                  targetElement.id = 'fruitPartyBowl';
 
-                var pseudoEvent = {
-                  type: 'fruitParty',
-                  target: targetElement,
-                  fruit: 'apple'
-                };
+                  var pseudoEvent = {
+                    type: 'fruitParty',
+                    target: targetElement,
+                    fruit: 'apple'
+                  };
 
-                var relatedElement = document.createElement('span');
-                relatedElement.id = 'kazoo';
-                relatedElement.innerHTML = '  <a href="#">Content with line \n breaks and multiple   spaces</a>';
+                  var relatedElement = document.createElement('span');
+                  relatedElement.id = 'kazoo';
+                  relatedElement.innerHTML = '  <a href="#">Content with line \n breaks and multiple   spaces</a>';
 
-                trigger(pseudoEvent, relatedElement);
-              });
-            };
+                  trigger(pseudoEvent, relatedElement);
+                });
+              };
 
-            module.exports = function(config, trigger) {
-              allTriggers.push(trigger);
-            };
+              module.exports = function(config, trigger) {
+                allTriggers.push(trigger);
+              };
+            }
+          },
+          dataElements: {
+            'testExtension.static': function(module, require) {
+              module.exports = function(config) {
+                return config.staticValue;
+              };
+            }
           }
         },
         rules: [
@@ -74,19 +81,12 @@
                   paramBased: '%param.fooParam%',
                   randBased: '%rand3%',
                   customBased: '%instrument%',
-                  undefinedBased: '%notdefined%',
+                  undefinedBased: '%notdefined%'
                 }
               }
             ]
           }
         ],
-        dataElementDelegates: {
-          'testExtension.static': function(module, require) {
-            module.exports = function(config) {
-              return config.staticValue;
-            };
-          }
-        },
         dataElements: {
           'treat': {
             type: "testExtension.static",

@@ -8,33 +8,41 @@
       _satellite = {};
 
       _satellite.container = {
-        resources: {
-          'testExtension/testResource': function(module) {
-            module.exports = testResource;
+        extensions: {
+          testExtension: {
+            resources: {
+              'testResource': function(module) {
+                module.exports = testResource;
+              }
+            },
+            actions: {
+              testAction: function(module, require) {
+                receivedResource = require('resourceProvider').get('testExtension', 'testResource');
+                module.exports = function() {};
+              }
+            },
+            events: {
+              testEvent: function(module) {
+                var allTriggers = [];
+
+                window.triggerTestEvent = function() {
+                  allTriggers.forEach(function(trigger) {
+                    trigger();
+                  });
+                };
+
+                module.exports = function(config, trigger) {
+                  allTriggers.push(trigger);
+                };
+              }
+            }
           },
-          'otherExtension/neverRequired': neverRequiredResourceSpy.and.callFake(function(module) {
-            module.exports = {};
-          })
-        },
-        actionDelegates: {
-          testAction: function(module, require) {
-            receivedResource = require('resourceProvider').get('testExtension', 'testResource');
-            module.exports = function() {};
-          }
-        },
-        eventDelegates: {
-          testEvent: function(module) {
-            var allTriggers = [];
-
-            window.triggerTestEvent = function() {
-              allTriggers.forEach(function(trigger) {
-                trigger();
-              });
-            };
-
-            module.exports = function(config, trigger) {
-              allTriggers.push(trigger);
-            };
+          otherExtension: {
+            resources: {
+              neverRequired: neverRequiredResourceSpy.and.callFake(function(module) {
+                module.exports = {};
+              })
+            }
           }
         },
         rules: [

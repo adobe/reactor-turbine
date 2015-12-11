@@ -30,7 +30,8 @@ module.exports = function(gulp) {
         },
         plugins: [
           new DefinePlugin({
-            ENV_TEST: true
+            // This is set to true by turbine-gulp-testrunner when running tests.
+            ENV_TEST: false
           })
         ],
         // npm 2 compatibility. If this weren't here, webpack would look for loaders in the

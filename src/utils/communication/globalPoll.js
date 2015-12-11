@@ -17,7 +17,7 @@ var startPolling = once(function() {
   if (ENV_TEST) {
     window.__tickGlobalPoll = executeListeners;
   } else {
-    intervalId = setInterval(executeListeners, POLL_INTERVAL);
+    setInterval(executeListeners, POLL_INTERVAL);
   }
 });
 

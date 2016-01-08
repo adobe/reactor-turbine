@@ -22,7 +22,7 @@
     "webpack-stream": "^2.1.1"
   },
   "devDependencies": {
-    "turbine-gulp-testrunner": "git+https://fcf1e02afcceac6505ac6b6a43c26061c0b9bcaa:x-oauth-basic@git.corp.adobe.com:reactor/turbine-gulp-testrunner.git",
-    "turbine-gulp-sandbox": "git+https://fcf1e02afcceac6505ac6b6a43c26061c0b9bcaa:x-oauth-basic@git.corp.adobe.com:reactor/turbine-gulp-sandbox.git"
+    "turbine-gulp-testrunner": "git+https://fcf1e02afcceac6505ac6b6a43c26061c0b9bcaa:x-oauth-basic@git.corp.adobe.com/reactor/turbine-gulp-testrunner.git",
+    "turbine-gulp-sandbox": "git+https://fcf1e02afcceac6505ac6b6a43c26061c0b9bcaa:x-oauth-basic@git.corp.adobe.com/reactor/turbine-gulp-sandbox.git"
   }
 }

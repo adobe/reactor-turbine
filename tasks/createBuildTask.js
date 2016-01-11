@@ -3,9 +3,10 @@
 var webpack = require('webpack-stream');
 var DefinePlugin = require('webpack').DefinePlugin;
 var path = require('path');
+var gulp = require('gulp');
 
-module.exports = function(gulp) {
-  gulp.task('turbine:build', function() {
+module.exports = function(options) {
+  return function() {
     return gulp.src(path.join(__dirname, '../src/bootstrap.js'))
       .pipe(webpack({
         output: {
@@ -30,8 +31,7 @@ module.exports = function(gulp) {
         },
         plugins: [
           new DefinePlugin({
-            // This is set to true by turbine-gulp-testrunner when running tests.
-            ENV_TEST: false
+            ENV_TEST: Boolean(options.ENV_TEST)
           })
         ],
         // npm 2 compatibility. If this weren't here, webpack would look for loaders in the
@@ -43,5 +43,5 @@ module.exports = function(gulp) {
         }
       }))
       .pipe(gulp.dest(path.join(__dirname, '../dist')));
-  });
+  };
 };

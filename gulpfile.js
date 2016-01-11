@@ -3,6 +3,6 @@
 var gulp = require('gulp');
 require('turbine-gulp-testrunner')(gulp);
 require('turbine-gulp-sandbox')(gulp);
-require('./tasks/compress')(gulp);
-require('./tasks/build')(gulp);
-gulp.task('default', ['turbine:build']);
+gulp.task('build', require('./tasks/createBuildTask')());
+gulp.task('compress', ['build'], require('./tasks/compress'));
+gulp.task('default', ['build']);

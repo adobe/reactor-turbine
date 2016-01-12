@@ -31,7 +31,7 @@ module.exports = function(options) {
         },
         plugins: [
           new DefinePlugin({
-            ENV_TEST: options && options.ENV_TEST
+            ENV_TEST: Boolean(options && options.ENV_TEST)
           })
         ],
         // npm 2 compatibility. If this weren't here, webpack would look for loaders in the

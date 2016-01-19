@@ -15,11 +15,11 @@
     "gulp": "^3.9.0",
     "gulp-gzip": "^1.2.0",
     "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^1.2.0",
+    "gulp-uglify": "^1.5.1",
     "is-plain-object": "^2.0.1",
-    "strict-loader": "^0.1.2",
-    "webpack": "^1.12.2",
-    "webpack-stream": "^2.1.1"
+    "strict-loader": "^1.0.0",
+    "webpack": "^1.12.11",
+    "webpack-stream": "^3.1.0"
   },
   "devDependencies": {
     "turbine-gulp-testrunner": "git+https://fcf1e02afcceac6505ac6b6a43c26061c0b9bcaa:x-oauth-basic@git.corp.adobe.com/reactor/turbine-gulp-testrunner.git",

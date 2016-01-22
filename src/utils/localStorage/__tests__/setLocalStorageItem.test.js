@@ -1,9 +1,9 @@
 'use strict';
 
-var setLocalStorageItem = require('../setLocalStorageItem');
-
 describe('setLocalStorageItem', function() {
   it('sets and returns item', function() {
+    var setLocalStorageItem = require('../setLocalStorageItem');
+
     setLocalStorageItem('foo', 'something');
     expect(window.localStorage.getItem('foo')).toEqual('something');
   });
@@ -17,11 +17,11 @@ describe('setLocalStorageItem', function() {
       }
     };
 
-    var mockSetLocalStorageItem = require('inject!../setLocalStorageItem')({
+    var setLocalStorageItem = require('inject!../setLocalStorageItem')({
       window: mockWindow
     });
 
-    mockSetLocalStorageItem('thing', 'something');
+    setLocalStorageItem('thing', 'something');
 
     expect(window.localStorage.getItem('thing')).toBeNull();
   });

@@ -1,4 +1,4 @@
-# turbine-dtm [![Build Status](https://dtm-builder.ut1.mcps.adobe.net/buildStatus/icon?job=turbine)](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/)
+# turbine [![Build Status](https://dtm-builder.ut1.mcps.adobe.net/buildStatus/icon?job=turbine)](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/)
 
 This is the DTM engine. It contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.
 

@@ -1,4 +1,5 @@
-var window = require('window'); //Required for mocking out the window object in setLocalStorageItem.test.js
+//Required for mocking out the window object in setLocalStorageItem.test.js
+var window = require('window');
 
 /**
  * Saves a value to local storage.

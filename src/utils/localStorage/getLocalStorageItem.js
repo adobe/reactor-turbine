@@ -1,4 +1,5 @@
-var window = require('window'); //Required for mocking out the window object in getLocalStorageItem.test.js
+//Required for mocking out the window object in getLocalStorageItem.test.js
+var window = require('window');
 
 /**
  * Reads a value from local storage.

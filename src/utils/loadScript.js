@@ -1,7 +1,7 @@
 var Promise = require('./communication/Promise');
 
 var getPromise = function(url, script) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     if ('onload' in script) {
       script.onload = function() {
         resolve(script);

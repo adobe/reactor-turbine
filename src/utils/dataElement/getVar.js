@@ -1,7 +1,7 @@
 var getObjectProperty = require('./getObjectProperty');
 var state = require('../../state');
 var getDataElement = require('./getDataElement');
-var getURI = require('./../uri/getURI');
+var getUri = require('./../uri/getUri');
 var getQueryParam = require('./../uri/getQueryParam');
 
 // getVar(variable, elm, evt)
@@ -17,12 +17,12 @@ var getQueryParam = require('./../uri/getQueryParam');
 // - `[element]` - the associated element, if any
 // - `[event]` - the associated event, if any
 module.exports = function(variable, element, event) {
-  var URI = getURI();
+  var uri = getUri();
   var randMatch;
   var value;
   var map = {
-    URI: URI,
-    uri: URI,
+    URI: uri,
+    uri: uri,
     protocol: document.location.protocol,
     hostname: document.location.hostname
   };

@@ -1,4 +1,4 @@
-var encodeObjectToURI = require('./uri/encodeObjectToURI');
+var encodeObjectToUri = require('./uri/encodeObjectToUri');
 var clientInfo = require('./clientInfo');
 
 var getBeaconIframesContainer = function() {
@@ -37,7 +37,7 @@ var createBeacon = function(config, successCallback, failCallback) {
   /*
    config = {
    type: 'image','ajax','form'
-   beaconURL: string
+   beaconUrl: string
    beaconData: json (framework) || string
    }
 
@@ -45,12 +45,12 @@ var createBeacon = function(config, successCallback, failCallback) {
    so it is always a success
    */
   var connection;
-  var request = config.beaconURL;
+  var request = config.beaconUrl;
 
   // GET using an Image
   if (config.type === 'image') {
     if (config.beaconData) {
-      request += '?' + encodeObjectToURI(config.beaconData);
+      request += '?' + encodeObjectToUri(config.beaconData);
     }
     if (clientInfo.browser === 'IE') {
       request = request.substring(0, 2047);

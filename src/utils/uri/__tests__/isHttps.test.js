@@ -8,7 +8,7 @@ var mockDocument = {
   }
 };
 
-var isHTTPS = require('inject!../isHTTPS')({
+var isHttps = require('inject!../isHttps')({
   document: mockDocument
 });
 
@@ -16,14 +16,14 @@ var setProtocol = function(protocol) {
   mockDocument.location.protocol = protocol;
 };
 
-describe('isHTTPS', function() {
+describe('isHttps', function() {
   it('returns true if the protocol is https', function() {
     setProtocol('https:');
-    expect(isHTTPS()).toBe(true);
+    expect(isHttps()).toBe(true);
   });
 
   it('returns false if the protocol is http', function() {
     setProtocol('http:');
-    expect(isHTTPS()).toBe(false);
+    expect(isHttps()).toBe(false);
   });
 });

@@ -28,7 +28,6 @@ module.exports = function(key) {
     },
     'matchesSelector': require('./utils/dom/matchesSelector'),
     'getDataElement': require('./utils/dataElement/getDataElement'),
-    'getVar': require('./utils/dataElement/getVar'),
     'getCookie': require('./utils/cookie/getCookie'),
     'setCookie': require('./utils/cookie/setCookie'),
     'removeCookie': require('./utils/cookie/removeCookie'),

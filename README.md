@@ -1,7 +1,5 @@
 # turbine
-[![Build Status](https://dtm-builder.ut1.mcps.adobe.net/buildStatus/icon?job=turbine)](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/)
-[![coverage](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/ws/badges/coverage.svg)](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/lastStableBuild/cobertura/)
-[![npm](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/ws/badges/npm.svg)](https://artifactory.corp.adobe.com/artifactory/webapp/#/artifacts/browse/tree/General/npm-mcps-release-local/@reactor/turbine/-/@reactor)
+[![Build Status][status-image]][status-url] [![Coverage Status][coverage-image]][coverage-url] [![NPM version][npm-image]][npm-url]
 
 This is the DTM engine. It contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.
 
@@ -13,3 +11,10 @@ This is the DTM engine. It contains the brains responsible for running rules on 
 5. Test the project by running `gulp test`.
 
 See the [turbine-gulp-sandbox README](https://git.corp.adobe.com/Activation/turbine-gulp-sandbox/blob/master/README.md) and the [turbine-gulp-testrunner README](https://git.corp.adobe.com/Activation/turbine-gulp-testrunner/blob/master/README.md) for more information on how to build and test this project.
+
+[status-url]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/
+[status-image]: https://dtm-builder.ut1.mcps.adobe.net/buildStatus/icon?job=turbine
+[coverage-url]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/lastStableBuild/cobertura/
+[coverage-image]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/ws/badges/coverage.svg
+[npm-url]: https://artifactory.corp.adobe.com/artifactory/webapp/#/artifacts/browse/tree/General/npm-mcps-release-local/@reactor/turbine/-/@reactor
+[npm-image]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/ws/badges/npm.svg

@@ -9,7 +9,7 @@ module.exports = function(variable, suppressDefault, dataDef) {
   }
 
   var storeLength = dataDef.config.storeLength;
-  var delegate = state.getDataElementDelegate(dataDef.type);
+  var delegate = state.getDelegateExports(dataDef.delegateId);
   var value = delegate(dataDef.config);
 
   // TODO: Move this to data element delegates?

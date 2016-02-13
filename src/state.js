@@ -1,112 +1,88 @@
-var createExtensionModuleProvider = require('./createExtensionModuleProvider');
+var extensionConfigurationProvider = require('./extensionConfigurationProvider');
+var delegateProvider = require('./delegateProvider');
+var resourceProvider = require('./resourceProvider');
 var dataElementSafe = require('./utils/dataElementSafe');
 var getLocalStorageItem = require('./utils/localStorage/getLocalStorageItem');
 var setLocalStorageItem = require('./utils/localStorage/setLocalStorageItem');
-var preprocessConfig;
 
 var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
 var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
 
-var _container;
+var container;
+var preprocessConfig;
+
+var hydrateProviders = function(container) {
+  var extensions = container.extensions;
+  if (extensions) {
+    Object.keys(extensions).forEach(function(extensionId) {
+      var extension = extensions[extensionId];
+
+      // The configuration provider must be hydrated first because configurations can be required
+      // by resources and delegates while their providers are being hydrated.
+      var configurations = extension.configurations;
+
+      if (configurations) {
+        Object.keys(configurations).forEach(function(configurationId) {
+          var configuration = configurations[configurationId];
+          extensionConfigurationProvider.addConfiguration(
+            extension.name, configurationId, configuration);
+        });
+      }
+
+      // The resource provider must be hydrated next because resources can be required by
+      // delegates while the delegate provider is being hydrated.
+      var resources = extension.resources;
+
+      if (resources) {
+        Object.keys(resources).forEach(function(resourceId) {
+          var resource = resources[resourceId];
+          resourceProvider.addResource(resourceId, resource);
+        });
+      }
+
+      var delegates = extension.delegates;
+
+      if (delegates) {
+        Object.keys(delegates).forEach(function(delegateId) {
+          var delegate = delegates[delegateId];
+          delegateProvider.addDelegate(delegateId, delegate);
+        });
+      }
+    });
+  }
+};
 
 module.exports = {
-  init: function(container) {
-    _container = container;
+  init: function(_container) {
+    container = _container;
     // We pull in preprocessConfig here and not at the top of the file to prevent a
     // circular reference since dependencies of preprocessConfig require this state module.
     preprocessConfig = require('./utils/preprocessConfig');
-
-    var moduleProvidersByCapability = {
-      'events': createExtensionModuleProvider(),
-      'conditions': createExtensionModuleProvider(),
-      'actions': createExtensionModuleProvider(),
-      'dataElements': createExtensionModuleProvider(),
-      'resources': createExtensionModuleProvider()
-    };
-
-    var getUniqueResourceId = function(extensionId, resourceId) {
-      return extensionId + '.' + resourceId;
-    };
-
-    // Loop through all extensions and add their module scripts to the appropriate module provider.
-    if (container.extensions) {
-      for (var extensionId in container.extensions) {
-        var extension = container.extensions[extensionId];
-        for (var capability in moduleProvidersByCapability) {
-          var provider = moduleProvidersByCapability[capability];
-
-          if (extension[capability]) {
-            var moduleScriptById = extension[capability];
-
-            for (var id in moduleScriptById) {
-              // Everything other than resources should already have a unique ID produced by
-              // the library emitter. Resources do not because delegate code needs to be able to
-              // refer to them by extension name + resource name.
-              var uniqueId = capability === 'resources' ? getUniqueResourceId(extensionId, id) : id;
-              provider.addModuleScript(uniqueId, moduleScriptById[id]);
-            }
-          }
-        }
-      }
-    }
-
-    this.getEventDelegate = moduleProvidersByCapability.events.getExports;
-    this.getConditionDelegate = moduleProvidersByCapability.conditions.getExports;
-    this.getActionDelegate = moduleProvidersByCapability.actions.getExports;
-    this.getDataElementDelegate = moduleProvidersByCapability.dataElements.getExports;
-    this.getResource = function(extensionId, resourceId) {
-      var uniqueResourceId = getUniqueResourceId(extensionId, resourceId);
-      return moduleProvidersByCapability.resources.getExports(uniqueResourceId);
-    };
-
-    // We want to run the module logic immediately. This allows for resource modules to provide
-    // behavior even when there are no event, condition, action, or data element types configured
-    // for the extension.
-    // One example is DTM's visitor tracking which needs to run regardless of whether conditions
-    // are configured to use them.
-    // Also, this allows logic in the delegates to run immediately which can be important
-    // if, for example, an action delegate needs to do some setup immediately rather than waiting
-    // until a rule with the action is triggered.
-    for (var capability in moduleProvidersByCapability) {
-      moduleProvidersByCapability[capability].primeCache();
-    }
+    hydrateProviders(container);
   },
   customVars: {},
   getPropertyConfig: function() {
-    return _container.propertyConfig || {};
+    return container.propertyConfig || {};
   },
-  getExtensionConfigsByExtensionId: function(extensionId) {
-    var preprocessedConfigs = [];
-    if (_container.extensions[extensionId]) {
-      var extensionConfigsById = _container.extensions[extensionId].configs;
-
-      if (extensionConfigsById) {
-        for (var id in extensionConfigsById) {
-          preprocessedConfigs.push(preprocessConfig(extensionConfigsById[id]));
-        }
-      }
-    }
-    return preprocessedConfigs;
+  getExtensionConfigurationsByExtensionName: function(extensionName) {
+    var settingsCollection = extensionConfigurationProvider
+      .getSettingsCollectionByExtensionName(extensionName);
+    return settingsCollection.map(function(settings) {
+      return preprocessConfig(settings);
+    });
   },
-  getExtensionConfigById: function(configId) {
-    // Possibly cache map of configurations by configuration id?
-    var config;
-
-    for (var extensionId in _container.extensions) {
-      var extension = _container.extensions[extensionId];
-      if (extension.configs && extension.configs[configId]) {
-        config = extension.configs[configId];
-        break;
-      }
-    }
-
-    return config ? preprocessConfig(config) : null;
+  getExtensionConfigurationById: function(configurationId) {
+    var settings = extensionConfigurationProvider.getSettingsByConfigurationId(configurationId);
+    return preprocessConfig(settings);
   },
+  getDelegate: delegateProvider.getDelegate,
+  getDelegateExports: delegateProvider.getExports,
+  getResourceExports: resourceProvider.getExports,
   getRules: function() {
-    return _container.rules;
+    return container.rules;
   },
   getDataElementDefinition: function(name) {
-    return _container.dataElements[name];
+    return container.dataElements[name];
   },
   getShouldExecuteActions: function() {
     return getLocalStorageItem(HIDE_ACTIVITY_LOCAL_STORAGE_NAME) !== 'true';
@@ -124,6 +100,6 @@ module.exports = {
     dataElementSafe(key, length, value);
   },
   getAppVersion: function() {
-    return _container.appVersion;
+    return container.appVersion;
   }
 };

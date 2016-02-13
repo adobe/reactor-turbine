@@ -17,13 +17,13 @@
     "registry": "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-mcps-release-local"
   },
   "dependencies": {
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
     "gulp-gzip": "^1.2.0",
     "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^1.5.1",
+    "gulp-uglify": "^1.5.2",
     "is-plain-object": "^2.0.1",
     "strict-loader": "^1.0.0",
-    "webpack": "^1.12.11",
+    "webpack": "^1.12.13",
     "webpack-stream": "^3.1.0"
   },
   "devDependencies": {

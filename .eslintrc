@@ -6,11 +6,9 @@
   },
   "rules": {
     "camelcase": [2, {"properties": "always"}],
-//  Not using indent rule due to issue in eslint that throws errors when code is correct. I think
-//  it's this one:  https://github.com/eslint/eslint/issues/3737
-//  "indent": [2, 2, {"SwitchCase": 1}], // 2 spaces indentation
+    "indent": [2, 2, {"SwitchCase": 1}], // 2 spaces indentation
     "semi": [2, "always"],
-    "space-after-keywords": [2, "always"],
+    "keyword-spacing": [2],
     "space-before-function-paren": [2, "never"],
     "space-before-blocks": [2, "always"],
     "space-infix-ops": [2, {"int32Hint": false}],

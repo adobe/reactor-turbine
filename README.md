@@ -1,4 +1,7 @@
-# turbine [![Build Status](https://dtm-builder.ut1.mcps.adobe.net/buildStatus/icon?job=turbine)](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/)
+# turbine
+[![Build Status](https://dtm-builder.ut1.mcps.adobe.net/buildStatus/icon?job=turbine)](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/)
+[![coverage](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/ws/badges/coverage.svg)](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/lastStableBuild/cobertura/)
+[![npm](https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/ws/badges/npm.svg)](https://artifactory.corp.adobe.com/artifactory/webapp/#/artifacts/browse/tree/General/npm-mcps-release-local/@reactor/turbine/-/@reactor)
 
 This is the DTM engine. It contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.
 

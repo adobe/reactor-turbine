@@ -27,7 +27,7 @@
     "webpack-stream": "^3.1.0"
   },
   "devDependencies": {
-    "@reactor/turbine-gulp-testrunner": "^0.0.1",
+    "@reactor/turbine-gulp-testrunner": "^0.1.0",
     "@reactor/turbine-gulp-sandbox": "^0.0.1"
   }
 }

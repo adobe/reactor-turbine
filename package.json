@@ -3,7 +3,9 @@
   "version": "1.0.1",
   "description": "DTM engine that contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.",
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "ci-job": "xvfb-run gulp test --ci --browser all && gulp lint && npm run plato",
+    "plato": "plato -r -d platoReport src"
   },
   "author": {
     "name": "DTM",

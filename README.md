@@ -1,5 +1,5 @@
 # turbine
-[![Build Status][status-image]][status-url] [![Coverage Status][coverage-image]][coverage-url] [![NPM version][npm-image]][npm-url]
+[![Build Status][status-image]][status-url] [![Coverage Status][coverage-image]][coverage-url] [![NPM version][npm-image]][npm-url] [![NPM Dependencies][npm-dependencies-image]][npm-dependencies-url]
 
 This is the DTM engine. It contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.
 
@@ -18,3 +18,6 @@ See the [turbine-gulp-sandbox README](https://git.corp.adobe.com/Activation/turb
 [coverage-image]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/ws/badges/coverage.svg
 [npm-url]: https://artifactory.corp.adobe.com/artifactory/webapp/#/artifacts/browse/tree/General/npm-mcps-release-local/@reactor/turbine/-/@reactor
 [npm-image]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/ws/badges/npm.svg
+[npm-dependencies-url]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/ws/dependencies.txt
+[npm-dependencies-image]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor/job/turbine/ws/badges/dependencies.svg
+

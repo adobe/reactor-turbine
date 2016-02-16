@@ -43,64 +43,76 @@
 
       var container = {
         extensions: {
-          testExtension: {
-            configs: {
-              abc: unprocessedConfig
+          EXa: {
+            name: 'exampleExtension',
+            displayName: 'Example Extension',
+            configurations: {
+              abc: {
+                settings: unprocessedConfig
+              }
             },
-            events: {
-              testEvent: function(module, require) {
-                var extensionConfigProvider = require('extensionConfigProvider');
-                console.log('asdfasdf', extensionConfigProvider);
+            delegates: {
+              'exampleExtension/events/testEvent': {
+                displayName: 'Test Event',
+                script: function(module, require) {
+                  var getExtension = require('getExtension');
+                  var extension = getExtension('exampleExtension');
 
-                var allTriggers = [];
+                  var allTriggers = [];
 
-                window.triggerTestEvent = function() {
-                  allTriggers.forEach(function(trigger) {
-                    var pseudoEvent = {
-                      type: 'fruitParty',
-                      target: document.createElement('div'),
-                      fruit: 'apple'
-                    };
+                  window.triggerTestEvent = function() {
+                    allTriggers.forEach(function(trigger) {
+                      var pseudoEvent = {
+                        type: 'fruitParty',
+                        target: document.createElement('div'),
+                        fruit: 'apple'
+                      };
 
-                    var relatedElement = document.createElement('span');
-                    relatedElement.id = 'kazoo';
+                      var relatedElement = document.createElement('span');
+                      relatedElement.id = 'kazoo';
 
-                    trigger(pseudoEvent, relatedElement);
+                      trigger(pseudoEvent, relatedElement);
+                    });
+                  };
+
+                  module.exports = eventDelegateSpy.and.callFake(function(config, trigger) {
+                    eventRequiredExtensionConfig = extension.getConfiguration('abc');
+                    allTriggers.push(trigger);
                   });
-                };
+                }
+              },
+              'exampleExtension/conditions/testCondition': {
+                displayName: 'Test Condition',
+                script: function(module, require) {
+                  var getExtension = require('getExtension');
+                  var extension = getExtension('exampleExtension');
 
-                module.exports = eventDelegateSpy.and.callFake(function(config, trigger) {
-                  eventRequiredExtensionConfig = extensionConfigProvider.getById('abc');
-                  allTriggers.push(trigger);
-                });
-              }
-            },
-            conditions: {
-              testCondition: function(module, require) {
-                var extensionConfigProvider = require('extensionConfigProvider');
+                  module.exports = conditionDelegateSpy.and.callFake(function() {
+                    conditionRequiredExtensionConfig = extension.getConfiguration('abc');
+                    return true;
+                  });
+                }
+              },
+              'exampleExtension/actions/testAction': {
+                displayName: 'Test Action',
+                script: function(module, require) {
+                  var getExtension = require('getExtension');
+                  var extension = getExtension('exampleExtension');
 
-                module.exports = conditionDelegateSpy.and.callFake(function() {
-                  conditionRequiredExtensionConfig = extensionConfigProvider.getById('abc');
-                  return true;
-                });
-              }
-            },
-            actions: {
-              testAction: function(module, require) {
-                var extensionConfigProvider = require('extensionConfigProvider');
-
-                module.exports = actionDelegateSpy.and.callFake(function() {
-                  actionRequiredExtensionConfig = extensionConfigProvider.getById('abc');
-                });
-              }
-            },
-            dataElements: {
-              'testExtension.appendText': function(module) {
-                module.exports = function(config) {
-                  // Append some text. This allows us to change the text that is appended in order to
-                  // test that configurations are processed each time a condition or action is called.
-                  return config.value + dataElementAppendText;
-                };
+                  module.exports = actionDelegateSpy.and.callFake(function() {
+                    actionRequiredExtensionConfig = extension.getConfiguration('abc');
+                  });
+                }
+              },
+              'exampleExtension/dataElements/testDataElement': {
+                displayName: 'Test Data Element',
+                script: function(module) {
+                  module.exports = function(config) {
+                    // Append some text. This allows us to change the text that is appended in order to
+                    // test that configurations are processed each time a condition or action is called.
+                    return config.value + dataElementAppendText;
+                  };
+                }
               }
             }
           }
@@ -109,20 +121,20 @@
           {
             events: [
               {
-                type: 'testEvent',
+                delegateId: 'exampleExtension/events/testEvent',
                 config: unprocessedConfig
               }
             ],
             conditions: [
               {
-                type: 'testCondition',
+                delegateId: 'exampleExtension/conditions/testCondition',
                 // Only conditions and actions can use %this.something% and %event.something%
                 config: unprocessedConfigWithElementAndEvent
               }
             ],
             actions: [
               {
-                type: 'testAction',
+                delegateId: 'exampleExtension/actions/testAction',
                 // Only conditions and actions can use %this.something% and %event.something%
                 config: unprocessedConfigWithElementAndEvent
               }
@@ -131,31 +143,31 @@
         ],
         dataElements: {
           account: {
-            type: "testExtension.appendText",
+            delegateId: "exampleExtension/dataElements/testDataElement",
             config: {
               value: "ABC123"
             }
           },
           firstName: {
-            type: "testExtension.appendText",
+            delegateId: "exampleExtension/dataElements/testDataElement",
             config: {
               value: "John"
             }
           },
           lastName: {
-            type: "testExtension.appendText",
+            delegateId: "exampleExtension/dataElements/testDataElement",
             config: {
               value: "Doe"
             }
           },
           apple: {
-            type: "testExtension.appendText",
+            delegateId: "exampleExtension/dataElements/testDataElement",
             config: {
               value: "apple"
             }
           },
           pear: {
-            type: "testExtension.appendText",
+            delegateId: "exampleExtension/dataElements/testDataElement",
             config: {
               value: "pear"
             }

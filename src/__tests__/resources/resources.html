@@ -1,47 +1,61 @@
 <html>
   <head>
     <script>
-      var testResource = {};
-      var receivedResource;
+      var testResourceExports = {};
+      var receivedResourceExports;
       var neverRequiredResourceSpy = jasmine.createSpy();
 
       _satellite = {};
 
       _satellite.container = {
         extensions: {
-          testExtension: {
+          EXa: {
+            displayName: 'Example Extension A',
+            name: 'exampleExtensionA',
+            delegates: {
+              'exampleExtensionA/events/testEvent': {
+                displayName: 'Test Event',
+                script: function(module) {
+                  var allTriggers = [];
+
+                  window.triggerTestEvent = function() {
+                    allTriggers.forEach(function(trigger) {
+                      trigger();
+                    });
+                  };
+
+                  module.exports = function(config, trigger) {
+                    allTriggers.push(trigger);
+                  };
+                }
+              },
+              'exampleExtensionA/actions/testAction': {
+                displayName: 'Test Action',
+                script: function(module, require) {
+                  var getExtension = require('getExtension');
+                  var extension = getExtension('exampleExtensionA');
+                  receivedResourceExports = extension.getResource('testResource');
+                  module.exports = function() {};
+                }
+              }
+            },
             resources: {
-              'testResource': function(module) {
-                module.exports = testResource;
-              }
-            },
-            actions: {
-              testAction: function(module, require) {
-                receivedResource = require('resourceProvider').get('testExtension', 'testResource');
-                module.exports = function() {};
-              }
-            },
-            events: {
-              testEvent: function(module) {
-                var allTriggers = [];
-
-                window.triggerTestEvent = function() {
-                  allTriggers.forEach(function(trigger) {
-                    trigger();
-                  });
-                };
-
-                module.exports = function(config, trigger) {
-                  allTriggers.push(trigger);
-                };
+              'exampleExtensionA/resources/testResource': {
+                script: function(module) {
+                  module.exports = testResourceExports;
+                }
               }
             }
           },
-          otherExtension: {
+          EXb: {
+            displayName: 'Example Extension B',
+            name: 'exampleExtensionB',
             resources: {
-              neverRequired: neverRequiredResourceSpy.and.callFake(function(module) {
-                module.exports = {};
-              })
+              'exampleExtensionB/resources/neverRequired': {
+                script: neverRequiredResourceSpy.and.callFake(function(module) {
+                  module.exports = {};
+                })
+              }
             }
           }
         },
@@ -49,12 +63,12 @@
           {
             events: [
               {
-                type: 'testEvent'
+                delegateId: 'exampleExtensionA/events/testEvent'
               }
             ],
             actions: [
               {
-                type: 'testAction'
+                delegateId: 'exampleExtensionA/actions/testAction'
               }
             ]
           }
@@ -69,12 +83,11 @@
 
       TestPage.execute(function() {
         window.triggerTestEvent();
-        expect(receivedResource).toBe(testResource);
+        expect(receivedResourceExports).toBe(testResourceExports);
 
         // The module should be called for even when it isn't required by anything. This is so
         // extensions can have logic that runs even when there are no event, condition, action,
-        // or data element types configured. One example is DTM's visitor tracking which needs to
-        // run regardless of whether conditions are configured to use them.
+        // or data element types configured.
         expect(neverRequiredResourceSpy.calls.count()).toBe(1);
       }).start();
     </script>

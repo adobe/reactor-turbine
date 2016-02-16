@@ -9,8 +9,8 @@ module.exports = function(variable, suppressDefault, dataDef) {
   }
 
   var storeLength = dataDef.config.storeLength;
-  var delegate = state.getDataElementDelegate(dataDef.type);
-  var value = delegate(dataDef.config);
+  var delegate = state.getDelegate(dataDef.delegateId);
+  var value = delegate.exports(dataDef.config);
 
   // TODO: Move this to data element delegates?
   if (dataDef.config.cleanText) {

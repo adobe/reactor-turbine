@@ -37,15 +37,7 @@ module.exports = function(key) {
     'once': require('./utils/once'),
     'logger': require('./utils/logger'),
     'writeHtml': require('./utils/writeHtml'),
-    'resourceProvider': {
-      get: function(extensionName, resourceName) {
-        return state.getResource(extensionName, resourceName);
-      }
-    },
-    'extensionConfigProvider': {
-      getById: state.getExtensionConfigById,
-      getByExtension: state.getExtensionConfigsByExtensionId
-    },
+    'getExtension': state.getExtension,
     'window': window,
     'document': document
   };

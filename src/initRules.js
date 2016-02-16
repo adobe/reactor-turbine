@@ -7,20 +7,20 @@ var runActions = function(rule, event, relatedElement) {
     rule.actions.forEach(function(action) {
       action.config = action.config || {};
 
-      var delegate = state.getActionDelegate(action.type);
+      var delegate = state.getDelegate(action.delegateId);
 
-      if (!delegate) {
-        logger.error('Action delegate of type ' + action.type + ' not found.');
+      if (!delegate.exports) {
+        logger.error('Action delegate ' + action.delegateId + ' not found.');
         return;
       }
 
       var config = preprocessConfig(action.config, relatedElement, event);
 
       try {
-        delegate(config);
+        delegate.exports(config);
       } catch (e) {
-        var message = 'Error when executing action for rule ' + rule.name +
-          '. Error message: ' + e.message;
+        var message = 'Error when executing ' + delegate.displayName + ' action for '
+          + rule.name + ' rule. Error message: ' + e.message;
 
         logger.error(message);
         // Don't re-throw the error because we want to continue execution.
@@ -37,10 +37,10 @@ var checkConditions = function(rule, event, relatedElement) {
       var condition = rule.conditions[i];
       condition.config = condition.config || {};
 
-      var delegate = state.getConditionDelegate(condition.type);
+      var delegate = state.getDelegate(condition.delegateId);
 
-      if (!delegate) {
-        logger.error('Condition delegate of type ' + condition.type + ' not found.');
+      if (!delegate.exports) {
+        logger.error('Condition delegate ' + condition.delegateId + ' not found.');
         // Return because we want to assume the condition would have failed and therefore
         // we don't want to run the rule's actions.
         return;
@@ -49,13 +49,13 @@ var checkConditions = function(rule, event, relatedElement) {
       var config = preprocessConfig(condition.config, relatedElement, event);
 
       try {
-        if (!delegate(config, event, relatedElement)) {
+        if (!delegate.exports(config, event, relatedElement)) {
           logger.log('Condition for rule ' + rule.name + ' not met.');
           return;
         }
       } catch (e) {
-        var message = 'Error when executing condition for rule ' + rule.name +
-          '. Error message: ' + e.message;
+        var message = 'Error when executing ' + delegate.displayName + ' condition for '
+          + rule.name + ' rule. Error message: ' + e.message;
 
         logger.error(message);
         // Don't re-throw the error because we want to continue execution. We do return
@@ -85,20 +85,20 @@ var initEventDelegate = function(rule) {
     rule.events.forEach(function(event) {
       event.config = event.config || {};
 
-      var delegate = state.getEventDelegate(event.type);
+      var delegate = state.getDelegate(event.delegateId);
 
-      if (!delegate) {
-        logger.error('Event delegate of type ' + event.type + ' not found.');
+      if (!delegate.exports) {
+        logger.error('Event delegate ' + event.delegateId + ' not found.');
         return;
       }
 
       var config = preprocessConfig(event.config);
 
       try {
-        delegate(config, trigger);
+        delegate.exports(config, trigger);
       } catch (e) {
-        var message = 'Error when executing event listener for rule ' + rule.name +
-          '. Error message: ' + e.message;
+        var message = 'Error when executing ' + delegate.displayName + ' event for '
+          + rule.name + ' rule. Error message: ' + e.message;
 
         logger.error(message);
         // Don't re-throw the error because we want to continue execution.

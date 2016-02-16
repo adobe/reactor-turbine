@@ -78,11 +78,9 @@ describe('initRules', function() {
         },
         getDelegate: function(delegateId) {
           return {
-            displayName: 'Display Name ' + delegateId
+            displayName: 'Display Name ' + delegateId,
+            exports: delegateExports[delegateId]
           };
-        },
-        getDelegateExports: function(delegateId) {
-          return delegateExports[delegateId];
         },
         getPropertyConfig: function() {
           return propertyConfig;
@@ -209,11 +207,9 @@ describe('initRules', function() {
       var state = {
         getDelegate: function(delegateId) {
           return {
-            displayName: 'Display Name ' + delegateId
+            displayName: 'Display Name ' + delegateId,
+            exports: delegateExports[delegateId]
           };
-        },
-        getDelegateExports: function(delegateId) {
-          return delegateExports[delegateId];
         },
         getRules: function() {
           return rules;

@@ -55,7 +55,8 @@
               'exampleExtension/events/testEvent': {
                 displayName: 'Test Event',
                 script: function(module, require) {
-                  var getExtensionConfigurationById = require('getExtensionConfigurationById');
+                  var getExtension = require('getExtension');
+                  var extension = getExtension('exampleExtension');
 
                   var allTriggers = [];
 
@@ -75,7 +76,7 @@
                   };
 
                   module.exports = eventDelegateSpy.and.callFake(function(config, trigger) {
-                    eventRequiredExtensionConfig = getExtensionConfigurationById('abc');
+                    eventRequiredExtensionConfig = extension.getConfiguration('abc');
                     allTriggers.push(trigger);
                   });
                 }
@@ -83,10 +84,11 @@
               'exampleExtension/conditions/testCondition': {
                 displayName: 'Test Condition',
                 script: function(module, require) {
-                  var getExtensionConfigurationById = require('getExtensionConfigurationById');
+                  var getExtension = require('getExtension');
+                  var extension = getExtension('exampleExtension');
 
                   module.exports = conditionDelegateSpy.and.callFake(function() {
-                    conditionRequiredExtensionConfig = getExtensionConfigurationById('abc');
+                    conditionRequiredExtensionConfig = extension.getConfiguration('abc');
                     return true;
                   });
                 }
@@ -94,10 +96,11 @@
               'exampleExtension/actions/testAction': {
                 displayName: 'Test Action',
                 script: function(module, require) {
-                  var getExtensionConfigurationById = require('getExtensionConfigurationById');
+                  var getExtension = require('getExtension');
+                  var extension = getExtension('exampleExtension');
 
                   module.exports = actionDelegateSpy.and.callFake(function() {
-                    actionRequiredExtensionConfig = getExtensionConfigurationById('abc');
+                    actionRequiredExtensionConfig = extension.getConfiguration('abc');
                   });
                 }
               },

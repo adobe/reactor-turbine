@@ -1,7 +1,6 @@
 <html>
   <head>
     <script>
-      console.log('here');
       var testResourceExports = {};
       var receivedResourceExports;
       var neverRequiredResourceSpy = jasmine.createSpy();
@@ -33,8 +32,9 @@
               'exampleExtensionA/actions/testAction': {
                 displayName: 'Test Action',
                 script: function(module, require) {
-                  var getResource = require('getResource');
-                  receivedResourceExports = getResource('exampleExtensionA', 'testResource');
+                  var getExtension = require('getExtension');
+                  var extension = getExtension('exampleExtensionA');
+                  receivedResourceExports = extension.getResource('testResource');
                   module.exports = function() {};
                 }
               }

@@ -1,15 +1,16 @@
 var extractModuleExports = require('./extractModuleExports');
 
-var exportsByResourceId = {};
+var resourceById = {};
 
 module.exports = {
   addResource: function(id, resource) {
     // We want to extract the module exports immediately to allow for the delegate to run
     // some logic immediately and regardless of whether any delegate requires it.
-    exportsByResourceId[id] = extractModuleExports(resource.script);
+    resource.exports = extractModuleExports(resource.script);
+    resourceById[id] = resource;
   },
-  getExports: function(extensionName, resourceName) {
+  getResource: function(extensionName, resourceName) {
     var resourceId = extensionName + '/resources/' + resourceName;
-    return exportsByResourceId[resourceId];
+    return resourceById[resourceId];
   }
 };

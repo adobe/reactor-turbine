@@ -62,22 +62,31 @@ module.exports = {
   },
   customVars: {},
   getPropertyConfig: function() {
+    // Property config does not support data element token replacements.
     return container.propertyConfig || {};
   },
-  getExtensionConfigurationsByExtensionName: function(extensionName) {
-    var settingsCollection = extensionConfigurationProvider
-      .getSettingsCollectionByExtensionName(extensionName);
-    return settingsCollection.map(function(settings) {
-      return preprocessConfig(settings);
-    });
-  },
-  getExtensionConfigurationById: function(configurationId) {
-    var settings = extensionConfigurationProvider.getSettingsByConfigurationId(configurationId);
-    return preprocessConfig(settings);
+  // This is only intended to be used by extensions therefore it accommodates APIs that
+  // extension developers would expect.
+  getExtension: function(extensionName) {
+    return {
+      getConfigurations: function() {
+        var settingsCollection = extensionConfigurationProvider
+          .getSettingsCollectionByExtensionName(extensionName);
+        return settingsCollection.map(function(settings) {
+          return preprocessConfig(settings);
+        });
+      },
+      getConfiguration: function(configurationId) {
+        var settings = extensionConfigurationProvider.getSettingsByConfigurationId(configurationId);
+        return preprocessConfig(settings);
+      },
+      getResource: function(resourceName) {
+        var resource = resourceProvider.getResource(extensionName, resourceName);
+        return resource ? resource.exports : null;
+      }
+    };
   },
   getDelegate: delegateProvider.getDelegate,
-  getDelegateExports: delegateProvider.getExports,
-  getResourceExports: resourceProvider.getExports,
   getRules: function() {
     return container.rules;
   },

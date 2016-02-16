@@ -7,9 +7,9 @@ var runActions = function(rule, event, relatedElement) {
     rule.actions.forEach(function(action) {
       action.config = action.config || {};
 
-      var delegateExports = state.getDelegateExports(action.delegateId);
+      var delegate = state.getDelegate(action.delegateId);
 
-      if (!delegateExports) {
+      if (!delegate.exports) {
         logger.error('Action delegate ' + action.delegateId + ' not found.');
         return;
       }
@@ -17,9 +17,8 @@ var runActions = function(rule, event, relatedElement) {
       var config = preprocessConfig(action.config, relatedElement, event);
 
       try {
-        delegateExports(config);
+        delegate.exports(config);
       } catch (e) {
-        var delegate = state.getDelegate(action.delegateId);
         var message = 'Error when executing ' + delegate.displayName + ' action for '
           + rule.name + ' rule. Error message: ' + e.message;
 
@@ -38,9 +37,9 @@ var checkConditions = function(rule, event, relatedElement) {
       var condition = rule.conditions[i];
       condition.config = condition.config || {};
 
-      var delegateExports = state.getDelegateExports(condition.delegateId);
+      var delegate = state.getDelegate(condition.delegateId);
 
-      if (!delegateExports) {
+      if (!delegate.exports) {
         logger.error('Condition delegate ' + condition.delegateId + ' not found.');
         // Return because we want to assume the condition would have failed and therefore
         // we don't want to run the rule's actions.
@@ -50,12 +49,11 @@ var checkConditions = function(rule, event, relatedElement) {
       var config = preprocessConfig(condition.config, relatedElement, event);
 
       try {
-        if (!delegateExports(config, event, relatedElement)) {
+        if (!delegate.exports(config, event, relatedElement)) {
           logger.log('Condition for rule ' + rule.name + ' not met.');
           return;
         }
       } catch (e) {
-        var delegate = state.getDelegate(condition.delegateId);
         var message = 'Error when executing ' + delegate.displayName + ' condition for '
           + rule.name + ' rule. Error message: ' + e.message;
 
@@ -87,9 +85,9 @@ var initEventDelegate = function(rule) {
     rule.events.forEach(function(event) {
       event.config = event.config || {};
 
-      var delegateExports = state.getDelegateExports(event.delegateId);
+      var delegate = state.getDelegate(event.delegateId);
 
-      if (!delegateExports) {
+      if (!delegate.exports) {
         logger.error('Event delegate ' + event.delegateId + ' not found.');
         return;
       }
@@ -97,9 +95,8 @@ var initEventDelegate = function(rule) {
       var config = preprocessConfig(event.config);
 
       try {
-        delegateExports(config, trigger);
+        delegate.exports(config, trigger);
       } catch (e) {
-        var delegate = state.getDelegate(event.delegateId);
         var message = 'Error when executing ' + delegate.displayName + ' event for '
           + rule.name + ' rule. Error message: ' + e.message;
 

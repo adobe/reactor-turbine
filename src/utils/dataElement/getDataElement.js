@@ -8,12 +8,12 @@ module.exports = function(variable, suppressDefault, dataDef) {
     return state.getPropertyConfig().undefinedVarsReturnEmpty ? '' : null;
   }
 
-  var storeLength = dataDef.config.storeLength;
+  var storeLength = dataDef.settings.storeLength;
   var delegate = state.getDelegate(dataDef.delegateId);
-  var value = delegate.exports(dataDef.config);
+  var value = delegate.exports(dataDef.settings);
 
   // TODO: Move this to data element delegates?
-  if (dataDef.config.cleanText) {
+  if (dataDef.settings.cleanText) {
     value = cleanText(value);
   }
 
@@ -26,12 +26,12 @@ module.exports = function(variable, suppressDefault, dataDef) {
   if (value === undefined && !suppressDefault) {
     // Have to wrap "default" in quotes since it is a keyword.
     /*eslint-disable dot-notation*/
-    value = dataDef.config['default'] || '';
+    value = dataDef.settings['default'] || '';
     /*eslint-enable dot-notation*/
   }
 
   // TODO: Move this to data element delegates?
-  if (dataDef.config.forceLowerCase && value.toLowerCase) {
+  if (dataDef.settings.forceLowerCase && value.toLowerCase) {
     value = value.toLowerCase();
   }
 

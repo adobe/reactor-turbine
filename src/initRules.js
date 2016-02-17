@@ -1,11 +1,11 @@
-var preprocessConfig = require('./utils/preprocessConfig');
+var replaceDataElementTokens = require('./utils/replaceDataElementTokens');
 var logger = require('./utils/logger');
 var state = require('./state');
 
 var runActions = function(rule, event, relatedElement) {
   if (state.getShouldExecuteActions() && rule.actions) {
     rule.actions.forEach(function(action) {
-      action.config = action.config || {};
+      action.settings = action.settings || {};
 
       var delegate = state.getDelegate(action.delegateId);
 
@@ -14,10 +14,10 @@ var runActions = function(rule, event, relatedElement) {
         return;
       }
 
-      var config = preprocessConfig(action.config, relatedElement, event);
+      var settings = replaceDataElementTokens(action.settings, relatedElement, event);
 
       try {
-        delegate.exports(config);
+        delegate.exports(settings);
       } catch (e) {
         var message = 'Error when executing ' + delegate.displayName + ' action for '
           + rule.name + ' rule. Error message: ' + e.message;
@@ -35,7 +35,7 @@ var checkConditions = function(rule, event, relatedElement) {
   if (rule.conditions) {
     for (var i = 0; i < rule.conditions.length; i++) {
       var condition = rule.conditions[i];
-      condition.config = condition.config || {};
+      condition.settings = condition.settings || {};
 
       var delegate = state.getDelegate(condition.delegateId);
 
@@ -46,10 +46,10 @@ var checkConditions = function(rule, event, relatedElement) {
         return;
       }
 
-      var config = preprocessConfig(condition.config, relatedElement, event);
+      var settings = replaceDataElementTokens(condition.settings, relatedElement, event);
 
       try {
-        if (!delegate.exports(config, event, relatedElement)) {
+        if (!delegate.exports(settings, event, relatedElement)) {
           logger.log('Condition for rule ' + rule.name + ' not met.');
           return;
         }
@@ -83,7 +83,7 @@ var initEventDelegate = function(rule) {
     };
 
     rule.events.forEach(function(event) {
-      event.config = event.config || {};
+      event.settings = event.settings || {};
 
       var delegate = state.getDelegate(event.delegateId);
 
@@ -92,10 +92,10 @@ var initEventDelegate = function(rule) {
         return;
       }
 
-      var config = preprocessConfig(event.config);
+      var settings = replaceDataElementTokens(event.settings);
 
       try {
-        delegate.exports(config, trigger);
+        delegate.exports(settings, trigger);
       } catch (e) {
         var message = 'Error when executing ' + delegate.displayName + ' event for '
           + rule.name + ' rule. Error message: ' + e.message;

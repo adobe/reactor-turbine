@@ -17,7 +17,7 @@ describe('initRules', function() {
       relatedElement = {};
 
       delegateExports = {
-        testEvent: jasmine.createSpy().and.callFake(function(config, trigger) {
+        testEvent: jasmine.createSpy().and.callFake(function(settings, trigger) {
           trigger(event, relatedElement);
         }),
         testCondition1: jasmine.createSpy().and.returnValue(true),
@@ -32,7 +32,7 @@ describe('initRules', function() {
           events: [
             {
               delegateId: 'testEvent',
-              config: {
+              settings: {
                 testEventFoo: 'bar'
               }
             }
@@ -40,13 +40,13 @@ describe('initRules', function() {
           conditions: [
             {
               delegateId: 'testCondition1',
-              config: {
+              settings: {
                 testCondition1Foo: 'bar'
               }
             },
             {
               delegateId:'testCondition2',
-              config: {
+              settings: {
                 testCondition2Foo: 'bar'
               }
             }
@@ -54,13 +54,13 @@ describe('initRules', function() {
           actions: [
             {
               delegateId: 'testAction1',
-              config: {
+              settings: {
                 testAction1Foo: 'bar'
               }
             },
             {
               delegateId: 'testAction2',
-              config: {
+              settings: {
                 testAction2Foo: 'bar'
               }
             }
@@ -200,7 +200,7 @@ describe('initRules', function() {
         error: jasmine.createSpy()
       };
 
-      delegateExports.testEvent = function(config, trigger) {
+      delegateExports.testEvent = function(settings, trigger) {
         trigger();
       };
 

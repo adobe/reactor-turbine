@@ -75,7 +75,7 @@
                     });
                   };
 
-                  module.exports = eventDelegateSpy.and.callFake(function(config, trigger) {
+                  module.exports = eventDelegateSpy.and.callFake(function(settings, trigger) {
                     eventRequiredExtensionConfig = extension.getConfiguration('abc');
                     allTriggers.push(trigger);
                   });
@@ -107,10 +107,10 @@
               'exampleExtension/dataElements/testDataElement': {
                 displayName: 'Test Data Element',
                 script: function(module) {
-                  module.exports = function(config) {
+                  module.exports = function(settings) {
                     // Append some text. This allows us to change the text that is appended in order to
                     // test that configurations are processed each time a condition or action is called.
-                    return config.value + dataElementAppendText;
+                    return settings.value + dataElementAppendText;
                   };
                 }
               }
@@ -122,21 +122,21 @@
             events: [
               {
                 delegateId: 'exampleExtension/events/testEvent',
-                config: unprocessedConfig
+                settings: unprocessedConfig
               }
             ],
             conditions: [
               {
                 delegateId: 'exampleExtension/conditions/testCondition',
                 // Only conditions and actions can use %this.something% and %event.something%
-                config: unprocessedConfigWithElementAndEvent
+                settings: unprocessedConfigWithElementAndEvent
               }
             ],
             actions: [
               {
                 delegateId: 'exampleExtension/actions/testAction',
                 // Only conditions and actions can use %this.something% and %event.something%
-                config: unprocessedConfigWithElementAndEvent
+                settings: unprocessedConfigWithElementAndEvent
               }
             ]
           }
@@ -144,31 +144,31 @@
         dataElements: {
           account: {
             delegateId: "exampleExtension/dataElements/testDataElement",
-            config: {
+            settings: {
               value: "ABC123"
             }
           },
           firstName: {
             delegateId: "exampleExtension/dataElements/testDataElement",
-            config: {
+            settings: {
               value: "John"
             }
           },
           lastName: {
             delegateId: "exampleExtension/dataElements/testDataElement",
-            config: {
+            settings: {
               value: "Doe"
             }
           },
           apple: {
             delegateId: "exampleExtension/dataElements/testDataElement",
-            config: {
+            settings: {
               value: "apple"
             }
           },
           pear: {
             delegateId: "exampleExtension/dataElements/testDataElement",
-            config: {
+            settings: {
               value: "pear"
             }
           }
@@ -184,9 +184,9 @@
       TestPage
         .execute(function() {
           // We're not testing all the various forms of data elements here. Those tests are in
-          // the data element tests. These tests are only to ensure that the configuration objects
+          // the data element tests. These tests are only to ensure that the settings objects
           // are being run through preprocessing at the right times, that preprocessing
-          // deeply preprocesses the configuration object, and that an element and event are
+          // deeply preprocesses the settings object, and that an element and event are
           // included in preprocessing for conditions and actions.
 
           window.triggerTestEvent();

@@ -1,4 +1,4 @@
-var preprocessConfig = require('./utils/preprocessConfig');
+var replaceDataElementTokens = require('./utils/replaceDataElementTokens');
 var logger = require('./utils/logger');
 var state = require('./state');
 
@@ -14,7 +14,7 @@ var runActions = function(rule, event, relatedElement) {
         return;
       }
 
-      var settings = preprocessConfig(action.settings, relatedElement, event);
+      var settings = replaceDataElementTokens(action.settings, relatedElement, event);
 
       try {
         delegate.exports(settings);
@@ -46,7 +46,7 @@ var checkConditions = function(rule, event, relatedElement) {
         return;
       }
 
-      var settings = preprocessConfig(condition.settings, relatedElement, event);
+      var settings = replaceDataElementTokens(condition.settings, relatedElement, event);
 
       try {
         if (!delegate.exports(settings, event, relatedElement)) {
@@ -92,7 +92,7 @@ var initEventDelegate = function(rule) {
         return;
       }
 
-      var settings = preprocessConfig(event.settings);
+      var settings = replaceDataElementTokens(event.settings);
 
       try {
         delegate.exports(settings, trigger);

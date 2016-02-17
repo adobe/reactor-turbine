@@ -50,7 +50,7 @@ preprocessArray = function(arr, element, event) {
  * %target.something%)
  * @returns {Object} A new, preprocessed object.
  */
-var preprocessConfig = function(config, element, event) {
+var replaceDataElementTokens = function(config, element, event) {
   if (!config) {
     return;
   }
@@ -58,4 +58,4 @@ var preprocessConfig = function(config, element, event) {
   return preprocessObject(config, element, event);
 };
 
-module.exports = preprocessConfig;
+module.exports = replaceDataElementTokens;

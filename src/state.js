@@ -9,7 +9,7 @@ var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
 var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
 
 var container;
-var preprocessConfig;
+var replaceDataElementTokens;
 
 var hydrateProviders = function(container) {
   var extensions = container.extensions;
@@ -55,9 +55,9 @@ var hydrateProviders = function(container) {
 module.exports = {
   init: function(_container) {
     container = _container;
-    // We pull in preprocessConfig here and not at the top of the file to prevent a
-    // circular reference since dependencies of preprocessConfig require this state module.
-    preprocessConfig = require('./utils/preprocessConfig');
+    // We pull in replaceDataElementTokens here and not at the top of the file to prevent a
+    // circular reference since dependencies of replaceDataElementTokens require this state module.
+    replaceDataElementTokens = require('./utils/replaceDataElementTokens');
     hydrateProviders(container);
   },
   customVars: {},
@@ -73,12 +73,12 @@ module.exports = {
         var settingsCollection = extensionConfigurationProvider
           .getSettingsCollectionByExtensionName(extensionName);
         return settingsCollection.map(function(settings) {
-          return preprocessConfig(settings);
+          return replaceDataElementTokens(settings);
         });
       },
       getConfiguration: function(configurationId) {
         var settings = extensionConfigurationProvider.getSettingsByConfigurationId(configurationId);
-        return preprocessConfig(settings);
+        return replaceDataElementTokens(settings);
       },
       getResource: function(resourceName) {
         var resource = resourceProvider.getResource(extensionName, resourceName);

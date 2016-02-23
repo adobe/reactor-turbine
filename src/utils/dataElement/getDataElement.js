@@ -1,8 +1,8 @@
 var state = require('../../state');
 var cleanText = require('./../string/cleanText');
 
-module.exports = function(variable, suppressDefault, dataDef) {
-  dataDef = dataDef || state.getDataElementDefinition(variable);
+module.exports = function(variable, suppressDefault) {
+  var dataDef = state.getDataElementDefinition(variable);
 
   if (!dataDef) {
     return state.getPropertyConfig().undefinedVarsReturnEmpty ? '' : null;

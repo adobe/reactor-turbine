@@ -15,7 +15,6 @@ module.exports = function(key) {
     'clientInfo': require('./utils/clientInfo'),
     'loadScript': require('./utils/loadScript'),
     'textMatch': require('./utils/string/textMatch'),
-    'unique': require('./utils/array/unique'),
     'getQueryParam': require('./utils/uri/getQueryParam'),
     'isString': require('./utils/isType/isString'),
     'isObject': require('./utils/isType/isObject'),

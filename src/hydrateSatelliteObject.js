@@ -19,7 +19,7 @@ module.exports = function() {
   _satellite.setVar = require('./utils/dataElement/setVar');
 // TODO: _satellite.getVisitorId
   _satellite.setCookie = require('./utils/cookie/setCookie');
-  _satellite.readCookie = require('./utils/cookie/getCookie');
+  _satellite.getCookie = _satellite.readCookie = require('./utils/cookie/getCookie');
   _satellite.removeCookie = require('./utils/cookie/removeCookie');
 
   _satellite.isLinked = function(element) {

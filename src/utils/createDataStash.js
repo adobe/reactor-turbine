@@ -1,9 +1,9 @@
-var SATELLITE_KEY = '__satellite__';
+var STORAGE_KEY = '__turbine__';
 var stashIdIncrementor = 0;
 
 /**
  * Creates a data stash used to store arbitrary data on an object (typically a DOM element). The
- * data is stored under a __satellite__ property on the object. Data stored using a given data
+ * data is stored under a __turbine__ property on the object. Data stored using a given data
  * stash is isolated from data stored through other data stashes.
  *
  * @param {string} [name] The name of the data stash. If defined, this becomes part of
@@ -21,16 +21,16 @@ module.exports = function(name) {
    * @param {Object} object The object from which the data stash should be retrieved.
    */
   return function(object) {
-    var stashByStashId = object[SATELLITE_KEY];
+    var stashByStashId = object[STORAGE_KEY];
 
     if (!stashByStashId) {
-      stashByStashId = object[SATELLITE_KEY] = Object.create(null);
+      stashByStashId = object[STORAGE_KEY] = {};
     }
 
     var stash = stashByStashId[stashId];
 
     if (!stash) {
-      stash = stashByStashId[stashId] = Object.create(null);
+      stash = stashByStashId[stashId] = {};
     }
 
     return stash;

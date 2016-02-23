@@ -26,7 +26,7 @@ EventEmitter.prototype.once = function(type, listener) {
   });
 };
 
-EventEmitter.prototype.trigger = function(type, args) {
+EventEmitter.prototype.trigger = function(type, payload) {
   if (!this._listenersByType) {
     return;
   }
@@ -43,7 +43,7 @@ EventEmitter.prototype.trigger = function(type, args) {
 
   setTimeout(function() {
     for (var i = 0, len = listeners.length; i < len; i++) {
-      listeners[i](args);
+      listeners[i](payload);
     }
   }, 0);
 };

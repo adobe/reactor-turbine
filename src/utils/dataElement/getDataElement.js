@@ -1,8 +1,8 @@
 var state = require('../../state');
 var cleanText = require('./../string/cleanText');
 
-module.exports = function(variable, suppressDefault) {
-  var dataDef = state.getDataElementDefinition(variable);
+module.exports = function(name, suppressDefault) {
+  var dataDef = state.getDataElementDefinition(name);
 
   if (!dataDef) {
     return state.getPropertyConfig().undefinedVarsReturnEmpty ? '' : null;
@@ -18,9 +18,9 @@ module.exports = function(variable, suppressDefault) {
   }
 
   if (value === undefined && storeLength) {
-    value = state.getCachedDataElement(variable, storeLength);
+    value = state.getCachedDataElement(name, storeLength);
   } else if (value !== undefined && storeLength) {
-    state.cacheDataElement(variable, storeLength, value);
+    state.cacheDataElement(name, storeLength, value);
   }
 
   if (value === undefined && !suppressDefault) {

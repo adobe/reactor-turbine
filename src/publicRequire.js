@@ -14,7 +14,6 @@ module.exports = function(key) {
     'assign': require('./utils/object/assign'),
     'clientInfo': require('./utils/clientInfo'),
     'loadScript': require('./utils/loadScript'),
-    'textMatch': require('./utils/string/textMatch'),
     'getQueryParam': require('./utils/uri/getQueryParam'),
     'isString': require('./utils/isType/isString'),
     'isObject': require('./utils/isType/isObject'),

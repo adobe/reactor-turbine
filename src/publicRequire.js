@@ -12,7 +12,6 @@ module.exports = function(key) {
     'poll': require('./utils/communication/globalPoll'),
     'createDataStash': require('./utils/createDataStash'),
     'assign': require('./utils/object/assign'),
-    'isHttps': require('./utils/uri/isHttps'),
     'clientInfo': require('./utils/clientInfo'),
     'hideElements': require('./utils/dom/hideElements'),
     'loadScript': require('./utils/loadScript'),

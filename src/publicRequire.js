@@ -15,7 +15,6 @@ module.exports = function(key) {
     'clientInfo': require('./utils/clientInfo'),
     'loadScript': require('./utils/loadScript'),
     'getQueryParam': require('./utils/uri/getQueryParam'),
-    'isString': require('./utils/isType/isString'),
     'isObject': require('./utils/isType/isObject'),
     'isLinked': function(element) { // For backward compatibility.
       require('./utils/dom/isAnchor')(element, true);

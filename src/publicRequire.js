@@ -13,7 +13,6 @@ module.exports = function(key) {
     'createDataStash': require('./utils/createDataStash'),
     'assign': require('./utils/object/assign'),
     'clientInfo': require('./utils/clientInfo'),
-    'hideElements': require('./utils/dom/hideElements'),
     'loadScript': require('./utils/loadScript'),
     'textMatch': require('./utils/string/textMatch'),
     'unique': require('./utils/array/unique'),

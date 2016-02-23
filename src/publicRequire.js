@@ -15,7 +15,6 @@ module.exports = function(key) {
     'encodeObjectToUri': require('./utils/uri/encodeObjectToUri'),
     'isHttps': require('./utils/uri/isHttps'),
     'clientInfo': require('./utils/clientInfo'),
-    'createBeacon': require('./utils/createBeacon'),
     'hideElements': require('./utils/dom/hideElements'),
     'loadScript': require('./utils/loadScript'),
     'textMatch': require('./utils/string/textMatch'),

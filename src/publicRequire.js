@@ -19,7 +19,6 @@ module.exports = function(key) {
     'isLinked': function(element) { // For backward compatibility.
       require('./utils/dom/isAnchor')(element, true);
     },
-    'matchesSelector': require('./utils/dom/matchesSelector'),
     'getVar': require('./utils/dataElement/getVar'),
     'getDataElement': require('./utils/dataElement/getDataElement'),
     'getCookie': require('./utils/cookie/getCookie'),

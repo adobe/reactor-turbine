@@ -9,7 +9,6 @@ module.exports = function(key) {
   modules = modules || {
     'Promise': require('./utils/communication/Promise'),
     'EventEmitter': require('./utils/communication/EventEmitter'),
-    'poll': require('./utils/communication/globalPoll'),
     'createDataStash': require('./utils/createDataStash'),
     'assign': require('./utils/object/assign'),
     'clientInfo': require('./utils/clientInfo'),

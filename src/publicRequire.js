@@ -25,6 +25,7 @@ module.exports = function(key) {
       require('./utils/dom/isAnchor')(element, true);
     },
     'matchesSelector': require('./utils/dom/matchesSelector'),
+    'getVar': require('./utils/dataElement/getVar'),
     'getDataElement': require('./utils/dataElement/getDataElement'),
     'getCookie': require('./utils/cookie/getCookie'),
     'setCookie': require('./utils/cookie/setCookie'),

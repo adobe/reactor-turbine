@@ -5,16 +5,17 @@
  * @param {Function} fn The target function to call once the delay period has passed.
  * @param {Number} delay The number of milliseconds that must pass before the target function is
  * called.
+ * @param {Object} [context] The context in which to call the target function.
  * @returns {Function}
  */
-module.exports = function(fn, delay) {
+module.exports = function(fn, delay, context) {
   var timeoutId = null;
   return function() {
-    var context = this;
+    var ctx = this || context;
     var args = arguments;
     clearTimeout(timeoutId);
     timeoutId = setTimeout(function() {
-      fn.apply(context, args);
+      fn.apply(ctx, args);
     }, delay);
   };
 };

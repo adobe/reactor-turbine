@@ -1,4 +1,4 @@
-var isObject = require('../isObject');
+var isObject = require('../isPlainObject');
 
 describe('isObject', function() {
   it('returns true when the item is a regular object', function() {

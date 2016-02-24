@@ -1,5 +1,5 @@
 var isString = require('./isType/isString');
-var isObject = require('./isType/isObject');
+var isObject = require('./isType/isPlainObject');
 var isArray = require('./isType/isArray');
 var replaceVarTokens = require('./dataElement/replaceVarTokens');
 

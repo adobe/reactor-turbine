@@ -24,6 +24,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.5.3",
     "is-plain-object": "^2.0.1",
+    "native-promise-only": "^0.8.1",
     "strict-loader": "^1.0.0",
     "webpack": "^1.12.14",
     "webpack-stream": "^3.1.0"

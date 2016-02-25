@@ -11,9 +11,9 @@
         extensions: {
           EXa: {
             displayName: 'Example Extension A',
-            name: 'exampleExtensionA',
+            name: 'example-extension-a',
             delegates: {
-              'exampleExtensionA/events/testEvent': {
+              'example-extension-a/events/test-event': {
                 displayName: 'Test Event',
                 script: function(module) {
                   var allTriggers = [];
@@ -29,18 +29,18 @@
                   };
                 }
               },
-              'exampleExtensionA/actions/testAction': {
+              'example-extension-a/actions/test-action': {
                 displayName: 'Test Action',
                 script: function(module, require) {
-                  var getExtension = require('getExtension');
-                  var extension = getExtension('exampleExtensionA');
-                  receivedResourceExports = extension.getResource('testResource');
+                  var getExtension = require('get-extension');
+                  var extension = getExtension('example-extension-a');
+                  receivedResourceExports = extension.getResource('test-resource');
                   module.exports = function() {};
                 }
               }
             },
             resources: {
-              'exampleExtensionA/resources/testResource': {
+              'example-extension-a/resources/test-resource': {
                 script: function(module) {
                   module.exports = testResourceExports;
                 }
@@ -49,9 +49,9 @@
           },
           EXb: {
             displayName: 'Example Extension B',
-            name: 'exampleExtensionB',
+            name: 'example-extension-b',
             resources: {
-              'exampleExtensionB/resources/neverRequired': {
+              'example-extension-b/resources/never-required': {
                 script: neverRequiredResourceSpy.and.callFake(function(module) {
                   module.exports = {};
                 })
@@ -63,12 +63,12 @@
           {
             events: [
               {
-                delegateId: 'exampleExtensionA/events/testEvent'
+                delegateId: 'example-extension-a/events/test-event'
               }
             ],
             actions: [
               {
-                delegateId: 'exampleExtensionA/actions/testAction'
+                delegateId: 'example-extension-a/actions/test-action'
               }
             ]
           }

@@ -5,7 +5,7 @@ module.exports = function(name, suppressDefault) {
   var dataDef = state.getDataElementDefinition(name);
 
   if (!dataDef) {
-    return state.getPropertyConfig().undefinedVarsReturnEmpty ? '' : null;
+    return state.getPropertySettings().undefinedVarsReturnEmpty ? '' : null;
   }
 
   var storeLength = dataDef.settings.storeLength;

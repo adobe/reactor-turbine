@@ -36,7 +36,7 @@ module.exports = function(key) {
   if (modules.hasOwnProperty(key)) {
     return modules[key];
   } else if (key === 'property-config') {
-    return state.getPropertyConfig();
+    return state.getPropertySettings();
   } else {
     throw new Error('Cannot resolve module "' + key + '".');
   }

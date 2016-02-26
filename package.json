@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@git.corp.adobe.com:aahardy/dtm-framework-sandbox.git"
+    "url": "git@git.corp.adobe.com:reactor/turbine.git"
   },
   "publishConfig": {
     "registry": "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-mcps-release-local"

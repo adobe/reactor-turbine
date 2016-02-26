@@ -1,6 +1,6 @@
 var getVar = require('./getVar');
 var state = require('../../state');
-var undefinedVarsReturnEmpty = state.getPropertyConfig().undefinedVarsReturnEmpty;
+var undefinedVarsReturnEmpty = state.getPropertySettings().undefinedVarsReturnEmpty;
 
 /**
  * Perform variable substitutions to a string where tokens are specified in the form %foo%.

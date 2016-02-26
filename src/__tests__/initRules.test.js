@@ -10,7 +10,7 @@ describe('initRules', function() {
     var relatedElement;
     var delegateExports;
     var rules;
-    var propertyConfig;
+    var propertySettings;
 
     beforeEach(function() {
       event = {};
@@ -68,7 +68,7 @@ describe('initRules', function() {
         }
       ];
 
-      propertyConfig = {
+      propertySettings = {
         propertyFoo: 'bar'
       };
 
@@ -82,8 +82,8 @@ describe('initRules', function() {
             exports: delegateExports[delegateId]
           };
         },
-        getPropertyConfig: function() {
-          return propertyConfig;
+        getPropertySettings: function() {
+          return propertySettings;
         },
         getRules: function() {
           return rules;
@@ -214,7 +214,7 @@ describe('initRules', function() {
         getRules: function() {
           return rules;
         },
-        getPropertyConfig: function() {
+        getPropertySettings: function() {
           return null;
         },
         getShouldExecuteActions: function() {

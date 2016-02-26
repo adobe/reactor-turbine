@@ -61,9 +61,9 @@ module.exports = {
     hydrateProviders(container);
   },
   customVars: {},
-  getPropertyConfig: function() {
+  getPropertySettings: function() {
     // Property config does not support data element token replacements.
-    return container.propertyConfig || {};
+    return container.propertySettings || {};
   },
   // This is only intended to be used by extensions therefore it accommodates APIs that
   // extension developers would expect.

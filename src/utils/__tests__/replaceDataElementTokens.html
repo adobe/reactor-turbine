@@ -44,7 +44,7 @@
       var container = {
         extensions: {
           EXa: {
-            name: 'exampleExtension',
+            name: 'example-extension',
             displayName: 'Example Extension',
             configurations: {
               abc: {
@@ -52,11 +52,11 @@
               }
             },
             delegates: {
-              'exampleExtension/events/testEvent': {
+              'example-extension/events/test-event': {
                 displayName: 'Test Event',
                 script: function(module, require) {
-                  var getExtension = require('getExtension');
-                  var extension = getExtension('exampleExtension');
+                  var getExtension = require('get-extension');
+                  var extension = getExtension('example-extension');
 
                   var allTriggers = [];
 
@@ -81,11 +81,11 @@
                   });
                 }
               },
-              'exampleExtension/conditions/testCondition': {
+              'example-extension/conditions/test-condition': {
                 displayName: 'Test Condition',
                 script: function(module, require) {
-                  var getExtension = require('getExtension');
-                  var extension = getExtension('exampleExtension');
+                  var getExtension = require('get-extension');
+                  var extension = getExtension('example-extension');
 
                   module.exports = conditionDelegateSpy.and.callFake(function() {
                     conditionRequiredExtensionConfig = extension.getConfiguration('abc');
@@ -93,18 +93,18 @@
                   });
                 }
               },
-              'exampleExtension/actions/testAction': {
+              'example-extension/actions/test-action': {
                 displayName: 'Test Action',
                 script: function(module, require) {
-                  var getExtension = require('getExtension');
-                  var extension = getExtension('exampleExtension');
+                  var getExtension = require('get-extension');
+                  var extension = getExtension('example-extension');
 
                   module.exports = actionDelegateSpy.and.callFake(function() {
                     actionRequiredExtensionConfig = extension.getConfiguration('abc');
                   });
                 }
               },
-              'exampleExtension/dataElements/testDataElement': {
+              'example-extension/dataElements/test-data-element': {
                 displayName: 'Test Data Element',
                 script: function(module) {
                   module.exports = function(settings) {
@@ -121,20 +121,20 @@
           {
             events: [
               {
-                delegateId: 'exampleExtension/events/testEvent',
+                delegateId: 'example-extension/events/test-event',
                 settings: unprocessedConfig
               }
             ],
             conditions: [
               {
-                delegateId: 'exampleExtension/conditions/testCondition',
+                delegateId: 'example-extension/conditions/test-condition',
                 // Only conditions and actions can use %this.something% and %event.something%
                 settings: unprocessedConfigWithElementAndEvent
               }
             ],
             actions: [
               {
-                delegateId: 'exampleExtension/actions/testAction',
+                delegateId: 'example-extension/actions/test-action',
                 // Only conditions and actions can use %this.something% and %event.something%
                 settings: unprocessedConfigWithElementAndEvent
               }
@@ -143,31 +143,31 @@
         ],
         dataElements: {
           account: {
-            delegateId: "exampleExtension/dataElements/testDataElement",
+            delegateId: "example-extension/dataElements/test-data-element",
             settings: {
               value: "ABC123"
             }
           },
           firstName: {
-            delegateId: "exampleExtension/dataElements/testDataElement",
+            delegateId: "example-extension/dataElements/test-data-element",
             settings: {
               value: "John"
             }
           },
           lastName: {
-            delegateId: "exampleExtension/dataElements/testDataElement",
+            delegateId: "example-extension/dataElements/test-data-element",
             settings: {
               value: "Doe"
             }
           },
           apple: {
-            delegateId: "exampleExtension/dataElements/testDataElement",
+            delegateId: "example-extension/dataElements/test-data-element",
             settings: {
               value: "apple"
             }
           },
           pear: {
-            delegateId: "exampleExtension/dataElements/testDataElement",
+            delegateId: "example-extension/dataElements/test-data-element",
             settings: {
               value: "pear"
             }

@@ -6,14 +6,14 @@
         container: {
           extensions: {
             EXa: {
-              name: 'testExtension',
+              name: 'test-extension',
               displayName: 'Test Extension',
               delegates: {
-                'testExtension/events/testEvent': {
+                'test-extension/events/test-event': {
                   displayName: 'Test Event',
                   script: getTestEventDelegate()
                 },
-                'testExtension/actions/testAction': {
+                'test-extension/actions/test-action': {
                   displayName: 'Test Action',
                   script: function(module) {
                     module.exports = actionSpy;
@@ -26,12 +26,12 @@
             {
               events: [
                 {
-                  delegateId: 'testExtension/events/testEvent'
+                  delegateId: 'test-extension/events/test-event'
                 }
               ],
               actions: [
                 {
-                  delegateId: 'testExtension/actions/testAction'
+                  delegateId: 'test-extension/actions/test-action'
                 }
               ]
             }

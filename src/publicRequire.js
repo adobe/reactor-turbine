@@ -6,35 +6,36 @@ module.exports = function(key) {
   // circular dependency issues.
   state = state || require('./state');
 
+  // Module names are not camelCase in order to be consistent with npm package name standards.
   modules = modules || {
-    'Promise': require('./utils/communication/Promise'),
-    'EventEmitter': require('./utils/communication/EventEmitter'),
-    'createDataStash': require('./utils/createDataStash'),
+    'promise': require('./utils/communication/Promise'),
+    'event-emitter': require('./utils/communication/EventEmitter'),
+    'create-data-stash': require('./utils/createDataStash'),
     'assign': require('./utils/object/assign'),
-    'clientInfo': require('./utils/clientInfo'),
-    'loadScript': require('./utils/loadScript'),
-    'getQueryParam': require('./utils/uri/getQueryParam'),
-    'isPlainObject': require('./utils/isType/isPlainObject'),
-    'isLinked': function(element) { // For backward compatibility.
+    'client-info': require('./utils/clientInfo'),
+    'load-script': require('./utils/loadScript'),
+    'get-query-param': require('./utils/uri/getQueryParam'),
+    'is-plain-object': require('./utils/isType/isPlainObject'),
+    'is-linked': function(element) { // For backward compatibility.
       require('./utils/dom/isAnchor')(element, true);
     },
-    'getVar': require('./utils/dataElement/getVar'),
-    'getDataElement': require('./utils/dataElement/getDataElement'),
-    'getCookie': require('./utils/cookie/getCookie'),
-    'setCookie': require('./utils/cookie/setCookie'),
-    'removeCookie': require('./utils/cookie/removeCookie'),
+    'get-var': require('./utils/dataElement/getVar'),
+    'get-data-element': require('./utils/dataElement/getDataElement'),
+    'get-cookie': require('./utils/cookie/getCookie'),
+    'set-cookie': require('./utils/cookie/setCookie'),
+    'remove-cookie': require('./utils/cookie/removeCookie'),
     'debounce': require('./utils/debounce'),
     'once': require('./utils/once'),
     'logger': require('./utils/logger'),
-    'writeHtml': require('./utils/writeHtml'),
-    'getExtension': state.getExtension,
+    'write-html': require('./utils/writeHtml'),
+    'get-extension': state.getExtension,
     'window': window,
     'document': document
   };
 
   if (modules.hasOwnProperty(key)) {
     return modules[key];
-  } else if (key === 'propertyConfig') {
+  } else if (key === 'property-config') {
     return state.getPropertyConfig();
   } else {
     throw new Error('Cannot resolve module "' + key + '".');

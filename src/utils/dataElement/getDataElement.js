@@ -12,7 +12,6 @@ module.exports = function(name, suppressDefault) {
   var delegate = state.getDelegate(dataDef.delegateId);
   var value = delegate.exports(dataDef.settings);
 
-  // TODO: Move this to data element delegates?
   if (dataDef.settings.cleanText) {
     value = cleanText(value);
   }
@@ -30,7 +29,6 @@ module.exports = function(name, suppressDefault) {
     /*eslint-enable dot-notation*/
   }
 
-  // TODO: Move this to data element delegates?
   if (dataDef.settings.forceLowerCase && value.toLowerCase) {
     value = value.toLowerCase();
   }

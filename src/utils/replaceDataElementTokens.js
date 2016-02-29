@@ -1,19 +1,19 @@
 var isPlainObject = require('./isType/isPlainObject');
 var replaceVarTokens = require('./dataElement/replaceVarTokens');
 
-var preprocessObject;
-var preprocessArray;
+var replaceTokensInObject;
+var replaceTokensInArray;
 
-preprocessObject = function(obj, element, event) {
+replaceTokensInObject = function(obj, element, event) {
   var ret = {};
   var keys = Object.keys(obj);
   for (var i = 0; i < keys.length; i++) {
     var key = keys[i];
     var value = obj[key];
     if (isPlainObject(value)) {
-      ret[key] = preprocessObject(value, element, event);
+      ret[key] = replaceTokensInObject(value, element, event);
     } else if (Array.isArray(value)) {
-      ret[key] = preprocessArray(value, element, event);
+      ret[key] = replaceTokensInArray(value, element, event);
     } else {
       ret[key] = replaceVarTokens(value, element, event);
     }
@@ -21,16 +21,16 @@ preprocessObject = function(obj, element, event) {
   return ret;
 };
 
-preprocessArray = function(arr, element, event) {
+replaceTokensInArray = function(arr, element, event) {
   var ret = [];
   for (var i = 0, len = arr.length; i < len; i++) {
     var value = arr[i];
     if (typeof value === 'string') {
       value = replaceVarTokens(value, element, event);
     } else if (Array.isArray(value)) {
-      value = preprocessArray(value, element, event);
-    } else if (value && value.constructor === Object) { // TODO: Can we use isObject here?
-      value = preprocessObject(value, element, event);
+      value = replaceTokensInArray(value, element, event);
+    } else if (isPlainObject(value)) {
+      value = replaceTokensInObject(value, element, event);
     }
     ret.push(value);
   }
@@ -53,7 +53,7 @@ var replaceDataElementTokens = function(config, element, event) {
     return;
   }
 
-  return preprocessObject(config, element, event);
+  return replaceTokensInObject(config, element, event);
 };
 
 module.exports = replaceDataElementTokens;

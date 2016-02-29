@@ -1,5 +1,5 @@
 var state = require('../../state');
-var cleanText = require('./../string/cleanText');
+var cleanText = require('../string/cleanText');
 
 module.exports = function(name, suppressDefault) {
   var dataDef = state.getDataElementDefinition(name);
@@ -8,28 +8,28 @@ module.exports = function(name, suppressDefault) {
     return state.getPropertySettings().undefinedVarsReturnEmpty ? '' : null;
   }
 
-  var storeLength = dataDef.settings.storeLength;
+  var storeLength = dataDef.storeLength;
   var delegate = state.getDelegate(dataDef.delegateId);
   var value = delegate.exports(dataDef.settings);
 
-  if (dataDef.settings.cleanText) {
+  if (dataDef.cleanText) {
     value = cleanText(value);
   }
 
   if (value === undefined && storeLength) {
-    value = state.getCachedDataElement(name, storeLength);
+    value = state.getCachedDataElementValue(name, storeLength);
   } else if (value !== undefined && storeLength) {
-    state.cacheDataElement(name, storeLength, value);
+    state.cacheDataElementValue(name, storeLength, value);
   }
 
   if (value === undefined && !suppressDefault) {
     // Have to wrap "default" in quotes since it is a keyword.
     /*eslint-disable dot-notation*/
-    value = dataDef.settings['default'] || '';
+    value = dataDef['default'] || '';
     /*eslint-enable dot-notation*/
   }
 
-  if (dataDef.settings.forceLowerCase && value.toLowerCase) {
+  if (dataDef.forceLowerCase && value.toLowerCase) {
     value = value.toLowerCase();
   }
 

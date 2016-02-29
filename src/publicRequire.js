@@ -20,7 +20,7 @@ module.exports = function(key) {
       require('./utils/dom/isAnchor')(element, true);
     },
     'get-var': require('./utils/dataElement/getVar'),
-    'get-data-element': require('./utils/dataElement/getDataElement'),
+    'get-data-element': require('./utils/dataElement/getDataElementValue'),
     'get-cookie': require('./utils/cookie/getCookie'),
     'set-cookie': require('./utils/cookie/setCookie'),
     'remove-cookie': require('./utils/cookie/removeCookie'),

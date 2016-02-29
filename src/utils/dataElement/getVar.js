@@ -1,8 +1,60 @@
-var getObjectProperty = require('./getObjectProperty');
+var document = require('document');
+var window = require('window');
 var state = require('../../state');
 var getDataElementValue = require('./getDataElementValue');
-var getUri = require('./../uri/getUri');
-var getQueryParam = require('./../uri/getQueryParam');
+var getUri = require('../uri/getUri');
+var getQueryParam = require('../uri/getQueryParam');
+var cleanText = require('../string/cleanText');
+
+var specialPropertyAccessors = {
+  text: function(obj) {
+    return obj.textContent;
+  },
+  cleanText: function(obj) {
+    return cleanText(obj.textContent);
+  }
+};
+
+/**
+ * This returns the value of a property at a given path. For example, a <code>path<code> of
+ * <code>foo.bar</code> will return the value of <code>obj.foo.bar</code>.
+ *
+ * In addition, if <code>path</code> is <code>foo.bar.getAttribute(unicorn)</code> and
+ * <code>obj.foo.bar</code> has a method named <code>getAttribute</code>, the method will be
+ * called with a value of <code>"unicorn"</code> and the value will be returned.
+ *
+ * Also, if <code>path</code> is <code>foo.bar.@text</code> or other supported properties
+ * beginning with <code>@</code>, a special accessor will be used.
+ *
+ * @param host
+ * @param path
+ * @param supportSpecial
+ * @returns {*}
+ */
+var getObjectProperty = function(host, path, supportSpecial) {
+  var propChain = path.split('.');
+  var value = host;
+  var attrMatch;
+  for (var i = 0, len = propChain.length; i < len; i++) {
+    if (value == null) {
+      return undefined;
+    }
+    var prop = propChain[i];
+    if (supportSpecial && prop.charAt(0) === '@') {
+      var specialProp = prop.slice(1);
+      value = specialPropertyAccessors[specialProp](value);
+      continue;
+    }
+    if (value.getAttribute &&
+      (attrMatch = prop.match(/^getAttribute\((.+)\)$/))) {
+      var attr = attrMatch[1];
+      value = value.getAttribute(attr);
+      continue;
+    }
+    value = value[prop];
+  }
+  return value;
+};
 
 // getVar(variable, elm, evt)
 // ==========================

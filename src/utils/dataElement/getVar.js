@@ -1,6 +1,6 @@
 var getObjectProperty = require('./getObjectProperty');
 var state = require('../../state');
-var getDataElement = require('./getDataElement');
+var getDataElementValue = require('./getDataElementValue');
 var getUri = require('./../uri/getUri');
 var getQueryParam = require('./../uri/getQueryParam');
 
@@ -27,7 +27,7 @@ module.exports = function(variable, element, event) {
     hostname: document.location.hostname
   };
   if (state.getDataElementDefinition(variable)) {
-    return getDataElement(variable);
+    return getDataElementValue(variable);
   }
   value = map[variable];
   if (value === undefined) {

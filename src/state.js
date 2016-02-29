@@ -102,10 +102,10 @@ module.exports = {
   setDebugOuputEnabled: function(value) {
     setLocalStorageItem(DEBUG_LOCAL_STORAGE_NAME, value);
   },
-  getCachedDataElement: function(key, length) {
+  getCachedDataElementValue: function(key, length) {
     return dataElementSafe(key, length);
   },
-  cacheDataElement: function(key, length, value) {
+  cacheDataElementValue: function(key, length, value) {
     dataElementSafe(key, length, value);
   },
   getAppVersion: function() {

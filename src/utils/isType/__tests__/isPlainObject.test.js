@@ -1,4 +1,4 @@
-var isObject = require('../isPlainObject');
+var isPlainObject = require('../isPlainObject');
 
 describe('isObject', function() {
   it('returns true when the item is a regular object', function() {
@@ -10,7 +10,7 @@ describe('isObject', function() {
     ];
 
     objects.forEach(function(item) {
-      expect(isObject(item)).toBe(true);
+      expect(isPlainObject(item)).toBe(true);
     });
   });
 
@@ -31,7 +31,7 @@ describe('isObject', function() {
     ];
 
     nonObjects.forEach(function(item) {
-      expect(isObject(item)).toBe(false);
+      expect(isPlainObject(item)).toBe(false);
     });
   });
 });

@@ -16,7 +16,7 @@ module.exports = function() {
   _satellite.appVersion = state.getAppVersion();
   _satellite.notify = logger.notify.bind(logger);
   _satellite.getVar = require('./utils/dataElement/getVar');
-  _satellite.setVar = require('./utils/dataElement/setVar');
+  _satellite.setVar = require('./utils/dataElement/setCustomVar');
 // TODO: _satellite.getVisitorId
   _satellite.setCookie = require('./utils/cookie/setCookie');
   _satellite.getCookie = _satellite.readCookie = require('./utils/cookie/getCookie');

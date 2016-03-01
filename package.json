@@ -26,6 +26,7 @@
     "is-plain-object": "^2.0.1",
     "native-promise-only": "^0.8.1",
     "strict-loader": "^1.0.0",
+    "tiny-emitter": "^1.0.2",
     "webpack": "^1.12.14",
     "webpack-stream": "^3.1.0"
   },

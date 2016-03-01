@@ -37,4 +37,10 @@ describe('publicRequire', function() {
       publicRequire('invalidmodulename');
     }).toThrowError(Error);
   });
+
+  it('is-linked returns true for a link element', function() {
+    var l = document.createElement('a');
+    var publicRequire = publicRequireInjector({});
+    expect(publicRequire('is-linked')(l)).toBe(true);
+  });
 });

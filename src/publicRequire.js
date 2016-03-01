@@ -17,7 +17,7 @@ module.exports = function(key) {
     'get-query-param': require('./utils/uri/getQueryParam'),
     'is-plain-object': require('./utils/isType/isPlainObject'),
     'is-linked': function(element) { // For backward compatibility.
-      require('./utils/dom/isAnchor')(element, true);
+      return require('./utils/dom/isAnchor')(element, true);
     },
     'get-var': require('./utils/dataElement/getVar'),
     'get-data-element': require('./utils/dataElement/getDataElementValue'),

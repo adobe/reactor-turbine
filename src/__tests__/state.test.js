@@ -129,4 +129,16 @@ describe('state ', function() {
     state.setDebugOuputEnabled('true');
     expect(state.getDebugOutputEnabled()).toBe(true);
   });
+
+  it('getShouldExecuteActions returns false when hide activity local storage key is set',
+  function() {
+    localStorage.setItem('sdsat_hide_activity', 'true');
+    expect(state.getShouldExecuteActions()).toBe(false);
+  });
+
+  it('getShouldExecuteActions returns true when hide activity local storage key is not set to true',
+    function() {
+      localStorage.setItem('sdsat_hide_activity', 'false');
+      expect(state.getShouldExecuteActions()).toBe(true);
+    });
 });

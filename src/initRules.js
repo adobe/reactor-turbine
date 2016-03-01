@@ -1,4 +1,4 @@
-var replaceDataElementTokens = require('./utils/replaceDataElementTokens');
+var replaceVarTokens = require('./utils/dataElement/replaceVarTokens');
 var logger = require('./utils/logger');
 var state = require('./state');
 
@@ -14,7 +14,7 @@ var runActions = function(rule, event, relatedElement) {
         return;
       }
 
-      var settings = replaceDataElementTokens(action.settings, relatedElement, event);
+      var settings = replaceVarTokens(action.settings, relatedElement, event);
 
       try {
         delegate.exports(settings);
@@ -46,7 +46,7 @@ var checkConditions = function(rule, event, relatedElement) {
         return;
       }
 
-      var settings = replaceDataElementTokens(condition.settings, relatedElement, event);
+      var settings = replaceVarTokens(condition.settings, relatedElement, event);
 
       try {
         if (!delegate.exports(settings, event, relatedElement)) {
@@ -92,7 +92,7 @@ var initEventDelegate = function(rule) {
         return;
       }
 
-      var settings = replaceDataElementTokens(event.settings);
+      var settings = replaceVarTokens(event.settings);
 
       try {
         delegate.exports(settings, trigger);

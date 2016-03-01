@@ -2,9 +2,10 @@
 
 var publicRequireInjector = require('inject!../publicRequire');
 
+
 describe('publicRequire', function() {
   it('should return the core modules', function() {
-    var windowSpy = jasmine.createSpy('window');
+    var windowSpy = {};
     var publicRequire = publicRequireInjector({
       'window': windowSpy
     });
@@ -17,16 +18,17 @@ describe('publicRequire', function() {
       domains: [ 'adobe.com', 'example.com' ]
     };
 
-    var stateSpy = jasmine.createSpyObj(['getPropertySettings']);
-    stateSpy.getPropertySettings.and.returnValue(propertySettings);
+    var mockState = {
+      getPropertySettings: function() {
+        return propertySettings;
+      }
+    };
 
     var publicRequire = publicRequireInjector({
-      './state': stateSpy
+      './state': mockState
     });
 
-    expect(publicRequire('property-settings')).toEqual({
-      domains: [ 'adobe.com', 'example.com' ]
-    });
+    expect(publicRequire('property-settings')).toBe(propertySettings);
   });
 
   it('should throw error when a non core module is required', function() {

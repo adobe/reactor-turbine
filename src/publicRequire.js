@@ -29,8 +29,8 @@ module.exports = function(key) {
     'logger': require('./utils/logger'),
     'write-html': require('./utils/writeHtml'),
     'get-extension': state.getExtension,
-    'window': window,
-    'document': document
+    'window': require('window'),
+    'document': require('document')
   };
 
   if (modules.hasOwnProperty(key)) {

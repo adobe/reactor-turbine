@@ -74,7 +74,18 @@ describe('classList', function() {
 
       classList.add(testElement, 'Man');
       expect(testElement.className).toEqual('foo  Man'); // double spaces
+    });
 
+    it('adds the className when force is set to true', function() {
+      testElement.className = 'Man';
+      classList.toggle(testElement, 'Man', true);
+      expect(testElement.className).toEqual('Man');
+    });
+
+    it('removes the className when force is set to false', function() {
+      testElement.className = '';
+      classList.toggle(testElement, 'Man', false);
+      expect(testElement.className).toEqual('');
     });
   });
 

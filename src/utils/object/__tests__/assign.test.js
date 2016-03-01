@@ -1,10 +1,12 @@
 var assign = require('../assign');
-
-var target = {a: 'apple', b: 'banana', c: 'cucumber'};
+var target;
 
 describe('assigns', function() {
-  it('returns new property list for own properties', function() {
+  beforeEach(function() {
+    target = {a: 'apple', b: 'banana', c: 'cucumber'};
+  });
 
+  it('returns new property list for own properties', function() {
     var Apple = function() {
       this.color = 'green';
     };
@@ -38,4 +40,8 @@ describe('assigns', function() {
     expect(res.a).toEqual('avocado');
   });
 
+  it('applies only defined objects', function() {
+    var res = assign(target, undefined);
+    expect(res.a).toEqual('apple');
+  });
 });

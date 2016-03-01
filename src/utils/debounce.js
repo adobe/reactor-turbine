@@ -11,7 +11,7 @@
 module.exports = function(fn, delay, context) {
   var timeoutId = null;
   return function() {
-    var ctx = this || context;
+    var ctx = context || this;
     var args = arguments;
     clearTimeout(timeoutId);
     timeoutId = setTimeout(function() {

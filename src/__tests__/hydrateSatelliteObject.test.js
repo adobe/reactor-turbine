@@ -40,4 +40,22 @@ describe('hydrateSatelliteObject', function() {
 
       expect(spy.outputEnabled).toBe(true);
     });
+
+  it('successfully allows setting, reading, and removing a cookie', function() {
+    var hydrateSatelliteObject = hydrateSatelliteObjectInjector({});
+    hydrateSatelliteObject();
+
+    var cookieName = 'cookiename';
+    var cookieValue = 'cookievalue';
+
+    _satellite.setCookie(cookieName, cookieValue, 91);
+
+    expect(document.cookie.indexOf(cookieName + '=' + cookieValue)).toBeGreaterThan(-1);
+
+    expect(_satellite.getCookie(cookieName)).toEqual('cookievalue');
+
+    _satellite.removeCookie(cookieName);
+
+    expect(document.cookie.indexOf(cookieName + '=' + cookieValue)).toBe(-1);
+  });
 });

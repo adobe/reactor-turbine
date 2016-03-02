@@ -1,5 +1,4 @@
-var setCookie = require('./cookie/setCookie');
-var getCookie = require('./cookie/getCookie');
+var cookie = require('cookie');
 
 var COOKIE_PREFIX = '_sdsat_';
 
@@ -11,23 +10,31 @@ var storeLength = {
 
 var pageviewCache = {};
 
-module.exports = function(key, length) {
-  if (arguments.length > 2) {
-    // setter
-    var value = arguments[2];
-    if (length === storeLength.PAGEVIEW) {
-      pageviewCache[key] = value;
-    } else if (length === storeLength.SESSION) {
-      setCookie(COOKIE_PREFIX + key, value);
-    } else if (length === storeLength.VISITOR) {
-      setCookie(COOKIE_PREFIX + key, value, 365 * 2);
+module.exports = {
+  setValue: function(key, length, value) {
+    switch (length) {
+      case storeLength.PAGEVIEW:
+        pageviewCache[key] = value;
+        break;
+      case storeLength.SESSION:
+        document.cookie = cookie.serialize(COOKIE_PREFIX + key, value);
+        break;
+      case storeLength.VISITOR:
+        var expireDate = new Date();
+        expireDate.setTime(expireDate.getTime() + (365 * 2 * 24 * 60 * 60 * 1000)); // 2 years
+        document.cookie = cookie.serialize(COOKIE_PREFIX + key, value, {
+          expires: expireDate
+        });
+        break;
     }
-  } else {
-    // getter
-    if (length === storeLength.PAGEVIEW) {
-      return pageviewCache[key];
-    } else if (length === storeLength.SESSION || length === storeLength.VISITOR) {
-      return getCookie(COOKIE_PREFIX + key);
+  },
+  getValue: function(key, length) {
+    switch (length) {
+      case storeLength.PAGEVIEW:
+        return pageviewCache[key];
+      case storeLength.SESSION:
+      case storeLength.VISITOR:
+        return cookie.parse(document.cookie)[COOKIE_PREFIX + key];
     }
   }
 };

@@ -1,3 +1,5 @@
+var cookie = require('cookie');
+
 /**
  * Writes a cookie.
  * @param {string} name The name of the cookie to save.
@@ -6,13 +8,13 @@
  * be stored for the session only.
  */
 module.exports = function(name, value, days) {
-  var expires;
+  var options = {};
+
   if (days) {
     var date = new Date();
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    expires = '; expires=' + date.toGMTString();
-  } else {
-    expires = '';
+    options.expires = date;
   }
-  document.cookie = name + '=' + value + expires + '; path=/';
+
+  document.cookie = cookie.serialize(name, value, options);
 };

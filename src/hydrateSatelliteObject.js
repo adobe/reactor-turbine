@@ -1,3 +1,4 @@
+var cookie = require('cookie');
 var isAnchor = require('./utils/dom/isAnchor');
 var state = require('./state');
 var logger = require('./utils/logger');
@@ -18,9 +19,42 @@ module.exports = function() {
   _satellite.getVar = require('./utils/dataElement/getVar');
   _satellite.setVar = require('./utils/dataElement/setCustomVar');
 // TODO: _satellite.getVisitorId
-  _satellite.setCookie = require('./utils/cookie/setCookie');
-  _satellite.getCookie = _satellite.readCookie = require('./utils/cookie/getCookie');
-  _satellite.removeCookie = require('./utils/cookie/removeCookie');
+
+  /**
+   * Writes a cookie.
+   * @param {string} name The name of the cookie to save.
+   * @param {string} value The value of the cookie to save.
+   * @param {number} [days] The number of days to store the cookie. If not specified, the cookie
+   * will be stored for the session only.
+   */
+  _satellite.setCookie = function(name, value, days) {
+    var options = {};
+
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      options.expires = date;
+    }
+
+    document.cookie = cookie.serialize(name, value, options);
+  };
+
+  /**
+   * Reads a cookie value.
+   * @param {string} name The name of the cookie to read.
+   * @returns {string}
+   */
+  _satellite.getCookie = _satellite.readCookie = function(name) {
+    return cookie.parse(document.cookie)[name];
+  };
+
+  /**
+   * Removes a cookie value.
+   * @param name
+   */
+  _satellite.removeCookie = function(name) {
+    _satellite.setCookie(name, '', -1);
+  };
 
   _satellite.isLinked = function(element) {
     return isAnchor(element, true);

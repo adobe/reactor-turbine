@@ -10,7 +10,7 @@ This is the DTM engine. It contains the brains responsible for running rules on 
 4. After navigating into the project directory, install project dependencies by running `npm install`.
 5. Test the project by running `gulp test`.
 
-See the [turbine-gulp-sandbox README](https://git.corp.adobe.com/Activation/turbine-gulp-sandbox/blob/master/README.md) and the [turbine-gulp-testrunner README](https://git.corp.adobe.com/Activation/turbine-gulp-testrunner/blob/master/README.md) for more information on how to build and test this project.
+See the [reactor-gulp-sandbox README](https://git.corp.adobe.com/Activation/reactor-gulp-sandbox/blob/master/README.md) and the [reactor-gulp-testrunner README](https://git.corp.adobe.com/Activation/reactor-gulp-testrunner/blob/master/README.md) for more information on how to build and test this project.
 
 [status-url]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor-Frontend/job/turbine/
 [status-image]: https://dtm-builder.ut1.mcps.adobe.net/buildStatus/icon?job=turbine

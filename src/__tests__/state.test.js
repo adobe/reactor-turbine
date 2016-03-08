@@ -141,4 +141,33 @@ describe('state ', function() {
       localStorage.setItem('sdsat_hide_activity', 'false');
       expect(state.getShouldExecuteActions()).toBe(true);
     });
+
+  it('should allow resources to load other resources', function() {
+    var exportSpy = jasmine.createSpy('resource2ExportSpy');
+    var spy = jasmine.createSpy('resource2Spy');
+
+    state.init({
+      extensions: {
+        'ext': {
+          resources: {
+            'ext/resources/resource1': {
+              script:  function(module, require) {
+                var extension = require('get-extension')('ext');
+                extension.getResource('resource2')();
+              }
+            },
+            'ext/resources/resource2': {
+              script:  function(module, require) {
+                spy();
+                module.exports = exportSpy;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(exportSpy).toHaveBeenCalled();
+  });
 });

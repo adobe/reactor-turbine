@@ -3,12 +3,17 @@ var extractModuleExports = require('./extractModuleExports');
 var delegateById = {};
 
 module.exports = {
-  addDelegate: function(id, delegate) {
-    // We want to extract the module exports immediately to allow for the resource to run
-    // some logic immediately.
-    delegate.exports = extractModuleExports(delegate.script);
-    delegateById[id] = delegate;
+  registerDelegates: function(delegates) {
+    Object.keys(delegates).forEach(function(delegateId) {
+      var delegate = delegates[delegateId];
+
+      // We want to extract the module exports immediately to allow for the resource to run
+      // some logic immediately.
+      delegate.exports = extractModuleExports(delegate.script);
+      delegateById[delegateId] = delegate;
+    });
   },
+
   getDelegate: function(id) {
     return delegateById[id];
   }

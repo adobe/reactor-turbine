@@ -14,14 +14,14 @@ describe('delegate provider', function() {
   });
   it('should return a delegate by the delegate id', function() {
     var delegate = jasmine.createSpy('delegate');
-    delegateProvider.addDelegate('someid', delegate);
+    delegateProvider.registerDelegates({'someid': delegate});
 
     expect(delegateProvider.getDelegate('someid')).toBe(delegate);
   });
 
   it('should add module exports to delegate', function() {
     var delegate = jasmine.createSpy('delegate');
-    delegateProvider.addDelegate('someid', delegate);
+    delegateProvider.registerDelegates({'someid': delegate});
 
     expect(delegateProvider.getDelegate('someid').exports).toBe(moduleExport);
   });

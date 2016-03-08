@@ -34,19 +34,13 @@ var hydrateProviders = function(container) {
       var resources = extension.resources;
 
       if (resources) {
-        Object.keys(resources).forEach(function(resourceId) {
-          var resource = resources[resourceId];
-          resourceProvider.addResource(resourceId, resource);
-        });
+        resourceProvider.registerResources(resources);
       }
 
       var delegates = extension.delegates;
 
       if (delegates) {
-        Object.keys(delegates).forEach(function(delegateId) {
-          var delegate = delegates[delegateId];
-          delegateProvider.addDelegate(delegateId, delegate);
-        });
+        delegateProvider.registerDelegates(delegates);
       }
     });
   }

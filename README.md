@@ -16,7 +16,7 @@ See the [extension-support-sandbox README](https://git.corp.adobe.com/Activation
 [status-image]: https://dtm-builder.ut1.mcps.adobe.net/buildStatus/icon?job=turbine
 [coverage-url]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor-Frontend/job/turbine/lastStableBuild/cobertura/
 [coverage-image]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor-Frontend/job/turbine/ws/badges/coverage.svg
-[npm-url]: https://artifactory.corp.adobe.com/artifactory/webapp/#/artifacts/browse/tree/General/npm-mcps-release-local/@Reactor-Frontend/turbine/-/@Reactor-Frontend
+[npm-url]: https://artifactory.corp.adobe.com/artifactory/webapp/#/artifacts/browse/tree/General/npm-mcps-release-local/@reactor/turbine/-/@reactor
 [npm-image]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor-Frontend/job/turbine/ws/badges/npm.svg
 [npm-dependencies-url]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor-Frontend/job/turbine/ws/dependencies.txt
 [npm-dependencies-image]: https://dtm-builder.ut1.mcps.adobe.net/view/Reactor-Frontend/job/turbine/ws/badges/dependencies.svg

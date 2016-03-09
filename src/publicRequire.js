@@ -27,6 +27,7 @@ module.exports = function(key) {
     'logger': require('./utils/logger'),
     'write-html': require('./utils/writeHtml'),
     'get-extension': state.getExtension,
+    'page-bottom': require('./utils/pageBottom'),
     'window': require('window'),
     'document': require('document')
   };

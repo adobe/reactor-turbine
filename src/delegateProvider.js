@@ -7,7 +7,7 @@ module.exports = {
     Object.keys(delegates).forEach(function(delegateId) {
       var delegate = delegates[delegateId];
 
-      // We want to extract the module exports immediately to allow for the resource to run
+      // We want to extract the module exports immediately to allow for the helper to run
       // some logic immediately.
       delegate.exports = extractModuleExports(delegate.script);
       delegateById[delegateId] = delegate;

@@ -1,7 +1,7 @@
 'use strict';
 
 var state = require('../state');
-var resourceSpy = jasmine.createSpy('resourceSpy');
+var helperSpy = jasmine.createSpy('helperSpy');
 
 var container = {
   rules: [
@@ -62,10 +62,10 @@ var container = {
           script: function() {}
         }
       },
-      resources: {
-        'exampleExtension/resources/myExampleResource': {
+      helpers: {
+        'exampleExtension/helpers/myExampleHelper': {
           script: jasmine.createSpy().and.callFake(function(module, require) {
-            module.exports = resourceSpy;
+            module.exports = helperSpy;
           })
         }
       }
@@ -94,13 +94,13 @@ describe('state ', function() {
     });
   });
 
-  it('should return extension resource', function() {
-    expect(state.getExtension('exampleExtension').getResource('myExampleResource'))
-      .toBe(resourceSpy);
+  it('should return extension helper', function() {
+    expect(state.getExtension('exampleExtension').getHelper('myExampleHelper'))
+      .toBe(helperSpy);
   });
 
-  it('should return null when extension resource is missing', function() {
-    expect(state.getExtension('exampleExtension').getResource('resource'))
+  it('should return null when extension helper is missing', function() {
+    expect(state.getExtension('exampleExtension').getHelper('helper'))
       .toBeNull();
   });
 
@@ -142,21 +142,21 @@ describe('state ', function() {
       expect(state.getShouldExecuteActions()).toBe(true);
     });
 
-  it('should allow resources to load other resources', function() {
-    var exportSpy = jasmine.createSpy('resource2ExportSpy');
-    var spy = jasmine.createSpy('resource2Spy');
+  it('should allow helpers to load other helpers', function() {
+    var exportSpy = jasmine.createSpy('helper2ExportSpy');
+    var spy = jasmine.createSpy('helper2Spy');
 
     state.init({
       extensions: {
         'ext': {
-          resources: {
-            'ext/resources/resource1': {
+          helpers: {
+            'ext/helpers/helper1': {
               script:  function(module, require) {
                 var extension = require('get-extension')('ext');
-                extension.getResource('resource2')();
+                extension.getHelper('helper2')();
               }
             },
-            'ext/resources/resource2': {
+            'ext/helpers/helper2': {
               script:  function(module, require) {
                 spy();
                 module.exports = exportSpy;

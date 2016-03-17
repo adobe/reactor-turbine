@@ -1,6 +1,6 @@
 var extensionConfigurationProvider = require('./extensionConfigurationProvider');
 var delegateProvider = require('./delegateProvider');
-var resourceProvider = require('./resourceProvider');
+var helperProvider = require('./helperProvider');
 var dataElementSafe = require('./utils/dataElementSafe');
 var getLocalStorageItem = require('./utils/localStorage/getLocalStorageItem');
 var setLocalStorageItem = require('./utils/localStorage/setLocalStorageItem');
@@ -18,7 +18,7 @@ var hydrateProviders = function(container) {
       var extension = extensions[extensionId];
 
       // The configuration provider must be hydrated first because configurations can be required
-      // by resources and delegates while their providers are being hydrated.
+      // by helpers and delegates while their providers are being hydrated.
       var configurations = extension.configurations;
 
       if (configurations) {
@@ -29,12 +29,12 @@ var hydrateProviders = function(container) {
         });
       }
 
-      // The resource provider must be hydrated next because resources can be required by
+      // The helper provider must be hydrated next because helpers can be required by
       // delegates while the delegate provider is being hydrated.
-      var resources = extension.resources;
+      var helpers = extension.helpers;
 
-      if (resources) {
-        resourceProvider.registerResources(resources);
+      if (helpers) {
+        helperProvider.registerHelpers(helpers);
       }
 
       var delegates = extension.delegates;
@@ -74,9 +74,9 @@ module.exports = {
         var settings = extensionConfigurationProvider.getSettingsByConfigurationId(configurationId);
         return replaceVarTokens(settings);
       },
-      getResource: function(resourceName) {
-        var resource = resourceProvider.getResource(extensionName, resourceName);
-        return resource ? resource.exports : null;
+      getHelper: function(helperName) {
+        var helper = helperProvider.getHelper(extensionName, helperName);
+        return helper ? helper.exports : null;
       }
     };
   },

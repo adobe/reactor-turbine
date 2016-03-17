@@ -1,9 +1,9 @@
 <html>
   <head>
     <script>
-      var testResourceExports = {};
-      var receivedResourceExports;
-      var neverRequiredResourceSpy = jasmine.createSpy();
+      var testHelperExports = {};
+      var receivedHelperExports;
+      var neverRequiredHelperSpy = jasmine.createSpy();
 
       _satellite = {};
 
@@ -34,15 +34,15 @@
                 script: function(module, require) {
                   var getExtension = require('get-extension');
                   var extension = getExtension('example-extension-a');
-                  receivedResourceExports = extension.getResource('test-resource');
+                  receivedHelperExports = extension.getHelper('test-helper');
                   module.exports = function() {};
                 }
               }
             },
-            resources: {
-              'example-extension-a/resources/test-resource': {
+            helpers: {
+              'example-extension-a/helpers/test-helper': {
                 script: function(module) {
-                  module.exports = testResourceExports;
+                  module.exports = testHelperExports;
                 }
               }
             }
@@ -50,9 +50,9 @@
           EXb: {
             displayName: 'Example Extension B',
             name: 'example-extension-b',
-            resources: {
-              'example-extension-b/resources/never-required': {
-                script: neverRequiredResourceSpy.and.callFake(function(module) {
+            helpers: {
+              'example-extension-b/helpers/never-required': {
+                script: neverRequiredHelperSpy.and.callFake(function(module) {
                   module.exports = {};
                 })
               }
@@ -83,12 +83,12 @@
 
       TestPage.execute(function() {
         window.triggerTestEvent();
-        expect(receivedResourceExports).toBe(testResourceExports);
+        expect(receivedHelperExports).toBe(testHelperExports);
 
         // The module should be called for even when it isn't required by anything. This is so
         // extensions can have logic that runs even when there are no event, condition, action,
         // or data element types configured.
-        expect(neverRequiredResourceSpy.calls.count()).toBe(1);
+        expect(neverRequiredHelperSpy.calls.count()).toBe(1);
       }).start();
     </script>
   </body>

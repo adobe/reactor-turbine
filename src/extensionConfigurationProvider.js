@@ -11,7 +11,7 @@ module.exports = {
     settingsCollectionByExtensionName[extensionName].push(configuration.settings);
   },
   getSettingsCollectionByExtensionName: function(extensionName) {
-    return settingsCollectionByExtensionName[extensionName];
+    return settingsCollectionByExtensionName[extensionName] || [];
   },
   getSettingsByConfigurationId: function(configurationId) {
     return settingsByConfigurationId[configurationId];

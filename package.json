@@ -1,6 +1,6 @@
 {
   "name": "@reactor/turbine",
-  "version": "7.1.0",
+  "version": "8.0.0",
   "description": "DTM engine that contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.",
   "scripts": {
     "test": "gulp test",

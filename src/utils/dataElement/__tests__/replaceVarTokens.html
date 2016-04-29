@@ -76,7 +76,7 @@
                   };
 
                   module.exports = eventDelegateSpy.and.callFake(function(settings, trigger) {
-                    eventRequiredExtensionConfig = extension.getConfiguration('abc');
+                    eventRequiredExtensionConfig = extension.getConfigurations().abc;
                     allTriggers.push(trigger);
                   });
                 }
@@ -88,7 +88,7 @@
                   var extension = getExtension('example-extension');
 
                   module.exports = conditionDelegateSpy.and.callFake(function() {
-                    conditionRequiredExtensionConfig = extension.getConfiguration('abc');
+                    conditionRequiredExtensionConfig = extension.getConfigurations().abc;
                     return true;
                   });
                 }
@@ -100,7 +100,7 @@
                   var extension = getExtension('example-extension');
 
                   module.exports = actionDelegateSpy.and.callFake(function() {
-                    actionRequiredExtensionConfig = extension.getConfiguration('abc');
+                    actionRequiredExtensionConfig = extension.getConfigurations().abc;
                   });
                 }
               },

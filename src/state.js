@@ -65,14 +65,14 @@ module.exports = {
     return {
       getConfigurations: function() {
         var settingsCollection = extensionConfigurationProvider
-          .getSettingsCollectionByExtensionName(extensionName);
-        return settingsCollection.map(function(settings) {
-          return replaceVarTokens(settings);
+          .getSettingsCollection(extensionName);
+
+        var collectionWithTokensReplaced = {};
+        Object.keys(settingsCollection).forEach(function(key) {
+          collectionWithTokensReplaced[key] = replaceVarTokens(settingsCollection[key]);
         });
-      },
-      getConfiguration: function(configurationId) {
-        var settings = extensionConfigurationProvider.getSettingsByConfigurationId(configurationId);
-        return replaceVarTokens(settings);
+
+        return collectionWithTokensReplaced;
       },
       getHelper: function(helperName) {
         var helper = helperProvider.getHelper(extensionName, helperName);

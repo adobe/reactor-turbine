@@ -7,15 +7,7 @@ describe('extension configuration provider', function() {
     var configuration = { settings: { settingKey: 'value' } };
     extensionConfigurationProvider.addConfiguration('extensionName', 'id', configuration);
 
-    expect(extensionConfigurationProvider.getSettingsCollectionByExtensionName('extensionName'))
-      .toEqual([{ settingKey: 'value' }]);
-  });
-
-  it('should return the settings for a specific configuration', function() {
-    var configuration = { settings: { settingKey: 'value' } };
-    extensionConfigurationProvider.addConfiguration('extensionName', 'id', configuration);
-
-    expect(extensionConfigurationProvider.getSettingsByConfigurationId('id'))
-      .toEqual({ settingKey: 'value' });
+    expect(extensionConfigurationProvider.getSettingsCollection('extensionName'))
+      .toEqual({id: { settingKey: 'value' }});
   });
 });

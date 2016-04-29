@@ -1,19 +1,13 @@
-var settingsCollectionByExtensionName = {};
-var settingsByConfigurationId = {};
+var settingsCollection = {};
 
 module.exports = {
   addConfiguration: function(extensionName, id, configuration) {
-    settingsByConfigurationId[id] = configuration.settings;
+    settingsCollection[extensionName] =
+      settingsCollection[extensionName] || {};
 
-    settingsCollectionByExtensionName[extensionName] =
-      settingsCollectionByExtensionName[extensionName] || [];
-
-    settingsCollectionByExtensionName[extensionName].push(configuration.settings);
+    settingsCollection[extensionName][id] = configuration.settings;
   },
-  getSettingsCollectionByExtensionName: function(extensionName) {
-    return settingsCollectionByExtensionName[extensionName] || [];
-  },
-  getSettingsByConfigurationId: function(configurationId) {
-    return settingsByConfigurationId[configurationId];
+  getSettingsCollection: function(extensionName) {
+    return settingsCollection[extensionName] || {};
   }
 };

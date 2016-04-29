@@ -83,15 +83,9 @@ describe('state ', function() {
   });
 
   it('should return extension configurations collection', function() {
-    expect(state.getExtension('exampleExtension').getConfigurations()).toEqual([{
+    expect(state.getExtension('exampleExtension').getConfigurations()).toEqual({ECa: {
       'code': 'somecode'
-    }]);
-  });
-
-  it('should return extension configuration by id', function() {
-    expect(state.getExtension('exampleExtension').getConfiguration('ECa')).toEqual({
-      'code': 'somecode'
-    });
+    }});
   });
 
   it('should return extension helper', function() {

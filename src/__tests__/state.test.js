@@ -72,9 +72,12 @@ var container = {
     }
   },
   propertySettings: {},
-  appVersion: '52A',
-  buildDate: '2015-03-16 20:55:42 UTC',
-  publishDate: '2015-03-16 14:43:44 -0600'
+  buildInfo: {
+    appVersion: '6BE',
+    buildDate: '2016-03-30 16:27:10 UTC',
+    publishDate: '2016-03-30 16:27:10 UTC',
+    environment: 'dev'
+  }
 };
 
 describe('state ', function() {
@@ -117,6 +120,10 @@ describe('state ', function() {
     state.cacheDataElementValue('somekey', 'pageview', 100);
     expect(state.getCachedDataElementValue('somekey', 'pageview'))
       .toBe(100);
+  });
+
+  it('should return the build info', function() {
+    expect(state.getBuildInfo()).toBe(container.buildInfo);
   });
 
   it('should enable the debug output', function() {

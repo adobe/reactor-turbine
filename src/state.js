@@ -98,7 +98,7 @@ module.exports = {
   },
   getCachedDataElementValue: dataElementSafe.getValue,
   cacheDataElementValue: dataElementSafe.setValue,
-  getAppVersion: function() {
-    return container.appVersion;
+  getBuildInfo: function() {
+    return container.buildInfo;
   }
 };

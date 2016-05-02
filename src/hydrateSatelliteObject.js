@@ -14,7 +14,7 @@ module.exports = function() {
   // are still calling the method.
   _satellite.track = function() {};
 
-  _satellite.appVersion = state.getAppVersion();
+  _satellite.buildInfo = state.getBuildInfo();
   _satellite.notify = logger.notify.bind(logger);
   _satellite.getVar = require('./utils/dataElement/getVar');
   _satellite.setVar = require('./utils/dataElement/setCustomVar');

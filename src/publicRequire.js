@@ -34,6 +34,8 @@ module.exports = function(key) {
 
   if (modules.hasOwnProperty(key)) {
     return modules[key];
+  } else if (key === 'build-info') {
+    return state.getBuildInfo();
   } else if (key === 'property-settings') {
     return state.getPropertySettings();
   } else {

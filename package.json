@@ -26,12 +26,12 @@
     "gulp-uglify": "^1.5.3",
     "is-plain-object": "2.0.1",
     "native-promise-only": "0.8.1",
-    "strict-loader": "^1.0.0",
+    "strict-loader": "^1.1.0",
     "tiny-emitter": "1.0.2",
-    "webpack": "^1.12.14",
-    "webpack-stream": "^3.1.0"
+    "webpack": "^1.13.0",
+    "webpack-stream": "^3.2.0"
   },
   "devDependencies": {
-    "@reactor/extension-support-testrunner": "^1.0.0"
+    "@reactor/extension-support-testrunner": "^2.2.0"
   }
 }

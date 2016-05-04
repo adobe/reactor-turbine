@@ -171,4 +171,50 @@ describe('state ', function() {
     expect(spy).toHaveBeenCalledTimes(1);
     expect(exportSpy).toHaveBeenCalled();
   });
+
+  it('should register all delegates before caching thier exports', function() {
+    var configurations = null;
+
+    state.init({
+      dataElements: {
+        'dataElement1666': {
+          delegateId: 'dtm/dataElements/javascript-variable'
+        }
+      },
+      extensions: {
+        ext: {
+          name: 'ext',
+          configurations: {
+            EXa: {
+              settings: {
+                key: "%dataElement1666%"
+              }
+            }
+          },
+          helpers: {
+            'ext/helpers/helper1': {
+              script:  function(module, require) {
+                var extension = require('get-extension')('ext');
+                configurations = extension.getConfigurations();
+              }
+            }
+          }
+        },
+        dtm: {
+          name: 'dtm',
+          delegates: {
+            'dtm/dataElements/javascript-variable': {
+              script:  function(module, require) {
+                module.exports = function() {
+                  return 'some data element value';
+                };
+              }
+            }
+          }
+        }
+      }
+    });
+
+    expect(configurations.EXa.key).toBe('some data element value');
+  });
 });

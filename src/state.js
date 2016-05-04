@@ -43,6 +43,14 @@ var hydrateProviders = function(container) {
         delegateProvider.registerDelegates(delegates);
       }
     });
+
+    // We want to extract the module exports immediately to allow for the delegates or helpers
+    // to run some logic immediately and regardless of whether any delegate requires it.
+    // We need to do the extraction here in order for the helperProvider to
+    // have all the helpers functions (eg. when helperA needs helperB, both helpers
+    // functions must exist inside the helper provider).
+    helperProvider.buildCache();
+    delegateProvider.buildCache();
   }
 };
 

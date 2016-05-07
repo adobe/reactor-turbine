@@ -1,112 +1,113 @@
-var extensionConfigurationProvider = require('./extensionConfigurationProvider');
-var delegateProvider = require('./delegateProvider');
-var helperProvider = require('./helperProvider');
 var dataElementSafe = require('./utils/dataElementSafe');
+var createModuleProvider = require('./createModuleProvider');
 var getLocalStorageItem = require('./utils/localStorage/getLocalStorageItem');
 var setLocalStorageItem = require('./utils/localStorage/setLocalStorageItem');
+var createGetSharedModuleExports = require('./createGetSharedModuleExports');
+var resolveRelativePath = require('./resolveRelativePath');
 
 var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
 var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
 
-var container;
-var replaceVarTokens;
+var customVars = {};
+var moduleProvider = createModuleProvider();
+var rules;
+var dataElements;
+var buildInfo;
+var propertySettings;
 
-var hydrateProviders = function(container) {
+var init = function(container) {
+  // These can't be required at the top of the file because they require other modules which require
+  // state. This circular dependency would cause issues. Maybe there's a better way?
+  var createGetExtensionConfigurations = require('./createGetExtensionConfigurations');
+  var createPublicRequire = require('./createPublicRequire');
+
+  rules = container.rules || [];
+  dataElements = container.dataElements || {};
+  buildInfo = container.buildInfo || {};
+  propertySettings = container.propertySettings || {};
+
   var extensions = container.extensions;
   if (extensions) {
-    Object.keys(extensions).forEach(function(extensionId) {
-      var extension = extensions[extensionId];
+    var getSharedModuleExports = createGetSharedModuleExports(extensions, moduleProvider);
 
-      // The configuration provider must be hydrated first because configurations can be required
-      // by helpers and delegates while their providers are being hydrated.
-      var configurations = extension.configurations;
+    Object.keys(extensions).forEach(function(extensionName) {
+      var extension = extensions[extensionName];
+      var getExtensionConfigurations = createGetExtensionConfigurations(extension.configurations);
 
-      if (configurations) {
-        Object.keys(configurations).forEach(function(configurationId) {
-          var configuration = configurations[configurationId];
-          extensionConfigurationProvider.addConfiguration(
-            extension.name, configurationId, configuration);
+      if (extension.modules) {
+        Object.keys(extension.modules).forEach(function(referencePath) {
+          var getModuleExportsByRelativePath = function(relativePath) {
+            var resolvedReferencePath = resolveRelativePath(referencePath, relativePath);
+            return moduleProvider.getModuleExports(resolvedReferencePath);
+          };
+
+          var publicRequire = createPublicRequire(
+            buildInfo,
+            propertySettings,
+            getExtensionConfigurations,
+            getSharedModuleExports,
+            getModuleExportsByRelativePath
+          );
+
+          var module = extension.modules[referencePath];
+
+          moduleProvider.registerModule(referencePath, module, publicRequire);
         });
-      }
-
-      // The helper provider must be hydrated next because helpers can be required by
-      // delegates while the delegate provider is being hydrated.
-      var helpers = extension.helpers;
-
-      if (helpers) {
-        helperProvider.registerHelpers(helpers);
-      }
-
-      var delegates = extension.delegates;
-
-      if (delegates) {
-        delegateProvider.registerDelegates(delegates);
       }
     });
 
-    // We want to extract the module exports immediately to allow for the delegates or helpers
-    // to run some logic immediately and regardless of whether any delegate requires it.
-    // We need to do the extraction here in order for the helperProvider to
-    // have all the helpers functions (eg. when helperA needs helperB, both helpers
-    // functions must exist inside the helper provider).
-    helperProvider.buildCache();
-    delegateProvider.buildCache();
+    // We want to extract the module exports immediately to allow the modules
+    // to run some logic immediately.
+    // We need to do the extraction here in order for the moduleProvider to
+    // have all the modules previously registered. (eg. when moduleA needs moduleB, both modules
+    // must exist inside moduleProvider).
+    moduleProvider.hydrateCache();
   }
 };
 
+var getRules = function() {
+  return rules;
+};
+
+var getElementDefinition = function(name) {
+  return dataElements[name];
+};
+
+var getShouldExecuteActions = function() {
+  return getLocalStorageItem(HIDE_ACTIVITY_LOCAL_STORAGE_NAME) !== 'true';
+};
+
+var getDebugOutputEnabled = function() {
+  return getLocalStorageItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';
+};
+
+var setDebugOutputEnabled = function(value) {
+  setLocalStorageItem(DEBUG_LOCAL_STORAGE_NAME, value);
+};
+
+var getPropertySettings = function() {
+  // Intentionally does not support data element token replacements because how data element
+  // tokens are replaced depends on certain property settings which creates a chicken-and-egg
+  // problem.
+  return propertySettings;
+};
+
+var getBuildInfo = function() {
+  return buildInfo;
+};
+
 module.exports = {
-  init: function(_container) {
-    container = _container;
-    // We pull in replaceVarTokens here and not at the top of the file to prevent a
-    // circular reference since dependencies of replaceVarTokens require this state module.
-    replaceVarTokens = require('./utils/dataElement/replaceVarTokens');
-    hydrateProviders(container);
-  },
-  customVars: {},
-  getPropertySettings: function() {
-    // Property config does not support data element token replacements.
-    return container.propertySettings || {};
-  },
-  // This is only intended to be used by extensions therefore it accommodates APIs that
-  // extension developers would expect.
-  getExtension: function(extensionName) {
-    return {
-      getConfigurations: function() {
-        var settingsCollection = extensionConfigurationProvider
-          .getSettingsCollection(extensionName);
-
-        var collectionWithTokensReplaced = {};
-        Object.keys(settingsCollection).forEach(function(key) {
-          collectionWithTokensReplaced[key] = replaceVarTokens(settingsCollection[key]);
-        });
-
-        return collectionWithTokensReplaced;
-      },
-      getHelper: function(helperName) {
-        var helper = helperProvider.getHelper(extensionName, helperName);
-        return helper ? helper.exports : null;
-      }
-    };
-  },
-  getDelegate: delegateProvider.getDelegate,
-  getRules: function() {
-    return container.rules;
-  },
-  getDataElementDefinition: function(name) {
-    return container.dataElements[name];
-  },
-  getShouldExecuteActions: function() {
-    return getLocalStorageItem(HIDE_ACTIVITY_LOCAL_STORAGE_NAME) !== 'true';
-  },
-  getDebugOutputEnabled: function() {
-    return getLocalStorageItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';
-  },
-  setDebugOuputEnabled: function(value) {
-    setLocalStorageItem(DEBUG_LOCAL_STORAGE_NAME, value);
-  },
+  init: init,
+  customVars: customVars,
+  getModuleDisplayName: moduleProvider.getModuleDisplayName,
+  getModuleExports: moduleProvider.getModuleExports,
+  getRules: getRules,
+  getDataElementDefinition: getElementDefinition,
+  getShouldExecuteActions: getShouldExecuteActions,
+  getDebugOutputEnabled: getDebugOutputEnabled,
+  setDebugOutputEnabled: setDebugOutputEnabled,
   getCachedDataElementValue: dataElementSafe.getValue,
   cacheDataElementValue: dataElementSafe.setValue,
-  getBuildInfo: function() {
-    return container.buildInfo;
-  }
+  getPropertySettings: getPropertySettings,
+  getBuildInfo: getBuildInfo
 };

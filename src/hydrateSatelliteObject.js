@@ -69,7 +69,7 @@ module.exports = function() {
   };
 
   _satellite.setDebug = function(value) {
-    state.setDebugOuputEnabled(value);
+    state.setDebugOutputEnabled(value);
 
     // TODO: Have state emit an event that logger listens to instead?
     logger.outputEnabled = value;

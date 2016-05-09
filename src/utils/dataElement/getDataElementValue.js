@@ -9,7 +9,7 @@ module.exports = function(name, suppressDefault) {
   }
 
   var storeLength = dataDef.storeLength;
-  var delegate = state.getDelegate(dataDef.delegateId);
+  var delegate = state.getDelegate(dataDef.modulePath);
   var value = delegate.exports(dataDef.settings);
 
   if (dataDef.cleanText) {

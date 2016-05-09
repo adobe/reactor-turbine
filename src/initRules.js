@@ -7,10 +7,10 @@ var runActions = function(rule, relatedElement, event) {
     rule.actions.forEach(function(action) {
       action.settings = action.settings || {};
 
-      var delegate = state.getDelegate(action.delegateId);
+      var delegate = state.getDelegate(action.modulePath);
 
       if (!delegate.exports) {
-        logger.error('Action delegate ' + action.delegateId + ' not found.');
+        logger.error('Action delegate ' + action.modulePath + ' not found.');
         return;
       }
 
@@ -37,10 +37,10 @@ var checkConditions = function(rule, relatedElement, event) {
       var condition = rule.conditions[i];
       condition.settings = condition.settings || {};
 
-      var delegate = state.getDelegate(condition.delegateId);
+      var delegate = state.getDelegate(condition.modulePath);
 
       if (!delegate.exports) {
-        logger.error('Condition delegate ' + condition.delegateId + ' not found.');
+        logger.error('Condition delegate ' + condition.modulePath + ' not found.');
         // Return because we want to assume the condition would have failed and therefore
         // we don't want to run the rule's actions.
         return;
@@ -85,10 +85,10 @@ var initEventDelegate = function(rule) {
     rule.events.forEach(function(event) {
       event.settings = event.settings || {};
 
-      var delegate = state.getDelegate(event.delegateId);
+      var delegate = state.getDelegate(event.modulePath);
 
       if (!delegate.exports) {
-        logger.error('Event delegate ' + event.delegateId + ' not found.');
+        logger.error('Event delegate ' + event.modulePath + ' not found.');
         return;
       }
 

@@ -38,7 +38,7 @@ module.exports = function(
   return function(key) {
     if (allModules[key]) {
       return allModules[key];
-    } else if (key.indexOf('.') === 0 || key.indexOf('..') === 0) {
+    } else if (key.indexOf('./') === 0 || key.indexOf('../') === 0) {
       return getModuleExportsByRelativePath(key);
     } {
       throw new Error('Cannot resolve module "' + key + '".');

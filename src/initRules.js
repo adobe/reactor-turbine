@@ -2,7 +2,7 @@ var replaceVarTokens = require('./utils/dataElement/replaceVarTokens');
 var logger = require('./utils/logger');
 var state = require('./state');
 
-var runActions = function(rule, event, relatedElement) {
+var runActions = function(rule, relatedElement, event) {
   if (state.getShouldExecuteActions() && rule.actions) {
     rule.actions.forEach(function(action) {
       action.settings = action.settings || {};
@@ -17,7 +17,7 @@ var runActions = function(rule, event, relatedElement) {
       var settings = replaceVarTokens(action.settings, relatedElement, event);
 
       try {
-        delegate.exports(settings);
+        delegate.exports(settings, relatedElement, event);
       } catch (e) {
         var message = 'Error when executing ' + delegate.displayName + ' action for '
           + rule.name + ' rule. Error message: ' + e.message;
@@ -49,7 +49,7 @@ var checkConditions = function(rule, event, relatedElement) {
       var settings = replaceVarTokens(condition.settings, relatedElement, event);
 
       try {
-        if (!delegate.exports(settings, event, relatedElement)) {
+        if (!delegate.exports(settings, relatedElement, event)) {
           logger.log('Condition for rule ' + rule.name + ' not met.');
           return;
         }
@@ -66,7 +66,7 @@ var checkConditions = function(rule, event, relatedElement) {
     }
   }
 
-  runActions(rule, event, relatedElement);
+  runActions(rule, relatedElement, event);
 };
 
 var initEventDelegate = function(rule) {
@@ -74,12 +74,12 @@ var initEventDelegate = function(rule) {
     /**
      * This is the callback that executes a particular rule when an event has occurred.
      * @callback ruleTrigger
+     * @param {HTMLElement} [relatedElement] The element the rule targeted.
      * @param {Object} [event] An event object (native or synthetic) that contains detail
      * regarding the event that occurred.
-     * @param {HTMLElement} [relatedElement] The element the rule targeted.
      */
-    var trigger = function(event, relatedElement) {
-      checkConditions(rule, event, relatedElement);
+    var trigger = function(relatedElement, event) {
+      checkConditions(rule, relatedElement, event);
     };
 
     rule.events.forEach(function(event) {

@@ -116,8 +116,8 @@ describe('initRules', function() {
         testCondition1Foo: 'bar'
       });
 
-      expect(conditionDelegate1Call.args[1]).toBe(event);
-      expect(conditionDelegate1Call.args[2]).toBe(relatedElement);
+      expect(conditionDelegate1Call.args[1]).toBe(relatedElement);
+      expect(conditionDelegate1Call.args[2]).toBe(event);
 
       expect(delegateExports.testCondition2.calls.count()).toBe(1);
 
@@ -127,8 +127,8 @@ describe('initRules', function() {
         testCondition2Foo: 'bar'
       });
 
-      expect(conditionDelegate2Call.args[1]).toBe(event);
-      expect(conditionDelegate2Call.args[2]).toBe(relatedElement);
+      expect(conditionDelegate2Call.args[1]).toBe(relatedElement);
+      expect(conditionDelegate2Call.args[2]).toBe(event);
 
       expect(delegateExports.testAction1.calls.count()).toBe(1);
 
@@ -145,6 +145,9 @@ describe('initRules', function() {
       expect(actionDelegate2Call.args[0]).toEqual({
         testAction2Foo: 'bar'
       });
+
+      expect(actionDelegate2Call.args[1]).toBe(relatedElement);
+      expect(actionDelegate2Call.args[2]).toBe(event);
     });
 
     it('ceases to execute remaining conditions and any actions when condition fails', function() {

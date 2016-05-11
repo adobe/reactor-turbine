@@ -18,7 +18,7 @@ describe('initRules', function() {
 
       delegateExports = {
         testEvent: jasmine.createSpy().and.callFake(function(settings, trigger) {
-          trigger(event, relatedElement);
+          trigger(relatedElement, event);
         }),
         testCondition1: jasmine.createSpy().and.returnValue(true),
         testCondition2: jasmine.createSpy().and.returnValue(true),

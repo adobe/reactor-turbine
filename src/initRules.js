@@ -31,7 +31,7 @@ var runActions = function(rule, relatedElement, event) {
   logger.log('Rule "' + rule.name + '" fired.');
 };
 
-var checkConditions = function(rule, event, relatedElement) {
+var checkConditions = function(rule, relatedElement, event) {
   if (rule.conditions) {
     for (var i = 0; i < rule.conditions.length; i++) {
       var condition = rule.conditions[i];

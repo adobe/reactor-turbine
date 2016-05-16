@@ -1,3 +1,11 @@
+/**
+ * Creates a function that, when called with an extension name and module name, will return the
+ * exports of the respective shared module.
+ *
+ * @param {Object} extensions
+ * @param {Object} moduleProvider
+ * @returns {Function}
+ */
 module.exports = function(extensions, moduleProvider) {
   return function(extensionName, moduleName) {
     var extension = extensions[extensionName];

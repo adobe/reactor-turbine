@@ -22,6 +22,16 @@ var modules = {
   'document': require('document')
 };
 
+/**
+ * Creates a function which can be passed as a "require" function to extension modules.
+ *
+ * @param {Object} buildInfo
+ * @param {Object} propertySettings
+ * @param {Function} getExtensionConfigurations
+ * @param {Function} getSharedModuleExports
+ * @param {Function} getModuleExportsByRelativePath
+ * @returns {Function}
+ */
 module.exports = function(
   buildInfo,
   propertySettings,

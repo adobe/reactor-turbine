@@ -1,4 +1,5 @@
 var extractModuleExports = require('./extractModuleExports');
+var logger = require('./utils/logger');
 
 module.exports = function() {
   var moduleByReferencePath = {};
@@ -16,7 +17,15 @@ module.exports = function() {
   var getModuleExports = function(referencePath) {
     var module = moduleByReferencePath[referencePath];
 
-    if (!module.exports) {
+    if (!module) {
+      var errorMessage = 'Module ' + referencePath + ' not found.';
+      logger.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    // Using hasOwnProperty instead of a falsey check because the module could export undefined
+    // in which case we don't want to execute the module each time the exports is requested.
+    if (!module.hasOwnProperty(exports)) {
       module.exports = extractModuleExports(module.script, module.require);
     }
 

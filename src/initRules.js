@@ -7,23 +7,26 @@ var runActions = function(rule, relatedElement, event) {
     rule.actions.forEach(function(action) {
       action.settings = action.settings || {};
 
-      var delegate = state.getDelegate(action.modulePath);
+      var moduleExports;
 
-      if (!delegate.exports) {
-        logger.error('Action delegate ' + action.modulePath + ' not found.');
+      try {
+        moduleExports = state.getModuleExports(action.modulePath);
+      } catch (e) {
         return;
       }
 
       var settings = replaceVarTokens(action.settings, relatedElement, event);
 
       try {
-        delegate.exports(settings, relatedElement, event);
+        moduleExports(settings, relatedElement, event);
       } catch (e) {
-        var message = 'Error when executing ' + delegate.displayName + ' action for '
+        var moduleName = state.getModuleDisplayName(action.modulePath);
+        var message = 'Error when executing ' + moduleName + ' action for '
           + rule.name + ' rule. Error message: ' + e.message;
 
         logger.error(message);
         // Don't re-throw the error because we want to continue execution.
+        return;
       }
     });
   }
@@ -37,24 +40,24 @@ var checkConditions = function(rule, relatedElement, event) {
       var condition = rule.conditions[i];
       condition.settings = condition.settings || {};
 
-      var delegate = state.getDelegate(condition.modulePath);
+      var moduleExports;
 
-      if (!delegate.exports) {
-        logger.error('Condition delegate ' + condition.modulePath + ' not found.');
-        // Return because we want to assume the condition would have failed and therefore
-        // we don't want to run the rule's actions.
+      try {
+        moduleExports = state.getModuleExports(condition.modulePath);
+      } catch (e) {
         return;
       }
 
       var settings = replaceVarTokens(condition.settings, relatedElement, event);
 
       try {
-        if (!delegate.exports(settings, relatedElement, event)) {
+        if (!moduleExports(settings, relatedElement, event)) {
           logger.log('Condition for rule ' + rule.name + ' not met.');
           return;
         }
       } catch (e) {
-        var message = 'Error when executing ' + delegate.displayName + ' condition for '
+        var moduleName = state.getModuleDisplayName(condition.modulePath);
+        var message = 'Error when executing ' + moduleName + ' condition for '
           + rule.name + ' rule. Error message: ' + e.message;
 
         logger.error(message);
@@ -69,7 +72,7 @@ var checkConditions = function(rule, relatedElement, event) {
   runActions(rule, relatedElement, event);
 };
 
-var initEventDelegate = function(rule) {
+var initEventModules = function(rule) {
   if (rule.events) {
     /**
      * This is the callback that executes a particular rule when an event has occurred.
@@ -85,19 +88,21 @@ var initEventDelegate = function(rule) {
     rule.events.forEach(function(event) {
       event.settings = event.settings || {};
 
-      var delegate = state.getDelegate(event.modulePath);
+      var moduleExports;
 
-      if (!delegate.exports) {
-        logger.error('Event delegate ' + event.modulePath + ' not found.');
+      try {
+        moduleExports = state.getModuleExports(event.modulePath);
+      } catch (e) {
         return;
       }
 
       var settings = replaceVarTokens(event.settings);
 
       try {
-        delegate.exports(settings, trigger);
+        moduleExports(settings, trigger);
       } catch (e) {
-        var message = 'Error when executing ' + delegate.displayName + ' event for '
+        var moduleName = state.getModuleDisplayName(event.modulePath);
+        var message = 'Error when executing ' + moduleName + ' event for '
           + rule.name + ' rule. Error message: ' + e.message;
 
         logger.error(message);
@@ -109,7 +114,7 @@ var initEventDelegate = function(rule) {
 
 module.exports = function() {
   state.getRules().forEach(function(rule) {
-    initEventDelegate(rule);
+    initEventModules(rule);
   });
 };
 

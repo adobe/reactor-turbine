@@ -1,5 +1,5 @@
 var extractModuleExports = require('./extractModuleExports');
-var logger = require('./utils/logger');
+var logger = require('./public/logger');
 
 module.exports = function() {
   var moduleByReferencePath = {};

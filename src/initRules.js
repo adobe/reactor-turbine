@@ -1,5 +1,5 @@
-var replaceVarTokens = require('./utils/dataElement/replaceVarTokens');
-var logger = require('./utils/logger');
+var replaceVarTokens = require('./replaceVarTokens');
+var logger = require('./public/logger');
 var state = require('./state');
 
 var runActions = function(rule, relatedElement, event) {

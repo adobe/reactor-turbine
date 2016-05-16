@@ -2,7 +2,7 @@
 
 var window = require('window');
 var document = require('document');
-var Promise = require('../utils/communication/Promise');
+var Promise = require('./Promise');
 
 window._satellite = window._satellite || {};
 

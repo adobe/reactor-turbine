@@ -1,7 +1,7 @@
 /*eslint no-alert:0*/
 'use strict';
 var logger = require('./logger');
-var hasDomContentLoaded = require('./dom/hasDomContentLoaded');
+var hasDomContentLoaded = require('./hasDomContentLoaded');
 
 module.exports = function(html) {
   // Document object in XML files is different from the ones in HTML files. Documents served with

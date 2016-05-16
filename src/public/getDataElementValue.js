@@ -1,5 +1,5 @@
-var state = require('../../state');
-var cleanText = require('../string/cleanText');
+var state = require('../state');
+var cleanText = require('../cleanText');
 
 module.exports = function(name, suppressDefault) {
   var dataDef = state.getDataElementDefinition(name);
@@ -9,8 +9,8 @@ module.exports = function(name, suppressDefault) {
   }
 
   var storeLength = dataDef.storeLength;
-  var delegate = state.getDelegate(dataDef.modulePath);
-  var value = delegate.exports(dataDef.settings);
+  var moduleExports = state.getModuleExports(dataDef.modulePath);
+  var value = moduleExports(dataDef.settings);
 
   if (dataDef.cleanText) {
     value = cleanText(value);

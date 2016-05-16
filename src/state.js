@@ -1,7 +1,7 @@
-var dataElementSafe = require('./utils/dataElementSafe');
+var dataElementSafe = require('./dataElementSafe');
 var createModuleProvider = require('./createModuleProvider');
-var getLocalStorageItem = require('./utils/localStorage/getLocalStorageItem');
-var setLocalStorageItem = require('./utils/localStorage/setLocalStorageItem');
+var getLocalStorageItem = require('./getLocalStorageItem');
+var setLocalStorageItem = require('./setLocalStorageItem');
 var createGetSharedModuleExports = require('./createGetSharedModuleExports');
 var resolveRelativePath = require('./resolveRelativePath');
 

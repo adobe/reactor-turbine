@@ -1,4 +1,4 @@
-var assign = require('./../object/assign');
+var assign = require('./assign');
 var EventEmitter = require('tiny-emitter');
 
 EventEmitter.mixin = function(obj) {

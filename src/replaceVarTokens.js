@@ -1,6 +1,6 @@
-var isPlainObject = require('../isType/isPlainObject');
-var getVar = require('./getVar');
-var state = require('../../state');
+var isPlainObject = require('./public/isPlainObject');
+var getVar = require('./public/getVar');
+var state = require('./state');
 var undefinedVarsReturnEmpty = state.getPropertySettings().undefinedVarsReturnEmpty;
 
 var replaceTokensInString;

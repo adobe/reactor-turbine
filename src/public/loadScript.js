@@ -1,4 +1,4 @@
-var Promise = require('./communication/Promise');
+var Promise = require('./Promise');
 
 var getPromise = function(url, script) {
   return new Promise(function(resolve, reject) {

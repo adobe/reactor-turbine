@@ -58,4 +58,12 @@ describe('hydrateSatelliteObject', function() {
 
     expect(document.cookie.indexOf(cookieName + '=' + cookieValue)).toBe(-1);
   });
+
+  it('exposes npm cookie package methods', function() {
+    var hydrateSatelliteObject = hydrateSatelliteObjectInjector({});
+    hydrateSatelliteObject();
+
+    expect(_satellite.cookie.serialize).toEqual(jasmine.any(Function));
+    expect(_satellite.cookie.parse).toEqual(jasmine.any(Function));
+  });
 });

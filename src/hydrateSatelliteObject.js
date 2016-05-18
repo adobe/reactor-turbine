@@ -28,6 +28,8 @@ module.exports = function() {
    * will be stored for the session only.
    */
   _satellite.setCookie = function(name, value, days) {
+    logger.warn('This method is being deprecated. Please start using the `_satellite.cookie` API.');
+
     var options = {};
 
     if (days) {
@@ -45,6 +47,8 @@ module.exports = function() {
    * @returns {string}
    */
   _satellite.getCookie = _satellite.readCookie = function(name) {
+    logger.warn('This method is being deprecated. Please start using the `_satellite.cookie` API.');
+
     return cookie.parse(document.cookie)[name];
   };
 
@@ -53,8 +57,12 @@ module.exports = function() {
    * @param name
    */
   _satellite.removeCookie = function(name) {
+    logger.warn('This method is being deprecated. Please start using the `_satellite.cookie` API.');
+
     _satellite.setCookie(name, '', -1);
   };
+
+  _satellite.cookie = cookie;
 
   _satellite.isLinked = function(element) {
     return isAnchor(element, true);

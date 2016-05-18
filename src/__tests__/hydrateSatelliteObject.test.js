@@ -60,7 +60,7 @@ describe('hydrateSatelliteObject', function() {
   });
 
   it('exposes npm cookie package methods', function() {
-    var hydrateSatelliteObject = hydrateSatelliteObjectInjector({});
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
     hydrateSatelliteObject();
 
     expect(_satellite.cookie.serialize).toEqual(jasmine.any(Function));

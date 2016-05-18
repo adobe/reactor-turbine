@@ -195,6 +195,9 @@ describe('initRules', function() {
         testAction1Foo: 'bar'
       });
 
+      expect(action1ExportsCall.args[1]).toBe(relatedElement);
+      expect(action1ExportsCall.args[2]).toBe(event);
+
       var action2Exports = moduleProvider.getModuleExports(TEST_ACTION2_PATH);
 
       expect(action2Exports.calls.count()).toBe(1);
@@ -205,8 +208,8 @@ describe('initRules', function() {
         testAction2Foo: 'bar'
       });
 
-      expect(actionDelegate2Call.args[1]).toBe(relatedElement);
-      expect(actionDelegate2Call.args[2]).toBe(event);
+      expect(action2ExportsCall.args[1]).toBe(relatedElement);
+      expect(action2ExportsCall.args[2]).toBe(event);
     });
 
     it('ceases to execute remaining conditions and any actions when condition fails', function() {

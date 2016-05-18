@@ -4,9 +4,9 @@ var getReplaceVarTokens = function(options) {
   options = options || {};
 
   return require('inject!../replaceVarTokens')({
-    '../isType/isPlainObject': require('../../isType/isPlainObject'),
-    './getVar': options.getVar || function() {},
-    '../../state': options.state || {
+    './public/isPlainObject': require('../public/isPlainObject'),
+    './public/getVar': options.getVar || function() {},
+    './state': options.state || {
       getPropertySettings: function() {
         return {};
       }

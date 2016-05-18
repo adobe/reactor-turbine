@@ -1,14 +1,20 @@
 'use strict';
 
-var getInjectedGetDataElementValue = function(options) {
-  var cleanText = options.cleanText || function() {};
-  return require('inject!../getDataElementValue')({
-    '../../state': options.state,
-    '../string/cleanText': cleanText
-  });
-};
-
 describe('getDataElementValue', function() {
+  var logger;
+  var getInjectedGetDataElementValue = function(options) {
+    var cleanText = options.cleanText || function() {};
+    return require('inject!../getDataElementValue')({
+      '../state': options.state,
+      '../cleanText': cleanText,
+      './logger': logger
+    });
+  };
+
+  beforeEach(function() {
+    logger = jasmine.createSpyObj('logger', ['log', 'error']);;
+  });
+
   it('returns a data element value using data element settings', function() {
     var getDataElementValue = getInjectedGetDataElementValue({
       state: {
@@ -19,11 +25,9 @@ describe('getDataElementValue', function() {
             }
           };
         },
-        getDelegate: function() {
-          return {
-            exports: function(settings) {
-              return settings.foo;
-            }
+        getModuleExports: function() {
+          return function(settings) {
+            return settings.foo;
           };
         },
         getPropertySettings: function() {
@@ -47,11 +51,9 @@ describe('getDataElementValue', function() {
             settings: {}
           };
         },
-        getDelegate: function() {
-          return {
-            exports: function() {
-              return 'bar';
-            }
+        getModuleExports: function() {
+          return function() {
+            return 'bar';
           };
         },
         getPropertySettings: function() {
@@ -78,10 +80,8 @@ describe('getDataElementValue', function() {
             settings: {}
           };
         },
-        getDelegate: function() {
-          return {
-            exports: function() {}
-          };
+        getModuleExports: function() {
+          return function() {};
         },
         getPropertySettings: function() {
           return {
@@ -121,10 +121,8 @@ describe('getDataElementValue', function() {
             settings: {}
           };
         },
-        getDelegate: function() {
-          return {
-            exports: function() {}
-          };
+        getModuleExports: function() {
+          return function() {};
         },
         getCachedDataElementValue: function() {
           return 'cachedValue';
@@ -150,10 +148,8 @@ describe('getDataElementValue', function() {
             settings: {}
           };
         },
-        getDelegate: function() {
-          return {
-            exports: function() {}
-          };
+        getModuleExports: function() {
+          return function() {};
         },
         getPropertySettings: function() {
           return {
@@ -175,10 +171,8 @@ describe('getDataElementValue', function() {
             settings: {}
           };
         },
-        getDelegate: function() {
-          return {
-            exports: function() {}
-          };
+        getModuleExports: function() {
+          return function() {};
         },
         getPropertySettings: function() {
           return {
@@ -203,11 +197,9 @@ describe('getDataElementValue', function() {
             }
           };
         },
-        getDelegate: function() {
-          return {
-            exports: function(settings) {
-              return settings.foo;
-            }
+        getModuleExports: function() {
+          return function(settings) {
+            return settings.foo;
           };
         },
         getPropertySettings: function() {
@@ -220,5 +212,93 @@ describe('getDataElementValue', function() {
 
     var value = getDataElementValue('testDataElement');
     expect(value).toBe('bar');
+  });
+
+  describe('error handling', function() {
+    it('logs an error when retrieving data element module exports fails', function() {
+      var getDataElementValue = getInjectedGetDataElementValue({
+        state: {
+          getDataElementDefinition: function() {
+            return {
+              modulePath: 'hello-world/foo.js',
+              settings: {}
+            };
+          },
+          getModuleExports: function() {
+            throw new Error('noob tried to divide by zero');
+          },
+          getPropertySettings: function() {
+            return {
+              undefinedVarsReturnEmpty: false
+            };
+          }
+        }
+      });
+
+      var value = getDataElementValue('testDataElement');
+      expect(value).toBeUndefined();
+
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      expect(errorMessage).toStartWith('Failed to execute data element module hello-world/foo.js ' +
+        'for data element testDataElement. noob tried to divide by zero');
+    });
+
+    it('logs an error when executing data element module exports fails', function() {
+      var getDataElementValue = getInjectedGetDataElementValue({
+        state: {
+          getDataElementDefinition: function() {
+            return {
+              modulePath: 'hello-world/foo.js',
+              settings: {}
+            };
+          },
+          getModuleExports: function() {
+            return function() {
+              throw new Error('noob tried to divide by zero');
+            };
+          },
+          getPropertySettings: function() {
+            return {
+              undefinedVarsReturnEmpty: false
+            };
+          }
+        }
+      });
+
+      var value = getDataElementValue('testDataElement');
+      expect(value).toBeUndefined();
+
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      expect(errorMessage).toStartWith('Failed to execute data element module hello-world/foo.js ' +
+        'for data element testDataElement. noob tried to divide by zero');
+    });
+
+    it('logs an error when the data element module does not export a function', function() {
+      var getDataElementValue = getInjectedGetDataElementValue({
+        state: {
+          getDataElementDefinition: function() {
+            return {
+              modulePath: 'hello-world/foo.js',
+              settings: {}
+            };
+          },
+          getModuleExports: function() {
+            return {};
+          },
+          getPropertySettings: function() {
+            return {
+              undefinedVarsReturnEmpty: false
+            };
+          }
+        }
+      });
+
+      var value = getDataElementValue('testDataElement');
+      expect(value).toBeUndefined();
+
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      expect(errorMessage).toBe('Failed to execute data element module hello-world/foo.js for ' +
+        'data element testDataElement. Module did not export a function.');
+    });
   });
 });

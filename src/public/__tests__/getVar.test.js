@@ -10,15 +10,15 @@ var getInjectedGetVar = function(options) {
       }
     },
     window: options.window || {},
-    '../../state': options.state || {
+    '../state': options.state || {
       getDataElementDefinition: noop
     },
     './getDataElementValue': options.getDataElementValue || noop,
-    '../uri/getUri': options.getUri || function() {
+    './getUri': options.getUri || function() {
       return 'testUri';
     },
-    '../uri/getQueryParam': options.getQueryParam || noop,
-    '../string/cleanText': options.cleanText || noop
+    './getQueryParam': options.getQueryParam || noop,
+    '../cleanText': options.cleanText || noop
   });
 };
 

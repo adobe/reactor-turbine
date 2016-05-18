@@ -3,8 +3,8 @@
  * Returns the directory of a path. A limited version of path.dirname in nodejs.
  *
  * To keep it simple, it makes the following assumptions:
- * path begins with a slash.
- * path does not end with a slash.
+ * path has a least one slash
+ * path does not end with a slash
  * path does not have empty segments (e.g., /src/lib//foo.bar)
  *
  * @param {string} path
@@ -19,7 +19,7 @@ var dirname = function(path) {
  * limited version of path.resolve in nodejs.
  *
  * To keep it simple, it makes the following assumptions:
- * fromPath begins with a slash
+ * fromPath has at least one slash
  * fromPath does not end with a slash.
  * fromPath does not have empty segments (e.g., /src/lib//foo.bar)
  * relativePath starts with ./ or ../

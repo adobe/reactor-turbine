@@ -1,119 +1,161 @@
 'use strict';
 
-var state = require('../state');
-var helperSpy = jasmine.createSpy('helperSpy');
+describe('state', function() {
+  var injectState = require('inject!../state');
+  var createModuleProvider = require('inject?!../moduleProvider');
+  var moduleProvider;
+  var createGetSharedModuleExports;
+  var createGetExtensionConfigurations;
+  var createPublicRequire;
+  var state;
 
-var container = {
-  rules: [
-    {
-      name: 'Example Rule',
-      events: [
-        {
-          delegateId: 'exampleExtension/events/click',
-          settings: {}
-        }
-      ],
-      conditions: [
-        {
-          delegateId: 'exampleExtension/conditions/operatingSystem',
-          settings: {}
-        }
-      ],
-      actions: [
-        {
-          delegateId: 'exampleExtension/actions/sendBeacon',
-          settings: {}
-        }
-      ]
-    }
-  ],
-  dataElements: {
-    myDataElement: {
-      delegateId: 'exampleExtension/dataElements/javascriptVariable',
-      settings: {}
-    }
-  },
-  extensions: {
-    EXa: {
-      name: 'exampleExtension',
-      displayName: 'Example Extension',
-      configurations: {
-        ECa: {
-          settings: {
-            'code': 'somecode'
+  var container = {
+    rules: [
+      {
+        name: 'Example Rule',
+        events: [
+          {
+            modulePath: 'example-extension/events/click.js',
+            settings: {}
+          }
+        ],
+        conditions: [
+          {
+            modulePath: 'example-extension/conditions/operatingSystem.js',
+            settings: {}
+          }
+        ],
+        actions: [
+          {
+            modulePath: 'example-extension/actions/sendBeacon.js',
+            settings: {}
+          }
+        ]
+      }
+    ],
+    dataElements: {
+      myDataElement: {
+        modulePath: 'example-extension/dataElements/javascriptVariable.js',
+        settings: {}
+      }
+    },
+    extensions: {
+      'example-extension': {
+        displayName: 'Example Extension',
+        configurations: {
+          ECa: {
+            settings: {
+              'code': 'somecode'
+            }
+          }
+        },
+        modules: {
+          'example-extension/events/click.js': {
+            displayName: 'Click',
+            script: function(module) {
+              module.exports = 'click exports';
+            }
+          },
+          'example-extension/conditions/operatingSystem.js': {
+            displayName: 'Operating System',
+            script: function() {}
+          },
+          'example-extension/actions/sendBeacon.js': {
+            displayName: 'Send Beacon',
+            script: function() {}
+          },
+          'example-extension/dataElements/javascriptVariable.js': {
+            displayName: 'JavaScript Variable',
+            script: function() {}
+          },
+          'example-extension/shared/sharedModule.js': {
+            sharedName: 'foo',
+            script: jasmine.createSpy().and.callFake(function(module, require) {
+              module.exports = sharedModuleSpy;
+            })
           }
         }
-      },
-      delegates: {
-        'exampleExtension/events/click': {
-          displayName: 'Click', // included because I want to improve logging
-          script: function() {}
-        },
-        'exampleExtension/conditions/operatingSystem': {
-          displayName: 'Operating System',
-          script: function() {}
-        },
-        'exampleExtension/actions/sendBeacon': {
-          displayName: 'Send Beacon',
-          script: function() {}
-        },
-        'exampleExtension/dataElements/javascriptVariable': {
-          displayName: 'JavaScript Variable',
-          script: function() {}
-        }
-      },
-      helpers: {
-        'exampleExtension/helpers/myExampleHelper': {
-          script: jasmine.createSpy().and.callFake(function(module, require) {
-            module.exports = helperSpy;
-          })
-        }
       }
+    },
+    propertySettings: {},
+    buildInfo: {
+      appVersion: '6BE',
+      buildDate: '2016-03-30 16:27:10 UTC',
+      publishDate: '2016-03-30 16:27:10 UTC',
+      environment: 'dev'
     }
-  },
-  propertySettings: {},
-  buildInfo: {
-    appVersion: '6BE',
-    buildDate: '2016-03-30 16:27:10 UTC',
-    publishDate: '2016-03-30 16:27:10 UTC',
-    environment: 'dev'
-  }
-};
+  };
 
-describe('state ', function() {
   beforeEach(function() {
+    moduleProvider = createModuleProvider();
+    
+    Object.keys(moduleProvider).forEach(function(methodName) {
+      spyOn(moduleProvider, methodName).and.callThrough();
+    });
+
+    createGetSharedModuleExports = jasmine.createSpy().and.callThrough(
+      require('../createGetSharedModuleExports'));
+
+    createGetExtensionConfigurations = jasmine.createSpy().and.callThrough(
+      require('../createGetExtensionConfigurations'));
+
+    createPublicRequire = jasmine.createSpy().and.callThrough(
+      require('../createPublicRequire'));
+
+    state = injectState({
+      './moduleProvider': moduleProvider,
+      './getLocalStorageItem': require('../getLocalStorageItem'),
+      './setLocalStorageItem': require('../setLocalStorageItem'),
+      './createGetSharedModuleExports': createGetSharedModuleExports,
+      './createGetExtensionConfigurations': createGetExtensionConfigurations,
+      './createPublicRequire': createPublicRequire
+    });
+
     state.init(container);
   });
 
-  it('should return extension configurations collection', function() {
-    expect(state.getExtension('exampleExtension').getConfigurations()).toEqual({ECa: {
-      'code': 'somecode'
-    }});
+  it('should hold customVars', function() {
+    expect(state.customVars).toEqual({});
   });
 
-  it('should return extension helper', function() {
-    expect(state.getExtension('exampleExtension').getHelper('myExampleHelper'))
-      .toBe(helperSpy);
+  it('should return a module display name', function() {
+    var modulePath = 'example-extension/events/click.js';
+    expect(state.getModuleDisplayName(modulePath)).toBe('Click');
+    expect(moduleProvider.getModuleDisplayName).toHaveBeenCalledWith(modulePath);
   });
 
-  it('should return null when extension helper is missing', function() {
-    expect(state.getExtension('exampleExtension').getHelper('helper'))
-      .toBeNull();
-  });
-
-  it('should return delegate by id', function() {
-    expect(state.getDelegate('exampleExtension/events/click'))
-      .toBe(container.extensions.EXa.delegates['exampleExtension/events/click']);
+  it('should return a module\'s exports', function() {
+    var modulePath = 'example-extension/events/click.js';
+    expect(state.getModuleExports(modulePath)).toBe('click exports');
+    expect(moduleProvider.getModuleExports).toHaveBeenCalledWith(modulePath);
   });
 
   it('should return rules', function() {
     expect(state.getRules()).toBe(container.rules);
   });
 
+  it('should get a data element definition', function() {
+    expect(state.getDataElementDefinition('myDataElement')).toEqual({
+      modulePath: 'example-extension/dataElements/javascriptVariable.js',
+      settings: {}
+    });
+  });
 
-  it('should return data element definition', function() {
-    expect(state.getDataElementDefinition('myDataElement'))
-      .toBe(container.dataElements.myDataElement);
+  it('getShouldExecuteActions returns false when hide activity local storage key is set',
+    function() {
+      localStorage.setItem('sdsat_hide_activity', 'true');
+      expect(state.getShouldExecuteActions()).toBe(false);
+    });
+
+  it('getShouldExecuteActions returns true when hide activity local storage key is not set to true',
+    function() {
+      localStorage.setItem('sdsat_hide_activity', 'false');
+      expect(state.getShouldExecuteActions()).toBe(true);
+    });
+
+  it('should enable the debug output', function() {
+    state.setDebugOutputEnabled('true');
+    expect(state.getDebugOutputEnabled()).toBe(true);
   });
 
   it('should return cached data element values', function() {
@@ -122,99 +164,33 @@ describe('state ', function() {
       .toBe(100);
   });
 
+  it('should return property settings', function() {
+    expect(state.getPropertySettings()).toBe(container.propertySettings);
+  });
+
   it('should return the build info', function() {
     expect(state.getBuildInfo()).toBe(container.buildInfo);
   });
 
-  it('should enable the debug output', function() {
-    state.setDebugOuputEnabled('true');
-    expect(state.getDebugOutputEnabled()).toBe(true);
+  it('creates getSharedModuleExports', function() {
+    expect(createGetSharedModuleExports).toHaveBeenCalledWith(
+      container.extensions, moduleProvider);
   });
 
-  it('getShouldExecuteActions returns false when hide activity local storage key is set',
-  function() {
-    localStorage.setItem('sdsat_hide_activity', 'true');
-    expect(state.getShouldExecuteActions()).toBe(false);
+  it('creates getExtensionConfigurations for each extension', function() {
+    expect(createGetExtensionConfigurations).toHaveBeenCalledWith(
+      container.extensions['example-extension'].configurations);
   });
 
-  it('getShouldExecuteActions returns true when hide activity local storage key is not set to true',
-    function() {
-      localStorage.setItem('sdsat_hide_activity', 'false');
-      expect(state.getShouldExecuteActions()).toBe(true);
-    });
-
-  it('should allow helpers to load other helpers', function() {
-    var exportSpy = jasmine.createSpy('helper2ExportSpy');
-    var spy = jasmine.createSpy('helper2Spy');
-
-    state.init({
-      extensions: {
-        'ext': {
-          helpers: {
-            'ext/helpers/helper1': {
-              script:  function(module, require) {
-                var extension = require('get-extension')('ext');
-                extension.getHelper('helper2')();
-              }
-            },
-            'ext/helpers/helper2': {
-              script:  function(module, require) {
-                spy();
-                module.exports = exportSpy;
-              }
-            }
-          }
-        }
-      }
-    });
-
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(exportSpy).toHaveBeenCalled();
+  it('creates a public require function for each module', function() {
+    expect(createPublicRequire.calls.count()).toBe(5);
   });
 
-  it('should register all delegates before caching thier exports', function() {
-    var configurations = null;
+  it('registers each module', function() {
+    expect(moduleProvider.registerModule.calls.count()).toBe(5);
+  });
 
-    state.init({
-      dataElements: {
-        'dataElement1666': {
-          delegateId: 'dtm/dataElements/javascript-variable'
-        }
-      },
-      extensions: {
-        ext: {
-          name: 'ext',
-          configurations: {
-            EXa: {
-              settings: {
-                key: "%dataElement1666%"
-              }
-            }
-          },
-          helpers: {
-            'ext/helpers/helper1': {
-              script:  function(module, require) {
-                var extension = require('get-extension')('ext');
-                configurations = extension.getConfigurations();
-              }
-            }
-          }
-        },
-        dtm: {
-          name: 'dtm',
-          delegates: {
-            'dtm/dataElements/javascript-variable': {
-              script:  function(module, require) {
-                module.exports = function() {
-                  return 'some data element value';
-                };
-              }
-            }
-          }
-        }
-      }
-    });
-
-    expect(configurations.EXa.key).toBe('some data element value');
+  it('hydrates module provider cache', function() {
+    expect(moduleProvider.hydrateCache.calls.count()).toBe(1);
   });
 });

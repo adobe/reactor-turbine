@@ -2,6 +2,14 @@ var replaceVarTokens = require('./replaceVarTokens');
 var logger = require('./public/logger');
 var state = require('./state');
 
+var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
+
+var getErrorMessage = function(ruleComponent, rule, errorMessage, errorStack) {
+  var moduleName = state.getModuleDisplayName(ruleComponent.modulePath) || ruleComponent.modulePath;
+  return 'Failed to execute ' + moduleName + ' for ' + rule.name + ' rule. ' +
+    errorMessage + (errorStack ? '\n' + errorStack : '');
+};
+
 var runActions = function(rule, relatedElement, event) {
   if (state.getShouldExecuteActions() && rule.actions) {
     rule.actions.forEach(function(action) {
@@ -12,6 +20,12 @@ var runActions = function(rule, relatedElement, event) {
       try {
         moduleExports = state.getModuleExports(action.modulePath);
       } catch (e) {
+        logger.error(getErrorMessage(action, rule, e.message, e.stack));
+        return;
+      }
+
+      if (typeof moduleExports !== 'function') {
+        logger.error(getErrorMessage(action, rule, MODULE_NOT_FUNCTION_ERROR));
         return;
       }
 
@@ -20,12 +34,7 @@ var runActions = function(rule, relatedElement, event) {
       try {
         moduleExports(settings, relatedElement, event);
       } catch (e) {
-        var moduleName = state.getModuleDisplayName(action.modulePath);
-        var message = 'Error when executing ' + moduleName + ' action for '
-          + rule.name + ' rule. Error message: ' + e.message;
-
-        logger.error(message);
-        // Don't re-throw the error because we want to continue execution.
+        logger.error(getErrorMessage(action, rule, e.message, e.stack));
         return;
       }
     });
@@ -45,6 +54,12 @@ var checkConditions = function(rule, relatedElement, event) {
       try {
         moduleExports = state.getModuleExports(condition.modulePath);
       } catch (e) {
+        logger.error(getErrorMessage(condition, rule, e.message, e.stack));
+        return;
+      }
+
+      if (typeof moduleExports !== 'function') {
+        logger.error(getErrorMessage(condition, rule, MODULE_NOT_FUNCTION_ERROR));
         return;
       }
 
@@ -56,14 +71,9 @@ var checkConditions = function(rule, relatedElement, event) {
           return;
         }
       } catch (e) {
-        var moduleName = state.getModuleDisplayName(condition.modulePath);
-        var message = 'Error when executing ' + moduleName + ' condition for '
-          + rule.name + ' rule. Error message: ' + e.message;
-
-        logger.error(message);
-        // Don't re-throw the error because we want to continue execution. We do return
-        // however because we want to assume the condition would have failed and therefore
-        // we don't want to run the rule's actions.
+        logger.error(getErrorMessage(condition, rule, e.message, e.stack));
+        // We return because we want to assume the condition would have failed and therefore
+        // we don't want to run the following conditions or the rule's actions.
         return;
       }
     }
@@ -93,6 +103,12 @@ var initEventModules = function(rule) {
       try {
         moduleExports = state.getModuleExports(event.modulePath);
       } catch (e) {
+        logger.error(getErrorMessage(event, rule, e.message, e.stack));
+        return;
+      }
+      
+      if (typeof moduleExports !== 'function') {
+        logger.error(getErrorMessage(event, rule, MODULE_NOT_FUNCTION_ERROR));
         return;
       }
 
@@ -101,12 +117,8 @@ var initEventModules = function(rule) {
       try {
         moduleExports(settings, trigger);
       } catch (e) {
-        var moduleName = state.getModuleDisplayName(event.modulePath);
-        var message = 'Error when executing ' + moduleName + ' event for '
-          + rule.name + ' rule. Error message: ' + e.message;
-
-        logger.error(message);
-        // Don't re-throw the error because we want to continue execution.
+        logger.error(getErrorMessage(event, rule, e.message, e.stack));
+        return;
       }
     });
   }

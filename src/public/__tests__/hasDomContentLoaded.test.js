@@ -5,8 +5,8 @@ describe('hasDomContentLoaded', function() {
     __dirname + '/domContentLoadedHasFired.html');
 
   it('returns true after DOM content was loaded', function() {
-    var hasDomContentLoadedInjector = require('inject!../hasDomContentLoaded');
-    var hasDomContentLoaded = hasDomContentLoadedInjector({
+    var injectHasDomContentLoaded = require('inject!../hasDomContentLoaded');
+    var hasDomContentLoaded = injectHasDomContentLoaded({
       'document': {
         readyState: 'complete'
       }

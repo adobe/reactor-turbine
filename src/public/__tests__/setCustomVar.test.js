@@ -5,7 +5,7 @@ describe('setCustomVar', function() {
   beforeEach(function() {
     customVars = {};
     setCustomVar = require('inject!../setCustomVar')({
-      '../../state': {
+      '../state': {
         customVars: customVars
       }
     });

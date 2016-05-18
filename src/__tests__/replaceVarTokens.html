@@ -43,20 +43,18 @@
 
       var container = {
         extensions: {
-          EXa: {
-            name: 'example-extension',
+          'example-extension': {
             displayName: 'Example Extension',
             configurations: {
               abc: {
                 settings: unprocessedConfig
               }
             },
-            delegates: {
-              'example-extension/events/test-event': {
+            modules: {
+              'example-extension/events/test-event.js': {
                 displayName: 'Test Event',
                 script: function(module, require) {
-                  var getExtension = require('get-extension');
-                  var extension = getExtension('example-extension');
+                  var getExtensionConfigurations = require('get-extension-configurations');
 
                   var allTriggers = [];
 
@@ -76,35 +74,33 @@
                   };
 
                   module.exports = eventDelegateSpy.and.callFake(function(settings, trigger) {
-                    eventRequiredExtensionConfig = extension.getConfigurations().abc;
+                    eventRequiredExtensionConfig = getExtensionConfigurations().abc;
                     allTriggers.push(trigger);
                   });
                 }
               },
-              'example-extension/conditions/test-condition': {
+              'example-extension/conditions/test-condition.js': {
                 displayName: 'Test Condition',
                 script: function(module, require) {
-                  var getExtension = require('get-extension');
-                  var extension = getExtension('example-extension');
+                  var getExtensionConfigurations = require('get-extension-configurations');
 
                   module.exports = conditionDelegateSpy.and.callFake(function() {
-                    conditionRequiredExtensionConfig = extension.getConfigurations().abc;
+                    conditionRequiredExtensionConfig = getExtensionConfigurations().abc;
                     return true;
                   });
                 }
               },
-              'example-extension/actions/test-action': {
+              'example-extension/actions/test-action.js': {
                 displayName: 'Test Action',
                 script: function(module, require) {
-                  var getExtension = require('get-extension');
-                  var extension = getExtension('example-extension');
+                  var getExtensionConfigurations = require('get-extension-configurations');
 
                   module.exports = actionDelegateSpy.and.callFake(function() {
-                    actionRequiredExtensionConfig = extension.getConfigurations().abc;
+                    actionRequiredExtensionConfig = getExtensionConfigurations().abc;
                   });
                 }
               },
-              'example-extension/dataElements/test-data-element': {
+              'example-extension/dataElements/test-data-element.js': {
                 displayName: 'Test Data Element',
                 script: function(module) {
                   module.exports = function(settings) {
@@ -121,20 +117,20 @@
           {
             events: [
               {
-                delegateId: 'example-extension/events/test-event',
+                modulePath: 'example-extension/events/test-event.js',
                 settings: unprocessedConfig
               }
             ],
             conditions: [
               {
-                delegateId: 'example-extension/conditions/test-condition',
+                modulePath: 'example-extension/conditions/test-condition.js',
                 // Only conditions and actions can use %this.something% and %event.something%
                 settings: unprocessedConfigWithElementAndEvent
               }
             ],
             actions: [
               {
-                delegateId: 'example-extension/actions/test-action',
+                modulePath: 'example-extension/actions/test-action.js',
                 // Only conditions and actions can use %this.something% and %event.something%
                 settings: unprocessedConfigWithElementAndEvent
               }
@@ -143,31 +139,31 @@
         ],
         dataElements: {
           account: {
-            delegateId: "example-extension/dataElements/test-data-element",
+            modulePath: "example-extension/dataElements/test-data-element.js",
             settings: {
               value: "ABC123"
             }
           },
           firstName: {
-            delegateId: "example-extension/dataElements/test-data-element",
+            modulePath: "example-extension/dataElements/test-data-element.js",
             settings: {
               value: "John"
             }
           },
           lastName: {
-            delegateId: "example-extension/dataElements/test-data-element",
+            modulePath: "example-extension/dataElements/test-data-element.js",
             settings: {
               value: "Doe"
             }
           },
           apple: {
-            delegateId: "example-extension/dataElements/test-data-element",
+            modulePath: "example-extension/dataElements/test-data-element.js",
             settings: {
               value: "apple"
             }
           },
           pear: {
-            delegateId: "example-extension/dataElements/test-data-element",
+            modulePath: "example-extension/dataElements/test-data-element.js",
             settings: {
               value: "pear"
             }

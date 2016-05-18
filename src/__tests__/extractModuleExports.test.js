@@ -1,22 +1,23 @@
 'use strict';
 
-var extractModuleExports = require('../extractModuleExports');
-
 describe('extract module exports', function() {
-  it('runs the module code', function() {
-    var moduleDefinition = jasmine.createSpy('module');
-    extractModuleExports(moduleDefinition);
+  var extractModuleExports = require('../extractModuleExports');
 
-    expect(moduleDefinition).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Function));
+  it('runs the module code', function() {
+    var moduleScript = jasmine.createSpy('module');
+    var require = function() {};
+    extractModuleExports(moduleScript, require);
+
+    expect(moduleScript).toHaveBeenCalledWith(jasmine.any(Object), require);
   });
 
   it('returns the extracted exports', function() {
-    var moduleExports = jasmine.createSpy('module.exports');
+    var moduleExports = 'exportedvalue';
 
-    var moduleDefinition = function(module) {
+    var moduleScript = function(module) {
       module.exports = moduleExports;
     };
 
-    expect(extractModuleExports(moduleDefinition)).toEqual(moduleExports);
+    expect(extractModuleExports(moduleScript)).toEqual(moduleExports);
   });
 });

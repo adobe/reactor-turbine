@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <script>
+      var receivedSharedModule;
+
+      _satellite = {};
+
+      _satellite.container = {
+        extensions: {
+          'example-extension-a': {
+            displayName: 'Example Extension A',
+            modules: {
+              'example-extension-a/src/foo.js': {
+                sharedName: 'foo',
+                script: function(module) {
+                  module.exports = 'bar';
+                }
+              }
+            }
+          },
+          'example-extension-b': {
+            displayName: 'Example Extension B',
+            modules: {
+              'example-extension-b/src/baz.js': {
+                script: function(module, require) {
+                  var getSharedModule = require('get-shared-module');
+                  receivedSharedModule = getSharedModule('example-extension-a', 'foo');
+                }
+              }
+            }
+          }
+        },
+        rules: []
+      };
+    </script>
+    <script src="/base/testrunner/engine.js"></script>
+  </head>
+  <body>
+    <script>
+      _satellite.pageBottom();
+
+      TestPage.execute(function() {
+        expect(receivedSharedModule).toBe('bar');
+      }).start();
+    </script>
+  </body>
+</html>

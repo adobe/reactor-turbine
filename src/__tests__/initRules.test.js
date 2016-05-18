@@ -1,37 +1,90 @@
 'use strict';
 
+var getMockDisplayName = function(referencePath) {
+  return 'Display Name ' + referencePath;
+};
+
 describe('initRules', function() {
+  var createModuleProvider = require('inject?!../moduleProvider');
+  var TEST_EVENT_PATH = 'hello-world/testEvent.js';
+  var TEST_CONDITION1_PATH = 'hello-world/testCondition1.js';
+  var TEST_CONDITION2_PATH = 'hello-world/testCondition2.js';
+  var TEST_ACTION1_PATH = 'hello-world/testAction1.js';
+  var TEST_ACTION2_PATH = 'hello-world/testAction2.js';
+
   describe('rule execution', function() {
-    var initRulesInjector = require('inject?./state!../initRules');
+    var injectInitRules = require('inject?./state!../initRules');
     var initRules;
 
     var state;
     var event;
     var relatedElement;
-    var delegateExports;
     var rules;
     var propertySettings;
+    var moduleProvider;
 
     beforeEach(function() {
       event = {};
       relatedElement = {};
 
-      delegateExports = {
-        testEvent: jasmine.createSpy().and.callFake(function(settings, trigger) {
-          trigger(relatedElement, event);
-        }),
-        testCondition1: jasmine.createSpy().and.returnValue(true),
-        testCondition2: jasmine.createSpy().and.returnValue(true),
-        testAction1: jasmine.createSpy(),
-        testAction2: jasmine.createSpy()
-      };
+      moduleProvider = createModuleProvider();
+
+      moduleProvider.registerModule(
+        TEST_EVENT_PATH,
+        {
+          displayName: getMockDisplayName(TEST_EVENT_PATH),
+          script: function(module) {
+            module.exports = jasmine
+              .createSpy()
+              .and
+              .callFake(function(settings, trigger) {
+                trigger(relatedElement, event);
+              });
+          }
+        });
+
+      moduleProvider.registerModule(
+        TEST_CONDITION1_PATH,
+        {
+          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          script: function(module) {
+            module.exports = jasmine.createSpy().and.returnValue(true);
+          }
+        });
+
+      moduleProvider.registerModule(
+        TEST_CONDITION2_PATH,
+        {
+          displayName: getMockDisplayName(TEST_CONDITION2_PATH),
+          script: function(module) {
+            module.exports = jasmine.createSpy().and.returnValue(true);
+          }
+        });
+
+      moduleProvider.registerModule(
+        TEST_ACTION1_PATH,
+        {
+          displayName: getMockDisplayName(TEST_ACTION1_PATH),
+          script: function(module) {
+            module.exports = jasmine.createSpy();
+          }
+        });
+
+      moduleProvider.registerModule(
+        TEST_ACTION2_PATH,
+        {
+          displayName: getMockDisplayName(TEST_ACTION2_PATH),
+          script: function(module) {
+            module.exports = jasmine.createSpy();
+          }
+        });
 
       rules = [
         {
           name: 'Test Rule',
           events: [
             {
-              delegateId: 'testEvent',
+              modulePath: TEST_EVENT_PATH,
               settings: {
                 testEventFoo: 'bar'
               }
@@ -39,13 +92,13 @@ describe('initRules', function() {
           ],
           conditions: [
             {
-              delegateId: 'testCondition1',
+              modulePath: TEST_CONDITION1_PATH,
               settings: {
                 testCondition1Foo: 'bar'
               }
             },
             {
-              delegateId:'testCondition2',
+              modulePath: TEST_CONDITION2_PATH,
               settings: {
                 testCondition2Foo: 'bar'
               }
@@ -53,13 +106,13 @@ describe('initRules', function() {
           ],
           actions: [
             {
-              delegateId: 'testAction1',
+              modulePath: TEST_ACTION1_PATH,
               settings: {
                 testAction1Foo: 'bar'
               }
             },
             {
-              delegateId: 'testAction2',
+              modulePath: TEST_ACTION2_PATH,
               settings: {
                 testAction2Foo: 'bar'
               }
@@ -76,12 +129,8 @@ describe('initRules', function() {
         getShouldExecuteActions: function() {
           return true;
         },
-        getDelegate: function(delegateId) {
-          return {
-            displayName: 'Display Name ' + delegateId,
-            exports: delegateExports[delegateId]
-          };
-        },
+        getModuleExports: moduleProvider.getModuleExports,
+        getModuleDisplayName: moduleProvider.getModuleDisplayName,
         getPropertySettings: function() {
           return propertySettings;
         },
@@ -90,7 +139,7 @@ describe('initRules', function() {
         }
       };
 
-      initRules = initRulesInjector({
+      initRules = injectInitRules({
         './state': state
       });
     });
@@ -98,51 +147,61 @@ describe('initRules', function() {
     it('evaluates all conditions and, when all pass, executes all actions', function() {
       initRules();
 
-      expect(delegateExports.testEvent.calls.count()).toBe(1);
+      var eventExports = moduleProvider.getModuleExports(TEST_EVENT_PATH);
 
-      var eventDelegateCall = delegateExports.testEvent.calls.mostRecent();
+      expect(eventExports.calls.count()).toBe(1);
 
-      expect(eventDelegateCall.args[0]).toEqual({
+      var eventExportsCalls = eventExports.calls.mostRecent();
+
+      expect(eventExportsCalls.args[0]).toEqual({
         testEventFoo: 'bar'
       });
 
-      expect(typeof eventDelegateCall.args[1]).toBe('function');
+      expect(typeof eventExportsCalls.args[1]).toBe('function');
 
-      expect(delegateExports.testCondition1.calls.count()).toBe(1);
+      var condition1Exports = moduleProvider.getModuleExports(TEST_CONDITION1_PATH);
 
-      var conditionDelegate1Call = delegateExports.testCondition1.calls.mostRecent();
+      expect(condition1Exports.calls.count()).toBe(1);
 
-      expect(conditionDelegate1Call.args[0]).toEqual({
+      var condiiton1ExportsCall = condition1Exports.calls.mostRecent();
+
+      expect(condiiton1ExportsCall.args[0]).toEqual({
         testCondition1Foo: 'bar'
       });
 
-      expect(conditionDelegate1Call.args[1]).toBe(relatedElement);
-      expect(conditionDelegate1Call.args[2]).toBe(event);
+      expect(condiiton1ExportsCall.args[1]).toBe(relatedElement);
+      expect(condiiton1ExportsCall.args[2]).toBe(event);
 
-      expect(delegateExports.testCondition2.calls.count()).toBe(1);
+      var condition2Exports = moduleProvider.getModuleExports(TEST_CONDITION2_PATH);
 
-      var conditionDelegate2Call = delegateExports.testCondition2.calls.mostRecent();
+      expect(condition2Exports.calls.count()).toBe(1);
 
-      expect(conditionDelegate2Call.args[0]).toEqual({
+      var condition2ExportsCall = condition2Exports.calls.mostRecent();
+
+      expect(condition2ExportsCall.args[0]).toEqual({
         testCondition2Foo: 'bar'
       });
 
-      expect(conditionDelegate2Call.args[1]).toBe(relatedElement);
-      expect(conditionDelegate2Call.args[2]).toBe(event);
+      expect(condition2ExportsCall.args[1]).toBe(relatedElement);
+      expect(condition2ExportsCall.args[2]).toBe(event);
 
-      expect(delegateExports.testAction1.calls.count()).toBe(1);
+      var action1Exports = moduleProvider.getModuleExports(TEST_ACTION1_PATH);
 
-      var actionDelegate1Call = delegateExports.testAction1.calls.mostRecent();
+      expect(action1Exports.calls.count()).toBe(1);
 
-      expect(actionDelegate1Call.args[0]).toEqual({
+      var action1ExportsCall = action1Exports.calls.mostRecent();
+
+      expect(action1ExportsCall.args[0]).toEqual({
         testAction1Foo: 'bar'
       });
 
-      expect(delegateExports.testAction2.calls.count()).toBe(1);
+      var action2Exports = moduleProvider.getModuleExports(TEST_ACTION2_PATH);
 
-      var actionDelegate2Call = delegateExports.testAction2.calls.mostRecent();
+      expect(action2Exports.calls.count()).toBe(1);
 
-      expect(actionDelegate2Call.args[0]).toEqual({
+      var action2ExportsCall = action2Exports.calls.mostRecent();
+
+      expect(action2ExportsCall.args[0]).toEqual({
         testAction2Foo: 'bar'
       });
 
@@ -151,14 +210,22 @@ describe('initRules', function() {
     });
 
     it('ceases to execute remaining conditions and any actions when condition fails', function() {
-      delegateExports.testCondition1 = jasmine.createSpy().and.returnValue(false);
+      moduleProvider.registerModule(
+        TEST_CONDITION1_PATH,
+        {
+          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          script: function(module) {
+            module.exports = jasmine.createSpy().and.returnValue(false);
+          }
+        }
+      );
 
       initRules();
 
-      expect(delegateExports.testCondition1.calls.count()).toBe(1);
-      expect(delegateExports.testCondition2.calls.count()).toBe(0);
-      expect(delegateExports.testAction1.calls.count()).toBe(0);
-      expect(delegateExports.testAction2.calls.count()).toBe(0);
+      expect(moduleProvider.getModuleExports(TEST_CONDITION1_PATH).calls.count()).toBe(1);
+      expect(moduleProvider.getModuleExports(TEST_CONDITION2_PATH).calls.count()).toBe(0);
+      expect(moduleProvider.getModuleExports(TEST_ACTION1_PATH).calls.count()).toBe(0);
+      expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
     });
 
     it('does not throw error when there are no events for a rule', function() {
@@ -186,239 +253,275 @@ describe('initRules', function() {
 
       initRules();
 
-      expect(delegateExports.testAction1.calls.count()).toBe(0);
-      expect(delegateExports.testAction2.calls.count()).toBe(0);
+      expect(moduleProvider.getModuleExports(TEST_ACTION1_PATH).calls.count()).toBe(0);
+      expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
     });
   });
 
-  describe('logging', function() {
+  describe('error handling', function() {
     var logger;
-    var delegateExports = {};
-    var rules;
     var initRules;
+    var state;
+    var moduleProvider;
 
     beforeEach(function() {
-      logger = {
-        log: jasmine.createSpy(),
-        error: jasmine.createSpy()
-      };
+      logger = jasmine.createSpyObj('logger', ['log', 'error']);
+      moduleProvider = createModuleProvider();
 
-      delegateExports.testEvent = function(settings, trigger) {
-        trigger();
-      };
+      moduleProvider.registerModule(
+        TEST_EVENT_PATH,
+        {
+          displayName: getMockDisplayName(TEST_EVENT_PATH),
+          script: function(module) {
+            module.exports = function(settings, trigger) { trigger(); };
+          }
+        });
 
-      var state = {
-        getDelegate: function(delegateId) {
-          return {
-            displayName: 'Display Name ' + delegateId,
-            exports: delegateExports[delegateId]
-          };
-        },
+      moduleProvider.registerModule(
+        TEST_CONDITION1_PATH,
+        {
+          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          script: function(module) {
+            module.exports = function() { return true; };
+          }
+        });
+
+      moduleProvider.registerModule(
+        TEST_ACTION1_PATH,
+        {
+          displayName: getMockDisplayName(TEST_ACTION1_PATH),
+          script: function(module) {
+            module.exports = function() {};
+          }
+        }
+      );
+
+      state = {
+        getModuleExports: moduleProvider.getModuleExports,
+        getModuleDisplayName: moduleProvider.getModuleDisplayName,
         getRules: function() {
-          return rules;
-        },
-        getPropertySettings: function() {
-          return null;
+          return [
+            {
+              name: 'Test Rule',
+              events: [
+                {
+                  modulePath: TEST_EVENT_PATH
+                }
+              ],
+              conditions: [
+                {
+                  modulePath: TEST_CONDITION1_PATH
+                }
+              ],
+              actions: [
+                {
+                  modulePath: TEST_ACTION1_PATH
+                }
+              ]
+            }
+          ];
         },
         getShouldExecuteActions: function() {
           return true;
         }
       };
 
-      initRules = require('inject?./utils/logger&./state!../initRules')({
-        './utils/logger': logger,
+      initRules = require('inject?./public/logger&./state!../initRules')({
+        './public/logger': logger,
         './state': state
       });
     });
 
-    it('logs an error when the event delegate throws an error', function() {
-      delegateExports.testEvent = function() {
-        throw new Error('noob tried to divide by zero');
-      };
-
-      rules = [
+    it('logs an error when retrieving event module exports fails', function() {
+      moduleProvider.registerModule(
+        TEST_EVENT_PATH,
         {
-          name: 'Test Rule',
-          events: [
-            {
-              delegateId: 'testEvent'
-            }
-          ]
-        }
-      ];
+          displayName: getMockDisplayName(TEST_EVENT_PATH),
+          script: function() {
+            throw new Error('noob tried to divide by zero.');
+          }
+        });
 
-      expect(function() {
-        initRules();
-      }).not.toThrowError();
+      initRules();
 
-      expect(logger.error.calls.mostRecent().args[0]).toEqual(
-        'Error when executing Display Name testEvent event for Test Rule rule. ' +
-        'Error message: noob tried to divide by zero');
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      var expectedErrorMessage = 'Failed to execute ' +
+        getMockDisplayName(TEST_EVENT_PATH) + ' for Test Rule rule. noob tried to divide by zero.';
+      expect(errorMessage).toStartWith(expectedErrorMessage);
     });
 
-    it('logs an error when the event delegate is not found', function() {
-      delegateExports.testEvent = null;
-
-      rules = [
+    it('logs an error when the event module exports is not a function', function() {
+      moduleProvider.registerModule(
+        TEST_EVENT_PATH,
         {
-          name: 'Test Rule',
-          events: [
-            {
-              delegateId: 'testEvent'
-            }
-          ]
+          displayName: getMockDisplayName(TEST_EVENT_PATH),
+          script: function(module) {
+            module.exports = {};
+          }
         }
-      ];
+      );
 
-      expect(function() {
-        initRules();
-      }).not.toThrowError();
+      initRules();
 
-      expect(logger.error.calls.mostRecent().args[0]).toEqual(
-        'Event delegate testEvent not found.');
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      expect(errorMessage).toBe('Failed to execute ' + getMockDisplayName(TEST_EVENT_PATH) +
+        ' for Test Rule rule. Module did not export a function.');
     });
 
-    it('logs an error when the condition delegate throws an error', function() {
-      delegateExports.testCondition = function() {
-        throw new Error('noob tried to divide by zero');
-      };
-
-      rules = [
+    it('logs an error when executing event module exports fails', function() {
+      moduleProvider.registerModule(
+        TEST_EVENT_PATH,
         {
-          name: 'Test Rule',
-          events: [
-            {
-              delegateId: 'testEvent'
-            }
-          ],
-          conditions: [
-            {
-              delegateId: 'testCondition'
-            }
-          ]
+          displayName: getMockDisplayName(TEST_EVENT_PATH),
+          script: function(module) {
+            module.exports = function() {
+              throw new Error('noob tried to divide by zero.');
+            };
+          }
         }
-      ];
+      );
 
-      expect(function() {
-        initRules();
-      }).not.toThrowError();
+      initRules();
 
-      expect(logger.error.calls.mostRecent().args[0]).toEqual(
-        'Error when executing Display Name testCondition condition for Test Rule rule. ' +
-        'Error message: noob tried to divide by zero');
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      var expectedErrorMessage = 'Failed to execute ' + getMockDisplayName(TEST_EVENT_PATH) +
+        ' for Test Rule rule. noob tried to divide by zero.';
+      expect(errorMessage).toStartWith(expectedErrorMessage);
     });
 
-    it('logs an error when the condition delegate is not found', function() {
-      delegateExports.testCondition = null;
-
-      rules = [
+    it('logs an error when retrieving condition module exports fails', function() {
+      moduleProvider.registerModule(
+        TEST_CONDITION1_PATH,
         {
-          name: 'Test Rule',
-          events: [
-            {
-              delegateId: 'testEvent'
-            }
-          ],
-          conditions: [
-            {
-              delegateId: 'testCondition'
-            }
-          ]
+          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          script: function() {
+            throw new Error('noob tried to divide by zero.');
+          }
         }
-      ];
+      );
 
-      expect(function() {
-        initRules();
-      }).not.toThrowError();
+      initRules();
 
-      expect(logger.error.calls.mostRecent().args[0]).toEqual(
-        'Condition delegate testCondition not found.');
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      var expectedErrorMessage = 'Failed to execute ' + getMockDisplayName(TEST_CONDITION1_PATH) +
+        ' for Test Rule rule. noob tried to divide by zero.';
+      expect(errorMessage).toStartWith(expectedErrorMessage);
+    });
+
+    it('logs an error when the condition module exports is not a function', function() {
+      moduleProvider.registerModule(
+        TEST_CONDITION1_PATH,
+        {
+          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          script: function(module) {
+            module.exports = {};
+          }
+        }
+      );
+
+      initRules();
+
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      expect(errorMessage).toBe('Failed to execute ' + getMockDisplayName(TEST_CONDITION1_PATH) +
+        ' for Test Rule rule. Module did not export a function.');
+    });
+
+    it('logs an error when executing condition module exports fails', function() {
+      moduleProvider.registerModule(
+        TEST_CONDITION1_PATH,
+        {
+          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          script: function(module) {
+            module.exports = function() {
+              throw new Error('noob tried to divide by zero.');
+            };
+          }
+        }
+      );
+
+      initRules();
+
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      var expectedErrorMessage = 'Failed to execute ' + getMockDisplayName(TEST_CONDITION1_PATH) +
+        ' for Test Rule rule. noob tried to divide by zero.';
+      expect(errorMessage).toStartWith(expectedErrorMessage);
     });
 
     it('logs an error when the condition doesn\'t pass', function() {
-      delegateExports.testCondition = function() {
-        return false;
-      };
-
-      rules = [
+      moduleProvider.registerModule(
+        TEST_CONDITION1_PATH,
         {
-          name: 'Test Rule',
-          events: [
-            {
-              delegateId: 'testEvent'
-            }
-          ],
-          conditions: [
-            {
-              delegateId: 'testCondition'
-            }
-          ]
+          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          script: function(module) {
+            module.exports = function() {
+              return false;
+            };
+          }
         }
-      ];
+      );
 
-      expect(function() {
-        initRules();
-      }).not.toThrowError();
+      initRules();
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
         'Condition for rule Test Rule not met.');
     });
 
-    it('logs an error when the action delegate throws an error', function() {
-      delegateExports.testAction = function() {
-        throw new Error('noob tried to divide by zero');
-      };
-
-      rules = [
+    it('logs an error when retrieving action module exports fails', function() {
+      moduleProvider.registerModule(
+        TEST_ACTION1_PATH,
         {
-          name: 'Test Rule',
-          events: [
-            {
-              delegateId: 'testEvent'
-            }
-          ],
-          actions: [
-            {
-              delegateId: 'testAction'
-            }
-          ]
-        }
-      ];
+          displayName: getMockDisplayName(TEST_ACTION1_PATH),
+          script: function() {
+            throw new Error('noob tried to divide by zero.');
+          }
+        });
 
-      expect(function() {
-        initRules();
-      }).not.toThrowError();
+      initRules();
 
-      expect(logger.error.calls.mostRecent().args[0]).toEqual(
-        'Error when executing Display Name testAction action for Test Rule rule. ' +
-        'Error message: noob tried to divide by zero');
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      var expectedErrorMessage = 'Failed to execute ' +
+        getMockDisplayName(TEST_ACTION1_PATH) + ' for Test Rule rule. noob tried to divide ' +
+        'by zero.';
+      expect(errorMessage).toStartWith(expectedErrorMessage);
     });
 
-    it('logs an error when the action delegate is not found', function() {
-      delegateExports.testAction = null;
-
-      rules = [
+    it('logs an error when the action module exports is not a function', function() {
+      moduleProvider.registerModule(
+        TEST_ACTION1_PATH,
         {
-          name: 'Test Rule',
-          events: [
-            {
-              delegateId: 'testEvent'
-            }
-          ],
-          actions: [
-            {
-              delegateId: 'testAction'
-            }
-          ]
+          displayName: getMockDisplayName(TEST_ACTION1_PATH),
+          script: function(module) {
+            module.exports = {};
+          }
         }
-      ];
+      );
 
-      expect(function() {
-        initRules();
-      }).not.toThrowError();
+      initRules();
 
-      expect(logger.error.calls.mostRecent().args[0]).toEqual(
-        'Action delegate testAction not found.');
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      expect(errorMessage).toBe('Failed to execute ' + getMockDisplayName(TEST_ACTION1_PATH) +
+        ' for Test Rule rule. Module did not export a function.');
+    });
+
+    it('logs an error when executing action module exports fails', function() {
+      moduleProvider.registerModule(
+        TEST_ACTION1_PATH,
+        {
+          displayName: getMockDisplayName(TEST_ACTION1_PATH),
+          script: function(module) {
+            module.exports = function() {
+              throw new Error('noob tried to divide by zero.');
+            };
+          }
+        }
+      );
+
+      initRules();
+
+      var errorMessage = logger.error.calls.mostRecent().args[0];
+      var expectedErrorMessage = 'Failed to execute ' + getMockDisplayName(TEST_ACTION1_PATH) +
+        ' for Test Rule rule. noob tried to divide by zero.';
+      expect(errorMessage).toStartWith(expectedErrorMessage);
     });
   });
 });

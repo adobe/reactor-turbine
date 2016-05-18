@@ -7,15 +7,14 @@
       var _satellite = {
         container: {
           extensions: {
-            EXa: {
-              name: 'test-extension',
+            'test-extension': {
               displayName: 'Test Extension',
-              delegates: {
-                'test-extension/events/test-event': {
+              modules: {
+                'test-extension/events/test-event.js': {
                   displayName: 'Test Event',
                   script: getTestEventDelegate()
                 },
-                'test-extension/actions/test-action': {
+                'test-extension/actions/test-action.js': {
                   displayName: 'Test Action',
                   script: function(module) {
                     module.exports = actionSpy;
@@ -28,12 +27,12 @@
             {
               events: [
                 {
-                  delegateId: 'test-extension/events/test-event'
+                  modulePath: 'test-extension/events/test-event'
                 }
               ],
               actions: [
                 {
-                  delegateId: 'test-extension/actions/test-action'
+                  modulePath: 'test-extension/actions/test-action'
                 }
               ]
             }

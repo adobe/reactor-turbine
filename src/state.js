@@ -1,5 +1,5 @@
 var dataElementSafe = require('./dataElementSafe');
-var createModuleProvider = require('./createModuleProvider');
+var moduleProvider = require('./moduleProvider');
 var getLocalStorageItem = require('./getLocalStorageItem');
 var setLocalStorageItem = require('./setLocalStorageItem');
 var createGetSharedModuleExports = require('./createGetSharedModuleExports');
@@ -9,7 +9,6 @@ var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
 var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
 
 var customVars = {};
-var moduleProvider = createModuleProvider();
 var rules;
 var dataElements;
 var buildInfo;

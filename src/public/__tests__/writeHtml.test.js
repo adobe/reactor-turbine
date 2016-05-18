@@ -1,11 +1,11 @@
 describe('writeHtml', function() {
+  var injectWriteHtml = require('inject!../writeHtml');
   var writeHtml;
 
   describe('before DOMContentLoaded was fired', function() {
     beforeAll(function() {
-      var delegateInjector = require('inject!../writeHtml');
-      writeHtml = delegateInjector({
-        './dom/hasDomContentLoaded': jasmine.createSpy().and.returnValue(false)
+      writeHtml = injectWriteHtml({
+        './hasDomContentLoaded': jasmine.createSpy().and.returnValue(false)
       });
     });
 
@@ -19,9 +19,8 @@ describe('writeHtml', function() {
 
   describe('after DOMContentLoaded was fired', function() {
     beforeAll(function() {
-      var delegateInjector = require('inject!../writeHtml');
-      writeHtml = delegateInjector({
-        './dom/hasDomContentLoaded': jasmine.createSpy().and.returnValue(true),
+      writeHtml = injectWriteHtml({
+        './hasDomContentLoaded': jasmine.createSpy().and.returnValue(true),
         './logger': jasmine.createSpyObj('logger', ['error'])
       });
     });
@@ -39,8 +38,7 @@ describe('writeHtml', function() {
     var loggerSpy = jasmine.createSpyObj('logger', ['error']);
 
     beforeAll(function() {
-      var delegateInjector = require('inject!../writeHtml');
-      writeHtml = delegateInjector({
+      writeHtml = injectWriteHtml({
         './logger': loggerSpy
       });
 

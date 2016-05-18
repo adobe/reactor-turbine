@@ -7,11 +7,11 @@ describe('pageBottom', function() {
   });
 
   it('fulfills the promise when `_satellite.pageBottom` is executed', function(done) {
-    var pageBottomInjector = require('inject!../pageBottom');
+    var injectPageBottom = require('inject!../pageBottom');
     var  windowFakeObject = {};
     var  documentFakeObject = { addEventListener: function() {} };
 
-    var pageBottom = pageBottomInjector({
+    var pageBottom = injectPageBottom({
       'window': windowFakeObject,
       'document': documentFakeObject
     });
@@ -22,7 +22,7 @@ describe('pageBottom', function() {
   });
 
   it('fulfills the promise when DOMContentLoaded is executed', function(done) {
-    var pageBottomInjector = require('inject!../pageBottom');
+    var injectPageBottom = require('inject!../pageBottom');
     var callback = null;
 
     var  windowFakeObject = {};
@@ -34,7 +34,7 @@ describe('pageBottom', function() {
       }
     };
 
-    var pageBottom = pageBottomInjector({
+    var pageBottom = injectPageBottom({
       'window': windowFakeObject,
       'document': documentFakeObject
     });
@@ -45,7 +45,7 @@ describe('pageBottom', function() {
   });
 
   it('promise is fullfilled only once', function(done) {
-    var pageBottomInjector = require('inject!../pageBottom');
+    var injectPageBottom = require('inject!../pageBottom');
     var callback = null;
 
     var  windowFakeObject = {};
@@ -57,7 +57,7 @@ describe('pageBottom', function() {
       }
     };
 
-    var pageBottom = pageBottomInjector({
+    var pageBottom = injectPageBottom({
       'window': windowFakeObject,
       'document': documentFakeObject
     });
@@ -73,7 +73,7 @@ describe('pageBottom', function() {
   });
 
   it('calls executors even after the promise was fulfilled', function(done) {
-    var pageBottomInjector = require('inject!../pageBottom');
+    var injectPageBottom = require('inject!../pageBottom');
     var callback = null;
 
     var  windowFakeObject = {};
@@ -85,7 +85,7 @@ describe('pageBottom', function() {
       }
     };
 
-    var pageBottom = pageBottomInjector({
+    var pageBottom = injectPageBottom({
       'window': windowFakeObject,
       'document': documentFakeObject
     });

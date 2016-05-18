@@ -1,5 +1,11 @@
 var state = require('../state');
 var cleanText = require('../cleanText');
+var logger = require('./logger');
+
+var getErrorMessage = function(dataDef, dataElementName, errorMessage, errorStack) {
+  return 'Failed to execute data element module ' + dataDef.modulePath + ' for data element ' +
+    dataElementName + '. ' + errorMessage + (errorStack ? '\n' + errorStack : '');
+};
 
 module.exports = function(name, suppressDefault) {
   var dataDef = state.getDataElementDefinition(name);
@@ -9,8 +15,28 @@ module.exports = function(name, suppressDefault) {
   }
 
   var storeLength = dataDef.storeLength;
-  var moduleExports = state.getModuleExports(dataDef.modulePath);
-  var value = moduleExports(dataDef.settings);
+  var moduleExports;
+
+  try {
+    moduleExports = state.getModuleExports(dataDef.modulePath);
+  } catch (e) {
+    logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
+    return;
+  }
+
+  if (typeof moduleExports !== 'function') {
+    logger.error(getErrorMessage(dataDef, name, 'Module did not export a function.'));
+    return;
+  }
+
+  var value;
+
+  try {
+    value = moduleExports(dataDef.settings);
+  } catch (e) {
+    logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
+    return;
+  }
 
   if (dataDef.cleanText) {
     value = cleanText(value);

@@ -1,21 +1,21 @@
 'use strict';
 
-var hydrateSatelliteObjectInjector = require('inject!../hydrateSatelliteObject');
-
 describe('hydrateSatelliteObject', function() {
+  var injectHydrateSatelliteObject = require('inject!../hydrateSatelliteObject');
+
   beforeEach(function() {
     window._satellite = {};
   });
 
   it('should add a pageBottom function on _satellite', function() {
-    var hydrateSatelliteObject = hydrateSatelliteObjectInjector({});
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
     hydrateSatelliteObject();
     window._satellite.pageBottom();
     expect(window._satellite.pageBottom).toEqual(jasmine.any(Function));
   });
 
   it('should add a track function on _satellite', function() {
-    var hydrateSatelliteObject = hydrateSatelliteObjectInjector({});
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
     hydrateSatelliteObject();
     window._satellite.track();
     expect(window._satellite.track).toEqual(jasmine.any(Function));
@@ -23,7 +23,7 @@ describe('hydrateSatelliteObject', function() {
 
   it('should add a `isLinked` method on _satellite that returns true for an anchor element',
   function() {
-    var hydrateSatelliteObject = hydrateSatelliteObjectInjector({});
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
     hydrateSatelliteObject();
     var l = document.createElement('a');
     expect(_satellite.isLinked(l)).toBe(true);
@@ -32,8 +32,8 @@ describe('hydrateSatelliteObject', function() {
   it('should add setDebug function on _satellite',
     function() {
       var spy = jasmine.createSpyObj(['notify']);
-      var hydrateSatelliteObject = hydrateSatelliteObjectInjector({
-        './utils/logger': spy
+      var hydrateSatelliteObject = injectHydrateSatelliteObject({
+        './public/logger': spy
       });
       hydrateSatelliteObject();
       _satellite.setDebug(true);
@@ -42,7 +42,7 @@ describe('hydrateSatelliteObject', function() {
     });
 
   it('successfully allows setting, reading, and removing a cookie', function() {
-    var hydrateSatelliteObject = hydrateSatelliteObjectInjector({});
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
     hydrateSatelliteObject();
 
     var cookieName = 'cookiename';
@@ -60,7 +60,7 @@ describe('hydrateSatelliteObject', function() {
   });
 
   it('exposes npm cookie package methods', function() {
-    var hydrateSatelliteObject = hydrateSatelliteObjectInjector({});
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
     hydrateSatelliteObject();
 
     expect(_satellite.cookie.serialize).toEqual(jasmine.any(Function));

@@ -1,11 +1,9 @@
-var publicRequire = require('./publicRequire');
-
-module.exports = function(module) {
-  var moduleApi = {
+module.exports = function(script, require) {
+  var module = {
     exports: {}
   };
 
-  module(moduleApi, publicRequire);
+  script(module, require);
 
-  return moduleApi.exports;
+  return module.exports;
 };

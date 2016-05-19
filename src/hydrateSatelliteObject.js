@@ -1,7 +1,7 @@
 var cookie = require('cookie');
-var isAnchor = require('./utils/dom/isAnchor');
+var isAnchor = require('./public/isAnchor');
 var state = require('./state');
-var logger = require('./utils/logger');
+var logger = require('./public/logger');
 
 module.exports = function() {
   // Will get replaced by the pageBottom event delegate. Exists here in case there are no page
@@ -16,8 +16,8 @@ module.exports = function() {
 
   _satellite.buildInfo = state.getBuildInfo();
   _satellite.notify = logger.notify.bind(logger);
-  _satellite.getVar = require('./utils/dataElement/getVar');
-  _satellite.setVar = require('./utils/dataElement/setCustomVar');
+  _satellite.getVar = require('./public/getVar');
+  _satellite.setVar = require('./public/setCustomVar');
 // TODO: _satellite.getVisitorId
 
   /**
@@ -69,7 +69,7 @@ module.exports = function() {
   };
 
   _satellite.setDebug = function(value) {
-    state.setDebugOuputEnabled(value);
+    state.setDebugOutputEnabled(value);
 
     // TODO: Have state emit an event that logger listens to instead?
     logger.outputEnabled = value;
@@ -77,7 +77,7 @@ module.exports = function() {
 
   if (ENV_TEST) {
     _satellite.__test = {
-      domContentLoadedHasFired: require('./utils/dom/hasDomContentLoaded')
+      domContentLoadedHasFired: require('./public/hasDomContentLoaded')
     };
   }
 };

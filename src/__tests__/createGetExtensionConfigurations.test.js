@@ -5,6 +5,7 @@ describe('function returned by createGetExtensionConfigurations', function() {
     './replaceVarTokens': function(obj) {
       var replacedObj = {};
 
+      // Simulate replacing data element tokens.
       Object.keys(obj).forEach(function(key) {
         replacedObj[key] = obj[key] + ' - replaced';
       });
@@ -17,22 +18,22 @@ describe('function returned by createGetExtensionConfigurations', function() {
     var getExtensionConfigurations = createGetExtensionConfigurations({
       id1: {
         settings: {
-          foo: 'bar'
+          foo: '%bar%'
         }
       },
       id2: {
         settings: {
-          baz: 'qux'
+          baz: '%qux%'
         }
       }
     });
 
     expect(getExtensionConfigurations()).toEqual({
       id1: {
-        foo: 'bar - replaced'
+        foo: '%bar% - replaced'
       },
       id2: {
-        baz: 'qux - replaced'
+        baz: '%qux% - replaced'
       }
     });
   });

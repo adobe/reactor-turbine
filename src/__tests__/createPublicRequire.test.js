@@ -6,7 +6,6 @@ describe('function returned by createPublicRequire', function() {
   it('should return the static core modules', function() {
     var promiseMock = {};
     var eventEmitterMock = {};
-    var createDataStashMock = {};
     var assignMock = {};
     var clientInfoMock = {};
     var loadScriptMock = {};
@@ -20,14 +19,15 @@ describe('function returned by createPublicRequire', function() {
     var loggerMock = {};
     var writeHtmlMock = {};
     var pageBottomMock = {};
+    var weakMapMock = {};
     var windowMock = {};
     var documentMock = {};
 
 
     var createPublicRequire = injectCreatePublicRequire({
-      './public/Promise': promiseMock,
       './public/EventEmitter': eventEmitterMock,
-      './public/createDataStash': createDataStashMock,
+      './public/Promise': promiseMock,
+      './public/WeakMap': weakMapMock,
       './public/assign': assignMock,
       './public/clientInfo': clientInfoMock,
       './public/loadScript': loadScriptMock,
@@ -47,9 +47,9 @@ describe('function returned by createPublicRequire', function() {
 
     var publicRequire = createPublicRequire();
 
-    expect(publicRequire('promise')).toBe(promiseMock);
     expect(publicRequire('event-emitter')).toBe(eventEmitterMock);
-    expect(publicRequire('create-data-stash')).toBe(createDataStashMock);
+    expect(publicRequire('promise')).toBe(promiseMock);
+    expect(publicRequire('weak-map')).toBe(weakMapMock);
     expect(publicRequire('assign')).toBe(assignMock);
     expect(publicRequire('client-info')).toBe(clientInfoMock);
     expect(publicRequire('load-script')).toBe(loadScriptMock);

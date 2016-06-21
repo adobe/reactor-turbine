@@ -27,7 +27,6 @@
     "native-promise-only": "0.8.1",
     "strict-loader": "^1.1.0",
     "tiny-emitter": "1.0.2",
-    "weak-map": "^1.0.5",
     "webpack": "^1.13.1",
     "webpack-stream": "^3.2.0"
   },

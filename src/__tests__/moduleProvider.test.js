@@ -17,19 +17,19 @@ describe('moduleProvider', function() {
       './public/logger': logger,
       './extractModuleExports': extractModuleExports
     });
-    
+
     var module = {
       displayName: displayName,
       script: function(module) {
         module.exports = moduleExports;
       }
     };
-    
-    var require = function() {};
-    
+
+    var require = function(path) {};
+
     moduleProvider.registerModule(referencePath, module, require);
   });
-  
+
   it('does not attempt to extract the module export when only registering a module', function() {
     expect(extractModuleExports.calls.count()).toBe(0);
   });

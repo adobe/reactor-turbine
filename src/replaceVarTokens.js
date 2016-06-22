@@ -46,7 +46,7 @@ replaceTokensInArray = function(arr, element, event) {
   return ret;
 };
 
-var replaceTokens = function(thing, element, event) {
+replaceTokens = function(thing, element, event) {
   if (typeof thing === 'string') {
     return replaceTokensInString(thing, element, event);
   } else if (Array.isArray(thing)) {

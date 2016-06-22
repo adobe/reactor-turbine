@@ -6,16 +6,17 @@ describe('moduleProvider', function() {
   var referencePath = 'hello-world/src/foo.js';
   var displayName = 'Foo';
   var moduleExports = {};
-  var extractModuleExports;
+  var extractModuleExports = require('../extractModuleExports');
+  var extractModuleExportsSpy;
   var moduleProvider;
 
   beforeEach(function() {
     logger = jasmine.createSpyObj('logger', ['log', 'error']);
-    extractModuleExports = jasmine.createSpy().and.callFake(require('../extractModuleExports'));
+    extractModuleExportsSpy = jasmine.createSpy('m').and.callFake(extractModuleExports);
 
     moduleProvider = injectModuleProvider({
       './public/logger': logger,
-      './extractModuleExports': extractModuleExports
+      './extractModuleExports': extractModuleExportsSpy
     });
 
     var module = {
@@ -25,20 +26,20 @@ describe('moduleProvider', function() {
       }
     };
 
-    var require = function(path) {};
+    var require = function(path) { return path; };
 
     moduleProvider.registerModule(referencePath, module, require);
   });
 
   it('does not attempt to extract the module export when only registering a module', function() {
-    expect(extractModuleExports.calls.count()).toBe(0);
+    expect(extractModuleExportsSpy.calls.count()).toBe(0);
   });
 
   it('hydrates cache', function() {
     moduleProvider.hydrateCache();
-    expect(extractModuleExports.calls.count()).toBe(1);
+    expect(extractModuleExportsSpy.calls.count()).toBe(1);
     moduleProvider.getModuleExports(referencePath);
-    expect(extractModuleExports.calls.count()).toBe(1);
+    expect(extractModuleExportsSpy.calls.count()).toBe(1);
   });
 
   it('logs an error if error is thrown while hydrating cache', function() {

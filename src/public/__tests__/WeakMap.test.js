@@ -27,7 +27,11 @@ describe('WeakMap', function() {
   // https://github.com/webcomponents/webcomponentsjs/blob/82964dec42a7f6af70142b1bbf3bc4ca16bf1bcf/tests/WeakMap/tests.html
 
   it('has get, set, delete, and has functions', function() {
-    var WeakMap = require('../WeakMap');
+    var WeakMap = require('inject!../WeakMap')({
+      // Inject an empty window so we don't end up testing the native WeakMap if it exists
+      // in the target browser.
+      'window': {}
+    });
     expect(WeakMap.prototype.get).toEqual(jasmine.any(Function));
     expect(WeakMap.prototype.set).toEqual(jasmine.any(Function));
     expect(WeakMap.prototype.delete).toEqual(jasmine.any(Function));
@@ -35,7 +39,11 @@ describe('WeakMap', function() {
   });
 
   it('has methods that perform as expected', function() {
-    var WeakMap = require('../WeakMap');
+    var WeakMap = require('inject!../WeakMap')({
+      // Inject an empty window so we don't end up testing the native WeakMap if it exists
+      // in the target browser.
+      'window': {}
+    });
     var wm = new WeakMap();
 
     var o1 = {};

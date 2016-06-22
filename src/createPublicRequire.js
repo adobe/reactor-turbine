@@ -1,7 +1,7 @@
 var modules = {
   'promise': require('./public/Promise'),
   'event-emitter': require('./public/EventEmitter'),
-  'create-data-stash': require('./public/createDataStash'),
+  'weak-map': require('./public/WeakMap'),
   'assign': require('./public/assign'),
   'client-info': require('./public/clientInfo'),
   'load-script': require('./public/loadScript'),

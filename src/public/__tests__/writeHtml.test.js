@@ -1,57 +1,36 @@
 describe('writeHtml', function() {
   var injectWriteHtml = require('inject!../writeHtml');
-  var writeHtml;
 
-  describe('before DOMContentLoaded was fired', function() {
-    beforeAll(function() {
-      writeHtml = injectWriteHtml({
-        './hasDomContentLoaded': jasmine.createSpy().and.returnValue(false)
-      });
+  it('should write content in the page before DOMContentLoaded was fired', function() {
+    var documentWriteSpy = jasmine.createSpy();
+    var writeHtml = injectWriteHtml({
+      './hasDomContentLoaded': jasmine.createSpy().and.returnValue(false),
+      'document': {
+        write: documentWriteSpy
+      }
     });
 
-    it('should write content in the page', function() {
-      spyOn(document, 'write');
-
-      writeHtml('<span></span>');
-      expect(document.write).toHaveBeenCalledWith('<span></span>');
-    });
+    writeHtml('<span></span>');
+    expect(documentWriteSpy).toHaveBeenCalledWith('<span></span>');
   });
 
-  describe('after DOMContentLoaded was fired', function() {
-    beforeAll(function() {
-      writeHtml = injectWriteHtml({
-        './hasDomContentLoaded': jasmine.createSpy().and.returnValue(true),
-        './logger': jasmine.createSpyObj('logger', ['error'])
-      });
+  it('should throw an error after DOMContentLoaded was fired', function() {
+    var writeHtml = injectWriteHtml({
+      './hasDomContentLoaded': jasmine.createSpy().and.returnValue(true)
     });
 
-    it('should not call `document.write`', function() {
-      spyOn(document, 'write');
-
+    expect(function() {
       writeHtml('<span></span>');
-      expect(document.write).not.toHaveBeenCalled();
-    });
+    }).toThrowError('Cannot call `document.write` after `DOMContentloaded` has fired.')
   });
 
-  describe('when `document.write` method is missing', function() {
-    var originalDocumentWrite = document.write;
-    var loggerSpy = jasmine.createSpyObj('logger', ['error']);
-
-    beforeAll(function() {
-      writeHtml = injectWriteHtml({
-        './logger': loggerSpy
-      });
-
-      document.write = undefined;
+  it('should throw an error when `document.write` method is missing', function() {
+    var writeHtml = injectWriteHtml({
+      'document': {}
     });
 
-    afterAll(function() {
-      document.write = originalDocumentWrite;
-    });
-
-    it('should log an error message', function() {
+    expect(function() {
       writeHtml('<span></span>');
-      expect(loggerSpy.error).toHaveBeenCalled();
-    });
+    }).toThrowError('Cannot write HTML to the page. `document.write` is unavailable.');
   });
 });

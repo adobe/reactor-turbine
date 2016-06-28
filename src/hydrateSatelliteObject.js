@@ -4,14 +4,10 @@ var state = require('./state');
 var logger = require('./public/logger');
 
 module.exports = function() {
-  // Will get replaced by the pageBottom event delegate. Exists here in case there are no page
-  // bottom rules (and therefore the pageBottom event delegate won't get included) and our
-  // customers are still calling the method.
-  _satellite.pageBottom = function() {};
-
-  // Will get replaced by the directCall event delegate. Exists here in case there are no direct
-  // call rules (and therefore the directCall event delegate won't get included) and our customers
-  // are still calling the method.
+  // Will get replaced by the directCall event delegate from the DTM extension. Exists here in
+  // case there are no direct call rules (and therefore the directCall event delegate won't get
+  // included) and our customers are still calling the method. In this case, we don't want an error
+  // to be thrown.
   _satellite.track = function() {};
 
   _satellite.buildInfo = state.getBuildInfo();

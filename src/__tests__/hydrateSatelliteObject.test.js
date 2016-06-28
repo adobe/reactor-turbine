@@ -7,13 +7,6 @@ describe('hydrateSatelliteObject', function() {
     window._satellite = {};
   });
 
-  it('should add a pageBottom function on _satellite', function() {
-    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
-    hydrateSatelliteObject();
-    window._satellite.pageBottom();
-    expect(window._satellite.pageBottom).toEqual(jasmine.any(Function));
-  });
-
   it('should add a track function on _satellite', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject({});
     hydrateSatelliteObject();

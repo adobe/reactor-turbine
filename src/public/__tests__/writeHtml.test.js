@@ -21,7 +21,7 @@ describe('writeHtml', function() {
 
     expect(function() {
       writeHtml('<span></span>');
-    }).toThrowError('Cannot call `document.write` after `DOMContentloaded` has fired.')
+    }).toThrowError('Cannot call `document.write` after `DOMContentloaded` has fired.');
   });
 
   it('should throw an error when `document.write` method is missing', function() {

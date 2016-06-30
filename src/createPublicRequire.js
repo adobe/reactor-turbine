@@ -17,7 +17,7 @@ var modules = {
   'once': require('./public/once'),
   'logger': require('./public/logger'),
   'write-html': require('./public/writeHtml'),
-  'page-bottom': require('./public/pageBottom'),
+  'on-page-bottom': require('./public/onPageBottom'),
   'window': require('window'),
   'document': require('document')
 };

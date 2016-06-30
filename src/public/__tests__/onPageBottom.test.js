@@ -1,8 +1,9 @@
 describe('onPageBottom', function() {
-  var getInjectedOnPageBottom = function(window, document) {
+  var getInjectedOnPageBottom = function(options) {
     return require('inject!../onPageBottom')({
-      'window': window,
-      'document': document,
+      'window': options.window,
+      'document': options.document,
+      './logger': options.logger || require('../logger'),
       './once': require('../once')
     });
   };
@@ -11,14 +12,17 @@ describe('onPageBottom', function() {
     var windowFakeObject = {};
     var documentFakeObject = { addEventListener: function() {} };
 
-    var onPageBottom = getInjectedOnPageBottom(windowFakeObject, documentFakeObject);
+    var onPageBottom = getInjectedOnPageBottom({
+      window: windowFakeObject,
+      document: documentFakeObject
+    });
 
     onPageBottom(done);
 
     windowFakeObject._satellite.pageBottom();
   });
 
-  it('calls the callback when DOMContentLoaded is executed', function(done) {
+  it('calls the callback when DOMContentLoaded is executed', function() {
     var triggerDOMContentLoaded = null;
 
     var windowFakeObject = {};
@@ -29,12 +33,26 @@ describe('onPageBottom', function() {
         }
       }
     };
+    var loggerFakeObject = {
+      error: jasmine.createSpy()
+    };
 
-    var onPageBottom = getInjectedOnPageBottom(windowFakeObject, documentFakeObject);
+    var onPageBottom = getInjectedOnPageBottom({
+      window: windowFakeObject,
+      document: documentFakeObject,
+      logger: loggerFakeObject
+    });
 
-    onPageBottom(done);
+    var spy = jasmine.createSpy();
+
+    onPageBottom(spy);
 
     triggerDOMContentLoaded();
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(loggerFakeObject.error).toHaveBeenCalledWith('_satellite.pageBottom() was not called ' +
+      'before the document finished loading. Please call _satellite.pageBottom() at the end of ' +
+      'the body tag to ensure proper behavior.');
   });
 
   it('callback is called only once', function() {
@@ -49,7 +67,10 @@ describe('onPageBottom', function() {
       }
     };
 
-    var onPageBottom = getInjectedOnPageBottom(windowFakeObject, documentFakeObject);
+    var onPageBottom = getInjectedOnPageBottom({
+      window: windowFakeObject,
+      document: documentFakeObject
+    });
 
     var spy = jasmine.createSpy();
 
@@ -68,7 +89,10 @@ describe('onPageBottom', function() {
       addEventListener: function() {}
     };
 
-    var onPageBottom = getInjectedOnPageBottom(windowFakeObject, documentFakeObject);
+    var onPageBottom = getInjectedOnPageBottom({
+      window: windowFakeObject,
+      document: documentFakeObject
+    });
 
     windowFakeObject._satellite.pageBottom();
 

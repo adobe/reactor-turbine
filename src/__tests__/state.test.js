@@ -71,7 +71,7 @@ describe('state', function() {
           'example-extension/shared/sharedModule.js': {
             sharedName: 'foo',
             script: jasmine.createSpy().and.callFake(function(module, require) {
-              module.exports = sharedModuleSpy;
+              module.exports = {};
             })
           }
         }

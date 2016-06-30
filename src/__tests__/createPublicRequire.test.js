@@ -18,11 +18,10 @@ describe('function returned by createPublicRequire', function() {
     var onceMock = {};
     var loggerMock = {};
     var writeHtmlMock = {};
-    var pageBottomMock = {};
+    var onPageBottomMock = {};
     var weakMapMock = {};
     var windowMock = {};
     var documentMock = {};
-
 
     var createPublicRequire = injectCreatePublicRequire({
       './public/EventEmitter': eventEmitterMock,
@@ -40,7 +39,7 @@ describe('function returned by createPublicRequire', function() {
       './public/once': onceMock,
       './public/logger': loggerMock,
       './public/writeHtml': writeHtmlMock,
-      './public/pageBottom': pageBottomMock,
+      './public/onPageBottom': onPageBottomMock,
       'window': windowMock,
       'document': documentMock
     });
@@ -63,7 +62,7 @@ describe('function returned by createPublicRequire', function() {
     expect(publicRequire('once')).toBe(onceMock);
     expect(publicRequire('logger')).toBe(loggerMock);
     expect(publicRequire('write-html')).toBe(writeHtmlMock);
-    expect(publicRequire('page-bottom')).toBe(pageBottomMock);
+    expect(publicRequire('on-page-bottom')).toBe(onPageBottomMock);
     expect(publicRequire('window')).toBe(windowMock);
     expect(publicRequire('document')).toBe(documentMock);
   });

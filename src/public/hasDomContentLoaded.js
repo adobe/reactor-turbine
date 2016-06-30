@@ -2,7 +2,16 @@
 'use strict';
 var document = require('document');
 
+var domContentLoaded = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+  domContentLoaded = true;
+});
+
 module.exports = function() {
-  // Check the page has been parsed, but all subresources have not yet been loaded.
-  return ['complete', 'loaded', 'interactive'].indexOf(document.readyState) !== -1;
+  return domContentLoaded;
+  // We can't do something like the following because IE (at least 9 and 10) sets readyState to
+  // interactive after loading the first external file which comes long before the
+  // DOMContentLoaded event.
+  // return ['complete', 'loaded', 'interactive'].indexOf(document.readyState) !== -1;
 };

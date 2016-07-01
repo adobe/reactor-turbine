@@ -3,6 +3,7 @@
 var window = require('window');
 var document = require('document');
 var once = require('./once');
+var logger = require('./logger');
 
 var callbacks = [];
 
@@ -30,7 +31,13 @@ window._satellite.pageBottom = pageBottomHandler;
  * Assume page bottom when DOMContentLoaded is fired, in case the hosting site didn't call
  * _satellite.pageBottom at the end of the page.
  */
-document.addEventListener('DOMContentLoaded', pageBottomHandler);
+document.addEventListener('DOMContentLoaded', function() {
+  if (!pageBottomTriggered) {
+    logger.error('_satellite.pageBottom() was not called before the document finished loading. ' +
+      'Please call _satellite.pageBottom() at the end of the body tag to ensure proper behavior.');
+    pageBottomHandler();
+  }
+});
 
 /**
  * Page bottom utility. Calls the callback when _satellite.pageBottom() is called. If

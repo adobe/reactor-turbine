@@ -9,10 +9,13 @@ var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
 var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
 
 var customVars = {};
-var rules;
-var dataElements;
-var buildInfo;
-var propertySettings;
+
+// Initialize immediately in case init isn't called (which occurs in tests that
+// essentially use state.js as a stub but never call init).
+var rules = [];
+var dataElements = {};
+var buildInfo = {};
+var propertySettings = {};
 
 var init = function(container) {
   // These can't be required at the top of the file because they require other modules which require
@@ -20,10 +23,10 @@ var init = function(container) {
   var createGetExtensionConfigurations = require('./createGetExtensionConfigurations');
   var createPublicRequire = require('./createPublicRequire');
 
-  rules = container.rules || [];
-  dataElements = container.dataElements || {};
-  buildInfo = container.buildInfo || {};
-  propertySettings = container.propertySettings || {};
+  rules = container.rules || rules;
+  dataElements = container.dataElements || dataElements;
+  buildInfo = container.buildInfo || buildInfo;
+  propertySettings = container.propertySettings || propertySettings;
 
   var extensions = container.extensions;
   if (extensions) {

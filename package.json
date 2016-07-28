@@ -3,8 +3,10 @@
   "version": "14.0.0",
   "description": "DTM engine that contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.",
   "scripts": {
-    "test": "gulp test",
-    "ci-job": "xvfb-run gulp test --ci --browser all && gulp lint"
+    "prepublish": "webpack",
+    "test": "run-reactor-tests",
+    "lint": "run-reactor-lint",
+    "ci-job": "xvfb-run run-reactor-tests --ci --browser all && run-reactor-lint"
   },
   "author": {
     "name": "DTM",
@@ -19,18 +21,13 @@
   },
   "dependencies": {
     "cookie": "0.3.1",
-    "gulp": "^3.9.1",
-    "gulp-gzip": "^1.4.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^1.5.3",
     "is-plain-object": "2.0.1",
     "native-promise-only": "0.8.1",
     "strict-loader": "^1.1.0",
     "tiny-emitter": "1.0.2",
-    "webpack": "^1.13.1",
-    "webpack-stream": "^3.2.0"
+    "webpack": "^1.13.1"
   },
   "devDependencies": {
-    "@reactor/extension-support-testrunner": "^3.1.0"
+    "@reactor/extension-support-testrunner": "^5.0.0"
   }
 }

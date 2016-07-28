@@ -1,0 +1,6 @@
+src
+tasks
+.*
+coverage
+webpack.config.js
+sonar-project.properties

@@ -14,7 +14,7 @@ module.exports = function(configurations) {
   return function() {
     var settingsByConfigurationId = {};
 
-    Object.keys(configurations).forEach(function(id) {
+    Object.keys(configurations || {}).forEach(function(id) {
       settingsByConfigurationId[id] = replaceVarTokens(configurations[id].settings);
     });
 

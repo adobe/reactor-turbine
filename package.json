@@ -4,9 +4,9 @@
   "description": "DTM engine that contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.",
   "scripts": {
     "prepublish": "webpack",
-    "test": "run-reactor-tests",
-    "lint": "run-reactor-lint",
-    "ci-job": "xvfb-run run-reactor-tests --ci --browser all && run-reactor-lint"
+    "test": "reactor-testrunner",
+    "lint": "reactor-testrunner lint",
+    "ci-job": "xvfb-run npm test -- --ci --browser all && npm run lint"
   },
   "author": {
     "name": "DTM",

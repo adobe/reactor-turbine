@@ -37,13 +37,15 @@ module.exports = function(
   propertySettings,
   getExtensionConfigurations,
   getSharedModuleExports,
-  getModuleExportsByRelativePath) {
+  getModuleExportsByRelativePath,
+  getHostedLibFileUrl) {
 
   var allModules = Object.create(modules);
   allModules['build-info'] = buildInfo;
   allModules['property-settings'] = propertySettings;
   allModules['get-extension-configurations'] = getExtensionConfigurations;
   allModules['get-shared-module'] = getSharedModuleExports;
+  allModules['get-hosted-lib-file-url'] = getHostedLibFileUrl;
 
   return function(key) {
     if (allModules[key]) {

@@ -72,19 +72,23 @@ describe('function returned by createPublicRequire', function() {
     var propertySettingsMock = {};
     var getExtensionConfigurationsMock = {};
     var getSharedModuleMock = {};
+    var getHostedLibFileUrlMock = {};
 
     var createPublicRequire = injectCreatePublicRequire({});
     var publicRequire = createPublicRequire(
       buildInfoMock,
       propertySettingsMock,
       getExtensionConfigurationsMock,
-      getSharedModuleMock
+      getSharedModuleMock,
+      null,
+      getHostedLibFileUrlMock
     );
 
     expect(publicRequire('build-info')).toBe(buildInfoMock);
     expect(publicRequire('property-settings')).toBe(propertySettingsMock);
     expect(publicRequire('get-extension-configurations')).toBe(getExtensionConfigurationsMock);
     expect(publicRequire('get-shared-module')).toBe(getSharedModuleMock);
+    expect(publicRequire('get-hosted-lib-file-url')).toBe(getHostedLibFileUrlMock);
   });
 
   it('should call for relative module when relative path is used', function() {

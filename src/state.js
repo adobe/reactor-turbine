@@ -3,6 +3,7 @@ var moduleProvider = require('./moduleProvider');
 var getLocalStorageItem = require('./getLocalStorageItem');
 var setLocalStorageItem = require('./setLocalStorageItem');
 var createGetSharedModuleExports = require('./createGetSharedModuleExports');
+var createGetHostedLibFileUrl = require('./createGetHostedLibFileUrl');
 var resolveRelativePath = require('./resolveRelativePath');
 
 var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
@@ -48,7 +49,8 @@ var init = function(container) {
             propertySettings,
             getExtensionConfigurations,
             getSharedModuleExports,
-            getModuleExportsByRelativePath
+            getModuleExportsByRelativePath,
+            createGetHostedLibFileUrl(extension.hostedLibFilesBaseUrl)
           );
 
           var module = extension.modules[referencePath];

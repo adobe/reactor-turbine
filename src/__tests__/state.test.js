@@ -7,6 +7,7 @@ describe('state', function() {
   var createGetSharedModuleExports;
   var createGetExtensionConfigurations;
   var createPublicRequire;
+  var createGetHostedLibFileUrl;
   var state;
 
   var container = {
@@ -42,6 +43,7 @@ describe('state', function() {
     extensions: {
       'example-extension': {
         displayName: 'Example Extension',
+        hostedLibFilesBaseUrl: '//examples.com/somefolder/',
         configurations: {
           ECa: {
             settings: {
@@ -88,7 +90,7 @@ describe('state', function() {
 
   beforeEach(function() {
     moduleProvider = createModuleProvider();
-    
+
     Object.keys(moduleProvider).forEach(function(methodName) {
       spyOn(moduleProvider, methodName).and.callThrough();
     });
@@ -102,13 +104,17 @@ describe('state', function() {
     createPublicRequire = jasmine.createSpy().and.callThrough(
       require('../createPublicRequire'));
 
+    createGetHostedLibFileUrl = jasmine.createSpy().and.callThrough(
+      require('../createGetHostedLibFileUrl'));
+
     state = injectState({
       './moduleProvider': moduleProvider,
       './getLocalStorageItem': require('../getLocalStorageItem'),
       './setLocalStorageItem': require('../setLocalStorageItem'),
       './createGetSharedModuleExports': createGetSharedModuleExports,
       './createGetExtensionConfigurations': createGetExtensionConfigurations,
-      './createPublicRequire': createPublicRequire
+      './createPublicRequire': createPublicRequire,
+      './createGetHostedLibFileUrl': createGetHostedLibFileUrl
     });
 
     state.init(container);
@@ -180,6 +186,11 @@ describe('state', function() {
   it('creates getExtensionConfigurations for each extension', function() {
     expect(createGetExtensionConfigurations).toHaveBeenCalledWith(
       container.extensions['example-extension'].configurations);
+  });
+
+  it('creates createGetHostedLibFileUrl for each extension', function() {
+    expect(createGetHostedLibFileUrl).toHaveBeenCalledWith(
+      container.extensions['example-extension'].hostedLibFilesBaseUrl);
   });
 
   it('creates a public require function for each module', function() {

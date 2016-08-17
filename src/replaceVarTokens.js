@@ -8,23 +8,36 @@ var replaceTokensInObject;
 var replaceTokensInArray;
 var replaceTokens;
 
+var getVarValue = function(token, variableName, element, event) {
+  var val = getVar(variableName, element, event);
+  if (val == null) {
+    return undefinedVarsReturnEmpty ? '' : token;
+  } else {
+    return val;
+  }
+};
+
 /**
  * Perform variable substitutions to a string where tokens are specified in the form %foo%.
- * @param str {string} The string to which substitutions should be applied.
+ * If the only content of the string is a single data element token, then the raw data element
+ * value will be returned instead.
+ *
+ * @param str {string} The string potentially containing data element tokens.
  * @param element {HTMLElement} The element to use for tokens in the form of %this.property%.
  * @param event {Object} The event object to use for tokens in the form of %target.property%.
- * @returns {string}
+ * @returns {*}
  */
 replaceTokensInString = function(str, element, event) {
-  return str
-    .replace(/%(.*?)%/g, function(token, variableName) {
-      var val = getVar(variableName, element, event);
-      if (val == null) {
-        return undefinedVarsReturnEmpty ? '' : token;
-      } else {
-        return val;
-      }
+  // Is the string a single data element token and nothing else?
+  var result = /^%([^%]+)%$/.exec(str);
+
+  if (result) {
+    return getVarValue(str, result[1], element, event);
+  } else {
+    return str.replace(/%(.+?)%/g, function(token, variableName) {
+      return getVarValue(token, variableName, element, event);
     });
+  }
 };
 
 replaceTokensInObject = function(obj, element, event) {

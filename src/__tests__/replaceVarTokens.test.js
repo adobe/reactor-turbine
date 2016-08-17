@@ -28,7 +28,8 @@ describe('replaceVarTokens', function() {
       foo: [
         {},
         {
-          bar: '%unicorn% and %dinosaur% tracks'
+          bar: '%unicorn% and %dinosaur% tracks',
+          zoo: '%unicorn% and %dinosaur%'
         }
       ],
       fruits: [
@@ -41,7 +42,8 @@ describe('replaceVarTokens', function() {
       foo: [
         {},
         {
-          bar: 'replaced:unicorn and replaced:dinosaur tracks'
+          bar: 'replaced:unicorn and replaced:dinosaur tracks',
+          zoo: 'replaced:unicorn and replaced:dinosaur'
         }
       ],
       fruits: [
@@ -87,7 +89,32 @@ describe('replaceVarTokens', function() {
     expect(replaceVarTokens('foo %bar%')).toBe('foo %bar%');
   });
 
-  it('returns things if it an unsupported type', function() {
+  it('returns the data element\'s raw value if only a ' +
+    'single data element token is given', function() {
+    var objValue = {};
+
+    var replaceVarTokens = getReplaceVarTokens({
+      getVar: function() {
+        return objValue;
+      }
+    });
+
+    expect(replaceVarTokens('%foo%')).toBe(objValue);
+  });
+
+  it('does not return the data element\'s raw value if string starts and ends with different ' +
+    'data element tokens', function() {
+    var replaceVarTokens = getReplaceVarTokens({
+      getVar: function() {
+        return 'quux';
+      }
+    });
+
+    // tests regex robustness
+    expect(replaceVarTokens('%foo% and %bar%')).toBe('quux and quux');
+  });
+
+  it('returns the argument unmodified if it is an unsupported type', function() {
     var replaceVarTokens = getReplaceVarTokens();
 
     var fn = function() {};

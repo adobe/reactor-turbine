@@ -10,8 +10,16 @@ describe('hydrateSatelliteObject', function() {
   it('should add a track function on _satellite', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject({});
     hydrateSatelliteObject();
-    window._satellite.track();
     expect(window._satellite.track).toEqual(jasmine.any(Function));
+    // shouldn't throw an error.
+    window._satellite.track();
+  });
+
+  it('should add a getVisitorId function on _satellite', function() {
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
+    hydrateSatelliteObject();
+    expect(window._satellite.getVisitorId).toEqual(jasmine.any(Function));
+    expect(window._satellite.getVisitorId()).toBe(null);
   });
 
   it('should add a `isLinked` method on _satellite that returns true for an anchor element',

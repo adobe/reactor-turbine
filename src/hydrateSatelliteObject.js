@@ -9,12 +9,16 @@ module.exports = function() {
   // included) and our customers are still calling the method. In this case, we don't want an error
   // to be thrown.
   _satellite.track = function() {};
+  
+  // Will get replaced by the Marketing Cloud ID extension if installed. Exists here in case
+  // the extension is not installed and our customers are still calling the method. In this case,
+  // we don't want an error to be thrown. This method existed before Reactor.
+  _satellite.getVisitorId = function() { return null; };
 
   _satellite.buildInfo = state.getBuildInfo();
   _satellite.notify = logger.notify.bind(logger);
   _satellite.getVar = require('./public/getVar');
   _satellite.setVar = require('./public/setCustomVar');
-// TODO: _satellite.getVisitorId
 
   /**
    * Writes a cookie.

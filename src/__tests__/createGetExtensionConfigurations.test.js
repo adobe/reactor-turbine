@@ -37,4 +37,18 @@ describe('function returned by createGetExtensionConfigurations', function() {
       }
     });
   });
+
+  it('gracefully handles undefined configurations', function() {
+    var getExtensionConfigurations = createGetExtensionConfigurations();
+
+    expect(getExtensionConfigurations()).toEqual({});
+  });
+
+  it('gracefully handles undefined settings objects', function() {
+    var getExtensionConfigurations = createGetExtensionConfigurations({
+      id1: {}
+    });
+
+    expect(getExtensionConfigurations().id1).toEqual({});
+  });
 });

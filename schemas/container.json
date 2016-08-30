@@ -1,0 +1,175 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/moduleConfig"
+            }
+          },
+          "conditions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/moduleConfig"
+            }
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/moduleConfig"
+            }
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "dataElements": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/moduleConfig"
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "configurations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "settings": {
+                  "type": "object"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "modules": {
+            "type": "object",
+            "patternProperties": {
+              "^[^\\/].*\\/.*\\.js$": {
+                "type": "object",
+                "properties": {
+                  "script": {},
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sharedName": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "script"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "displayName"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "propertySettings": {
+      "type": "object",
+      "properties": {
+        "undefinedVarsReturnEmpty": {
+          "type": "boolean"
+        },
+        "euCookieName": {
+          "type": "string"
+        },
+        "linkDelay": {
+          "type": "integer"
+        },
+        "domainList": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "buildInfo": {
+      "type": "object",
+      "properties": {
+        "turbineVersion": {
+          "$ref": "#/definitions/semver"
+        },
+        "turbineBuildDate": {
+          "format": "date-time"
+        },
+        "buildDate": {
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "turbineVersion",
+        "turbineBuildDate",
+        "buildDate",
+        "environment"
+      ]
+    }
+  },
+  "required": [
+    "propertySettings",
+    "buildInfo"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "moduleConfig": {
+      "type": "object",
+      "properties": {
+        "modulePath": {
+          "$ref": "#/definitions/modulePath"
+        },
+        "settings": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "modulePath",
+      ],
+      "additionalProperties": true
+    },
+    "modulePath": {
+      "type": "string",
+      "pattern": "^[^\\/].*\\/.*\\.js$"
+    },
+    "semver": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^\\bv?(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?\\b$"
+    }
+  }
+}

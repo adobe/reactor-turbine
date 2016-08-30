@@ -114,7 +114,8 @@
           },
           "uniqueItems": true
         }
-      }
+      },
+      "additionalProperties": false
     },
     "buildInfo": {
       "type": "object",
@@ -138,7 +139,8 @@
         "turbineBuildDate",
         "buildDate",
         "environment"
-      ]
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
@@ -158,7 +160,7 @@
         }
       },
       "required": [
-        "modulePath",
+        "modulePath"
       ],
       "additionalProperties": true
     },

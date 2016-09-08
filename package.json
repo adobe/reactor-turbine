@@ -28,6 +28,6 @@
     "webpack": "^1.13.1"
   },
   "devDependencies": {
-    "@reactor/extension-support-testrunner": "^5.0.0"
+    "@reactor/extension-support-testrunner": "^7.0.0"
   }
 }

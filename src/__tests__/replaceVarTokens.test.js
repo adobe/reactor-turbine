@@ -15,8 +15,6 @@ var getReplaceVarTokens = function(options) {
 };
 
 describe('replaceVarTokens', function() {
-  runTestPage('replaces tokens in objects', __dirname + '/replaceVarTokens.html');
-
   it('replaces nested tokens', function() {
     var replaceVarTokens = getReplaceVarTokens({
       getVar: function(variableName) {

@@ -14,19 +14,61 @@
           "events": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/moduleConfig"
+              "type": "object",
+              "properties": {
+                "modulePath": {
+                  "$ref": "#/definitions/modulePath"
+                },
+                "settings": {
+                  "type": "object"
+                }
+              },
+              "required": [
+                "modulePath"
+              ],
+              "additionalProperties": true
             }
           },
           "conditions": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/moduleConfig"
+              "type": "object",
+              "properties": {
+                "modulePath": {
+                  "$ref": "#/definitions/modulePath"
+                },
+                "settings": {
+                  "type": "object"
+                },
+                "logicType": {
+                  "enum": [
+                    "and",
+                    "exception"
+                  ]
+                }
+              },
+              "required": [
+                "modulePath"
+              ],
+              "additionalProperties": true
             }
           },
           "actions": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/moduleConfig"
+              "type": "object",
+              "properties": {
+                "modulePath": {
+                  "$ref": "#/definitions/modulePath"
+                },
+                "settings": {
+                  "type": "object"
+                }
+              },
+              "required": [
+                "modulePath"
+              ],
+              "additionalProperties": true
             }
           }
         },
@@ -39,7 +81,19 @@
     "dataElements": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/moduleConfig"
+        "type": "object",
+        "properties": {
+          "modulePath": {
+            "$ref": "#/definitions/modulePath"
+          },
+          "settings": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "modulePath"
+        ],
+        "additionalProperties": true
       }
     },
     "extensions": {
@@ -155,21 +209,6 @@
   ],
   "additionalProperties": false,
   "definitions": {
-    "moduleConfig": {
-      "type": "object",
-      "properties": {
-        "modulePath": {
-          "$ref": "#/definitions/modulePath"
-        },
-        "settings": {
-          "type": "object"
-        }
-      },
-      "required": [
-        "modulePath"
-      ],
-      "additionalProperties": true
-    },
     "modulePath": {
       "type": "string",
       "pattern": "^[^\\/].*\\/.*\\.js$"

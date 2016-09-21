@@ -4,9 +4,15 @@ var state = require('./state');
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 
+var EXCEPTION_LOGIC_TYPE = 'exception';
+
+var getModuleDisplayName = function(ruleComponent) {
+  return state.getModuleDisplayName(ruleComponent.modulePath) || ruleComponent.modulePath;
+};
+
 var getErrorMessage = function(ruleComponent, rule, errorMessage, errorStack) {
-  var moduleName = state.getModuleDisplayName(ruleComponent.modulePath) || ruleComponent.modulePath;
-  return 'Failed to execute ' + moduleName + ' for ' + rule.name + ' rule. ' +
+  var moduleDisplayName = getModuleDisplayName(ruleComponent);
+  return 'Failed to execute ' + moduleDisplayName + ' for ' + rule.name + ' rule. ' +
     errorMessage + (errorStack ? '\n' + errorStack : '');
 };
 
@@ -65,15 +71,22 @@ var checkConditions = function(rule, relatedElement, event) {
 
       var settings = replaceVarTokens(condition.settings, relatedElement, event);
 
+      var result;
+
       try {
-        if (!moduleExports(settings, relatedElement, event)) {
-          logger.log('Condition for rule ' + rule.name + ' not met.');
-          return;
-        }
+        result = moduleExports(settings, relatedElement, event);
       } catch (e) {
         logger.error(getErrorMessage(condition, rule, e.message, e.stack));
         // We return because we want to assume the condition would have failed and therefore
         // we don't want to run the following conditions or the rule's actions.
+        return;
+      }
+
+      var isExceptionCondition = condition.logicType === EXCEPTION_LOGIC_TYPE;
+
+      if ((!result && !isExceptionCondition) || (result && isExceptionCondition)) {
+        var conditionDisplayName = getModuleDisplayName(condition);
+        logger.log('Condition ' + conditionDisplayName + ' for rule ' + rule.name + ' not met.');
         return;
       }
     }

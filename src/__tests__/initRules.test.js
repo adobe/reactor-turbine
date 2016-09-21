@@ -57,7 +57,7 @@ describe('initRules', function() {
         {
           displayName: getMockDisplayName(TEST_CONDITION2_PATH),
           script: function(module) {
-            module.exports = jasmine.createSpy().and.returnValue(true);
+            module.exports = jasmine.createSpy().and.returnValue(false);
           }
         });
 
@@ -101,7 +101,8 @@ describe('initRules', function() {
               modulePath: TEST_CONDITION2_PATH,
               settings: {
                 testCondition2Foo: 'bar'
-              }
+              },
+              logicType: 'exception'
             }
           ],
           actions: [
@@ -231,6 +232,18 @@ describe('initRules', function() {
       expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
     });
 
+    it('ceases to execute remaining conditions and any actions when exception ' +
+      'condition fails', function() {
+      rules[0].conditions[0].logicType = 'exception';
+
+      initRules();
+
+      expect(moduleProvider.getModuleExports(TEST_CONDITION1_PATH).calls.count()).toBe(1);
+      expect(moduleProvider.getModuleExports(TEST_CONDITION2_PATH).calls.count()).toBe(0);
+      expect(moduleProvider.getModuleExports(TEST_ACTION1_PATH).calls.count()).toBe(0);
+      expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
+    });
+
     it('does not throw error when there are no events for a rule', function() {
       delete rules[0].events;
 
@@ -261,9 +274,10 @@ describe('initRules', function() {
     });
   });
 
-  describe('error handling', function() {
+  describe('error handling and logging', function() {
     var logger;
     var initRules;
+    var rules;
     var state;
     var moduleProvider;
 
@@ -299,30 +313,32 @@ describe('initRules', function() {
         }
       );
 
+      rules = [
+        {
+          name: 'Test Rule',
+          events: [
+            {
+              modulePath: TEST_EVENT_PATH
+            }
+          ],
+          conditions: [
+            {
+              modulePath: TEST_CONDITION1_PATH
+            }
+          ],
+          actions: [
+            {
+              modulePath: TEST_ACTION1_PATH
+            }
+          ]
+        }
+      ];
+
       state = {
         getModuleExports: moduleProvider.getModuleExports,
         getModuleDisplayName: moduleProvider.getModuleDisplayName,
         getRules: function() {
-          return [
-            {
-              name: 'Test Rule',
-              events: [
-                {
-                  modulePath: TEST_EVENT_PATH
-                }
-              ],
-              conditions: [
-                {
-                  modulePath: TEST_CONDITION1_PATH
-                }
-              ],
-              actions: [
-                {
-                  modulePath: TEST_ACTION1_PATH
-                }
-              ]
-            }
-          ];
+          return rules;
         },
         getShouldExecuteActions: function() {
           return true;
@@ -450,7 +466,7 @@ describe('initRules', function() {
       expect(errorMessage).toStartWith(expectedErrorMessage);
     });
 
-    it('logs an error when the condition doesn\'t pass', function() {
+    it('logs a message when the condition doesn\'t pass', function() {
       moduleProvider.registerModule(
         TEST_CONDITION1_PATH,
         {
@@ -466,7 +482,16 @@ describe('initRules', function() {
       initRules();
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
-        'Condition for rule Test Rule not met.');
+        'Condition Display Name hello-world/testCondition1.js for rule Test Rule not met.');
+    });
+
+    it('logs a message when the exception condition doesn\'t pass', function() {
+      rules[0].conditions[0].logicType = 'exception';
+
+      initRules();
+
+      expect(logger.log.calls.mostRecent().args[0]).toEqual(
+        'Condition Display Name hello-world/testCondition1.js for rule Test Rule not met.');
     });
 
     it('logs an error when retrieving action module exports fails', function() {

@@ -40,11 +40,8 @@
                 "settings": {
                   "type": "object"
                 },
-                "logicType": {
-                  "enum": [
-                    "and",
-                    "exception"
-                  ]
+                "negate": {
+                  "type": "boolean"
                 }
               },
               "required": [

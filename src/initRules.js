@@ -4,8 +4,6 @@ var state = require('./state');
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 
-var EXCEPTION_LOGIC_TYPE = 'exception';
-
 var getModuleDisplayName = function(ruleComponent) {
   return state.getModuleDisplayName(ruleComponent.modulePath) || ruleComponent.modulePath;
 };
@@ -82,9 +80,7 @@ var checkConditions = function(rule, relatedElement, event) {
         return;
       }
 
-      var isExceptionCondition = condition.logicType === EXCEPTION_LOGIC_TYPE;
-
-      if ((!result && !isExceptionCondition) || (result && isExceptionCondition)) {
+      if ((!result && !condition.negate) || (result && condition.negate)) {
         var conditionDisplayName = getModuleDisplayName(condition);
         logger.log('Condition ' + conditionDisplayName + ' for rule ' + rule.name + ' not met.');
         return;

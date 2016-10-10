@@ -13,42 +13,62 @@ describe('function returned by createGetExtensionConfigurations', function() {
       return replacedObj;
     }
   });
-  
+
   it('returns configurations with data element tokens replaced', function() {
-    var getExtensionConfigurations = createGetExtensionConfigurations({
-      id1: {
+    var getExtensionConfigurations = createGetExtensionConfigurations([
+      {
+        id: 'id1',
+        name: 'extension configuration 1',
         settings: {
           foo: '%bar%'
         }
       },
-      id2: {
+      {
+        id: 'id2',
+        name: 'extension configuration 2',
         settings: {
           baz: '%qux%'
         }
       }
-    });
+    ]);
 
-    expect(getExtensionConfigurations()).toEqual({
-      id1: {
-        foo: '%bar% - replaced'
+    expect(getExtensionConfigurations()).toEqual([
+      {
+        id: 'id1',
+        name: 'extension configuration 1',
+        settings: {
+          foo: '%bar% - replaced'
+        }
+
       },
-      id2: {
-        baz: '%qux% - replaced'
+      {
+        id: 'id2',
+        name: 'extension configuration 2',
+        settings: {
+          baz: '%qux% - replaced'
+        }
       }
-    });
+    ]);
   });
 
   it('gracefully handles undefined configurations', function() {
     var getExtensionConfigurations = createGetExtensionConfigurations();
 
-    expect(getExtensionConfigurations()).toEqual({});
+    expect(getExtensionConfigurations()).toEqual([]);
   });
 
   it('gracefully handles undefined settings objects', function() {
-    var getExtensionConfigurations = createGetExtensionConfigurations({
-      id1: {}
-    });
+    var getExtensionConfigurations = createGetExtensionConfigurations([
+      {
+        id: 'id1',
+        name: 'extension configuration 1'
+      }
+    ]);
 
-    expect(getExtensionConfigurations().id1).toEqual({});
+    expect(getExtensionConfigurations()).toEqual([{
+      id: 'id1',
+      name: 'extension configuration 1',
+      settings: {}
+    }]);
   });
 });

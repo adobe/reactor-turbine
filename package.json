@@ -24,10 +24,10 @@
     "is-plain-object": "2.0.1",
     "native-promise-only": "0.8.1",
     "strict-loader": "^1.1.0",
-    "tiny-emitter": "1.0.2",
-    "webpack": "^1.13.1"
+    "tiny-emitter": "1.1.0",
+    "webpack": "^1.13.2"
   },
   "devDependencies": {
-    "@reactor/extension-support-testrunner": "^7.0.0"
+    "@reactor/extension-support-testrunner": "^7.1.0"
   }
 }

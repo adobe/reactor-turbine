@@ -103,14 +103,26 @@
             "minLength": 1
           },
           "configurations": {
-            "type": "object",
-            "additionalProperties": {
+            "type": "array",
+            "items": {
               "type": "object",
               "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
                 "settings": {
                   "type": "object"
                 }
               },
+              "required": [
+                "id",
+                "name"
+              ],
               "additionalProperties": false
             }
           },

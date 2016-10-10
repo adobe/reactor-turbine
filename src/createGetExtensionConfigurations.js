@@ -12,12 +12,13 @@ module.exports = function(configurations) {
   var replaceVarTokens = require('./replaceVarTokens');
 
   return function() {
-    var settingsByConfigurationId = {};
 
-    Object.keys(configurations || {}).forEach(function(id) {
-      settingsByConfigurationId[id] = replaceVarTokens(configurations[id].settings || {});
+    return (configurations || []).map(function(configuration) {
+      return {
+        id: configuration.id,
+        name: configuration.name,
+        settings: replaceVarTokens(configuration.settings || {})
+      };
     });
-
-    return settingsByConfigurationId;
   };
 };

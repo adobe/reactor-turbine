@@ -44,14 +44,14 @@ var init = function(container) {
             return moduleProvider.getModuleExports(resolvedReferencePath);
           };
 
-          var publicRequire = createPublicRequire(
-            buildInfo,
-            propertySettings,
-            getExtensionConfigurations,
-            getSharedModuleExports,
-            getModuleExportsByRelativePath,
-            createGetHostedLibFileUrl(extension.hostedLibFilesBaseUrl)
-          );
+          var publicRequire = createPublicRequire({
+            buildInfo: buildInfo,
+            propertySettings: propertySettings,
+            getExtensionConfigurations: getExtensionConfigurations,
+            getSharedModuleExports: getSharedModuleExports,
+            getModuleExportsByRelativePath: getModuleExportsByRelativePath,
+            getHostedLibFileUrl: createGetHostedLibFileUrl(extension.hostedLibFilesBaseUrl)
+          });
 
           var module = extension.modules[referencePath];
 

@@ -32,26 +32,21 @@ var modules = {
  * @param {Function} getModuleExportsByRelativePath
  * @returns {Function}
  */
-module.exports = function(
-  buildInfo,
-  propertySettings,
-  getExtensionConfigurations,
-  getSharedModuleExports,
-  getModuleExportsByRelativePath,
-  getHostedLibFileUrl) {
+module.exports = function(dynamicModules) {
+  dynamicModules = dynamicModules || {};
 
   var allModules = Object.create(modules);
-  allModules['build-info'] = buildInfo;
-  allModules['property-settings'] = propertySettings;
-  allModules['get-extension-configurations'] = getExtensionConfigurations;
-  allModules['get-shared-module'] = getSharedModuleExports;
-  allModules['get-hosted-lib-file-url'] = getHostedLibFileUrl;
+  allModules['build-info'] = dynamicModules.buildInfo;
+  allModules['property-settings'] = dynamicModules.propertySettings;
+  allModules['get-extension-configurations'] = dynamicModules.getExtensionConfigurations;
+  allModules['get-shared-module'] = dynamicModules.getSharedModuleExports;
+  allModules['get-hosted-lib-file-url'] = dynamicModules.getHostedLibFileUrl;
 
   return function(key) {
     if (allModules[key]) {
       return allModules[key];
     } else if (key.indexOf('./') === 0 || key.indexOf('../') === 0) {
-      return getModuleExportsByRelativePath(key);
+      return dynamicModules.getModuleExportsByRelativePath(key);
     } {
       throw new Error('Cannot resolve module "' + key + '".');
     }

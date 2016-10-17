@@ -2,5 +2,5 @@ src
 tasks
 .*
 coverage
-webpack.config.js
+webpack.*.config.js
 sonar-project.properties

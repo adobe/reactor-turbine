@@ -75,14 +75,13 @@ describe('function returned by createPublicRequire', function() {
     var getHostedLibFileUrlMock = {};
 
     var createPublicRequire = injectCreatePublicRequire({});
-    var publicRequire = createPublicRequire(
-      buildInfoMock,
-      propertySettingsMock,
-      getExtensionConfigurationsMock,
-      getSharedModuleMock,
-      null,
-      getHostedLibFileUrlMock
-    );
+    var publicRequire = createPublicRequire({
+      buildInfo: buildInfoMock,
+      propertySettings: propertySettingsMock,
+      getExtensionConfigurations: getExtensionConfigurationsMock,
+      getSharedModuleExports: getSharedModuleMock,
+      getHostedLibFileUrl: getHostedLibFileUrlMock
+    });
 
     expect(publicRequire('build-info')).toBe(buildInfoMock);
     expect(publicRequire('property-settings')).toBe(propertySettingsMock);
@@ -100,13 +99,9 @@ describe('function returned by createPublicRequire', function() {
       return relativeModuleMock;
     });
 
-    var publicRequire = createPublicRequire(
-      null,
-      null,
-      null,
-      null,
-      getModuleExportsByRelativePath
-    );
+    var publicRequire = createPublicRequire({
+      getModuleExportsByRelativePath: getModuleExportsByRelativePath
+    });
 
     expect(publicRequire('./foo/bar.js')).toBe(relativeModuleMock);
     expect(getModuleExportsByRelativePath).toHaveBeenCalledWith('./foo/bar.js');

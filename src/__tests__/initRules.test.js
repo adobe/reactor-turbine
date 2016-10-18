@@ -102,7 +102,7 @@ describe('initRules', function() {
               settings: {
                 testCondition2Foo: 'bar'
               },
-              negate: true
+              logicType: 'exception'
             }
           ],
           actions: [
@@ -234,7 +234,7 @@ describe('initRules', function() {
 
     it('ceases to execute remaining conditions and any actions when exception ' +
       'condition fails', function() {
-      rules[0].conditions[0].negate = true;
+      rules[0].conditions[0].logicType = 'exception';
 
       initRules();
 
@@ -486,7 +486,7 @@ describe('initRules', function() {
     });
 
     it('logs a message when the exception condition doesn\'t pass', function() {
-      rules[0].conditions[0].negate = true;
+      rules[0].conditions[0].logicType = 'exception';
 
       initRules();
 

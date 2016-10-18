@@ -5,9 +5,22 @@
  * used within the engine.
  */
 module.exports = require('../createPublicRequire')({
-  buildInfo: {},
-  propertySettings: {},
+  buildInfo: {
+    turbineVersion: '16.0.0',
+    turbineBuildDate: '2016-07-01T18:10:34Z',
+    buildDate: '2016-08-01T12:10:33Z',
+    environment: 'development'
+  },
+  propertySettings: {
+    domains: [
+      'adobe.com',
+      'example.com'
+    ],
+    linkDelay: 100,
+    euCookieName: 'sat_track',
+    undefinedVarsReturnEmpty: false
+  },
   getExtensionConfigurations: function() { return []; },
   getSharedModuleExports: function() { },
-  getHostedLibFileUrl: function() { return ''; }
+  getHostedLibFileUrl: function(file) { return '//example.com/' + file; }
 });

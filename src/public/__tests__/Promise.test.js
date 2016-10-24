@@ -1,24 +1,33 @@
 describe('Promise', function() {
-  it('returns the native Promise constructor if it exists', function() {
-    var mockNativePromise = function() {};
-    var mockWindow = {
-      Promise: mockNativePromise
-    };
+  var clearRequireCache = function() {
+    delete require.cache[require.resolve('../Promise')];
+    delete require.cache[require.resolve('native-promise-only-ponyfill')];
+  };
 
-    var Promise = require('inject!../Promise')({
-      'window': mockWindow
-    });
+  beforeEach(clearRequireCache);
 
-    expect(Promise).toBe(mockNativePromise);
+  afterAll(clearRequireCache);
+
+  it('returns native promise if available', function() {
+    var originalPromise = window.Promise;
+    var mockPromise = {};
+    window.Promise = mockPromise;
+    var Promise = require('../Promise');
+
+    expect(Promise).toBe(mockPromise);
+
+    window.Promise = originalPromise;
   });
 
-  it('returns a Promise constructor implementation if a native one does not exist', function() {
-    var mockWindow = {};
-
-    var Promise = require('inject!../Promise')({
-      'window': mockWindow
-    });
+  it('returns ponyfill promise if native promise not available', function() {
+    var originalPromise = window.Promise;
+    window.Promise = undefined;
+    var Promise = require('../Promise');
 
     expect(Promise).toEqual(jasmine.any(Function));
+    expect(Promise).not.toBe(originalPromise);
+    expect(window.Promise).toBeUndefined();
+
+    window.Promise = originalPromise;
   });
 });

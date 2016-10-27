@@ -15,14 +15,14 @@ var setSearch = function(search) {
 };
 
 describe('getQueryParam', function() {
-  it('returns null if the queryString is empty', function() {
+  it('returns undefined if the queryString is empty', function() {
     setSearch('');
-    expect(getQueryParam('fly')).toBeNull();
+    expect(getQueryParam('fly')).toBeUndefined();
   });
 
-  it('returns null when null is passed as the parameter name', function() {
+  it('returns undefined when null is passed as the parameter name', function() {
     setSearch('?fly=caddis');
-    expect(getQueryParam(null)).toBeNull();
+    expect(getQueryParam(null)).toBeUndefined();
   });
 
   it('returns value for matching parameter - Case Sensitive', function() {
@@ -30,9 +30,9 @@ describe('getQueryParam', function() {
     expect(getQueryParam('fly')).toEqual('caddis');
   });
 
-  it('returns null when no matching parameter is found - Case Sensitive', function() {
+  it('returns undefined when no matching parameter is found - Case Sensitive', function() {
     setSearch('?fly=caddis');
-    expect(getQueryParam('Fly')).toBeNull();
+    expect(getQueryParam('Fly')).toBeUndefined();
   });
 
   it('returns value for matching parameter - Case Insensitive', function() {
@@ -40,9 +40,9 @@ describe('getQueryParam', function() {
     expect(getQueryParam('Fly', true)).toEqual('caddis');
   });
 
-  it('returns null when no matching parameter is found', function() {
+  it('returns undefined when no matching parameter is found', function() {
     setSearch('?fly=caddis');
-    expect(getQueryParam('nymph', true)).toBeNull();
+    expect(getQueryParam('nymph', true)).toBeUndefined();
   });
 
   it('returns a value for specific parameter when multiple ' +

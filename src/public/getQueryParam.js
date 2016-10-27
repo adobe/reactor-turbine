@@ -12,5 +12,8 @@ module.exports = function(name, caseInsensitive) {
   // the HTML5 History API.
   var match = new RegExp('[?&]' + name + '=([^&]*)', caseInsensitive ? 'i' : '')
       .exec(window.location.search);
-  return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+
+  if (match) {
+    return decodeURIComponent(match[1].replace(/\+/g, ' '));
+  }
 };

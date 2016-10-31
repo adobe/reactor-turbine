@@ -51,7 +51,7 @@ module.exports = function(name, suppressDefault) {
   if (value === undefined && !suppressDefault) {
     // Have to wrap "default" in quotes since it is a keyword.
     /*eslint-disable dot-notation*/
-    value = dataDef['default'] || '';
+    value = dataDef.defaultValue || '';
     /*eslint-enable dot-notation*/
   }
 

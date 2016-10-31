@@ -144,7 +144,7 @@ describe('getDataElementValue', function() {
       state: {
         getDataElementDefinition: function() {
           return {
-            'default': 'defaultValue',
+            defaultValue: 'defaultValue',
             settings: {}
           };
         },

@@ -1,3 +1,5 @@
+var JS_EXTENSION = '.js';
+
 /**
  * @private
  * Returns the directory of a path. A limited version of path.dirname in nodejs.
@@ -15,6 +17,16 @@ var dirname = function(path) {
 };
 
 /**
+ * Determines if a string ends with a certain string.
+ * @param {string} str The string to test.
+ * @param {string} suffix The suffix to look for at the end of str.
+ * @returns {boolean} Whether str ends in suffix.
+ */
+var endsWith = function(str, suffix) {
+  return str.indexOf(suffix, str.length - suffix.length) !== -1;
+};
+
+/**
  * Given a starting path and a path relative to the starting path, returns the final path. A
  * limited version of path.resolve in nodejs.
  *
@@ -29,6 +41,11 @@ var dirname = function(path) {
  * @returns {string}
  */
 module.exports = function(fromPath, relativePath) {
+  // Handle the case where the relative path does not end in the .js extension. We auto-append it.
+  if (relativePath && !endsWith(relativePath, JS_EXTENSION)) {
+    relativePath = relativePath + JS_EXTENSION;
+  }
+
   var relativePathSegments = relativePath.split('/');
   var resolvedPathSegments = dirname(fromPath).split('/');
 

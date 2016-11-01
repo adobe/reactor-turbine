@@ -28,5 +28,8 @@ describe('resolveRelativePath', function() {
     // This is an invalid relative path but we do our best and don't throw errors.
     path = resolveRelativePath('extension/file1.js', '../../../../file2.js');
     expect(path).toBe('file2.js');
+
+    path = resolveRelativePath('extension/file.js', './file2');
+    expect(path).toBe('extension/file2.js');
   });
 });

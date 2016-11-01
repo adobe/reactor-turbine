@@ -42,7 +42,7 @@ var endsWith = function(str, suffix) {
  */
 module.exports = function(fromPath, relativePath) {
   // Handle the case where the relative path does not end in the .js extension. We auto-append it.
-  if (relativePath && !endsWith(relativePath, JS_EXTENSION)) {
+  if (!endsWith(relativePath, JS_EXTENSION)) {
     relativePath = relativePath + JS_EXTENSION;
   }
 

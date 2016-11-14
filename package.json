@@ -7,7 +7,7 @@
     "prepublish": "npm run build",
     "test": "reactor-testrunner",
     "lint": "reactor-testrunner lint",
-    "ci-job": "xvfb-run npm test -- --ci --browser all && npm run lint"
+    "ci-job": "xvfb-run npm test -- --ci --browser firefox chrome ie9sg ie10sg ie11sg edgesg && npm run lint"
   },
   "author": {
     "name": "DTM",

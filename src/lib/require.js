@@ -20,7 +20,7 @@ module.exports = require('../createPublicRequire')({
     euCookieName: 'sat_track',
     undefinedVarsReturnEmpty: false
   },
-  getExtensionConfigurations: function() { return []; },
+  getExtensionConfiguration: function() { },
   getSharedModuleExports: function() { },
   getHostedLibFileUrl: function(file) { return '//example.com/' + file; }
 });

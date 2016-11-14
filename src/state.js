@@ -21,7 +21,7 @@ var propertySettings = {};
 var init = function(container) {
   // These can't be required at the top of the file because they require other modules which require
   // state. This circular dependency would cause issues. Maybe there's a better way?
-  var createGetExtensionConfigurations = require('./createGetExtensionConfigurations');
+  var createGetExtensionConfiguration = require('./createGetExtensionConfiguration');
   var createPublicRequire = require('./createPublicRequire');
 
   rules = container.rules || rules;
@@ -35,7 +35,7 @@ var init = function(container) {
 
     Object.keys(extensions).forEach(function(extensionName) {
       var extension = extensions[extensionName];
-      var getExtensionConfigurations = createGetExtensionConfigurations(extension.configurations);
+      var getExtensionConfiguration = createGetExtensionConfiguration(extension.configuration);
 
       if (extension.modules) {
         Object.keys(extension.modules).forEach(function(referencePath) {
@@ -47,7 +47,7 @@ var init = function(container) {
           var publicRequire = createPublicRequire({
             buildInfo: buildInfo,
             propertySettings: propertySettings,
-            getExtensionConfigurations: getExtensionConfigurations,
+            getExtensionConfiguration: getExtensionConfiguration,
             getSharedModuleExports: getSharedModuleExports,
             getModuleExportsByRelativePath: getModuleExportsByRelativePath,
             getHostedLibFileUrl: createGetHostedLibFileUrl(extension.hostedLibFilesBaseUrl)

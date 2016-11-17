@@ -1,6 +1,6 @@
 {
   "name": "@reactor/turbine",
-  "version": "16.1.2",
+  "version": "16.2.0",
   "description": "DTM engine that contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.",
   "scripts": {
     "build": "webpack --config webpack.dist.config.js && webpack --config webpack.lib.config.js",

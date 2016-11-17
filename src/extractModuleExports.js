@@ -3,7 +3,7 @@ module.exports = function(script, require) {
     exports: {}
   };
 
-  script(module, require);
+  script.call(module.exports, module, module.exports, require);
 
   return module.exports;
 };

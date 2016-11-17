@@ -8,7 +8,7 @@ describe('extract module exports', function() {
     var require = function() {};
     extractModuleExports(moduleScript, require);
 
-    expect(moduleScript).toHaveBeenCalledWith(jasmine.any(Object), require);
+    expect(moduleScript).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object), require);
   });
 
   it('returns the extracted exports', function() {

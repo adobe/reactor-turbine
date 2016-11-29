@@ -1,11 +1,8 @@
-// `cleanText(str)`
-// ================
-//
-// "Cleans" text by trimming the string and removing spaces and newlines.
+/**
+ * "Cleans" text by trimming the string and removing spaces and newlines.
+ * @param {string} str The string to clean.
+ * @returns {string}
+ */
 module.exports = function(str) {
-  if (str == null) {
-    return null;
-  }
-
-  return str.replace(/\s+/g, ' ').trim();
+  return typeof str === 'string' ? str.replace(/\s+/g, ' ').trim() : str;
 };

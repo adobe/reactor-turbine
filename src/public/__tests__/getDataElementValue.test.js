@@ -42,7 +42,7 @@ describe('getDataElementValue', function() {
     expect(value).toBe('bar');
   });
 
-  it('cleans text when cleanText = true', function() {
+  it('cleans the value when cleanText = true', function() {
     var getDataElementValue = getInjectedGetDataElementValue({
       state: {
         getDataElementDefinition: function() {
@@ -54,6 +54,36 @@ describe('getDataElementValue', function() {
         getModuleExports: function() {
           return function() {
             return 'bar';
+          };
+        },
+        getPropertySettings: function() {
+          return {
+            undefinedVarsReturnEmpty: false
+          };
+        }
+      },
+      cleanText: function(value) {
+        return 'cleaned:' + value;
+      }
+    });
+
+    var value = getDataElementValue('testDataElement');
+    expect(value).toBe('cleaned:bar');
+  });
+
+  it('cleans the default value when cleanText = true', function() {
+    var getDataElementValue = getInjectedGetDataElementValue({
+      state: {
+        getDataElementDefinition: function() {
+          return {
+            cleanText: true,
+            defaultValue: 'bar',
+            settings: {}
+          };
+        },
+        getModuleExports: function() {
+          return function() {
+            return;
           };
         },
         getPropertySettings: function() {
@@ -200,6 +230,33 @@ describe('getDataElementValue', function() {
         getModuleExports: function() {
           return function(settings) {
             return settings.foo;
+          };
+        },
+        getPropertySettings: function() {
+          return {
+            undefinedVarsReturnEmpty: false
+          };
+        }
+      }
+    });
+
+    var value = getDataElementValue('testDataElement');
+    expect(value).toBe('bar');
+  });
+
+  it('lowercases the default value if forceLowerCase = true', function() {
+    var getDataElementValue = getInjectedGetDataElementValue({
+      state: {
+        getDataElementDefinition: function() {
+          return {
+            forceLowerCase: true,
+            defaultValue: 'bAr',
+            settings: {}
+          };
+        },
+        getModuleExports: function() {
+          return function() {
+            return;
           };
         },
         getPropertySettings: function() {

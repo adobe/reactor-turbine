@@ -38,10 +38,6 @@ module.exports = function(name, suppressDefault) {
     return;
   }
 
-  if (dataDef.cleanText) {
-    value = cleanText(value);
-  }
-
   if (value === undefined && storeLength) {
     value = state.getCachedDataElementValue(name, storeLength);
   } else if (value !== undefined && storeLength) {
@@ -55,8 +51,14 @@ module.exports = function(name, suppressDefault) {
     /*eslint-enable dot-notation*/
   }
 
-  if (dataDef.forceLowerCase && value.toLowerCase) {
-    value = value.toLowerCase();
+  if (typeof value === 'string') {
+    if (dataDef.cleanText) {
+      value = cleanText(value);
+    }
+
+    if (dataDef.forceLowerCase) {
+      value = value.toLowerCase();
+    }
   }
 
   return value;

@@ -12,6 +12,7 @@ describe('function returned by createPublicRequire', function() {
     var getQueryParamMock = {};
     var isPlainObjectMock = {};
     var getVarMock = {};
+    var isVarMock = {};
     var getDataElementMock = {};
     var cookieMock = {};
     var debounceMock = {};
@@ -33,6 +34,7 @@ describe('function returned by createPublicRequire', function() {
       './public/getQueryParam': getQueryParamMock,
       './public/isPlainObject': isPlainObjectMock,
       './public/getVar': getVarMock,
+      './public/isVar': isVarMock,
       './public/getDataElementValue': getDataElementMock,
       './public/cookie': cookieMock,
       './public/debounce': debounceMock,
@@ -56,6 +58,7 @@ describe('function returned by createPublicRequire', function() {
     expect(publicRequire('is-plain-object')).toBe(isPlainObjectMock);
     expect(publicRequire('is-linked')).toEqual(jasmine.any(Function));
     expect(publicRequire('get-var')).toBe(getVarMock);
+    expect(publicRequire('is-var')).toBe(isVarMock);
     expect(publicRequire('get-data-element-value')).toBe(getDataElementMock);
     expect(publicRequire('cookie')).toBe(cookieMock);
     expect(publicRequire('debounce')).toBe(debounceMock);

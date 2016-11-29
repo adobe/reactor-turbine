@@ -11,6 +11,7 @@ var modules = {
     return require('./public/isAnchor')(element, true);
   },
   'get-var': require('./public/getVar'),
+  'is-var': require('./public/isVar'),
   'get-data-element-value': require('./public/getDataElementValue'),
   'cookie': require('./public/cookie'),
   'debounce': require('./public/debounce'),

@@ -11,14 +11,13 @@ describe('function returned by createPublicRequire', function() {
     var loadScriptMock = {};
     var getQueryParamMock = {};
     var isPlainObjectMock = {};
-    var getVarMock = {};
-    var isVarMock = {};
     var getDataElementMock = {};
     var cookieMock = {};
     var debounceMock = {};
     var onceMock = {};
     var loggerMock = {};
     var writeHtmlMock = {};
+    var replaceTokensMock = {};
     var onPageBottomMock = {};
     var weakMapMock = {};
     var windowMock = {};
@@ -33,14 +32,13 @@ describe('function returned by createPublicRequire', function() {
       './public/loadScript': loadScriptMock,
       './public/getQueryParam': getQueryParamMock,
       './public/isPlainObject': isPlainObjectMock,
-      './public/getVar': getVarMock,
-      './public/isVar': isVarMock,
       './public/getDataElementValue': getDataElementMock,
       './public/cookie': cookieMock,
       './public/debounce': debounceMock,
       './public/once': onceMock,
       './public/logger': loggerMock,
       './public/writeHtml': writeHtmlMock,
+      './public/replaceTokens': replaceTokensMock,
       './public/onPageBottom': onPageBottomMock,
       'window': windowMock,
       'document': documentMock
@@ -57,14 +55,13 @@ describe('function returned by createPublicRequire', function() {
     expect(publicRequire('get-query-param')).toBe(getQueryParamMock);
     expect(publicRequire('is-plain-object')).toBe(isPlainObjectMock);
     expect(publicRequire('is-linked')).toEqual(jasmine.any(Function));
-    expect(publicRequire('get-var')).toBe(getVarMock);
-    expect(publicRequire('is-var')).toBe(isVarMock);
     expect(publicRequire('get-data-element-value')).toBe(getDataElementMock);
     expect(publicRequire('cookie')).toBe(cookieMock);
     expect(publicRequire('debounce')).toBe(debounceMock);
     expect(publicRequire('once')).toBe(onceMock);
     expect(publicRequire('logger')).toBe(loggerMock);
     expect(publicRequire('write-html')).toBe(writeHtmlMock);
+    expect(publicRequire('replace-tokens')).toBe(replaceTokensMock);
     expect(publicRequire('on-page-bottom')).toBe(onPageBottomMock);
     expect(publicRequire('window')).toBe(windowMock);
     expect(publicRequire('document')).toBe(documentMock);

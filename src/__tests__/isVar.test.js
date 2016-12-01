@@ -3,7 +3,7 @@ var noop = function() {};
 var getInjectedIsVar = function(options) {
   options = options || {};
   return require('inject!../isVar')({
-    '../state': options.state || {
+    './state': options.state || {
       getDataElementDefinition: noop
     }
   });

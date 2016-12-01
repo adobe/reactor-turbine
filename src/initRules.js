@@ -1,4 +1,4 @@
-var replaceVarTokens = require('./replaceVarTokens');
+var replaceVarTokens = require('./public/replaceTokens');
 var logger = require('./public/logger');
 var state = require('./state');
 
@@ -119,7 +119,7 @@ var initEventModules = function(rule) {
         logger.error(getErrorMessage(event, rule, e.message, e.stack));
         return;
       }
-      
+
       if (typeof moduleExports !== 'function') {
         logger.error(getErrorMessage(event, rule, MODULE_NOT_FUNCTION_ERROR));
         return;

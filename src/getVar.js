@@ -1,10 +1,10 @@
 var document = require('document');
 var window = require('window');
-var state = require('../state');
-var getDataElementValue = require('./getDataElementValue');
-var getUri = require('./getUri');
-var getQueryParam = require('./getQueryParam');
-var cleanText = require('../cleanText');
+var state = require('./state');
+var getDataElementValue = require('./public/getDataElementValue');
+var getUri = require('./public/getUri');
+var getQueryParam = require('./public/getQueryParam');
+var cleanText = require('./cleanText');
 
 var specialPropertyAccessors = {
   text: function(obj) {

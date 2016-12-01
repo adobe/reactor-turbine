@@ -2,7 +2,7 @@
 
 describe('function returned by createGetExtensionConfigurations', function() {
   var createGetExtensionConfigurations = require('inject!../createGetExtensionConfigurations')({
-    './replaceVarTokens': function(obj) {
+    './public/replaceTokens': function(obj) {
       var replacedObj = {};
 
       // Simulate replacing data element tokens.

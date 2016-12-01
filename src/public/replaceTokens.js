@@ -1,6 +1,7 @@
-var isPlainObject = require('./public/isPlainObject');
-var getVar = require('./public/getVar');
-var state = require('./state');
+var isPlainObject = require('./isPlainObject');
+var getVar = require('../getVar');
+var isVar = require('../isVar');
+var state = require('../state');
 var undefinedVarsReturnEmpty = state.getPropertySettings().undefinedVarsReturnEmpty;
 
 var replaceTokensInString;
@@ -9,12 +10,12 @@ var replaceTokensInArray;
 var replaceTokens;
 
 var getVarValue = function(token, variableName, element, event) {
-  var val = getVar(variableName, element, event);
-  if (val == null) {
-    return undefinedVarsReturnEmpty ? '' : token;
-  } else {
-    return val;
+  if (!isVar(variableName)) {
+    return token;
   }
+
+  var val = getVar(variableName, element, event);
+  return val == null && undefinedVarsReturnEmpty ? '' : val;
 };
 
 /**

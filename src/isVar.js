@@ -1,4 +1,4 @@
-var state = require('../state');
+var state = require('./state');
 
 // isVar(variableName)
 // ==========================

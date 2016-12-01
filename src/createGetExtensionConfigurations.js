@@ -6,10 +6,10 @@
  * @returns {Function}
  */
 module.exports = function(configurations) {
-  // We pull in replaceVarTokens here and not at the top of the file to prevent a
-  // circular reference since dependencies of replaceVarTokens requires state which requires
+  // We pull in replaceTokens here and not at the top of the file to prevent a
+  // circular reference since dependencies of replaceTokens requires state which requires
   // this module.
-  var replaceVarTokens = require('./replaceVarTokens');
+  var replaceTokens = require('./public/replaceTokens');
 
   return function() {
 
@@ -17,7 +17,7 @@ module.exports = function(configurations) {
       return {
         id: configuration.id,
         name: configuration.name,
-        settings: replaceVarTokens(configuration.settings || {})
+        settings: replaceTokens(configuration.settings || {})
       };
     });
   };

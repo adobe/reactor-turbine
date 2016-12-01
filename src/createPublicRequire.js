@@ -10,14 +10,13 @@ var modules = {
   'is-linked': function(element) { // For backward compatibility.
     return require('./public/isAnchor')(element, true);
   },
-  'get-var': require('./public/getVar'),
-  'is-var': require('./public/isVar'),
   'get-data-element-value': require('./public/getDataElementValue'),
   'cookie': require('./public/cookie'),
   'debounce': require('./public/debounce'),
   'once': require('./public/once'),
   'logger': require('./public/logger'),
   'write-html': require('./public/writeHtml'),
+  'replace-tokens': require('./public/replaceTokens'),
   'on-page-bottom': require('./public/onPageBottom'),
   'window': require('window'),
   'document': require('document')

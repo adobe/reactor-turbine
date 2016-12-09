@@ -1,9 +1,8 @@
 var cookie = require('cookie');
 var isAnchor = require('./public/isAnchor');
-var state = require('./state');
 var logger = require('./public/logger');
 
-module.exports = function() {
+module.exports = function(buildInfo, setDebugOutputEnabled) {
   // Will get replaced by the directCall event delegate from the DTM extension. Exists here in
   // case there are no direct call rules (and therefore the directCall event delegate won't get
   // included) and our customers are still calling the method. In this case, we don't want an error
@@ -15,7 +14,7 @@ module.exports = function() {
   // we don't want an error to be thrown. This method existed before Reactor.
   _satellite.getVisitorId = function() { return null; };
 
-  _satellite.buildInfo = state.getBuildInfo();
+  _satellite.buildInfo = buildInfo;
   _satellite.notify = logger.notify.bind(logger);
   _satellite.getVar = require('./getVar');
   _satellite.setVar = require('./public/setCustomVar');
@@ -69,7 +68,7 @@ module.exports = function() {
   };
 
   _satellite.setDebug = function(value) {
-    state.setDebugOutputEnabled(value);
+    setDebugOutputEnabled(value);
 
     // TODO: Have state emit an event that logger listens to instead?
     logger.outputEnabled = value;

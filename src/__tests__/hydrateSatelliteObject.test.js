@@ -32,14 +32,15 @@ describe('hydrateSatelliteObject', function() {
 
   it('should add setDebug function on _satellite',
     function() {
-      var spy = jasmine.createSpyObj(['notify']);
+      var notifySpy = jasmine.createSpyObj(['notify']);
+      var setDebugOutputEnabledSpy = jasmine.createSpy('setDebugOutputEnabled');
       var hydrateSatelliteObject = injectHydrateSatelliteObject({
-        './public/logger': spy
+        './public/logger': notifySpy
       });
-      hydrateSatelliteObject();
+      hydrateSatelliteObject(null, setDebugOutputEnabledSpy);
       _satellite.setDebug(true);
 
-      expect(spy.outputEnabled).toBe(true);
+      expect(setDebugOutputEnabledSpy).toHaveBeenCalledWith(true);
     });
 
   it('successfully allows setting, reading, and removing a cookie', function() {

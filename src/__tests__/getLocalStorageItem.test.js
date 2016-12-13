@@ -2,12 +2,30 @@
 
 describe('getLocalStorageItem', function() {
   it('returns a local storage item', function() {
-    var getLocalStorageItem = require('../getLocalStorageItem');
+    // Mocking window because Safari throws an error when setting a local storage item in Private
+    // Browser Mode.
+    var mockWindow = {
+      localStorage: {
+        setItem: function(key, value) {
+          this[key] = value;
+        },
+        getItem: function(key) {
+          return this[key];
+        },
+        removeItem: function(key) {
+          this[key] = null;
+        }
+      }
+    };
 
-    window.localStorage.setItem('foo', 'something');
+    var getLocalStorageItem = require('inject!../getLocalStorageItem')({
+      window: mockWindow
+    });
+
+    mockWindow.localStorage.setItem('foo', 'something');
     expect(getLocalStorageItem('foo')).toEqual('something');
 
-    window.localStorage.removeItem('foo');
+    mockWindow.localStorage.removeItem('foo');
     expect(getLocalStorageItem('foo')).toBeNull();
   });
 

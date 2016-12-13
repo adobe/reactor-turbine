@@ -1,5 +1,7 @@
 'use strict';
 
+var isSafariDesktop = /^((?!chrome|android|ipad|iphone).)*safari/i.test(navigator.userAgent);
+
 describe('state', function() {
   var injectState = require('inject!../state');
   var createModuleProvider = require('inject?!../moduleProvider');
@@ -147,22 +149,27 @@ describe('state', function() {
     });
   });
 
-  it('getShouldExecuteActions returns false when hide activity local storage key is set',
-    function() {
-      localStorage.setItem('sdsat_hide_activity', 'true');
-      expect(state.getShouldExecuteActions()).toBe(false);
-    });
+  // Safari throws an error when setting a local storage item in Private Browser Mode.
+  if (!isSafariDesktop) {
+    it('getShouldExecuteActions returns false when hide activity local storage key is set',
+      function() {
+        localStorage.setItem('sdsat_hide_activity', 'true');
+        expect(state.getShouldExecuteActions()).toBe(false);
+      });
 
-  it('getShouldExecuteActions returns true when hide activity local storage key is not set to true',
-    function() {
-      localStorage.setItem('sdsat_hide_activity', 'false');
-      expect(state.getShouldExecuteActions()).toBe(true);
-    });
+    it('getShouldExecuteActions returns true when hide activity local storage key is not set ' +
+      'to true',
+      function() {
+        localStorage.setItem('sdsat_hide_activity', 'false');
+        expect(state.getShouldExecuteActions()).toBe(true);
+      });
 
-  it('should enable the debug output', function() {
-    state.setDebugOutputEnabled('true');
-    expect(state.getDebugOutputEnabled()).toBe(true);
-  });
+
+    it('should enable the debug output', function() {
+      state.setDebugOutputEnabled('true');
+      expect(state.getDebugOutputEnabled()).toBe(true);
+    });
+  }
 
   it('should return cached data element values', function() {
     state.cacheDataElementValue('somekey', 'pageview', 100);

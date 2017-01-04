@@ -46,25 +46,25 @@ describe('function returned by createPublicRequire', function() {
 
     var publicRequire = createPublicRequire();
 
-    expect(publicRequire('event-emitter')).toBe(eventEmitterMock);
-    expect(publicRequire('promise')).toBe(promiseMock);
-    expect(publicRequire('weak-map')).toBe(weakMapMock);
-    expect(publicRequire('assign')).toBe(assignMock);
-    expect(publicRequire('client-info')).toBe(clientInfoMock);
-    expect(publicRequire('load-script')).toBe(loadScriptMock);
-    expect(publicRequire('get-query-param')).toBe(getQueryParamMock);
-    expect(publicRequire('is-plain-object')).toBe(isPlainObjectMock);
-    expect(publicRequire('is-linked')).toEqual(jasmine.any(Function));
-    expect(publicRequire('get-data-element-value')).toBe(getDataElementMock);
-    expect(publicRequire('cookie')).toBe(cookieMock);
-    expect(publicRequire('debounce')).toBe(debounceMock);
-    expect(publicRequire('once')).toBe(onceMock);
-    expect(publicRequire('logger')).toBe(loggerMock);
-    expect(publicRequire('write-html')).toBe(writeHtmlMock);
-    expect(publicRequire('replace-tokens')).toBe(replaceTokensMock);
-    expect(publicRequire('on-page-bottom')).toBe(onPageBottomMock);
-    expect(publicRequire('window')).toBe(windowMock);
-    expect(publicRequire('document')).toBe(documentMock);
+    expect(publicRequire('@turbine/event-emitter')).toBe(eventEmitterMock);
+    expect(publicRequire('@turbine/promise')).toBe(promiseMock);
+    expect(publicRequire('@turbine/weak-map')).toBe(weakMapMock);
+    expect(publicRequire('@turbine/assign')).toBe(assignMock);
+    expect(publicRequire('@turbine/client-info')).toBe(clientInfoMock);
+    expect(publicRequire('@turbine/load-script')).toBe(loadScriptMock);
+    expect(publicRequire('@turbine/get-query-param')).toBe(getQueryParamMock);
+    expect(publicRequire('@turbine/is-plain-object')).toBe(isPlainObjectMock);
+    expect(publicRequire('@turbine/is-linked')).toEqual(jasmine.any(Function));
+    expect(publicRequire('@turbine/get-data-element-value')).toBe(getDataElementMock);
+    expect(publicRequire('@turbine/cookie')).toBe(cookieMock);
+    expect(publicRequire('@turbine/debounce')).toBe(debounceMock);
+    expect(publicRequire('@turbine/once')).toBe(onceMock);
+    expect(publicRequire('@turbine/logger')).toBe(loggerMock);
+    expect(publicRequire('@turbine/write-html')).toBe(writeHtmlMock);
+    expect(publicRequire('@turbine/replace-tokens')).toBe(replaceTokensMock);
+    expect(publicRequire('@turbine/on-page-bottom')).toBe(onPageBottomMock);
+    expect(publicRequire('@turbine/window')).toBe(windowMock);
+    expect(publicRequire('@turbine/document')).toBe(documentMock);
   });
 
   it('should return the dynamic core modules', function() {
@@ -83,11 +83,12 @@ describe('function returned by createPublicRequire', function() {
       getHostedLibFileUrl: getHostedLibFileUrlMock
     });
 
-    expect(publicRequire('build-info')).toBe(buildInfoMock);
-    expect(publicRequire('property-settings')).toBe(propertySettingsMock);
-    expect(publicRequire('get-extension-configurations')).toBe(getExtensionConfigurationsMock);
-    expect(publicRequire('get-shared-module')).toBe(getSharedModuleMock);
-    expect(publicRequire('get-hosted-lib-file-url')).toBe(getHostedLibFileUrlMock);
+    expect(publicRequire('@turbine/build-info')).toBe(buildInfoMock);
+    expect(publicRequire('@turbine/property-settings')).toBe(propertySettingsMock);
+    expect(publicRequire('@turbine/get-extension-configurations'))
+      .toBe(getExtensionConfigurationsMock);
+    expect(publicRequire('@turbine/get-shared-module')).toBe(getSharedModuleMock);
+    expect(publicRequire('@turbine/get-hosted-lib-file-url')).toBe(getHostedLibFileUrlMock);
   });
 
   it('should call for relative module when relative path is used', function() {
@@ -114,7 +115,7 @@ describe('function returned by createPublicRequire', function() {
     var createPublicRequire = injectCreatePublicRequire({});
     var publicRequire = createPublicRequire();
     expect(function() {
-      publicRequire('invalidmodulename');
+      publicRequire('@turbine/invalidmodulename');
     }).toThrowError(Error);
   });
 
@@ -122,6 +123,19 @@ describe('function returned by createPublicRequire', function() {
     var link = document.createElement('a');
     var createPublicRequire = injectCreatePublicRequire({});
     var publicRequire = createPublicRequire();
-    expect(publicRequire('is-linked')(link)).toBe(true);
+    expect(publicRequire('@turbine/is-linked')(link)).toBe(true);
+  });
+
+  it('should log warning when requiring core module without @turbine scope', function() {
+    spyOn(console, 'warn');
+
+    var eventEmitterMock = {};
+    var createPublicRequire = injectCreatePublicRequire({
+      './public/EventEmitter': eventEmitterMock
+    });
+
+    var publicRequire = createPublicRequire();
+    expect(publicRequire('event-emitter')).toBe(eventEmitterMock);
+    expect(console.warn).toHaveBeenCalled();
   });
 });

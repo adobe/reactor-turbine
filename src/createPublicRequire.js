@@ -29,7 +29,7 @@ var modules = {
  *
  * @param {Object} buildInfo
  * @param {Object} propertySettings
- * @param {Function} getExtensionConfiguration
+ * @param {Function} getExtensionSettings
  * @param {Function} getSharedModuleExports
  * @param {Function} getModuleExportsByRelativePath
  * @returns {Function}
@@ -40,7 +40,7 @@ module.exports = function(dynamicModules) {
   var allModules = Object.create(modules);
   allModules['build-info'] = dynamicModules.buildInfo;
   allModules['property-settings'] = dynamicModules.propertySettings;
-  allModules['get-extension-configuration'] = dynamicModules.getExtensionConfiguration;
+  allModules['get-extension-settings'] = dynamicModules.getExtensionSettings;
   allModules['get-shared-module'] = dynamicModules.getSharedModuleExports;
   allModules['get-hosted-lib-file-url'] = dynamicModules.getHostedLibFileUrl;
 

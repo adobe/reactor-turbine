@@ -1,4 +1,5 @@
 'use strict';
+const webpack = require('webpack');
 
 module.exports = {
   entry: './src/lib/require.js',
@@ -18,6 +19,9 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin()
+  ],
   externals: {
     window: 'var window',
     document: 'var document'

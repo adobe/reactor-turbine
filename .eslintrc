@@ -24,9 +24,6 @@
     "consistent-this": [0, "self"]
   },
   "globals": {
-    "Simulate": true,
-    "TestPage": true,
-    "runTestPage": true,
     "_satellite": true
   }
 }

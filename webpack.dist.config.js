@@ -1,4 +1,5 @@
 'use strict';
+const webpack = require('webpack');
 
 module.exports = {
   entry: './src/bootstrap.js',
@@ -18,6 +19,9 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin()
+  ],
   externals: {
     // So that modules can require('window') and then tests can mock it.
     window: 'window',

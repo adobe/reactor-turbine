@@ -70,7 +70,7 @@ describe('function returned by createPublicRequire', function() {
   it('should return the dynamic core modules', function() {
     var buildInfoMock = {};
     var propertySettingsMock = {};
-    var getExtensionConfigurationsMock = {};
+    var getExtensionSettingsMock = {};
     var getSharedModuleMock = {};
     var getHostedLibFileUrlMock = {};
 
@@ -78,15 +78,15 @@ describe('function returned by createPublicRequire', function() {
     var publicRequire = createPublicRequire({
       buildInfo: buildInfoMock,
       propertySettings: propertySettingsMock,
-      getExtensionConfigurations: getExtensionConfigurationsMock,
+      getExtensionSettings: getExtensionSettingsMock,
       getSharedModuleExports: getSharedModuleMock,
       getHostedLibFileUrl: getHostedLibFileUrlMock
     });
 
     expect(publicRequire('@turbine/build-info')).toBe(buildInfoMock);
     expect(publicRequire('@turbine/property-settings')).toBe(propertySettingsMock);
-    expect(publicRequire('@turbine/get-extension-configurations'))
-      .toBe(getExtensionConfigurationsMock);
+    expect(publicRequire('@turbine/get-extension-settings'))
+      .toBe(getExtensionSettingsMock);
     expect(publicRequire('@turbine/get-shared-module')).toBe(getSharedModuleMock);
     expect(publicRequire('@turbine/get-hosted-lib-file-url')).toBe(getHostedLibFileUrlMock);
   });

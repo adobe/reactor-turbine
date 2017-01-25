@@ -7,7 +7,7 @@ describe('state', function() {
   var createModuleProvider = require('inject?!../moduleProvider');
   var moduleProvider;
   var createGetSharedModuleExports;
-  var createGetExtensionConfigurations;
+  var createGetExtensionSettings;
   var createPublicRequire;
   var createGetHostedLibFileUrl;
   var state;
@@ -46,12 +46,8 @@ describe('state', function() {
       'example-extension': {
         displayName: 'Example Extension',
         hostedLibFilesBaseUrl: '//examples.com/somefolder/',
-        configurations: {
-          ECa: {
-            settings: {
-              'code': 'somecode'
-            }
-          }
+        settings: {
+          'code': 'somecode'
         },
         modules: {
           'example-extension/events/click.js': {
@@ -100,8 +96,8 @@ describe('state', function() {
     createGetSharedModuleExports = jasmine.createSpy().and.callThrough(
       require('../createGetSharedModuleExports'));
 
-    createGetExtensionConfigurations = jasmine.createSpy().and.callThrough(
-      require('../createGetExtensionConfigurations'));
+    createGetExtensionSettings = jasmine.createSpy().and.callThrough(
+      require('../createGetExtensionSettings'));
 
     createPublicRequire = jasmine.createSpy().and.callThrough(
       require('../createPublicRequire'));
@@ -114,7 +110,7 @@ describe('state', function() {
       './getLocalStorageItem': require('../getLocalStorageItem'),
       './setLocalStorageItem': require('../setLocalStorageItem'),
       './createGetSharedModuleExports': createGetSharedModuleExports,
-      './createGetExtensionConfigurations': createGetExtensionConfigurations,
+      './createGetExtensionSettings': createGetExtensionSettings,
       './createPublicRequire': createPublicRequire,
       './createGetHostedLibFileUrl': createGetHostedLibFileUrl
     });
@@ -190,9 +186,9 @@ describe('state', function() {
       container.extensions, moduleProvider);
   });
 
-  it('creates getExtensionConfigurations for each extension', function() {
-    expect(createGetExtensionConfigurations).toHaveBeenCalledWith(
-      container.extensions['example-extension'].configurations);
+  it('creates getExtensionSettings for each extension', function() {
+    expect(createGetExtensionSettings).toHaveBeenCalledWith(
+      container.extensions['example-extension'].settings);
   });
 
   it('creates createGetHostedLibFileUrl for each extension', function() {

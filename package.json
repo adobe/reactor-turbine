@@ -1,5 +1,5 @@
 {
-  "name": "@reactor/turbine",
+  "name": "@adobe/composer-turbine",
   "version": "17.0.0",
   "description": "DTM engine that contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.",
   "scripts": {
@@ -16,9 +16,6 @@
   "repository": {
     "type": "git",
     "url": "git@git.corp.adobe.com:reactor/turbine.git"
-  },
-  "publishConfig": {
-    "registry": "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-mcps-release-local"
   },
   "dependencies": {
     "cookie": "0.3.1",

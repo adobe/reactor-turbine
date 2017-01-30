@@ -1,5 +1,8 @@
 'use strict';
 const webpack = require('webpack');
+const fs = require('fs');
+
+const banner = fs.readFileSync('./copyrightBanner.txt', 'utf8');
 
 module.exports = {
   entry: './src/bootstrap.js',
@@ -20,7 +23,10 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.optimize.UglifyJsPlugin()
+    new webpack.optimize.UglifyJsPlugin(),
+    new webpack.BannerPlugin(banner, {
+      raw: true
+    })
   ],
   externals: {
     // So that modules can require('window') and then tests can mock it.

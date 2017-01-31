@@ -26,9 +26,6 @@ var modules = {
   'load-script': require('./public/loadScript'),
   'get-query-param': require('./public/getQueryParam'),
   'is-plain-object': require('./public/isPlainObject'),
-  'is-linked': function(element) { // For backward compatibility.
-    return require('./public/isAnchor')(element, true);
-  },
   'get-data-element-value': require('./public/getDataElementValue'),
   'cookie': require('./public/cookie'),
   'debounce': require('./public/debounce'),

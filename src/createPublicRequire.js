@@ -20,7 +20,6 @@ var CORE_MODULE_SCOPE = '@turbine/';
 
 var modules = {
   'promise': require('./public/Promise'),
-  'event-emitter': require('./public/EventEmitter'),
   'weak-map': require('./public/WeakMap'),
   'assign': require('./public/assign'),
   'client-info': require('./public/clientInfo'),

@@ -23,7 +23,6 @@ describe('function returned by createPublicRequire', function() {
 
   it('should return the static core modules', function() {
     var promiseMock = {};
-    var eventEmitterMock = {};
     var assignMock = {};
     var clientInfoMock = {};
     var loadScriptMock = {};
@@ -42,7 +41,6 @@ describe('function returned by createPublicRequire', function() {
     var documentMock = {};
 
     var createPublicRequire = injectCreatePublicRequire({
-      './public/EventEmitter': eventEmitterMock,
       './public/Promise': promiseMock,
       './public/WeakMap': weakMapMock,
       './public/assign': assignMock,
@@ -64,7 +62,6 @@ describe('function returned by createPublicRequire', function() {
 
     var publicRequire = createPublicRequire();
 
-    expect(publicRequire('@turbine/event-emitter')).toBe(eventEmitterMock);
     expect(publicRequire('@turbine/promise')).toBe(promiseMock);
     expect(publicRequire('@turbine/weak-map')).toBe(weakMapMock);
     expect(publicRequire('@turbine/assign')).toBe(assignMock);
@@ -147,13 +144,13 @@ describe('function returned by createPublicRequire', function() {
   it('should log warning when requiring core module without @turbine scope', function() {
     spyOn(console, 'warn');
 
-    var eventEmitterMock = {};
+    var onceMock = {};
     var createPublicRequire = injectCreatePublicRequire({
-      './public/EventEmitter': eventEmitterMock
+      './public/once': onceMock
     });
 
     var publicRequire = createPublicRequire();
-    expect(publicRequire('event-emitter')).toBe(eventEmitterMock);
+    expect(publicRequire('once')).toBe(onceMock);
     expect(console.warn).toHaveBeenCalled();
   });
 });

@@ -16,4 +16,4 @@
 * from Adobe Systems Incorporated.
 **************************************************************************/
 
-module.exports = require('native-promise-only-ponyfill');
+module.exports = window.Promise || require('promise-polyfill');

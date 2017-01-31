@@ -18,8 +18,12 @@
 
 describe('Promise', function() {
   var clearRequireCache = function() {
+    // Make sure we start fresh for each test so we're not dealing
+    // with cached values from previous tests. This is important so
+    // that we properly determine what gets exported depending on global
+    // variables that exist when turbine is loaded on a website.
     delete require.cache[require.resolve('../Promise')];
-    delete require.cache[require.resolve('native-promise-only-ponyfill')];
+    delete require.cache[require.resolve('promise-polyfill')];
   };
 
   beforeEach(clearRequireCache);

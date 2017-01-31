@@ -23,7 +23,6 @@ describe('function returned by createPublicRequire', function() {
 
   it('should return the static core modules', function() {
     var promiseMock = {};
-    var eventEmitterMock = {};
     var assignMock = {};
     var clientInfoMock = {};
     var loadScriptMock = {};
@@ -42,7 +41,6 @@ describe('function returned by createPublicRequire', function() {
     var documentMock = {};
 
     var createPublicRequire = injectCreatePublicRequire({
-      './public/EventEmitter': eventEmitterMock,
       './public/Promise': promiseMock,
       './public/WeakMap': weakMapMock,
       './public/assign': assignMock,
@@ -64,7 +62,6 @@ describe('function returned by createPublicRequire', function() {
 
     var publicRequire = createPublicRequire();
 
-    expect(publicRequire('@turbine/event-emitter')).toBe(eventEmitterMock);
     expect(publicRequire('@turbine/promise')).toBe(promiseMock);
     expect(publicRequire('@turbine/weak-map')).toBe(weakMapMock);
     expect(publicRequire('@turbine/assign')).toBe(assignMock);
@@ -72,7 +69,6 @@ describe('function returned by createPublicRequire', function() {
     expect(publicRequire('@turbine/load-script')).toBe(loadScriptMock);
     expect(publicRequire('@turbine/get-query-param')).toBe(getQueryParamMock);
     expect(publicRequire('@turbine/is-plain-object')).toBe(isPlainObjectMock);
-    expect(publicRequire('@turbine/is-linked')).toEqual(jasmine.any(Function));
     expect(publicRequire('@turbine/get-data-element-value')).toBe(getDataElementMock);
     expect(publicRequire('@turbine/cookie')).toBe(cookieMock);
     expect(publicRequire('@turbine/debounce')).toBe(debounceMock);
@@ -137,23 +133,4 @@ describe('function returned by createPublicRequire', function() {
     }).toThrowError(Error);
   });
 
-  it('is-linked returns true for a link element', function() {
-    var link = document.createElement('a');
-    var createPublicRequire = injectCreatePublicRequire({});
-    var publicRequire = createPublicRequire();
-    expect(publicRequire('@turbine/is-linked')(link)).toBe(true);
-  });
-
-  it('should log warning when requiring core module without @turbine scope', function() {
-    spyOn(console, 'warn');
-
-    var eventEmitterMock = {};
-    var createPublicRequire = injectCreatePublicRequire({
-      './public/EventEmitter': eventEmitterMock
-    });
-
-    var publicRequire = createPublicRequire();
-    expect(publicRequire('event-emitter')).toBe(eventEmitterMock);
-    expect(console.warn).toHaveBeenCalled();
-  });
 });

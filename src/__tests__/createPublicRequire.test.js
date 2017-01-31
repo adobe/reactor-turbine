@@ -133,16 +133,4 @@ describe('function returned by createPublicRequire', function() {
     }).toThrowError(Error);
   });
 
-  it('should log warning when requiring core module without @turbine scope', function() {
-    spyOn(console, 'warn');
-
-    var onceMock = {};
-    var createPublicRequire = injectCreatePublicRequire({
-      './public/once': onceMock
-    });
-
-    var publicRequire = createPublicRequire();
-    expect(publicRequire('once')).toBe(onceMock);
-    expect(console.warn).toHaveBeenCalled();
-  });
 });

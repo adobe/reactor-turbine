@@ -1,7 +1,7 @@
 {
-  "name": "@adobe/composer-turbine",
+  "name": "@adobe/reactor-turbine",
   "version": "18.0.0",
-  "description": "DTM engine that contains the brains responsible for running rules on a client's website as well as delegating logic to extensions.",
+  "description": "Rule engine for processing rules on a client's website as well as delegating logic to extensions.",
   "scripts": {
     "build": "webpack --config webpack.dist.config.js && webpack --config webpack.lib.config.js",
     "prepublish": "npm run build",

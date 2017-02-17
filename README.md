@@ -1,6 +1,6 @@
-# @adobe/composer-turbine
+# @adobe/reactor-turbine
 
-Composer rule engine for processing rules on a client's website as well as delegating logic to extensions.
+Rule engine for processing rules on a client's website as well as delegating logic to extensions.
 
 ## Development Setup
 

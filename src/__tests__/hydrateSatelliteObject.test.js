@@ -40,14 +40,6 @@ describe('hydrateSatelliteObject', function() {
     expect(window._satellite.getVisitorId()).toBe(null);
   });
 
-  it('should add a `isLinked` method on _satellite that returns true for an anchor element',
-  function() {
-    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
-    hydrateSatelliteObject();
-    var l = document.createElement('a');
-    expect(_satellite.isLinked(l)).toBe(true);
-  });
-
   it('should add setDebug function on _satellite',
     function() {
       var notifySpy = jasmine.createSpyObj(['notify']);

@@ -17,7 +17,6 @@
 **************************************************************************/
 
 var cookie = require('cookie');
-var isAnchor = require('./public/isAnchor');
 var logger = require('./public/logger');
 
 module.exports = function(buildInfo, setDebugOutputEnabled) {
@@ -80,10 +79,6 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
   };
 
   _satellite.cookie = cookie;
-
-  _satellite.isLinked = function(element) {
-    return isAnchor(element, true);
-  };
 
   _satellite.setDebug = function(value) {
     setDebugOutputEnabled(value);

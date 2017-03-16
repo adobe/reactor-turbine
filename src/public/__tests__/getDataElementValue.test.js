@@ -25,7 +25,7 @@ describe('getDataElementValue', function() {
     return require('inject!../getDataElementValue')({
       '../state': options.state,
       '../cleanText': cleanText,
-      './logger': logger
+      '../logger': logger
     });
   };
 

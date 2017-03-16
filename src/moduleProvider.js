@@ -17,7 +17,7 @@
 **************************************************************************/
 
 var extractModuleExports = require('./extractModuleExports');
-var logger = require('./public/logger');
+var logger = require('./logger');
 
 var moduleByReferencePath = {};
 

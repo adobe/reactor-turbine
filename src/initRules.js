@@ -17,7 +17,7 @@
 **************************************************************************/
 
 var replaceVarTokens = require('./public/replaceTokens');
-var logger = require('./public/logger');
+var logger = require('./logger');
 var state = require('./state');
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';

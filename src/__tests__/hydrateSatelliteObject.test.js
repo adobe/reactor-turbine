@@ -18,6 +18,8 @@
 
 'use strict';
 
+var noop = function() {};
+
 describe('hydrateSatelliteObject', function() {
   var injectHydrateSatelliteObject = require('inject!../hydrateSatelliteObject');
 
@@ -42,15 +44,19 @@ describe('hydrateSatelliteObject', function() {
 
   it('should add setDebug function on _satellite',
     function() {
-      var notifySpy = jasmine.createSpyObj(['notify']);
+      var loggerMock = {
+        outputEnabled: false,
+        createPrefixedLogger: function() {}
+      };
       var setDebugOutputEnabledSpy = jasmine.createSpy('setDebugOutputEnabled');
       var hydrateSatelliteObject = injectHydrateSatelliteObject({
-        './public/logger': notifySpy
+        './logger': loggerMock
       });
       hydrateSatelliteObject(null, setDebugOutputEnabledSpy);
       _satellite.setDebug(true);
 
       expect(setDebugOutputEnabledSpy).toHaveBeenCalledWith(true);
+      expect(loggerMock.outputEnabled).toBe(true);
     });
 
   it('successfully allows setting, reading, and removing a cookie', function() {
@@ -77,5 +83,52 @@ describe('hydrateSatelliteObject', function() {
 
     expect(_satellite.cookie.serialize).toEqual(jasmine.any(Function));
     expect(_satellite.cookie.parse).toEqual(jasmine.any(Function));
+  });
+
+  it('exposes a logger', function() {
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
+    hydrateSatelliteObject();
+
+    expect(_satellite.logger.log).toEqual(jasmine.any(Function));
+    expect(_satellite.logger.info).toEqual(jasmine.any(Function));
+    expect(_satellite.logger.warn).toEqual(jasmine.any(Function));
+    expect(_satellite.logger.error).toEqual(jasmine.any(Function));
+  });
+
+  it('exposes a notify method', function() {
+    var loggerMock = jasmine.createSpyObj('logger', [
+      'log',
+      'info',
+      'warn',
+      'error'
+    ]);
+
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({
+      './logger': {
+        warn: noop,
+        log: noop,
+        info: noop,
+        error: noop,
+        createPrefixedLogger: function() {
+          return loggerMock;
+        }
+      }
+    });
+    hydrateSatelliteObject();
+
+    _satellite.notify('log test');
+    expect(loggerMock.log).toHaveBeenCalledWith('log test');
+
+    _satellite.notify('log test 2', 2);
+    expect(loggerMock.log).toHaveBeenCalledWith('log test 2');
+
+    _satellite.notify('info test', 3);
+    expect(loggerMock.info).toHaveBeenCalledWith('info test');
+
+    _satellite.notify('warn test', 4);
+    expect(loggerMock.warn).toHaveBeenCalledWith('warn test');
+
+    _satellite.notify('error test', 5);
+    expect(loggerMock.error).toHaveBeenCalledWith('error test');
   });
 });

@@ -363,8 +363,8 @@ describe('initRules', function() {
         }
       };
 
-      initRules = require('inject?./public/logger&./state!../initRules')({
-        './public/logger': logger,
+      initRules = require('inject?./logger&./state!../initRules')({
+        './logger': logger,
         './state': state
       });
     });

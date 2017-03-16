@@ -21,7 +21,7 @@
 var window = require('window');
 var document = require('document');
 var once = require('./once');
-var logger = require('./logger');
+var logger = require('../logger');
 
 var callbacks = [];
 

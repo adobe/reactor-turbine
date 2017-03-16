@@ -17,7 +17,8 @@
 **************************************************************************/
 
 var cookie = require('cookie');
-var logger = require('./public/logger');
+var logger = require('./logger');
+var prefixedLogger = logger.createPrefixedLogger('Custom Script');
 
 module.exports = function(buildInfo, setDebugOutputEnabled) {
   // Will get replaced by the directCall event delegate from the DTM extension. Exists here in
@@ -32,7 +33,33 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
   _satellite.getVisitorId = function() { return null; };
 
   _satellite.buildInfo = buildInfo;
-  _satellite.notify = logger.notify.bind(logger);
+
+  _satellite.logger = prefixedLogger;
+
+  /**
+   * Log a message. We keep this due to legacy baggage.
+   * @param {string} message The message to log.
+   * @param {number} [level] A number that represents the level of logging.
+   * 3=info, 4=warn, 5=error, anything else=log
+   */
+  _satellite.notify = function(message, level) {
+    logger.warn('_satellite.notify is deprecated. Please use the `_satellite.logger` API.');
+
+    switch (level) {
+      case 3:
+        prefixedLogger.info(message);
+        break;
+      case 4:
+        prefixedLogger.warn(message);
+        break;
+      case 5:
+        prefixedLogger.error(message);
+        break;
+      default:
+        prefixedLogger.log(message);
+    }
+  };
+
   _satellite.getVar = require('./getVar');
   _satellite.setVar = require('./public/setCustomVar');
 
@@ -44,7 +71,7 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
    * will be stored for the session only.
    */
   _satellite.setCookie = function(name, value, days) {
-    logger.warn('This method is being deprecated. Please start using the `_satellite.cookie` API.');
+    logger.warn('_satellite.setCookie is deprecated. Please use the `_satellite.cookie` API.');
 
     var options = {};
 
@@ -63,7 +90,7 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
    * @returns {string}
    */
   _satellite.getCookie = _satellite.readCookie = function(name) {
-    logger.warn('This method is being deprecated. Please start using the `_satellite.cookie` API.');
+    logger.warn('_satellite.getCookie is deprecated. Please use the `_satellite.cookie` API.');
 
     return cookie.parse(document.cookie)[name];
   };
@@ -73,7 +100,7 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
    * @param name
    */
   _satellite.removeCookie = function(name) {
-    logger.warn('This method is being deprecated. Please start using the `_satellite.cookie` API.');
+    logger.warn('_satellite.removeCookie is deprecated. Please use the `_satellite.cookie` API.');
 
     _satellite.setCookie(name, '', -1);
   };

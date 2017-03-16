@@ -32,7 +32,6 @@ describe('function returned by createPublicRequire', function() {
     var cookieMock = {};
     var debounceMock = {};
     var onceMock = {};
-    var loggerMock = {};
     var writeHtmlMock = {};
     var replaceTokensMock = {};
     var onPageBottomMock = {};
@@ -52,7 +51,6 @@ describe('function returned by createPublicRequire', function() {
       './public/cookie': cookieMock,
       './public/debounce': debounceMock,
       './public/once': onceMock,
-      './public/logger': loggerMock,
       './public/writeHtml': writeHtmlMock,
       './public/replaceTokens': replaceTokensMock,
       './public/onPageBottom': onPageBottomMock,
@@ -73,7 +71,6 @@ describe('function returned by createPublicRequire', function() {
     expect(publicRequire('@turbine/cookie')).toBe(cookieMock);
     expect(publicRequire('@turbine/debounce')).toBe(debounceMock);
     expect(publicRequire('@turbine/once')).toBe(onceMock);
-    expect(publicRequire('@turbine/logger')).toBe(loggerMock);
     expect(publicRequire('@turbine/write-html')).toBe(writeHtmlMock);
     expect(publicRequire('@turbine/replace-tokens')).toBe(replaceTokensMock);
     expect(publicRequire('@turbine/on-page-bottom')).toBe(onPageBottomMock);
@@ -82,6 +79,7 @@ describe('function returned by createPublicRequire', function() {
   });
 
   it('should return the dynamic core modules', function() {
+    var loggerMock = {};
     var buildInfoMock = {};
     var propertySettingsMock = {};
     var getExtensionSettingsMock = {};
@@ -90,6 +88,7 @@ describe('function returned by createPublicRequire', function() {
 
     var createPublicRequire = injectCreatePublicRequire({});
     var publicRequire = createPublicRequire({
+      logger: loggerMock,
       buildInfo: buildInfoMock,
       propertySettings: propertySettingsMock,
       getExtensionSettings: getExtensionSettingsMock,
@@ -97,6 +96,7 @@ describe('function returned by createPublicRequire', function() {
       getHostedLibFileUrl: getHostedLibFileUrlMock
     });
 
+    expect(publicRequire('@turbine/logger')).toBe(loggerMock);
     expect(publicRequire('@turbine/build-info')).toBe(buildInfoMock);
     expect(publicRequire('@turbine/property-settings')).toBe(propertySettingsMock);
     expect(publicRequire('@turbine/get-extension-settings'))

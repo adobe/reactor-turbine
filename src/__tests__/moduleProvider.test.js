@@ -33,7 +33,7 @@ describe('moduleProvider', function() {
     extractModuleExportsSpy = jasmine.createSpy('m').and.callFake(extractModuleExports);
 
     moduleProvider = injectModuleProvider({
-      './public/logger': logger,
+      './logger': logger,
       './extractModuleExports': extractModuleExportsSpy
     });
 

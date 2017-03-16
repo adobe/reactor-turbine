@@ -23,6 +23,7 @@ var setLocalStorageItem = require('./setLocalStorageItem');
 var createGetSharedModuleExports = require('./createGetSharedModuleExports');
 var createGetHostedLibFileUrl = require('./createGetHostedLibFileUrl');
 var resolveRelativePath = require('./resolveRelativePath');
+var logger = require('./logger');
 
 var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
 var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
@@ -63,6 +64,7 @@ var init = function(container) {
           };
 
           var publicRequire = createPublicRequire({
+            logger: logger.createPrefixedLogger(extension.displayName),
             buildInfo: buildInfo,
             propertySettings: propertySettings,
             getExtensionSettings: getExtensionSettings,

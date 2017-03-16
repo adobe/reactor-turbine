@@ -30,7 +30,6 @@ var modules = {
   'cookie': require('./public/cookie'),
   'debounce': require('./public/debounce'),
   'once': require('./public/once'),
-  'logger': require('./public/logger'),
   'write-html': require('./public/writeHtml'),
   'replace-tokens': require('./public/replaceTokens'),
   'on-page-bottom': require('./public/onPageBottom'),
@@ -52,6 +51,7 @@ module.exports = function(dynamicModules) {
   dynamicModules = dynamicModules || {};
 
   var allModules = Object.create(modules);
+  allModules['logger'] = dynamicModules.logger;
   allModules['build-info'] = dynamicModules.buildInfo;
   allModules['property-settings'] = dynamicModules.propertySettings;
   allModules['get-extension-settings'] = dynamicModules.getExtensionSettings;

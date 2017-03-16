@@ -18,7 +18,7 @@
 
 var state = require('../state');
 var cleanText = require('../cleanText');
-var logger = require('./logger');
+var logger = require('../logger');
 
 var getErrorMessage = function(dataDef, dataElementName, errorMessage, errorStack) {
   return 'Failed to execute data element module ' + dataDef.modulePath + ' for data element ' +

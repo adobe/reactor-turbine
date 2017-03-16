@@ -21,7 +21,7 @@ describe('onPageBottom', function() {
     return require('inject!../onPageBottom')({
       'window': options.window,
       'document': options.document,
-      './logger': options.logger || require('../logger'),
+      '../logger': options.logger || require('../../logger'),
       './once': require('../once')
     });
   };

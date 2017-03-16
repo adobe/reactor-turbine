@@ -32,5 +32,5 @@ require('./hydrateSatelliteObject')(
 );
 
 state.init(window._satellite.container); // Must come first.
-require('./public/logger').outputEnabled = state.getDebugOutputEnabled();
+require('./logger').outputEnabled = state.getDebugOutputEnabled();
 require('./initRules')(); // Must come last.

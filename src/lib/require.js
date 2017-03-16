@@ -16,6 +16,8 @@
 * from Adobe Systems Incorporated.
 **************************************************************************/
 
+var noop = function() {};
+
 /**
  * We expose this as a lib file within the built turbine npm package for consumption by extensions.
  * Extensions may use it during testing either directly or indirectly (through turbine-loader)
@@ -23,6 +25,12 @@
  * used within the engine.
  */
 module.exports = require('../createPublicRequire')({
+  logger: {
+    log: noop,
+    info: noop,
+    warn: noop,
+    error: noop
+  },
   buildInfo: {
     turbineVersion: '16.0.0',
     turbineBuildDate: '2016-07-01T18:10:34Z',
@@ -38,7 +46,7 @@ module.exports = require('../createPublicRequire')({
     euCookieName: 'sat_track',
     undefinedVarsReturnEmpty: false
   },
-  getExtensionConfiguration: function() { },
-  getSharedModuleExports: function() { },
+  getExtensionConfiguration: noop,
+  getSharedModuleExports: noop,
   getHostedLibFileUrl: function(file) { return '//example.com/' + file; }
 });

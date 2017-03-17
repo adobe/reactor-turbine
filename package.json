@@ -10,7 +10,7 @@
     "ci-job": "xvfb-run npm test -- --ci --browser firefox chrome ie9sg ie10sg ie11sg edgesg ios android safarisg && npm run lint"
   },
   "author": {
-    "name": "Adobe Systems Incorporated",
+    "name": "Adobe Systems",
     "url": "http://adobe.com",
     "email": "reactor@adobe.com"
   },

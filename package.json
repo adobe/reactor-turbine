@@ -3,7 +3,7 @@
   "version": "18.1.2",
   "description": "Rule engine for processing rules on a client's website as well as delegating logic to extensions.",
   "scripts": {
-    "build": "webpack --config webpack.dist.config.js && webpack --config webpack.lib.config.js",
+    "build": "webpack --config webpack.dist.config.js && webpack --config webpack.dist.config.js --compress && webpack --config webpack.lib.config.js",
     "prepublish": "npm run build",
     "test": "reactor-testrunner",
     "lint": "reactor-testrunner lint",
@@ -26,6 +26,7 @@
     "webpack": "^1.13.2"
   },
   "devDependencies": {
-    "@reactor/extension-support-testrunner": "^9.0.0"
+    "@reactor/extension-support-testrunner": "^9.0.0",
+    "yargs": "^7.0.2"
   }
 }

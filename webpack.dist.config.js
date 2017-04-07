@@ -1,14 +1,15 @@
 'use strict';
 const webpack = require('webpack');
 const fs = require('fs');
+const argv = require('yargs').argv;
 
 const banner = fs.readFileSync('./copyrightBanner.txt', 'utf8');
 
-module.exports = {
+const config = {
   entry: './src/bootstrap.js',
   output: {
     path: './dist',
-    filename: 'engine.js'
+    filename: argv.compress ? 'engine.min.js' : 'engine.js'
   },
   //devtool: 'source-map', // Doesn't match the right lines in the debugger half the time. :/
   resolve: {
@@ -23,7 +24,6 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.optimize.UglifyJsPlugin(),
     new webpack.BannerPlugin(banner, {
       raw: true
     })
@@ -34,3 +34,9 @@ module.exports = {
     document: 'document'
   }
 };
+
+if (argv.compress) {
+  config.plugins.unshift(new webpack.optimize.UglifyJsPlugin());
+}
+
+module.exports = config;

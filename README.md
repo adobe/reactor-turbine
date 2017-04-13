@@ -1,6 +1,6 @@
 # @adobe/reactor-turbine
 
-Rule engine for processing rules on a client's website as well as delegating logic to extensions.
+Launch rule engine which processes rules on client websites and delegates logic to extensions.
 
 ## Development Setup
 

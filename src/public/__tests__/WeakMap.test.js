@@ -17,7 +17,7 @@ describe('WeakMap', function() {
       WeakMap: MockWeakMap
     };
 
-    var WeakMap = require('inject!../WeakMap')({
+    var WeakMap = require('inject-loader!../WeakMap')({
       'window': mockWindow
     });
 
@@ -27,7 +27,7 @@ describe('WeakMap', function() {
   it('returns WeakMap implementation without modifying global scope', function() {
     var mockWindow = {};
 
-    var WeakMap = require('inject!../WeakMap')({
+    var WeakMap = require('inject-loader!../WeakMap')({
       'window': mockWindow
     });
 
@@ -39,7 +39,7 @@ describe('WeakMap', function() {
   // https://github.com/webcomponents/webcomponentsjs/blob/82964dec42a7f6af70142b1bbf3bc4ca16bf1bcf/tests/WeakMap/tests.html
 
   it('has get, set, delete, and has functions', function() {
-    var WeakMap = require('inject!../WeakMap')({
+    var WeakMap = require('inject-loader!../WeakMap')({
       // Inject an empty window so we don't end up testing the native WeakMap if it exists
       // in the target browser.
       'window': {}
@@ -51,7 +51,7 @@ describe('WeakMap', function() {
   });
 
   it('has methods that perform as expected', function() {
-    var WeakMap = require('inject!../WeakMap')({
+    var WeakMap = require('inject-loader!../WeakMap')({
       // Inject an empty window so we don't end up testing the native WeakMap if it exists
       // in the target browser.
       'window': {}

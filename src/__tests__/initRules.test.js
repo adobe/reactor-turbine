@@ -17,7 +17,7 @@ var getMockDisplayName = function(referencePath) {
 };
 
 describe('initRules', function() {
-  var createModuleProvider = require('inject?!../moduleProvider');
+  var createModuleProvider = require('inject-loader?!../moduleProvider');
   var TEST_EVENT_PATH = 'hello-world/testEvent.js';
   var TEST_CONDITION1_PATH = 'hello-world/testCondition1.js';
   var TEST_CONDITION2_PATH = 'hello-world/testCondition2.js';
@@ -25,7 +25,7 @@ describe('initRules', function() {
   var TEST_ACTION2_PATH = 'hello-world/testAction2.js';
 
   describe('rule execution', function() {
-    var injectInitRules = require('inject?./state!../initRules');
+    var injectInitRules = require('inject-loader?./state!../initRules');
     var initRules;
 
     var state;
@@ -357,7 +357,7 @@ describe('initRules', function() {
         }
       };
 
-      initRules = require('inject?./logger&./state!../initRules')({
+      initRules = require('inject-loader?./logger&./state!../initRules')({
         './logger': logger,
         './state': state
       });

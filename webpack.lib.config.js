@@ -7,23 +7,24 @@ const banner = fs.readFileSync('./copyrightBanner.txt', 'utf8');
 module.exports = {
   entry: './src/lib/require.js',
   output: {
-    path: './lib',
+    path: __dirname + '/lib',
     filename: 'require.js',
     libraryTarget: 'commonjs2'
   },
   resolve: {
-    extensions: ['', '.js']
+    extensions: ['.js']
   },
   module: {
     loaders: [
       {
         test: /\.js$/,
-        loader: 'strict'
+        loader: 'strict-loader'
       }
     ]
   },
   plugins: [
-    new webpack.BannerPlugin(banner, {
+    new webpack.BannerPlugin({
+      banner: banner,
       raw: true
     })
   ],

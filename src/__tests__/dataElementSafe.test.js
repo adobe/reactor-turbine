@@ -14,7 +14,7 @@ var cookie = require('cookie');
 
 describe('dataElementSafe', function() {
   var mockDate = new Date();
-  var dataElementSafe = require('inject!../dataElementSafe')({
+  var dataElementSafe = require('inject-loader!../dataElementSafe')({
     'cookie': cookie
   });
 

@@ -15,8 +15,8 @@
 var isSafariDesktop = /^((?!chrome|android|ipad|iphone).)*safari/i.test(navigator.userAgent);
 
 describe('state', function() {
-  var injectState = require('inject!../state');
-  var createModuleProvider = require('inject?!../moduleProvider');
+  var injectState = require('inject-loader!../state');
+  var createModuleProvider = require('inject-loader?!../moduleProvider');
   var moduleProvider;
   var createGetSharedModuleExports;
   var createGetExtensionSettings;

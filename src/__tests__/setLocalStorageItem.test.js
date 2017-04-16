@@ -27,7 +27,7 @@ describe('setLocalStorageItem', function() {
       }
     };
 
-    var setLocalStorageItem = require('inject!../setLocalStorageItem')({
+    var setLocalStorageItem = require('inject-loader!../setLocalStorageItem')({
       window: mockWindow
     });
 
@@ -44,7 +44,7 @@ describe('setLocalStorageItem', function() {
       }
     };
 
-    var setLocalStorageItem = require('inject!../setLocalStorageItem')({
+    var setLocalStorageItem = require('inject-loader!../setLocalStorageItem')({
       window: mockWindow
     });
 

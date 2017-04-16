@@ -30,7 +30,7 @@ describe('getLocalStorageItem', function() {
       }
     };
 
-    var getLocalStorageItem = require('inject!../getLocalStorageItem')({
+    var getLocalStorageItem = require('inject-loader!../getLocalStorageItem')({
       window: mockWindow
     });
 
@@ -50,7 +50,7 @@ describe('getLocalStorageItem', function() {
       }
     };
 
-    var getLocalStorageItem = require('inject!../getLocalStorageItem')({
+    var getLocalStorageItem = require('inject-loader!../getLocalStorageItem')({
       window: mockWindow
     });
 

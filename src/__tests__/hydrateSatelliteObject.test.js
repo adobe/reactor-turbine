@@ -15,7 +15,7 @@
 var noop = function() {};
 
 describe('hydrateSatelliteObject', function() {
-  var injectHydrateSatelliteObject = require('inject!../hydrateSatelliteObject');
+  var injectHydrateSatelliteObject = require('inject-loader!../hydrateSatelliteObject');
 
   beforeEach(function() {
     window._satellite = {};

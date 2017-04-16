@@ -12,7 +12,7 @@
 
 describe('onPageBottom', function() {
   var getInjectedOnPageBottom = function(options) {
-    return require('inject!../onPageBottom')({
+    return require('inject-loader!../onPageBottom')({
       'window': options.window,
       'document': options.document,
       '../logger': options.logger || require('../../logger'),

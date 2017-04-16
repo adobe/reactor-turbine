@@ -13,7 +13,7 @@
 'use strict';
 
 describe('function returned by createPublicRequire', function() {
-  var injectCreatePublicRequire = require('inject!../createPublicRequire');
+  var injectCreatePublicRequire = require('inject-loader!../createPublicRequire');
 
   it('should return the static core modules', function() {
     var promiseMock = {};

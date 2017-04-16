@@ -16,7 +16,7 @@ describe('getDataElementValue', function() {
   var logger;
   var getInjectedGetDataElementValue = function(options) {
     var cleanText = options.cleanText || function() {};
-    return require('inject!../getDataElementValue')({
+    return require('inject-loader!../getDataElementValue')({
       '../state': options.state,
       '../cleanText': cleanText,
       '../logger': logger

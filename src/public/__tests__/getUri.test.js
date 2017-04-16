@@ -20,7 +20,7 @@ var mockDocument = {
   }
 };
 
-var getUri = require('inject!../getUri')({
+var getUri = require('inject-loader!../getUri')({
   document: mockDocument
 });
 

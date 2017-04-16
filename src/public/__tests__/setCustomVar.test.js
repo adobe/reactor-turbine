@@ -16,7 +16,7 @@ describe('setCustomVar', function() {
 
   beforeEach(function() {
     customVars = {};
-    setCustomVar = require('inject!../setCustomVar')({
+    setCustomVar = require('inject-loader!../setCustomVar')({
       '../state': {
         customVars: customVars
       }

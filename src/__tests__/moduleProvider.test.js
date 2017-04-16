@@ -14,7 +14,7 @@
 
 describe('moduleProvider', function() {
   var logger;
-  var injectModuleProvider = require('inject!../moduleProvider');
+  var injectModuleProvider = require('inject-loader!../moduleProvider');
   var referencePath = 'hello-world/src/foo.js';
   var displayName = 'Foo';
   var moduleExports = {};

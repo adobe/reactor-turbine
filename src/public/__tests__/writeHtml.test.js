@@ -11,7 +11,7 @@
  ****************************************************************************************/
 
 describe('writeHtml', function() {
-  var injectWriteHtml = require('inject!../writeHtml');
+  var injectWriteHtml = require('inject-loader!../writeHtml');
 
   it('should write content in the page before DOMContentLoaded was fired', function() {
     var documentWriteSpy = jasmine.createSpy();

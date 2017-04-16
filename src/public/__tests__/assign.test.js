@@ -22,7 +22,7 @@ describe('assign', function() {
       }
     };
 
-    var assign = require('inject!../assign')({
+    var assign = require('inject-loader!../assign')({
       'window': mockWindow
     });
 
@@ -31,7 +31,7 @@ describe('assign', function() {
 
   describe('when a native implementation does not exists', function() {
     beforeEach(function() {
-      assign = require('inject!../assign')({
+      assign = require('inject-loader!../assign')({
         'window': {
           Object: {}
         }

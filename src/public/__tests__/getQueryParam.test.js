@@ -18,7 +18,7 @@ var mockWindow = {
   }
 };
 
-var getQueryParam = require('inject!../getQueryParam')({
+var getQueryParam = require('inject-loader!../getQueryParam')({
   window: mockWindow
 });
 

@@ -12,7 +12,7 @@
 
 describe('hasDomContentLoaded', function() {
   it('returns true after DOM content was loaded', function() {
-    var injectHasDomContentLoaded = require('inject!../hasDomContentLoaded');
+    var injectHasDomContentLoaded = require('inject-loader!../hasDomContentLoaded');
     var hasDomContentLoaded = injectHasDomContentLoaded({
       'document': {
         addEventListener: function(type, callback) {
@@ -27,7 +27,7 @@ describe('hasDomContentLoaded', function() {
   });
 
   it('returns false before DOM content was loaded', function() {
-    var injectHasDomContentLoaded = require('inject!../hasDomContentLoaded');
+    var injectHasDomContentLoaded = require('inject-loader!../hasDomContentLoaded');
     var hasDomContentLoaded = injectHasDomContentLoaded({
       'document': {
         addEventListener: function() {}

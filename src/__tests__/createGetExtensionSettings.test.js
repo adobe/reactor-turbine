@@ -13,7 +13,7 @@
 'use strict';
 
 describe('function returned by createGetExtensionConfiguration', function() {
-  var createGetExtensionSettings = require('inject!../createGetExtensionSettings')({
+  var createGetExtensionSettings = require('inject-loader!../createGetExtensionSettings')({
     './public/replaceTokens': function(obj) {
       var replacedObj = {};
 

@@ -6,8 +6,6 @@ Launch rule engine which processes rules on client websites and delegates logic 
 
 ## Development Setup
 
-The development experience is only supported for engineers inside the Adobe firewall.
-
 1. Install [node.js](https://nodejs.org/).
 3. Clone the repository.
 4. After navigating into the project directory, install project dependencies by running `npm install`.

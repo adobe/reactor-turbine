@@ -27,7 +27,6 @@
     "webpack": "^2.4.1"
   },
   "devDependencies": {
-    "coveralls": "^2.13.0",
     "eslint": "^3.9.1",
     "inject-loader": "^3.0.0",
     "istanbul-instrumenter-loader": "^2.0.0",

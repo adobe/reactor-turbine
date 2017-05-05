@@ -1,5 +1,7 @@
 # @adobe/reactor-turbine
 
+[![Build Status](https://travis-ci.org/Adobe-Marketing-Cloud/reactor-turbine.svg?branch=master)](https://travis-ci.org/Adobe-Marketing-Cloud/reactor-turbine)
+[![Coverage Status](https://coveralls.io/repos/github/Adobe-Marketing-Cloud/reactor-turbine/badge.svg)](https://coveralls.io/github/Adobe-Marketing-Cloud/reactor-turbine)
 [![npm (scoped with tag)](https://img.shields.io/npm/v/@adobe/reactor-turbine.svg?style=flat)](https://www.npmjs.com/package/@adobe/reactor-turbine)
 
 Launch rule engine which processes rules on client websites and delegates logic to extensions.

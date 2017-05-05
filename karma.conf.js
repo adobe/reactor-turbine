@@ -1,12 +1,20 @@
 var path = require('path');
+
+var defaultBrowsers = ['Chrome'];
+if (process.env.TRAVIS) {
+  var buildId =
+    'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')';
+  defaultBrowsers = ['SL_IE9', 'SL_IE10', 'SL_IE11', 'SL_CHROME', 'SL_FIREFOX'];
+}
+
 var argv = require('yargs')
   .array('browsers')
-  .default('browsers', ['Firefox'])
+  .default('browsers', defaultBrowsers)
   .default('singleRun', true)
   .default('coverage', true)
   .argv;
 
-var reporters = ['dots'];
+var reporters = ['dots', 'saucelabs'];
 var rules = [];
 
 if (argv.coverage) {
@@ -82,6 +90,79 @@ module.exports = function(config) {
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: argv.browsers,
 
+    customLaunchers: {
+      'SL_CHROME': {
+        base: 'SauceLabs',
+        browserName: 'chrome',
+        version: 'latest'
+      },
+      'SL_CHROMEBETA': {
+        base: 'SauceLabs',
+        browserName: 'chrome',
+        version: 'beta'
+      },
+      'SL_FIREFOX': {
+        base: 'SauceLabs',
+        browserName: 'firefox',
+        version: 'latest'
+      },
+      'SL_FIREFOXBETA': {
+        base: 'SauceLabs',
+        browserName: 'firefox',
+        version: 'beta'
+      },
+      'SL_SAFARI': {
+        base: 'SauceLabs',
+        browserName: 'safari',
+        version: 'latest'
+      },
+      'SL_IE9': {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        version: '9'
+      },
+      'SL_IE10': {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        version: '10'
+      },
+      'SL_IE11': {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        version: '11'
+      },
+      'SL_EDGE': {
+        base: 'SauceLabs',
+        browserName: 'MicrosoftEdge',
+        version: 'latest'
+      },
+      'SL_IOS10': {
+        base: 'SauceLabs',
+        deviceName: 'iPhone 7 Simulator',
+        appiumVersion: '1.6.3',
+        browserName: 'Safari',
+        platformName: 'iOS',
+        platformVersion: '10.2'
+      },
+      'SL_ANDROID7': {
+        base: 'SauceLabs',
+        deviceName: 'Android GoogleAPI Emulator',
+        appiumVersion: '1.6.3',
+        browserName: 'Chrome',
+        platformName: 'Android',
+        platformVersion: '7.0'
+      }
+    },
+
+    sauceLabs: {
+      buildId: buildId,
+      testName: 'reactor-turbine Unit Test',
+      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+      startConnect: false,
+      retryLimit: 3,
+      recordVideo: false,
+      recordScreenshots: false
+    },
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
@@ -97,6 +178,11 @@ module.exports = function(config) {
         { type: 'lcovonly', subdir: '.', file: 'lcov.dat' }
       ]
     },
+
+    captureTimeout: 180000,
+    browserDisconnectTimeout: 180000,
+    browserDisconnectTolerance: 3,
+    browserNoActivityTimeout: 300000,
 
     webpack: {
       externals: {

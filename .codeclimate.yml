@@ -2,14 +2,13 @@ engines:
   eslint:
     enabled: true
   duplication:
-      enabled: true
+    enabled: true
     config:
-        languages:
+      languages:
       - javascript
 ratings:
   paths:
-  - src/**
-  - tasks/**
+  - "src/**"
+  - "tasks/**"
 exclude_paths:
 - "src/**/__tests__"
-

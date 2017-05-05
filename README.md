@@ -6,6 +6,8 @@
 [![dependencies Status](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine/status.svg)](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine)
 [![devDependencies Status](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine/dev-status.svg)](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine?type=dev)
 
+[![Build Status](https://saucelabs.com/browser-matrix/dompuiu.svg)](https://saucelabs.com/beta/builds/d8990a524f1f4d5f91e471ec26a9a530)
+
 Launch rule engine which processes rules on client websites and delegates logic to extensions.
 
 ## Development Setup

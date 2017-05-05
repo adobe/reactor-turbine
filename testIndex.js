@@ -1,3 +1,5 @@
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+
 var testsContext = require.context('./src', true, /__tests__\/.*\.test\.jsx?$/);
 testsContext.keys().forEach(testsContext);
 

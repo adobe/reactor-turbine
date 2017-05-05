@@ -7,7 +7,7 @@
     "build": "webpack --config webpack.dist.config.js --env && webpack --config webpack.dist.config.js --env.compress && webpack --config webpack.lib.config.js",
     "prepublish": "npm run build",
     "test": "karma start",
-    "test:watch": "npm test -- --no-single-run --no-coverage --browsers Chrome",
+    "test:watch": "npm test -- --no-single-run --no-coverage",
     "lint": "eslint 'src/**/*.js'"
   },
   "author": {
@@ -37,6 +37,7 @@
     "karma-firefox-launcher": "^1.0.1",
     "karma-jasmine": "^1.1.0",
     "karma-jasmine-matchers": "^3.7.0",
+    "karma-sauce-launcher": "^1.1.0",
     "karma-webpack": "^2.0.3",
     "yargs": "^8.0.1"
   }

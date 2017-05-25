@@ -29,7 +29,7 @@ module.exports = function(extensions, moduleProvider) {
         for (var i = 0; i < referencePaths.length; i++) {
           var referencePath = referencePaths[i];
           var module = modules[referencePath];
-          if (module.sharedName === moduleName) {
+          if (module.shared && module.name === moduleName) {
             return moduleProvider.getModuleExports(referencePath);
           }
         }

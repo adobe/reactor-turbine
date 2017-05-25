@@ -63,25 +63,30 @@ describe('state', function() {
         },
         modules: {
           'example-extension/events/click.js': {
+            name: 'click',
             displayName: 'Click',
             script: function(module) {
               module.exports = 'click exports';
             }
           },
           'example-extension/conditions/operatingSystem.js': {
+            name: 'operating-system',
             displayName: 'Operating System',
             script: function() {}
           },
           'example-extension/actions/sendBeacon.js': {
+            name: 'send-beacon',
             displayName: 'Send Beacon',
             script: function() {}
           },
           'example-extension/dataElements/javascriptVariable.js': {
+            name: 'javascript-variable',
             displayName: 'JavaScript Variable',
             script: function() {}
           },
           'example-extension/shared/sharedModule.js': {
-            sharedName: 'foo',
+            name: 'foo',
+            shared: true,
             script: jasmine.createSpy().and.callFake(function(module, require) {
               module.exports = {};
             })

@@ -1,10 +1,16 @@
 var path = require('path');
 
 var defaultBrowsers = ['Chrome'];
+var reporters = ['dots'];
 if (process.env.TRAVIS) {
   var buildId =
     'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')';
   defaultBrowsers = ['SL_IE9', 'SL_IE10', 'SL_IE11', 'SL_CHROME', 'SL_FIREFOX'];
+  reporters.push('saucelabs');
+}
+
+if (process.env.SAUCE_USERNAME) {
+    reporters.push('saucelabs');
 }
 
 var argv = require('yargs')
@@ -14,7 +20,6 @@ var argv = require('yargs')
   .default('coverage', true)
   .argv;
 
-var reporters = ['dots', 'saucelabs'];
 var rules = [];
 
 if (argv.coverage) {

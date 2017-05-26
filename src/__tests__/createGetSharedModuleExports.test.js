@@ -21,7 +21,8 @@ describe('function returned by createGetSharedModuleExports', function() {
       'hello-world': {
         modules: {
           'hello-world/src/foo.js': {
-            sharedName: 'foo'
+            name: 'foo',
+            shared: true
           },
           'hello-world/src/baz.js': {
           }

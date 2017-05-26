@@ -15,8 +15,11 @@ var logger = require('./logger');
 
 var moduleByReferencePath = {};
 
-var registerModule = function(referencePath, module, require) {
-  module = Object.create(module);
+var registerModule = function(referencePath, moduleDefinition, require) {
+  var module = {
+    definition: moduleDefinition,
+    require: require
+  };
   module.require = require;
   moduleByReferencePath[referencePath] = module;
 };
@@ -43,22 +46,21 @@ var getModuleExports = function(referencePath) {
   // Using hasOwnProperty instead of a falsey check because the module could export undefined
   // in which case we don't want to execute the module each time the exports is requested.
   if (!module.hasOwnProperty('exports')) {
-    module.exports = extractModuleExports(module.script, module.require);
+    module.exports = extractModuleExports(module.definition.script, module.require);
   }
 
   return module.exports;
 };
 
-var getModuleDisplayName = function(referencePath) {
-  var module = moduleByReferencePath[referencePath];
-  return module ? module.displayName : null;
+var getModuleDefinition = function(referencePath) {
+  return moduleByReferencePath[referencePath].definition;
 };
 
 module.exports = {
   registerModule: registerModule,
   hydrateCache: hydrateCache,
   getModuleExports: getModuleExports,
-  getModuleDisplayName: getModuleDisplayName
+  getModuleDefinition: getModuleDefinition
 };
 
 

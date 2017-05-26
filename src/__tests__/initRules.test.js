@@ -143,7 +143,7 @@ describe('initRules', function() {
           return true;
         },
         getModuleExports: moduleProvider.getModuleExports,
-        getModuleDisplayName: moduleProvider.getModuleDisplayName,
+        getModuleDefinition: moduleProvider.getModuleDefinition,
         getPropertySettings: function() {
           return propertySettings;
         },
@@ -348,7 +348,7 @@ describe('initRules', function() {
 
       state = {
         getModuleExports: moduleProvider.getModuleExports,
-        getModuleDisplayName: moduleProvider.getModuleDisplayName,
+        getModuleDefinition: moduleProvider.getModuleDefinition,
         getRules: function() {
           return rules;
         },

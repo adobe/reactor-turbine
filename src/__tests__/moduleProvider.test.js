@@ -16,6 +16,7 @@ describe('moduleProvider', function() {
   var logger;
   var injectModuleProvider = require('inject-loader!../moduleProvider');
   var referencePath = 'hello-world/src/foo.js';
+  var name = 'foo';
   var displayName = 'Foo';
   var moduleExports = {};
   var extractModuleExports = require('../extractModuleExports');
@@ -32,6 +33,7 @@ describe('moduleProvider', function() {
     });
 
     var module = {
+      name: name,
       displayName: displayName,
       script: function(module) {
         module.exports = moduleExports;
@@ -39,7 +41,7 @@ describe('moduleProvider', function() {
     };
 
     var require = function(path) { return path; };
-
+debugger;
     moduleProvider.registerModule(referencePath, module, require);
   });
 
@@ -76,8 +78,12 @@ describe('moduleProvider', function() {
     expect(moduleProvider.getModuleExports(referencePath)).toBe(moduleExports);
   });
 
-  it('returns display name', function() {
-    expect(moduleProvider.getModuleDisplayName(referencePath)).toBe('Foo');
+  it('returns definition', function() {
+    expect(moduleProvider.getModuleDefinition(referencePath)).toEqual({
+      name: name,
+      displayName: displayName,
+      script: jasmine.any(Function)
+    });
   });
 
   it('throws an error when a module is not found', function() {

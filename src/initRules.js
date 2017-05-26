@@ -13,17 +13,19 @@
 var replaceVarTokens = require('./public/replaceTokens');
 var logger = require('./logger');
 var state = require('./state');
+var document = require('document');
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 
 var EXCEPTION_LOGIC_TYPE = 'exception';
 
-var getModuleDisplayName = function(ruleComponent) {
-  return state.getModuleDisplayName(ruleComponent.modulePath) || ruleComponent.modulePath;
+var getModuleDisplayNameByRuleComponent = function(ruleComponent) {
+  var moduleDefinition = state.getModuleDefinition(ruleComponent.modulePath);
+  return (moduleDefinition && moduleDefinition.displayName) || ruleComponent.modulePath;
 };
 
 var getErrorMessage = function(ruleComponent, rule, errorMessage, errorStack) {
-  var moduleDisplayName = getModuleDisplayName(ruleComponent);
+  var moduleDisplayName = getModuleDisplayNameByRuleComponent(ruleComponent);
   return 'Failed to execute ' + moduleDisplayName + ' for ' + rule.name + ' rule. ' +
     errorMessage + (errorStack ? '\n' + errorStack : '');
 };
@@ -97,7 +99,7 @@ var checkConditions = function(rule, relatedElement, event) {
       var isExceptionCondition = condition.logicType === EXCEPTION_LOGIC_TYPE;
 
       if ((!result && !isExceptionCondition) || (result && isExceptionCondition)) {
-        var conditionDisplayName = getModuleDisplayName(condition);
+        var conditionDisplayName = getModuleDisplayNameByRuleComponent(condition);
         logger.log('Condition ' + conditionDisplayName + ' for rule ' + rule.name + ' not met.');
         return;
       }

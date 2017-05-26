@@ -139,10 +139,14 @@ describe('state', function() {
     expect(state.customVars).toEqual({});
   });
 
-  it('should return a module display name', function() {
+  it('should return a module definition', function() {
     var modulePath = 'example-extension/events/click.js';
-    expect(state.getModuleDisplayName(modulePath)).toBe('Click');
-    expect(moduleProvider.getModuleDisplayName).toHaveBeenCalledWith(modulePath);
+    expect(state.getModuleDefinition(modulePath)).toEqual({
+      name: 'click',
+      displayName: 'Click',
+      script: jasmine.any(Function)
+    });
+    expect(moduleProvider.getModuleDefinition).toHaveBeenCalledWith(modulePath);
   });
 
   it('should return a module\'s exports', function() {

@@ -87,7 +87,7 @@ var getRules = function() {
   return rules;
 };
 
-var getElementDefinition = function(name) {
+var getDataElementDefinition = function(name) {
   return dataElements[name];
 };
 
@@ -117,10 +117,10 @@ var getBuildInfo = function() {
 module.exports = {
   init: init,
   customVars: customVars,
-  getModuleDisplayName: moduleProvider.getModuleDisplayName,
+  getModuleDefinition: moduleProvider.getModuleDefinition,
   getModuleExports: moduleProvider.getModuleExports,
   getRules: getRules,
-  getDataElementDefinition: getElementDefinition,
+  getDataElementDefinition: getDataElementDefinition,
   getShouldExecuteActions: getShouldExecuteActions,
   getDebugOutputEnabled: getDebugOutputEnabled,
   setDebugOutputEnabled: setDebugOutputEnabled,

@@ -12,17 +12,28 @@
 
 'use strict';
 
-var getMockDisplayName = function(referencePath) {
-  return 'Display Name ' + referencePath;
-};
-
 describe('initRules', function() {
   var createModuleProvider = require('inject-loader?!../moduleProvider');
+
   var TEST_EVENT_PATH = 'hello-world/testEvent.js';
+  var TEST_EVENT_NAME = 'test-event';
+  var TEST_EVENT_DISPLAY_NAME = 'Test Event';
+
   var TEST_CONDITION1_PATH = 'hello-world/testCondition1.js';
+  var TEST_CONDITION1_NAME = 'test-condition-1';
+  var TEST_CONDITION1_DISPLAY_NAME = 'Test Condition 1';
+
   var TEST_CONDITION2_PATH = 'hello-world/testCondition2.js';
+  var TEST_CONDITION2_NAME = 'test-condition-2';
+  var TEST_CONDITION2_DISPLAY_NAME = 'Test Condition 2';
+
   var TEST_ACTION1_PATH = 'hello-world/testAction1.js';
+  var TEST_ACTION1_NAME = 'test-action-1';
+  var TEST_ACTION1_DISPLAY_NAME = 'Test Action 1';
+
   var TEST_ACTION2_PATH = 'hello-world/testAction2.js';
+  var TEST_ACTION2_NAME = 'test-action-2';
+  var TEST_ACTION2_DISPLAY_NAME = 'Test Action 2';
 
   describe('rule execution', function() {
     var injectInitRules = require('inject-loader?./state!../initRules');
@@ -30,66 +41,75 @@ describe('initRules', function() {
 
     var state;
     var event;
-    var relatedElement;
     var rules;
     var propertySettings;
     var moduleProvider;
+    var extensionName = 'test-extension';
 
     beforeEach(function() {
       event = {};
-      relatedElement = {};
 
       moduleProvider = createModuleProvider();
 
       moduleProvider.registerModule(
         TEST_EVENT_PATH,
         {
-          displayName: getMockDisplayName(TEST_EVENT_PATH),
+          name: TEST_EVENT_NAME,
+          displayName: TEST_EVENT_DISPLAY_NAME,
           script: function(module) {
             module.exports = jasmine
               .createSpy()
               .and
               .callFake(function(settings, trigger) {
-                trigger(relatedElement, event);
+                trigger(event);
               });
           }
-        });
+        },
+        extensionName);
 
       moduleProvider.registerModule(
         TEST_CONDITION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          name: TEST_CONDITION1_NAME,
+          displayName: TEST_CONDITION1_DISPLAY_NAME,
           script: function(module) {
             module.exports = jasmine.createSpy().and.returnValue(true);
           }
-        });
+        },
+        extensionName);
 
       moduleProvider.registerModule(
         TEST_CONDITION2_PATH,
         {
-          displayName: getMockDisplayName(TEST_CONDITION2_PATH),
+          name: TEST_CONDITION2_NAME,
+          displayName: TEST_CONDITION2_DISPLAY_NAME,
           script: function(module) {
             module.exports = jasmine.createSpy().and.returnValue(false);
           }
-        });
+        },
+        extensionName);
 
       moduleProvider.registerModule(
         TEST_ACTION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_ACTION1_PATH),
+          name: TEST_ACTION1_NAME,
+          displayName: TEST_ACTION1_DISPLAY_NAME,
           script: function(module) {
             module.exports = jasmine.createSpy();
           }
-        });
+        },
+        extensionName);
 
       moduleProvider.registerModule(
         TEST_ACTION2_PATH,
         {
-          displayName: getMockDisplayName(TEST_ACTION2_PATH),
+          name: TEST_ACTION2_NAME,
+          displayName: TEST_ACTION2_DISPLAY_NAME,
           script: function(module) {
             module.exports = jasmine.createSpy();
           }
-        });
+        },
+        extensionName);
 
       rules = [
         {
@@ -144,6 +164,7 @@ describe('initRules', function() {
         },
         getModuleExports: moduleProvider.getModuleExports,
         getModuleDefinition: moduleProvider.getModuleDefinition,
+        getModuleExtensionName: moduleProvider.getModuleExtensionName,
         getPropertySettings: function() {
           return propertySettings;
         },
@@ -176,14 +197,17 @@ describe('initRules', function() {
 
       expect(condition1Exports.calls.count()).toBe(1);
 
-      var condiiton1ExportsCall = condition1Exports.calls.mostRecent();
+      var condition1ExportsCall = condition1Exports.calls.mostRecent();
 
-      expect(condiiton1ExportsCall.args[0]).toEqual({
+      expect(condition1ExportsCall.args[0]).toEqual({
         testCondition1Foo: 'bar'
       });
 
-      expect(condiiton1ExportsCall.args[1]).toBe(relatedElement);
-      expect(condiiton1ExportsCall.args[2]).toBe(event);
+      expect(condition1ExportsCall.args[1]).toEqual({
+        type: 'test-extension.test-event',
+        element: window,
+        target: window
+      });
 
       var condition2Exports = moduleProvider.getModuleExports(TEST_CONDITION2_PATH);
 
@@ -195,8 +219,11 @@ describe('initRules', function() {
         testCondition2Foo: 'bar'
       });
 
-      expect(condition2ExportsCall.args[1]).toBe(relatedElement);
-      expect(condition2ExportsCall.args[2]).toBe(event);
+      expect(condition2ExportsCall.args[1]).toEqual({
+        type: 'test-extension.test-event',
+        element: window,
+        target: window
+      });
 
       var action1Exports = moduleProvider.getModuleExports(TEST_ACTION1_PATH);
 
@@ -208,8 +235,11 @@ describe('initRules', function() {
         testAction1Foo: 'bar'
       });
 
-      expect(action1ExportsCall.args[1]).toBe(relatedElement);
-      expect(action1ExportsCall.args[2]).toBe(event);
+      expect(action1ExportsCall.args[1]).toEqual({
+        type: 'test-extension.test-event',
+        element: window,
+        target: window
+      });
 
       var action2Exports = moduleProvider.getModuleExports(TEST_ACTION2_PATH);
 
@@ -221,15 +251,19 @@ describe('initRules', function() {
         testAction2Foo: 'bar'
       });
 
-      expect(action2ExportsCall.args[1]).toBe(relatedElement);
-      expect(action2ExportsCall.args[2]).toBe(event);
+      expect(action2ExportsCall.args[1]).toEqual({
+        type: 'test-extension.test-event',
+        element: window,
+        target: window
+      });
     });
 
     it('ceases to execute remaining conditions and any actions when condition fails', function() {
       moduleProvider.registerModule(
         TEST_CONDITION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          name: TEST_CONDITION1_NAME,
+          displayName: TEST_CONDITION1_DISPLAY_NAME,
           script: function(module) {
             module.exports = jasmine.createSpy().and.returnValue(false);
           }
@@ -300,7 +334,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_EVENT_PATH,
         {
-          displayName: getMockDisplayName(TEST_EVENT_PATH),
+          name: TEST_EVENT_NAME,
+          displayName: TEST_EVENT_DISPLAY_NAME,
           script: function(module) {
             module.exports = function(settings, trigger) { trigger(); };
           }
@@ -309,7 +344,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_CONDITION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          name: TEST_CONDITION1_NAME,
+          displayName: TEST_CONDITION1_DISPLAY_NAME,
           script: function(module) {
             module.exports = function() { return true; };
           }
@@ -318,7 +354,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_ACTION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_ACTION1_PATH),
+          name: TEST_ACTION1_NAME,
+          displayName: TEST_ACTION2_DISPLAY_NAME,
           script: function(module) {
             module.exports = function() {};
           }
@@ -349,6 +386,7 @@ describe('initRules', function() {
       state = {
         getModuleExports: moduleProvider.getModuleExports,
         getModuleDefinition: moduleProvider.getModuleDefinition,
+        getModuleExtensionName: moduleProvider.getModuleExtensionName,
         getRules: function() {
           return rules;
         },
@@ -367,7 +405,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_EVENT_PATH,
         {
-          displayName: getMockDisplayName(TEST_EVENT_PATH),
+          name: TEST_EVENT_NAME,
+          displayName: TEST_EVENT_DISPLAY_NAME,
           script: function() {
             throw new Error('noob tried to divide by zero.');
           }
@@ -377,7 +416,7 @@ describe('initRules', function() {
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' +
-        getMockDisplayName(TEST_EVENT_PATH) + ' for Test Rule rule. noob tried to divide by zero.';
+        TEST_EVENT_DISPLAY_NAME + ' for Test Rule rule. noob tried to divide by zero.';
       expect(errorMessage).toStartWith(expectedErrorMessage);
     });
 
@@ -385,7 +424,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_EVENT_PATH,
         {
-          displayName: getMockDisplayName(TEST_EVENT_PATH),
+          name: TEST_EVENT_NAME,
+          displayName: TEST_EVENT_DISPLAY_NAME,
           script: function(module) {
             module.exports = {};
           }
@@ -395,7 +435,7 @@ describe('initRules', function() {
       initRules();
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
-      expect(errorMessage).toBe('Failed to execute ' + getMockDisplayName(TEST_EVENT_PATH) +
+      expect(errorMessage).toBe('Failed to execute ' + TEST_EVENT_DISPLAY_NAME +
         ' for Test Rule rule. Module did not export a function.');
     });
 
@@ -403,7 +443,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_EVENT_PATH,
         {
-          displayName: getMockDisplayName(TEST_EVENT_PATH),
+          name: TEST_EVENT_NAME,
+          displayName: TEST_EVENT_DISPLAY_NAME,
           script: function(module) {
             module.exports = function() {
               throw new Error('noob tried to divide by zero.');
@@ -415,7 +456,7 @@ describe('initRules', function() {
       initRules();
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
-      var expectedErrorMessage = 'Failed to execute ' + getMockDisplayName(TEST_EVENT_PATH) +
+      var expectedErrorMessage = 'Failed to execute ' + TEST_EVENT_DISPLAY_NAME +
         ' for Test Rule rule. noob tried to divide by zero.';
       expect(errorMessage).toStartWith(expectedErrorMessage);
     });
@@ -424,7 +465,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_CONDITION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          name: TEST_CONDITION1_NAME,
+          displayName: TEST_CONDITION1_DISPLAY_NAME,
           script: function() {
             throw new Error('noob tried to divide by zero.');
           }
@@ -434,7 +476,7 @@ describe('initRules', function() {
       initRules();
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
-      var expectedErrorMessage = 'Failed to execute ' + getMockDisplayName(TEST_CONDITION1_PATH) +
+      var expectedErrorMessage = 'Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
         ' for Test Rule rule. noob tried to divide by zero.';
       expect(errorMessage).toStartWith(expectedErrorMessage);
     });
@@ -443,7 +485,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_CONDITION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          name: TEST_CONDITION1_NAME,
+          displayName: TEST_CONDITION1_DISPLAY_NAME,
           script: function(module) {
             module.exports = {};
           }
@@ -453,7 +496,7 @@ describe('initRules', function() {
       initRules();
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
-      expect(errorMessage).toBe('Failed to execute ' + getMockDisplayName(TEST_CONDITION1_PATH) +
+      expect(errorMessage).toBe('Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
         ' for Test Rule rule. Module did not export a function.');
     });
 
@@ -461,7 +504,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_CONDITION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          name: TEST_CONDITION1_NAME,
+          displayName: TEST_CONDITION1_DISPLAY_NAME,
           script: function(module) {
             module.exports = function() {
               throw new Error('noob tried to divide by zero.');
@@ -473,7 +517,7 @@ describe('initRules', function() {
       initRules();
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
-      var expectedErrorMessage = 'Failed to execute ' + getMockDisplayName(TEST_CONDITION1_PATH) +
+      var expectedErrorMessage = 'Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
         ' for Test Rule rule. noob tried to divide by zero.';
       expect(errorMessage).toStartWith(expectedErrorMessage);
     });
@@ -482,7 +526,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_CONDITION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_CONDITION1_PATH),
+          name: TEST_CONDITION1_NAME,
+          displayName: TEST_CONDITION1_DISPLAY_NAME,
           script: function(module) {
             module.exports = function() {
               return false;
@@ -494,7 +539,7 @@ describe('initRules', function() {
       initRules();
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
-        'Condition Display Name hello-world/testCondition1.js for rule Test Rule not met.');
+        'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
     });
 
     it('logs a message when the exception condition doesn\'t pass', function() {
@@ -503,14 +548,15 @@ describe('initRules', function() {
       initRules();
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
-        'Condition Display Name hello-world/testCondition1.js for rule Test Rule not met.');
+        'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
     });
 
     it('logs an error when retrieving action module exports fails', function() {
       moduleProvider.registerModule(
         TEST_ACTION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_ACTION1_PATH),
+          name: TEST_ACTION1_NAME,
+          displayName: TEST_ACTION1_DISPLAY_NAME,
           script: function() {
             throw new Error('noob tried to divide by zero.');
           }
@@ -520,7 +566,7 @@ describe('initRules', function() {
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' +
-        getMockDisplayName(TEST_ACTION1_PATH) + ' for Test Rule rule. noob tried to divide ' +
+        TEST_ACTION1_DISPLAY_NAME + ' for Test Rule rule. noob tried to divide ' +
         'by zero.';
       expect(errorMessage).toStartWith(expectedErrorMessage);
     });
@@ -529,7 +575,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_ACTION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_ACTION1_PATH),
+          name: TEST_ACTION1_NAME,
+          displayName: TEST_ACTION1_DISPLAY_NAME,
           script: function(module) {
             module.exports = {};
           }
@@ -539,7 +586,7 @@ describe('initRules', function() {
       initRules();
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
-      expect(errorMessage).toBe('Failed to execute ' + getMockDisplayName(TEST_ACTION1_PATH) +
+      expect(errorMessage).toBe('Failed to execute ' + TEST_ACTION1_DISPLAY_NAME +
         ' for Test Rule rule. Module did not export a function.');
     });
 
@@ -547,7 +594,8 @@ describe('initRules', function() {
       moduleProvider.registerModule(
         TEST_ACTION1_PATH,
         {
-          displayName: getMockDisplayName(TEST_ACTION1_PATH),
+          name: TEST_ACTION1_NAME,
+          displayName: TEST_ACTION1_DISPLAY_NAME,
           script: function(module) {
             module.exports = function() {
               throw new Error('noob tried to divide by zero.');
@@ -559,7 +607,7 @@ describe('initRules', function() {
       initRules();
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
-      var expectedErrorMessage = 'Failed to execute ' + getMockDisplayName(TEST_ACTION1_PATH) +
+      var expectedErrorMessage = 'Failed to execute ' + TEST_ACTION1_DISPLAY_NAME +
         ' for Test Rule rule. noob tried to divide by zero.';
       expect(errorMessage).toStartWith(expectedErrorMessage);
     });

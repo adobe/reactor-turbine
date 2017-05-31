@@ -14,6 +14,7 @@ var replaceVarTokens = require('./public/replaceTokens');
 var logger = require('./logger');
 var state = require('./state');
 var document = require('document');
+var normalizeSyntheticEvent = require('./normalizeSyntheticEvent');
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 
@@ -30,7 +31,7 @@ var getErrorMessage = function(ruleComponent, rule, errorMessage, errorStack) {
     errorMessage + (errorStack ? '\n' + errorStack : '');
 };
 
-var runActions = function(rule, relatedElement, event) {
+var runActions = function(rule, syntheticEvent) {
   if (state.getShouldExecuteActions() && rule.actions) {
     rule.actions.forEach(function(action) {
       action.settings = action.settings || {};
@@ -49,10 +50,10 @@ var runActions = function(rule, relatedElement, event) {
         return;
       }
 
-      var settings = replaceVarTokens(action.settings, relatedElement, event);
+      var settings = replaceVarTokens(action.settings, syntheticEvent);
 
       try {
-        moduleExports(settings, relatedElement, event);
+        moduleExports(settings, syntheticEvent);
       } catch (e) {
         logger.error(getErrorMessage(action, rule, e.message, e.stack));
         return;
@@ -63,7 +64,7 @@ var runActions = function(rule, relatedElement, event) {
   logger.log('Rule "' + rule.name + '" fired.');
 };
 
-var checkConditions = function(rule, relatedElement, event) {
+var checkConditions = function(rule, syntheticEvent) {
   if (rule.conditions) {
     for (var i = 0; i < rule.conditions.length; i++) {
       var condition = rule.conditions[i];
@@ -83,12 +84,12 @@ var checkConditions = function(rule, relatedElement, event) {
         return;
       }
 
-      var settings = replaceVarTokens(condition.settings, relatedElement, event);
+      var settings = replaceVarTokens(condition.settings, syntheticEvent);
 
       var result;
 
       try {
-        result = moduleExports(settings, relatedElement, event);
+        result = moduleExports(settings, syntheticEvent);
       } catch (e) {
         logger.error(getErrorMessage(condition, rule, e.message, e.stack));
         // We return because we want to assume the condition would have failed and therefore
@@ -106,29 +107,22 @@ var checkConditions = function(rule, relatedElement, event) {
     }
   }
 
-  runActions(rule, relatedElement, event);
+  runActions(rule, syntheticEvent);
 };
 
 var initEventModules = function(rule) {
   if (rule.events) {
-    /**
-     * This is the callback that executes a particular rule when an event has occurred.
-     * @callback ruleTrigger
-     * @param {HTMLElement} [relatedElement] The element the rule targeted.
-     * @param {Object} [event] An event object (native or synthetic) that contains detail
-     * regarding the event that occurred.
-     */
-    var trigger = function(relatedElement, event) {
-      checkConditions(rule, relatedElement, event);
-    };
-
     rule.events.forEach(function(event) {
       event.settings = event.settings || {};
 
       var moduleExports;
+      var moduleName;
+      var extensionName;
 
       try {
         moduleExports = state.getModuleExports(event.modulePath);
+        moduleName = state.getModuleDefinition(event.modulePath).name;
+        extensionName = state.getModuleExtensionName(event.modulePath);
       } catch (e) {
         logger.error(getErrorMessage(event, rule, e.message, e.stack));
         return;
@@ -140,6 +134,17 @@ var initEventModules = function(rule) {
       }
 
       var settings = replaceVarTokens(event.settings);
+      var syntheticEventType = extensionName + '.' + moduleName;
+
+      /**
+       * This is the callback that executes a particular rule when an event has occurred.
+       * @callback ruleTrigger
+       * @param {Object} [syntheticEvent] An object that contains detail regarding the event
+       * that occurred.
+       */
+      var trigger = function(syntheticEvent) {
+        checkConditions(rule, normalizeSyntheticEvent(syntheticEventType, syntheticEvent));
+      };
 
       try {
         moduleExports(settings, trigger);

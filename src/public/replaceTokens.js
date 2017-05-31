@@ -21,12 +21,12 @@ var replaceTokensInObject;
 var replaceTokensInArray;
 var replaceTokens;
 
-var getVarValue = function(token, variableName, element, event) {
+var getVarValue = function(token, variableName, syntheticEvent) {
   if (!isVar(variableName)) {
     return token;
   }
 
-  var val = getVar(variableName, element, event);
+  var val = getVar(variableName, syntheticEvent);
   return val == null && undefinedVarsReturnEmpty ? '' : val;
 };
 
@@ -40,45 +40,45 @@ var getVarValue = function(token, variableName, element, event) {
  * @param event {Object} The event object to use for tokens in the form of %target.property%.
  * @returns {*}
  */
-replaceTokensInString = function(str, element, event) {
+replaceTokensInString = function(str, syntheticEvent) {
   // Is the string a single data element token and nothing else?
   var result = /^%([^%]+)%$/.exec(str);
 
   if (result) {
-    return getVarValue(str, result[1], element, event);
+    return getVarValue(str, result[1], syntheticEvent);
   } else {
     return str.replace(/%(.+?)%/g, function(token, variableName) {
-      return getVarValue(token, variableName, element, event);
+      return getVarValue(token, variableName, syntheticEvent);
     });
   }
 };
 
-replaceTokensInObject = function(obj, element, event) {
+replaceTokensInObject = function(obj, syntheticEvent) {
   var ret = {};
   var keys = Object.keys(obj);
   for (var i = 0; i < keys.length; i++) {
     var key = keys[i];
     var value = obj[key];
-    ret[key] = replaceTokens(value, element, event);
+    ret[key] = replaceTokens(value, syntheticEvent);
   }
   return ret;
 };
 
-replaceTokensInArray = function(arr, element, event) {
+replaceTokensInArray = function(arr, syntheticEvent) {
   var ret = [];
   for (var i = 0, len = arr.length; i < len; i++) {
-    ret.push(replaceTokens(arr[i], element, event));
+    ret.push(replaceTokens(arr[i], syntheticEvent));
   }
   return ret;
 };
 
-replaceTokens = function(thing, element, event) {
+replaceTokens = function(thing, syntheticEvent) {
   if (typeof thing === 'string') {
-    return replaceTokensInString(thing, element, event);
+    return replaceTokensInString(thing, syntheticEvent);
   } else if (Array.isArray(thing)) {
-    return replaceTokensInArray(thing, element, event);
+    return replaceTokensInArray(thing, syntheticEvent);
   } else if (isPlainObject(thing)) {
-    return replaceTokensInObject(thing, element, event);
+    return replaceTokensInObject(thing, syntheticEvent);
   }
 
   return thing;

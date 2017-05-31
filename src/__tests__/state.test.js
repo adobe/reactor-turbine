@@ -155,6 +155,12 @@ describe('state', function() {
     expect(moduleProvider.getModuleExports).toHaveBeenCalledWith(modulePath);
   });
 
+  it('should return a module\'s extension name', function() {
+    var modulePath = 'example-extension/events/click.js';
+    expect(state.getModuleExtensionName(modulePath)).toBe('example-extension');
+    expect(moduleProvider.getModuleExtensionName).toHaveBeenCalledWith(modulePath);
+  });
+
   it('should return rules', function() {
     expect(state.getRules()).toBe(container.rules);
   });

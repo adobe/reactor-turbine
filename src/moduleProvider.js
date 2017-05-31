@@ -15,10 +15,21 @@ var logger = require('./logger');
 
 var moduleByReferencePath = {};
 
-var registerModule = function(referencePath, moduleDefinition, require) {
+var getModule = function(referencePath) {
+  var module = moduleByReferencePath[referencePath];
+
+  if (!module) {
+    throw new Error('Module ' + referencePath + ' not found.');
+  }
+
+  return module;
+};
+
+var registerModule = function(referencePath, moduleDefinition, extensionName, require) {
   var module = {
     definition: moduleDefinition,
-    require: require
+    require: require,
+    extensionName: extensionName
   };
   module.require = require;
   moduleByReferencePath[referencePath] = module;
@@ -37,11 +48,7 @@ var hydrateCache = function() {
 };
 
 var getModuleExports = function(referencePath) {
-  var module = moduleByReferencePath[referencePath];
-
-  if (!module) {
-    throw new Error('Module ' + referencePath + ' not found.');
-  }
+  var module = getModule(referencePath);
 
   // Using hasOwnProperty instead of a falsey check because the module could export undefined
   // in which case we don't want to execute the module each time the exports is requested.
@@ -53,14 +60,19 @@ var getModuleExports = function(referencePath) {
 };
 
 var getModuleDefinition = function(referencePath) {
-  return moduleByReferencePath[referencePath].definition;
+  return getModule(referencePath).definition;
+};
+
+var getModuleExtensionName = function(referencePath) {
+  return getModule(referencePath).extensionName;
 };
 
 module.exports = {
   registerModule: registerModule,
   hydrateCache: hydrateCache,
   getModuleExports: getModuleExports,
-  getModuleDefinition: getModuleDefinition
+  getModuleDefinition: getModuleDefinition,
+  getModuleExtensionName: getModuleExtensionName
 };
 
 

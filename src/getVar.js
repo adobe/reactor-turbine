@@ -68,19 +68,15 @@ var getObjectProperty = function(host, path, supportSpecial) {
   return value;
 };
 
-// getVar(variable, elm, evt)
-// ==========================
-//
-// Return the value of a variable, where the variable
-// can be a data element, defined in the "data" section
-// of the initial config, or reference properties on
-// an element, event, or target of the event in question,
-// a query parameter, or a random number.
-//
-// - `variable` - the name of the variable to get
-// - `[element]` - the associated element, if any
-// - `[event]` - the associated event, if any
-module.exports = function(variable, element, event) {
+/**
+ * Returns the value of a variable, where the variable can be a data element, event, element, or
+ * target in question.
+ * @param {string} variable
+ * @param {Object} [syntheticEvent] A synthetic event. Only required when using %event... %this...
+ * or %target...
+ * @returns {*}
+ */
+module.exports = function(variable, syntheticEvent) {
   var uri = getUri();
   var randMatch;
   var value;
@@ -96,19 +92,19 @@ module.exports = function(variable, element, event) {
   value = map[variable];
   if (value === undefined) {
     if (variable.substring(0, 5) === 'this.') {
-      if (element) {
+      if (syntheticEvent) {
         variable = variable.slice(5);
-        value = getObjectProperty(element, variable, true);
+        value = getObjectProperty(syntheticEvent.element, variable, true);
       }
     } else if (variable.substring(0, 6) === 'event.') {
-      if (event) {
+      if (syntheticEvent) {
         variable = variable.slice(6);
-        value = getObjectProperty(event, variable);
+        value = getObjectProperty(syntheticEvent, variable);
       }
     } else if (variable.substring(0, 7) === 'target.') {
-      if (event.target) {
+      if (syntheticEvent) {
         variable = variable.slice(7);
-        value = getObjectProperty(event.target, variable);
+        value = getObjectProperty(syntheticEvent.target, variable);
       }
     } else if (variable.substring(0, 7) === 'window.') {
       variable = variable.slice(7);

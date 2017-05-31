@@ -16,6 +16,7 @@ describe('moduleProvider', function() {
   var logger;
   var injectModuleProvider = require('inject-loader!../moduleProvider');
   var referencePath = 'hello-world/src/foo.js';
+  var extensionName = 'test-extension';
   var name = 'foo';
   var displayName = 'Foo';
   var moduleExports = {};
@@ -41,8 +42,8 @@ describe('moduleProvider', function() {
     };
 
     var require = function(path) { return path; };
-debugger;
-    moduleProvider.registerModule(referencePath, module, require);
+
+    moduleProvider.registerModule(referencePath, module, extensionName, require);
   });
 
   it('does not attempt to extract the module export when only registering a module', function() {
@@ -84,6 +85,10 @@ debugger;
       displayName: displayName,
       script: jasmine.any(Function)
     });
+  });
+
+  it('returns extension name', function() {
+    expect(moduleProvider.getModuleExtensionName(referencePath)).toBe(extensionName);
   });
 
   it('throws an error when a module is not found', function() {

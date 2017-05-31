@@ -69,7 +69,7 @@ var init = function(container) {
 
           var module = extension.modules[referencePath];
 
-          moduleProvider.registerModule(referencePath, module, publicRequire);
+          moduleProvider.registerModule(referencePath, module, extensionName, publicRequire);
         });
       }
     });
@@ -119,6 +119,7 @@ module.exports = {
   customVars: customVars,
   getModuleDefinition: moduleProvider.getModuleDefinition,
   getModuleExports: moduleProvider.getModuleExports,
+  getModuleExtensionName: moduleProvider.getModuleExtensionName,
   getRules: getRules,
   getDataElementDefinition: getDataElementDefinition,
   getShouldExecuteActions: getShouldExecuteActions,

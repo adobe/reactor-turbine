@@ -69,7 +69,9 @@ describe('getVar', function() {
   it('returns property on element using "this." prefix', function() {
     var getVar = getInjectedGetVar();
     var value = getVar('this.foo', {
-      foo: 'bar'
+      element: {
+        foo: 'bar'
+      }
     });
     expect(value).toBe('bar');
   });
@@ -78,7 +80,9 @@ describe('getVar', function() {
     var getVar = getInjectedGetVar();
 
     var value = getVar('this.@text', {
-      textContent: 'bar'
+      element: {
+        textContent: 'bar'
+      }
     });
 
     expect(value).toBe('bar');
@@ -89,8 +93,10 @@ describe('getVar', function() {
     var getVar = getInjectedGetVar();
 
     var value = getVar('this.getAttribute(foo)', {
-      getAttribute: function(name) {
-        return name + 'Value';
+      element: {
+        getAttribute: function(name) {
+          return name + 'Value';
+        }
       }
     });
 
@@ -105,7 +111,9 @@ describe('getVar', function() {
     });
 
     var value = getVar('this.@cleanText', {
-      textContent: 'bar'
+      element: {
+        textContent: 'bar'
+      }
     });
 
     expect(value).toBe('cleaned:bar');
@@ -114,7 +122,7 @@ describe('getVar', function() {
   it('returns property on event using "event." prefix', function() {
     var getVar = getInjectedGetVar();
 
-    var value = getVar('event.foo', null, {
+    var value = getVar('event.foo', {
       foo: 'bar'
     });
 
@@ -124,7 +132,7 @@ describe('getVar', function() {
   it('returns property on event.target using "target." prefix', function() {
     var getVar = getInjectedGetVar();
 
-    var value = getVar('target.foo', null, {
+    var value = getVar('target.foo', {
       target: {
         foo: 'bar'
       }

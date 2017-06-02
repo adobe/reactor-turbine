@@ -26,16 +26,12 @@ var getInjectedGetVar = function(options) {
       getDataElementDefinition: noop
     },
     './public/getDataElementValue': options.getDataElementValue || noop,
-    './public/getUri': options.getUri || function() {
-      return 'testUri';
-    },
-    './public/getQueryParam': options.getQueryParam || noop,
     './cleanText': options.cleanText || noop
   });
 };
 
 describe('getVar', function() {
-  it('returns a data element value', function() {
+  it('returns nested property of a data element value', function() {
     var getVar = getInjectedGetVar({
       state: {
         getDataElementDefinition: function() {
@@ -43,37 +39,47 @@ describe('getVar', function() {
         }
       },
       getDataElementValue: function() {
-        return 'dataElementValue';
+        return {
+          foo: {
+            bar: 'baz'
+          }
+        };
       }
     });
 
-    expect(getVar('foo')).toBe('dataElementValue');
+    expect(getVar('unicorn.foo.bar')).toBe('baz');
   });
 
-  it('returns the URI', function() {
-    var getVar = getInjectedGetVar();
-    expect(getVar('uri')).toBe('testUri');
-    expect(getVar('URI')).toBe('testUri');
+  // This probably sufficiently covers the same use case for the other token prefixes
+  it('returns undefined if part of prop chain doesn\'t exist', function() {
+    var getVar = getInjectedGetVar({
+      state: {
+        getDataElementDefinition: function() {
+          return {};
+        }
+      },
+      getDataElementValue: function() {
+        return {
+          foo: {
+            bar: 'baz'
+          }
+        };
+      }
+    });
+
+    expect(getVar('unicorn.goo.gar')).toBeUndefined();
   });
 
-  it('returns the protocol', function() {
+  it('returns nested property on element using "this." prefix', function() {
     var getVar = getInjectedGetVar();
-    expect(getVar('protocol')).toBe('testProtocol');
-  });
-
-  it('returns the hostname', function() {
-    var getVar = getInjectedGetVar();
-    expect(getVar('hostname')).toBe('testHostname');
-  });
-
-  it('returns property on element using "this." prefix', function() {
-    var getVar = getInjectedGetVar();
-    var value = getVar('this.foo', {
+    var value = getVar('this.foo.bar', {
       element: {
-        foo: 'bar'
+        foo: {
+          bar: 'baz'
+        }
       }
     });
-    expect(value).toBe('bar');
+    expect(value).toBe('baz');
   });
 
   it('returns textContent of element when using this.@text', function() {
@@ -119,69 +125,46 @@ describe('getVar', function() {
     expect(value).toBe('cleaned:bar');
   });
 
-  it('returns property on event using "event." prefix', function() {
+  it('returns nested property on event using "event." prefix', function() {
     var getVar = getInjectedGetVar();
 
-    var value = getVar('event.foo', {
-      foo: 'bar'
+    var value = getVar('event.foo.bar', {
+      foo: {
+        bar: 'baz'
+      }
     });
 
-    expect(value).toBe('bar');
+    expect(value).toBe('baz');
   });
 
-  it('returns property on event.target using "target." prefix', function() {
+  it('returns nested property on event.target using "target." prefix', function() {
     var getVar = getInjectedGetVar();
 
-    var value = getVar('target.foo', {
+    var value = getVar('target.foo.bar', {
       target: {
-        foo: 'bar'
+        foo: {
+          bar: 'baz'
+        }
       }
     });
 
-    expect(value).toBe('bar');
+    expect(value).toBe('baz');
   });
 
-  it('returns property on window using "window." prefix', function() {
-    var getVar = getInjectedGetVar({
-      window: {
-        foo: 'bar'
-      }
-    });
-
-    expect(getVar('window.foo')).toBe('bar');
-  });
-
-  it('returns query string parameter value using "param." prefix', function() {
-    var getVar = getInjectedGetVar({
-      getQueryParam: function() {
-        return 'bar';
-      }
-    });
-
-    expect(getVar('param.foo')).toBe('bar');
-  });
-
-  it('returns a random number using "rand#" for some random reason', function() {
-    var getVar = getInjectedGetVar();
-
-    var value = getVar('rand8');
-
-    expect(value).toEqual(jasmine.any(String));
-    expect(value.length).toBe(8);
-  });
-
-  it('returns property on a custom var', function() {
+  it('returns nested property on a custom var', function() {
     var getVar = getInjectedGetVar({
       state: {
         getDataElementDefinition: noop,
         customVars: {
           foo: {
-            bar: 'unicorn'
+            bar: {
+              baz: 'unicorn'
+            }
           }
         }
       }
     });
 
-    expect(getVar('foo.bar')).toBe('unicorn');
+    expect(getVar('foo.bar.baz')).toBe('unicorn');
   });
 });

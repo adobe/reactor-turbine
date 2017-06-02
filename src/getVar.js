@@ -14,8 +14,6 @@ var document = require('document');
 var window = require('window');
 var state = require('./state');
 var getDataElementValue = require('./public/getDataElementValue');
-var getUri = require('./public/getUri');
-var getQueryParam = require('./public/getQueryParam');
 var cleanText = require('./cleanText');
 
 var specialPropertyAccessors = {
@@ -43,8 +41,7 @@ var specialPropertyAccessors = {
  * @param supportSpecial
  * @returns {*}
  */
-var getObjectProperty = function(host, path, supportSpecial) {
-  var propChain = path.split('.');
+var getObjectProperty = function(host, propChain, supportSpecial) {
   var value = host;
   var attrMatch;
   for (var i = 0, len = propChain.length; i < len; i++) {
@@ -77,51 +74,29 @@ var getObjectProperty = function(host, path, supportSpecial) {
  * @returns {*}
  */
 module.exports = function(variable, syntheticEvent) {
-  var uri = getUri();
-  var randMatch;
   var value;
-  var map = {
-    URI: uri,
-    uri: uri,
-    protocol: document.location.protocol,
-    hostname: document.location.hostname
-  };
-  if (state.getDataElementDefinition(variable)) {
-    return getDataElementValue(variable);
-  }
-  value = map[variable];
-  if (value === undefined) {
-    if (variable.substring(0, 5) === 'this.') {
-      if (syntheticEvent) {
-        variable = variable.slice(5);
-        value = getObjectProperty(syntheticEvent.element, variable, true);
-      }
-    } else if (variable.substring(0, 6) === 'event.') {
-      if (syntheticEvent) {
-        variable = variable.slice(6);
-        value = getObjectProperty(syntheticEvent, variable);
-      }
-    } else if (variable.substring(0, 7) === 'target.') {
-      if (syntheticEvent) {
-        variable = variable.slice(7);
-        value = getObjectProperty(syntheticEvent.target, variable);
-      }
-    } else if (variable.substring(0, 7) === 'window.') {
-      variable = variable.slice(7);
-      value = getObjectProperty(window, variable);
-    } else if (variable.substring(0, 6) === 'param.') {
-      variable = variable.slice(6);
-      value = getQueryParam(variable);
-    } else {
-      randMatch = variable.match(/^rand([0-9]+)$/);
-      if (randMatch) {
-        var len = Number(randMatch[1]);
-        var s = (Math.random() * (Math.pow(10, len) - 1)).toFixed(0);
-        value = Array(len - s.length + 1).join('0') + s;
-      } else {
-        value = getObjectProperty(state.customVars, variable);
-      }
+  var propChain = variable.split('.');
+  var variableHostName = propChain.shift();
+
+  if (state.getDataElementDefinition(variableHostName)) {
+    value = getObjectProperty(getDataElementValue(variableHostName), propChain);
+  } else if (variableHostName === 'this') {
+    if (syntheticEvent) {
+      // I don't know why this is the only one that supports special properties, but that's the
+      // way it was in Satellite.
+      value = getObjectProperty(syntheticEvent.element, propChain, true);
     }
+  } else if (variableHostName === 'event') {
+    if (syntheticEvent) {
+      value = getObjectProperty(syntheticEvent, propChain);
+    }
+  } else if (variableHostName === 'target') {
+    if (syntheticEvent) {
+      value = getObjectProperty(syntheticEvent.target, propChain);
+    }
+  } else {
+    value = getObjectProperty(state.customVars[variableHostName], propChain);
   }
+
   return value;
 };

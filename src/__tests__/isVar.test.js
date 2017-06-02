@@ -31,23 +31,7 @@ describe('isVar', function() {
       }
     });
 
-    expect(isVar('foo')).toBe(true);
-  });
-
-  it('returns true for URI', function() {
-    var isVar = getInjectedIsVar();
-    expect(isVar('uri')).toBe(true);
-    expect(isVar('URI')).toBe(true);
-  });
-
-  it('returns true for protocol', function() {
-    var isVar = getInjectedIsVar();
-    expect(isVar('protocol')).toBe(true);
-  });
-
-  it('returns true for the hostname', function() {
-    var isVar = getInjectedIsVar();
-    expect(isVar('hostname')).toBe(true);
+    expect(isVar('foo.bar.baz')).toBe(true);
   });
 
   it('returns true for name using "this." prefix', function() {
@@ -70,22 +54,7 @@ describe('isVar', function() {
     expect(value).toBe(true);
   });
 
-  it('returns true for name using "window." prefix', function() {
-    var isVar = getInjectedIsVar();
-    expect(isVar('window.foo')).toBe(true);
-  });
-
-  it('returns true for name using "param." prefix', function() {
-    var isVar = getInjectedIsVar();
-    expect(isVar('param.foo')).toBe(true);
-  });
-
-  it('returns true for name using "rand#" for some random reason', function() {
-    var isVar = getInjectedIsVar();
-    expect(isVar('rand8')).toBe(true);
-  });
-
-  it('returns property on a custom var', function() {
+  it('returns true for an existing custom var', function() {
     var getVar = getInjectedIsVar({
       state: {
         getDataElementDefinition: noop,

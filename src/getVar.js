@@ -75,27 +75,32 @@ var getObjectProperty = function(host, propChain, supportSpecial) {
  */
 module.exports = function(variable, syntheticEvent) {
   var value;
-  var propChain = variable.split('.');
-  var variableHostName = propChain.shift();
 
-  if (state.getDataElementDefinition(variableHostName)) {
-    value = getObjectProperty(getDataElementValue(variableHostName), propChain);
-  } else if (variableHostName === 'this') {
-    if (syntheticEvent) {
-      // I don't know why this is the only one that supports special properties, but that's the
-      // way it was in Satellite.
-      value = getObjectProperty(syntheticEvent.element, propChain, true);
-    }
-  } else if (variableHostName === 'event') {
-    if (syntheticEvent) {
-      value = getObjectProperty(syntheticEvent, propChain);
-    }
-  } else if (variableHostName === 'target') {
-    if (syntheticEvent) {
-      value = getObjectProperty(syntheticEvent.target, propChain);
-    }
+  if (state.getDataElementDefinition(variable)) {
+    // Accessing nested properties of a data element using dot-notation is unsupported because users
+    // can currently create data elements with periods in the name.
+    value = getDataElementValue(variable);
   } else {
-    value = getObjectProperty(state.customVars[variableHostName], propChain);
+    var propChain = variable.split('.');
+    var variableHostName = propChain.shift();
+
+    if (variableHostName === 'this') {
+      if (syntheticEvent) {
+        // I don't know why this is the only one that supports special properties, but that's the
+        // way it was in Satellite.
+        value = getObjectProperty(syntheticEvent.element, propChain, true);
+      }
+    } else if (variableHostName === 'event') {
+      if (syntheticEvent) {
+        value = getObjectProperty(syntheticEvent, propChain);
+      }
+    } else if (variableHostName === 'target') {
+      if (syntheticEvent) {
+        value = getObjectProperty(syntheticEvent.target, propChain);
+      }
+    } else {
+      value = getObjectProperty(state.customVars[variableHostName], propChain);
+    }
   }
 
   return value;

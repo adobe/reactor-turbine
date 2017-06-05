@@ -31,7 +31,7 @@ var getInjectedGetVar = function(options) {
 };
 
 describe('getVar', function() {
-  it('returns nested property of a data element value', function() {
+  it('returns data element value', function() {
     var getVar = getInjectedGetVar({
       state: {
         getDataElementDefinition: function() {
@@ -39,19 +39,16 @@ describe('getVar', function() {
         }
       },
       getDataElementValue: function() {
-        return {
-          foo: {
-            bar: 'baz'
-          }
-        };
+        return 'baz';
       }
     });
 
     expect(getVar('unicorn.foo.bar')).toBe('baz');
   });
 
-  // This probably sufficiently covers the same use case for the other token prefixes
-  it('returns undefined if part of prop chain doesn\'t exist', function() {
+  // Accessing nested properties of a data element using dot-notation is unsupported because users
+  // can currently create data elements with periods in the name.
+  it('does not return nested property of a data element value', function() {
     var getVar = getInjectedGetVar({
       state: {
         getDataElementDefinition: function() {
@@ -67,7 +64,7 @@ describe('getVar', function() {
       }
     });
 
-    expect(getVar('unicorn.goo.gar')).toBeUndefined();
+    expect(getVar('unicorn.foo.bar')).not.toBe('baz');
   });
 
   it('returns nested property on element using "this." prefix', function() {
@@ -80,6 +77,20 @@ describe('getVar', function() {
       }
     });
     expect(value).toBe('baz');
+  });
+
+  // This probably sufficiently covers the same use case for the other token prefixes
+  it('returns undefined if part of prop chain doesn\'t exist', function() {
+    var getVar = getInjectedGetVar();
+    var value = getVar('this.goo.bar', {
+      element: {
+        foo: {
+          bar: 'baz'
+        }
+      }
+    });
+
+    expect(value).toBeUndefined();
   });
 
   it('returns textContent of element when using this.@text', function() {

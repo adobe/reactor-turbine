@@ -15,13 +15,6 @@ var noop = function() {};
 var getInjectedGetVar = function(options) {
   options = options || {};
   return require('inject-loader!../getVar')({
-    document: {
-      location: {
-        protocol: 'testProtocol',
-        hostname: 'testHostname'
-      }
-    },
-    window: options.window || {},
     './state': options.state || {
       getDataElementDefinition: noop
     },

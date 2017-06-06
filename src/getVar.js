@@ -10,8 +10,6 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var document = require('document');
-var window = require('window');
 var state = require('./state');
 var getDataElementValue = require('./public/getDataElementValue');
 var cleanText = require('./cleanText');

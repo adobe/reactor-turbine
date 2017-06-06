@@ -10,6 +10,8 @@
 
 Launch rule engine which processes rules on client websites and delegates logic to extensions.
 
+For more information regarding Launch, please visit our [product website](http://www.adobe.com/enterprise/cloud-platform/launch.html).
+
 ## Development Setup
 
 1. Install [node.js](https://nodejs.org/).

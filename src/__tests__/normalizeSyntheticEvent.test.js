@@ -20,27 +20,7 @@ describe('normalizeSyntheticEvent', function() {
   it('creates a synthetic event with defaults if synthetic event is undefined', function() {
     var syntheticEvent = normalizeSyntheticEvent(MOCK_TYPE);
     expect(syntheticEvent).toEqual({
-      type: MOCK_TYPE,
-      element: window,
-      target: window
-    });
-  });
-
-  it('element and targetElement are derived from nativeEvent if nativeEvent exists', function() {
-    var nativeEvent = {
-      currentTarget: {},
-      target: {}
-    };
-
-    var syntheticEvent = normalizeSyntheticEvent(MOCK_TYPE, {
-      nativeEvent: nativeEvent
-    });
-
-    expect(syntheticEvent).toEqual({
-      type: MOCK_TYPE,
-      element: nativeEvent.currentTarget,
-      target: nativeEvent.target,
-      nativeEvent: nativeEvent
+      type: MOCK_TYPE
     });
   });
 
@@ -50,18 +30,5 @@ describe('normalizeSyntheticEvent', function() {
     });
 
     expect(syntheticEvent.type).toBe(MOCK_TYPE);
-  });
-
-  it('does not overwrite element or target if set', function() {
-    var element = {};
-    var target = {};
-
-    var syntheticEvent = normalizeSyntheticEvent(MOCK_TYPE, {
-      element: element,
-      target: target
-    });
-
-    expect(syntheticEvent.element).toBe(element);
-    expect(syntheticEvent.target).toBe(target);
   });
 });

@@ -11,8 +11,7 @@
  ****************************************************************************************/
 
 /**
- * Normalizes a synthetic event so that it exists and has at least type, element, and target
- * properties.
+ * Normalizes a synthetic event so that it exists and has at least type.
  * @param {string} syntheticEventType
  * @param {Object} [syntheticEvent]
  * @returns {Object}
@@ -20,15 +19,5 @@
 module.exports = function(syntheticEventType, syntheticEvent) {
   syntheticEvent = syntheticEvent || {};
   syntheticEvent.type = syntheticEventType;
-
-  var nativeEvent = syntheticEvent.nativeEvent;
-
-  syntheticEvent.element = syntheticEvent.element ||
-    (nativeEvent && nativeEvent.currentTarget) ||
-    window;
-  syntheticEvent.target = syntheticEvent.target ||
-    (nativeEvent && nativeEvent.target) ||
-    window;
-
   return syntheticEvent;
 };

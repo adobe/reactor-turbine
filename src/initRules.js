@@ -18,8 +18,6 @@ var normalizeSyntheticEvent = require('./normalizeSyntheticEvent');
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 
-var EXCEPTION_LOGIC_TYPE = 'exception';
-
 var getModuleDisplayNameByRuleComponent = function(ruleComponent) {
   var moduleDefinition = state.getModuleDefinition(ruleComponent.modulePath);
   return (moduleDefinition && moduleDefinition.displayName) || ruleComponent.modulePath;
@@ -97,9 +95,7 @@ var checkConditions = function(rule, syntheticEvent) {
         return;
       }
 
-      var isExceptionCondition = condition.logicType === EXCEPTION_LOGIC_TYPE;
-
-      if ((!result && !isExceptionCondition) || (result && isExceptionCondition)) {
+      if ((!result && !condition.negate) || (result && condition.negate)) {
         var conditionDisplayName = getModuleDisplayNameByRuleComponent(condition);
         logger.log('Condition ' + conditionDisplayName + ' for rule ' + rule.name + ' not met.');
         return;

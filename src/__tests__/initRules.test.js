@@ -134,7 +134,7 @@ describe('initRules', function() {
               settings: {
                 testCondition2Foo: 'bar'
               },
-              logicType: 'exception'
+              negate: true
             }
           ],
           actions: [
@@ -270,9 +270,9 @@ describe('initRules', function() {
       expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
     });
 
-    it('ceases to execute remaining conditions and any actions when exception ' +
+    it('ceases to execute remaining conditions and any actions when negated ' +
       'condition fails', function() {
-      rules[0].conditions[0].logicType = 'exception';
+      rules[0].conditions[0].negate = true;
 
       initRules();
 
@@ -534,8 +534,8 @@ describe('initRules', function() {
         'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
     });
 
-    it('logs a message when the exception condition doesn\'t pass', function() {
-      rules[0].conditions[0].logicType = 'exception';
+    it('logs a message when the negated condition doesn\'t pass', function() {
+      rules[0].conditions[0].negate = true;
 
       initRules();
 

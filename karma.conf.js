@@ -2,15 +2,19 @@ var path = require('path');
 
 var defaultBrowsers = ['Chrome'];
 var reporters = ['dots'];
+var startConnect = false;
+
 if (process.env.TRAVIS) {
   var buildId =
     'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')';
   defaultBrowsers = ['SL_IE9', 'SL_IE10', 'SL_IE11', 'SL_CHROME', 'SL_FIREFOX'];
   reporters.push('saucelabs');
+} else {
+  startConnect = true;
 }
 
 if (process.env.SAUCE_USERNAME) {
-    reporters.push('saucelabs');
+  reporters.push('saucelabs');
 }
 
 var argv = require('yargs')
@@ -163,7 +167,7 @@ module.exports = function(config) {
       buildId: buildId,
       testName: 'reactor-turbine Unit Test',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-      startConnect: false,
+      startConnect: startConnect,
       retryLimit: 3,
       recordVideo: false,
       recordScreenshots: false

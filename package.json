@@ -24,7 +24,7 @@
     "is-plain-object": "2.0.3",
     "promise-polyfill": "^6.0.2",
     "strict-loader": "^1.1.0",
-    "webpack": "^2.4.1"
+    "webpack": "^3.0.0"
   },
   "devDependencies": {
     "eslint": "^3.9.1",

@@ -27,7 +27,7 @@
     "webpack": "^3.0.0"
   },
   "devDependencies": {
-    "eslint": "^3.9.1",
+    "eslint": "^4.0.0",
     "inject-loader": "^3.0.0",
     "istanbul-instrumenter-loader": "^2.0.0",
     "jasmine-core": "^2.5.2",

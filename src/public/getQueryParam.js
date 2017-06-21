@@ -23,7 +23,7 @@ module.exports = function(name, caseInsensitive) {
   // We can't cache querystring values because they can be changed at any time with
   // the HTML5 History API.
   var match = new RegExp('[?&]' + name + '=([^&]*)', caseInsensitive ? 'i' : '')
-      .exec(window.location.search);
+    .exec(window.location.search);
 
   if (match) {
     return decodeURIComponent(match[1].replace(/\+/g, ' '));

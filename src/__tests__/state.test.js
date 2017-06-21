@@ -182,10 +182,10 @@ describe('state', function() {
 
     it('getShouldExecuteActions returns true when hide activity local storage key is not set ' +
       'to true',
-      function() {
-        localStorage.setItem('sdsat_hide_activity', 'false');
-        expect(state.getShouldExecuteActions()).toBe(true);
-      });
+    function() {
+      localStorage.setItem('sdsat_hide_activity', 'false');
+      expect(state.getShouldExecuteActions()).toBe(true);
+    });
 
 
     it('should enable the debug output', function() {

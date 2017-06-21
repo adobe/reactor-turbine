@@ -21,11 +21,11 @@ describe('loadScript', function() {
 
   it('the promise should be fulfilled when the script is loaded', function(callback) {
     loadScript('https://code.jquery.com/jquery-2.2.1.min.js').
-    then(callback);
+      then(callback);
   });
 
   it('the promise should be rejected when the script fails loading', function(callback) {
     loadScript('https://someinexistentdomain/somefile.min.js').
-    catch(callback);
+      catch(callback);
   });
 });

@@ -181,51 +181,85 @@ describe('getDataElementValue', function() {
     expect(value).toBe('cachedValue');
   });
 
-  it('returns a default value if value is undefined', function() {
-    var getDataElementValue = getInjectedGetDataElementValue({
-      state: {
-        getDataElementDefinition: function() {
-          return {
-            defaultValue: 'defaultValue',
-            settings: {}
-          };
-        },
-        getModuleExports: function() {
-          return function() {};
-        },
-        getPropertySettings: function() {
-          return {
-            undefinedVarsReturnEmpty: false
-          };
-        }
-      }
+  describe('default value handling', function() {
+    [undefined, null].forEach(function(value) {
+      it('returns a default value if value is ' + value, function() {
+        var getDataElementValue = getInjectedGetDataElementValue({
+          state: {
+            getDataElementDefinition: function() {
+              return {
+                defaultValue: 'defaultValue',
+                settings: {}
+              };
+            },
+            getModuleExports: function() {
+              return function() {
+                return value;
+              };
+            },
+            getPropertySettings: function() {
+              return {
+                undefinedVarsReturnEmpty: false
+              };
+            }
+          }
+        });
+
+        var value = getDataElementValue('testDataElement');
+        expect(value).toBe('defaultValue');
+      });
+
+      it('returns an empty string if value is ' + value + ' and default is undefined', function() {
+        var getDataElementValue = getInjectedGetDataElementValue({
+          state: {
+            getDataElementDefinition: function() {
+              return {
+                settings: {}
+              };
+            },
+            getModuleExports: function() {
+              return function() {};
+            },
+            getPropertySettings: function() {
+              return {
+                undefinedVarsReturnEmpty: false
+              };
+            }
+          }
+        });
+
+        var value = getDataElementValue('testDataElement');
+        expect(value).toBe('');
+      });
     });
 
-    var value = getDataElementValue('testDataElement');
-    expect(value).toBe('defaultValue');
-  });
+    ['', 0, false, NaN].forEach(function(dataElementValue) {
+      it('does not return a default value if value is ' + dataElementValue, function() {
+        var getDataElementValue = getInjectedGetDataElementValue({
+          state: {
+            getDataElementDefinition: function() {
+              return {
+                defaultValue: 'defaultValue',
+                settings: {}
+              };
+            },
+            getModuleExports: function() {
+              return function() {
+                return dataElementValue;
+              };
+            },
+            getPropertySettings: function() {
+              return {
+                undefinedVarsReturnEmpty: false
+              };
+            }
+          }
+        });
 
-  it('returns an empty string if value is undefined and default is undefined', function() {
-    var getDataElementValue = getInjectedGetDataElementValue({
-      state: {
-        getDataElementDefinition: function() {
-          return {
-            settings: {}
-          };
-        },
-        getModuleExports: function() {
-          return function() {};
-        },
-        getPropertySettings: function() {
-          return {
-            undefinedVarsReturnEmpty: false
-          };
-        }
-      }
+        var value = getDataElementValue('testDataElement');
+        expect(value).toEqual(dataElementValue);
+      });
     });
-
-    var value = getDataElementValue('testDataElement');
-    expect(value).toBe('');
   });
 
   it('lowercases the value if forceLowerCase = true', function() {

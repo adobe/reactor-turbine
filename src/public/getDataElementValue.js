@@ -56,11 +56,8 @@ module.exports = function(name, suppressDefault) {
     state.cacheDataElementValue(name, storeLength, value);
   }
 
-  if (value === undefined && !suppressDefault) {
-    // Have to wrap "default" in quotes since it is a keyword.
-    /*eslint-disable dot-notation*/
+  if ((value === undefined || value === null) && !suppressDefault) {
     value = dataDef.defaultValue || '';
-    /*eslint-enable dot-notation*/
   }
 
   if (typeof value === 'string') {

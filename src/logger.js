@@ -16,7 +16,7 @@
  * @enum {string}
  * @private
  */
-var LEVELS = {
+var levels = {
   LOG: 'log',
   INFO: 'info',
   WARN: 'warn',
@@ -125,7 +125,7 @@ var prefixWithBrackets = function(prefix, message) {
  * @param {String} message The message to output.
  */
 var log = function(message) {
-  process(message, LEVELS.LOG);
+  process(message, levels.LOG);
 };
 
 /**
@@ -134,7 +134,7 @@ var log = function(message) {
  * @param {String} message The message to output.
  */
 var info = function(message) {
-  process(message, LEVELS.INFO);
+  process(message, levels.INFO);
 };
 
 /**
@@ -142,7 +142,7 @@ var info = function(message) {
  * @param {String} message The message to output.
  */
 var warn = function(message) {
-  process(message, LEVELS.WARN);
+  process(message, levels.WARN);
 };
 
 /**
@@ -150,7 +150,7 @@ var warn = function(message) {
  * @param {String} message The message to output.
  */
 var error = function(message) {
-  process(message, LEVELS.ERROR);
+  process(message, levels.ERROR);
 };
 
 module.exports = {

@@ -19,6 +19,10 @@ var getErrorMessage = function(dataDef, dataElementName, errorMessage, errorStac
     dataElementName + '. ' + errorMessage + (errorStack ? '\n' + errorStack : '');
 };
 
+var isDataElementValuePresent = function(value) {
+  return value !== undefined && value !== null;
+};
+
 module.exports = function(name, suppressDefault) {
   var dataDef = state.getDataElementDefinition(name);
 
@@ -26,7 +30,7 @@ module.exports = function(name, suppressDefault) {
     return state.getPropertySettings().undefinedVarsReturnEmpty ? '' : null;
   }
 
-  var storeLength = dataDef.storeLength;
+  var storageDuration = dataDef.storageDuration;
   var moduleExports;
 
   try {
@@ -50,13 +54,15 @@ module.exports = function(name, suppressDefault) {
     return;
   }
 
-  if (value === undefined && storeLength) {
-    value = state.getCachedDataElementValue(name, storeLength);
-  } else if (value !== undefined && storeLength) {
-    state.cacheDataElementValue(name, storeLength, value);
+  if (storageDuration) {
+    if (isDataElementValuePresent(value)) {
+      state.cacheDataElementValue(name, storageDuration, value);
+    } else {
+      value = state.getCachedDataElementValue(name, storageDuration);
+    }
   }
 
-  if ((value === undefined || value === null) && !suppressDefault) {
+  if (!isDataElementValuePresent(value) && !suppressDefault) {
     value = dataDef.defaultValue || '';
   }
 

@@ -23,7 +23,7 @@ var isDataElementValuePresent = function(value) {
   return value !== undefined && value !== null;
 };
 
-module.exports = function(name, suppressDefault) {
+module.exports = function(name) {
   var dataDef = state.getDataElementDefinition(name);
 
   if (!dataDef) {
@@ -62,7 +62,7 @@ module.exports = function(name, suppressDefault) {
     }
   }
 
-  if (!isDataElementValuePresent(value) && !suppressDefault) {
+  if (!isDataElementValuePresent(value)) {
     value = dataDef.defaultValue || '';
   }
 

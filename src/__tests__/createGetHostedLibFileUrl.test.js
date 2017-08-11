@@ -12,11 +12,49 @@
 
 'use strict';
 
-describe('function returned by createGetHostedLibFileUrl', function() {
-  var createGetHostedLibFileUrl = require('../createGetHostedLibFileUrl');
+var getCreateGetHostedLibFileUrl = function(options) {
+  options = options || {};
 
+  return require('inject-loader!../createGetHostedLibFileUrl')({
+    './state': options.state || {
+      getBuildInfo: function() {
+        return {};
+      }
+    }
+  });
+};
+
+describe('function returned by createGetHostedLibFileUrl', function() {
   it('returns full hosted lib path url', function() {
+    var createGetHostedLibFileUrl = getCreateGetHostedLibFileUrl();
     var getHostedLibFileUrl = createGetHostedLibFileUrl('//example.com/');
     expect(getHostedLibFileUrl('file.js')).toEqual('//example.com/file.js');
+  });
+
+  describe('for a minified build', function() {
+    var createGetHostedLibFileUrlForMinifiedFiles = getCreateGetHostedLibFileUrl({
+      state: {
+        getBuildInfo: function() {
+          return {
+            minified: true
+          };
+        }
+      }
+    });
+
+    it('returns full hosted lib path url for a file', function() {
+      var getHostedLibFileUrl = createGetHostedLibFileUrlForMinifiedFiles('//example.com/');
+      expect(getHostedLibFileUrl('file.js')).toEqual('//example.com/file.min.js');
+    });
+
+    it('returns full hosted lib path url for a file with multiple dots', function() {
+      var getHostedLibFileUrl = createGetHostedLibFileUrlForMinifiedFiles('//example.com/');
+      expect(getHostedLibFileUrl('file.some.js')).toEqual('//example.com/file.some.min.js');
+    });
+
+    it('returns full hosted lib path url for a file without extension', function() {
+      var getHostedLibFileUrl = createGetHostedLibFileUrlForMinifiedFiles('//example.com/');
+      expect(getHostedLibFileUrl('file')).toEqual('//example.com/file.min');
+    });
   });
 });

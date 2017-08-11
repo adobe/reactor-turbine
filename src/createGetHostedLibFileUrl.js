@@ -19,6 +19,7 @@
 
 module.exports = function(hostedLibFilesBaseUrl) {
   return function(file) {
+    // State is required here because otherwise it would be an empty object.
     var state = require('./state');
     var buildInfo = state.getBuildInfo();
 

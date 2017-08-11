@@ -16,8 +16,18 @@
  * @param {string} hostedLibFilesBaseUrl
  * @returns {Function}
  */
+
 module.exports = function(hostedLibFilesBaseUrl) {
   return function(file) {
+    var state = require('./state');
+    var buildInfo = state.getBuildInfo();
+
+    if (buildInfo['minified']) {
+      var fileParts = file.split('.');
+      fileParts.splice(fileParts.length - 1 || 1, 0, 'min');
+      file = fileParts.join('.');
+    }
+
     return hostedLibFilesBaseUrl + file;
   };
 };

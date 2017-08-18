@@ -10,14 +10,17 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var container = window._satellite.container;
+// Remove container in public scope ASAP so it can't be manipulated by extension or user code.
+delete window._satellite.container;
+
 var state = require('./state');
 
 require('./hydrateSatelliteObject')(
-  window._satellite.container.buildInfo,
+  container.buildInfo,
   state.setDebugOutputEnabled
 );
 
-state.init(window._satellite.container); // Must come first.
-delete window._satellite.container;
+state.init(container); // Must come first.
 require('./logger').outputEnabled = state.getDebugOutputEnabled();
 require('./initRules')(); // Must come last.

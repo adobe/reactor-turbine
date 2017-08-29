@@ -18,7 +18,7 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
   // Will get replaced by the directCall event delegate from the DTM extension. Exists here in
   // case there are no direct call rules (and therefore the directCall event delegate won't get
   // included) and our customers are still calling the method. In this case, we don't want an error
-  // to be thrown.
+  // to be thrown. This method existed before Reactor.
   _satellite.track = function() {};
 
   // Will get replaced by the Marketing Cloud ID extension if installed. Exists here in case
@@ -84,7 +84,7 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
    * @returns {string}
    */
   _satellite.getCookie = _satellite.readCookie = function(name) {
-    logger.warn('_satellite.getCookie is deprecated. Please use the `_satellite.cookie` API.');
+    logger.warn('_satellite.readCookie is deprecated. Please use the `_satellite.cookie` API.');
 
     return cookie.parse(document.cookie)[name];
   };

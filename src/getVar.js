@@ -64,8 +64,7 @@ var getObjectProperty = function(host, propChain, supportSpecial) {
 };
 
 /**
- * Returns the value of a variable, where the variable can be a data element, event, element, or
- * target in question.
+ * Returns the value of a variable.
  * @param {string} variable
  * @param {Object} [syntheticEvent] A synthetic event. Only required when using %event... %this...
  * or %target...

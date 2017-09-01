@@ -20,11 +20,9 @@
     "url": "git@github.com:Adobe-Marketing-Cloud/reactor-turbine.git"
   },
   "dependencies": {
-    "cookie": "0.3.1",
     "is-plain-object": "2.0.4",
-    "promise-polyfill": "^6.0.2",
-    "strict-loader": "^1.2.0",
-    "webpack": "^3.1.0"
+    "js-cookie": "2.1.4",
+    "promise-polyfill": "6.0.2"
   },
   "devDependencies": {
     "eslint": "^4.2.0",
@@ -40,6 +38,8 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sauce-launcher": "^1.1.0",
     "karma-webpack": "^2.0.4",
+    "strict-loader": "^1.2.0",
+    "webpack": "^3.1.0",
     "yargs": "^8.0.2"
   }
 }

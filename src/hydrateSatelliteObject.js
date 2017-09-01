@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var cookie = require('cookie');
+var cookie = require('./public/cookie');
 var logger = require('./logger');
 var prefixedLogger = logger.createPrefixedLogger('Custom Script');
 
@@ -65,17 +65,19 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
    * will be stored for the session only.
    */
   _satellite.setCookie = function(name, value, days) {
-    logger.warn('_satellite.setCookie is deprecated. Please use the `_satellite.cookie` API.');
-
+    var optionsStr = '';
     var options = {};
 
     if (days) {
-      var date = new Date();
-      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-      options.expires = date;
+      optionsStr = ', { expires: ' + days + ' }';
+      options.expires = days;
     }
 
-    document.cookie = cookie.serialize(name, value, options);
+    var msg = '_satellite.setCookie is deprecated. Please use ' +
+      '_satellite.cookie.set("' + name + '", "' + value + '"' + optionsStr + ').';
+
+    logger.warn(msg);
+    cookie.set(name, value, options);
   };
 
   /**
@@ -83,10 +85,10 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
    * @param {string} name The name of the cookie to read.
    * @returns {string}
    */
-  _satellite.getCookie = _satellite.readCookie = function(name) {
-    logger.warn('_satellite.readCookie is deprecated. Please use the `_satellite.cookie` API.');
-
-    return cookie.parse(document.cookie)[name];
+  _satellite.readCookie = function(name) {
+    logger.warn('_satellite.readCookie is deprecated. ' +
+      'Please use _satellite.cookie.get("' + name + '").');
+    return cookie.get(name);
   };
 
   /**
@@ -94,9 +96,9 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
    * @param name
    */
   _satellite.removeCookie = function(name) {
-    logger.warn('_satellite.removeCookie is deprecated. Please use the `_satellite.cookie` API.');
-
-    _satellite.setCookie(name, '', -1);
+    logger.warn('_satellite.removeCookie is deprecated. ' +
+      'Please use _satellite.cookie.remove("' + name + '")');
+    cookie.remove(name);
   };
 
   _satellite.cookie = cookie;

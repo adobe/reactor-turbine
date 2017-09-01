@@ -64,7 +64,7 @@ describe('hydrateSatelliteObject', function() {
 
     expect(document.cookie.indexOf(cookieName + '=' + cookieValue)).toBeGreaterThan(-1);
 
-    expect(_satellite.getCookie(cookieName)).toEqual('cookievalue');
+    expect(_satellite.readCookie(cookieName)).toEqual('cookievalue');
 
     _satellite.removeCookie(cookieName);
 
@@ -75,8 +75,9 @@ describe('hydrateSatelliteObject', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject({});
     hydrateSatelliteObject();
 
-    expect(_satellite.cookie.serialize).toEqual(jasmine.any(Function));
-    expect(_satellite.cookie.parse).toEqual(jasmine.any(Function));
+    expect(_satellite.cookie.get).toEqual(jasmine.any(Function));
+    expect(_satellite.cookie.set).toEqual(jasmine.any(Function));
+    expect(_satellite.cookie.remove).toEqual(jasmine.any(Function));
   });
 
   it('exposes a logger', function() {

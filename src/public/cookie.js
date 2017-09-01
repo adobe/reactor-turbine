@@ -10,4 +10,4 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-module.exports = require('cookie');
+module.exports = require('js-cookie');

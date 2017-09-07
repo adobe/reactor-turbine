@@ -25,8 +25,7 @@ var matchUserAgent = function(regexs) {
 };
 
 var browser = matchUserAgent({
-  'IE Edge Mobile': /Windows Phone.*Edge/,
-  'IE Edge': /Edge/,
+  Edge: /Edge/,
   OmniWeb: /OmniWeb/,
   'Opera Mini': /Opera Mini/,
   'Opera Mobile': /Opera Mobi/,

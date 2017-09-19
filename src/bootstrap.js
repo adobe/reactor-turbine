@@ -18,6 +18,7 @@ var state = require('./state');
 
 require('./hydrateSatelliteObject')(
   container.buildInfo,
+  container.property.name,
   state.setDebugOutputEnabled
 );
 

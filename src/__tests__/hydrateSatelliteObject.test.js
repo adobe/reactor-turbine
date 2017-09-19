@@ -36,6 +36,12 @@ describe('hydrateSatelliteObject', function() {
     expect(window._satellite.getVisitorId()).toBe(null);
   });
 
+  it('should add a property name on _satellite', function() {
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({});
+    hydrateSatelliteObject(null, 'some property name');
+    expect(window._satellite.property.name).toEqual('some property name');
+  });
+
   it('should add setDebug function on _satellite',
     function() {
       var loggerMock = {
@@ -46,7 +52,7 @@ describe('hydrateSatelliteObject', function() {
       var hydrateSatelliteObject = injectHydrateSatelliteObject({
         './logger': loggerMock
       });
-      hydrateSatelliteObject(null, setDebugOutputEnabledSpy);
+      hydrateSatelliteObject(null, null, setDebugOutputEnabledSpy);
       _satellite.setDebug(true);
 
       expect(setDebugOutputEnabledSpy).toHaveBeenCalledWith(true);

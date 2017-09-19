@@ -14,7 +14,7 @@ var cookie = require('./public/cookie');
 var logger = require('./logger');
 var prefixedLogger = logger.createPrefixedLogger('Custom Script');
 
-module.exports = function(buildInfo, setDebugOutputEnabled) {
+module.exports = function(buildInfo, propertyName, setDebugOutputEnabled) {
   // Will get replaced by the directCall event delegate from the DTM extension. Exists here in
   // case there are no direct call rules (and therefore the directCall event delegate won't get
   // included) and our customers are still calling the method. In this case, we don't want an error
@@ -25,6 +25,10 @@ module.exports = function(buildInfo, setDebugOutputEnabled) {
   // the extension is not installed and our customers are still calling the method. In this case,
   // we don't want an error to be thrown. This method existed before Reactor.
   _satellite.getVisitorId = function() { return null; };
+
+  _satellite.property = {
+    name: propertyName
+  };
 
   _satellite.buildInfo = buildInfo;
 

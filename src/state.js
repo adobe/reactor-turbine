@@ -40,7 +40,7 @@ var init = function(container) {
   rules = container.rules || rules;
   dataElements = container.dataElements || dataElements;
   buildInfo = container.buildInfo || buildInfo;
-  propertySettings = container.propertySettings || propertySettings;
+  propertySettings = container.property.settings || propertySettings;
 
   var extensions = container.extensions;
   if (extensions) {

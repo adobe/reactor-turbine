@@ -94,7 +94,10 @@ describe('state', function() {
         }
       }
     },
-    propertySettings: {},
+    property: {
+      name: 'some name',
+      settings: {}
+    },
     buildInfo: {
       appVersion: '6BE',
       buildDate: '2016-03-30 16:27:10 UTC',
@@ -201,7 +204,7 @@ describe('state', function() {
   });
 
   it('should return property settings', function() {
-    expect(state.getPropertySettings()).toBe(container.propertySettings);
+    expect(state.getPropertySettings()).toBe(container.property.settings);
   });
 
   it('should return the build info', function() {

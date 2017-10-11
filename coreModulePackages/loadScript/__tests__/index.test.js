@@ -9,23 +9,24 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  ****************************************************************************************/
-
-var loadScript = require('../loadScript');
-
-describe('loadScript', function() {
-  it('returns a promise', function() {
-    var promise = loadScript('https://code.jquery.com/jquery-2.2.1.min.js');
-    expect(promise.then).toBeDefined();
-    expect(promise.catch).toBeDefined();
-  });
-
-  it('the promise should be fulfilled when the script is loaded', function(callback) {
-    loadScript('https://code.jquery.com/jquery-2.2.1.min.js').
-      then(callback);
-  });
-
-  it('the promise should be rejected when the script fails loading', function(callback) {
-    loadScript('https://someinexistentdomain/somefile.min.js').
-      catch(callback);
-  });
-});
+// 'use strict';
+//
+// var loadScript = require('../index');
+//
+// describe('loadScript', function() {
+//   it('returns a promise', function() {
+//     var promise = loadScript('https://code.jquery.com/jquery-2.2.1.min.js');
+//     expect(promise.then).toBeDefined();
+//     expect(promise.catch).toBeDefined();
+//   });
+//
+//   it('the promise should be fulfilled when the script is loaded', function(callback) {
+//     loadScript('https://code.jquery.com/jquery-2.2.1.min.js').
+//       then(callback);
+//   });
+//
+//   it('the promise should be rejected when the script fails loading', function(callback) {
+//     loadScript('https://someinexistentdomain/somefile.min.js').
+//       catch(callback);
+//   });
+// });

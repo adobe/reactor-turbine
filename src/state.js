@@ -18,6 +18,7 @@ var createGetSharedModuleExports = require('./createGetSharedModuleExports');
 var createGetHostedLibFileUrl = require('./createGetHostedLibFileUrl');
 var resolveRelativePath = require('./resolveRelativePath');
 var logger = require('./logger');
+var onPageBottom = require('./public/onPageBottom');
 
 var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
 var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
@@ -36,6 +37,8 @@ var init = function(container) {
   // state. This circular dependency would cause issues. Maybe there's a better way?
   var createGetExtensionSettings = require('./createGetExtensionSettings');
   var createPublicRequire = require('./createPublicRequire');
+  var getDataElementValue = require('./public/getDataElementValue');
+  var replaceTokens = require('./public/replaceTokens');
 
   rules = container.rules || rules;
   dataElements = container.dataElements || dataElements;
@@ -51,25 +54,47 @@ var init = function(container) {
       var getExtensionSettings = createGetExtensionSettings(extension.settings);
 
       if (extension.modules) {
+        var prefixedLogger = logger.createPrefixedLogger(extension.displayName);
+        var getHostedLibFileUrl = createGetHostedLibFileUrl(extension.hostedLibFilesBaseUrl);
+        var turbine = {
+          buildInfo: buildInfo,
+          getDataElementValue: getDataElementValue,
+          getExtensionSettings: getExtensionSettings,
+          getHostedLibFileUrl: getHostedLibFileUrl,
+          getSharedModule: getSharedModuleExports,
+          logger: prefixedLogger,
+          onPageBottom: onPageBottom,
+          propertySettings: propertySettings,
+          replaceTokens: replaceTokens
+        };
+
         Object.keys(extension.modules).forEach(function(referencePath) {
           var getModuleExportsByRelativePath = function(relativePath) {
             var resolvedReferencePath = resolveRelativePath(referencePath, relativePath);
             return moduleProvider.getModuleExports(resolvedReferencePath);
           };
 
+          var module = extension.modules[referencePath];
+
+          // TODO Remove passing in dynamic/contextual modules when we remove support for
+          // require()ing them.
           var publicRequire = createPublicRequire({
-            logger: logger.createPrefixedLogger(extension.displayName),
+            logger: prefixedLogger,
             buildInfo: buildInfo,
             propertySettings: propertySettings,
             getExtensionSettings: getExtensionSettings,
             getSharedModuleExports: getSharedModuleExports,
             getModuleExportsByRelativePath: getModuleExportsByRelativePath,
-            getHostedLibFileUrl: createGetHostedLibFileUrl(extension.hostedLibFilesBaseUrl)
-          });
+            getHostedLibFileUrl: getHostedLibFileUrl
+          }, extension.displayName);
 
-          var module = extension.modules[referencePath];
-
-          moduleProvider.registerModule(referencePath, module, extensionName, publicRequire);
+          moduleProvider.registerModule(
+            referencePath,
+            module,
+            extensionName,
+            publicRequire,
+            turbine
+          );
         });
       }
     });

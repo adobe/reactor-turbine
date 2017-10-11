@@ -23,6 +23,9 @@ describe('state', function() {
   var createPublicRequire;
   var createGetHostedLibFileUrl;
   var state;
+  var logger;
+  var getDataElementValue;
+  var replaceTokens;
 
   var container = {
     rules: [
@@ -113,17 +116,32 @@ describe('state', function() {
       spyOn(moduleProvider, methodName).and.callThrough();
     });
 
-    createGetSharedModuleExports = jasmine.createSpy().and.callThrough(
-      require('../createGetSharedModuleExports'));
+    createGetSharedModuleExports = jasmine.createSpy().and.callFake(
+      require('../createGetSharedModuleExports')
+    );
 
-    createGetExtensionSettings = jasmine.createSpy().and.callThrough(
-      require('../createGetExtensionSettings'));
+    createGetExtensionSettings = jasmine.createSpy().and.callFake(
+      require('../createGetExtensionSettings')
+    );
 
-    createPublicRequire = jasmine.createSpy().and.callThrough(
-      require('../createPublicRequire'));
+    createPublicRequire = jasmine.createSpy().and.callFake(
+      require('../createPublicRequire')
+    );
 
-    createGetHostedLibFileUrl = jasmine.createSpy().and.callThrough(
-      require('../createGetHostedLibFileUrl'));
+    createGetHostedLibFileUrl = jasmine.createSpy().and.callFake(
+      require('../createGetHostedLibFileUrl')
+    );
+
+    getDataElementValue = jasmine.createSpy().and.callFake(
+      require('../public/getDataElementValue')
+    );
+
+    replaceTokens = jasmine.createSpy().and.callFake(
+      require('../public/replaceTokens')
+    );
+
+    logger = require('../logger');
+    spyOn(logger, 'createPrefixedLogger').and.callThrough();
 
     state = injectState({
       './moduleProvider': moduleProvider,
@@ -132,7 +150,10 @@ describe('state', function() {
       './createGetSharedModuleExports': createGetSharedModuleExports,
       './createGetExtensionSettings': createGetExtensionSettings,
       './createPublicRequire': createPublicRequire,
-      './createGetHostedLibFileUrl': createGetHostedLibFileUrl
+      './createGetHostedLibFileUrl': createGetHostedLibFileUrl,
+      './logger': logger,
+      './public/getDataElementValue': getDataElementValue,
+      './public/replaceTokens': replaceTokens
     });
 
     state.init(container);
@@ -221,6 +242,10 @@ describe('state', function() {
       container.extensions['example-extension'].settings);
   });
 
+  it('creates a prefixed logger for each extension', function() {
+    expect(logger.createPrefixedLogger).toHaveBeenCalledWith('Example Extension');
+  });
+
   it('creates createGetHostedLibFileUrl for each extension', function() {
     expect(createGetHostedLibFileUrl).toHaveBeenCalledWith(
       container.extensions['example-extension'].hostedLibFilesBaseUrl);
@@ -232,6 +257,23 @@ describe('state', function() {
 
   it('registers each module', function() {
     expect(moduleProvider.registerModule.calls.count()).toBe(5);
+    expect(moduleProvider.registerModule.calls.first().args).toEqual([
+      'example-extension/events/click.js',
+      { name: 'click', displayName: 'Click', script: jasmine.any(Function) },
+      'example-extension',
+      jasmine.any(Function),
+      {
+        buildInfo: container.buildInfo,
+        getDataElementValue: getDataElementValue,
+        getExtensionSettings: jasmine.any(Function),
+        getHostedLibFileUrl: jasmine.any(Function),
+        getSharedModule: jasmine.any(Function),
+        logger: jasmine.any(Object),
+        onPageBottom: jasmine.any(Function),
+        propertySettings: container.property.settings,
+        replaceTokens: replaceTokens
+      }
+    ]);
   });
 
   it('hydrates module provider cache', function() {

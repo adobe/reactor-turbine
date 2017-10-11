@@ -14,7 +14,7 @@ describe('hasDomContentLoaded', function() {
   it('returns true after DOM content was loaded', function() {
     var injectHasDomContentLoaded = require('inject-loader!../hasDomContentLoaded');
     var hasDomContentLoaded = injectHasDomContentLoaded({
-      'document': {
+      '@adobe/reactor-document': {
         addEventListener: function(type, callback) {
           if (type === 'DOMContentLoaded') {
             callback();
@@ -29,7 +29,7 @@ describe('hasDomContentLoaded', function() {
   it('returns false before DOM content was loaded', function() {
     var injectHasDomContentLoaded = require('inject-loader!../hasDomContentLoaded');
     var hasDomContentLoaded = injectHasDomContentLoaded({
-      'document': {
+      '@adobe/reactor-document': {
         addEventListener: function() {}
       }
     });

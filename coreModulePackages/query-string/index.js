@@ -9,25 +9,25 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  ****************************************************************************************/
+'use strict';
 
-var window = require('window');
-var assign = window.Object.assign;
+var querystring = require('querystring');
 
-if (typeof assign === 'undefined') {
-  assign = function(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var from = arguments[i];
-      if (from === null || from === undefined) {
-        continue;
-      }
-      var keys = Object.keys(from);
-      for (var j = 0; j < keys.length; j++) {
-        var key = keys[j];
-        target[key] = from[key];
-      }
+// We proxy the underlying querystring module so we can limit the API we expose.
+// This allows us to more easily make changes to the underlying implementation later without
+// having to worry about breaking extensions. If extensions demand additional functionality, we
+// can make adjustments as needed.
+module.exports = {
+  parse: function(string) {
+    //
+    if (typeof string === 'string') {
+      // Remove leading ?, #, & for some leniency so you can pass in location.search or
+      // location.hash directly.
+      string = string.trim().replace(/^[?#&]/, '');
     }
-    return target;
-  };
-}
-
-module.exports = assign;
+    return querystring.parse(string);
+  },
+  stringify: function(object) {
+    return querystring.stringify(object);
+  }
+};

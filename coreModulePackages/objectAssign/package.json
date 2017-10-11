@@ -1,0 +1,18 @@
+{
+  "name": "@adobe/reactor-object-assign",
+  "version": "1.0.0",
+  "description": "Object.assign implementation. Exposes the \"object-assign\" npm package. Intended for use in Adobe Launch extensions.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Adobe Systems",
+    "url": "http://adobe.com",
+    "email": "reactor@adobe.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Adobe-Marketing-Cloud/reactor-turbine.git"
+  },
+  "dependencies": {
+    "object-assign": "4.1.1"
+  }
+}

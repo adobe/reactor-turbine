@@ -14,7 +14,7 @@ describe('onPageBottom', function() {
   var getInjectedOnPageBottom = function(options) {
     return require('inject-loader!../onPageBottom')({
       'window': options.window,
-      'document': options.document,
+      '@adobe/reactor-document': options.document,
       '../logger': options.logger || require('../../logger'),
       './once': require('../once')
     });

@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var cookie = require('./public/cookie');
+var cookie = require('@adobe/reactor-cookie');
 var logger = require('./logger');
 var prefixedLogger = logger.createPrefixedLogger('Custom Script');
 

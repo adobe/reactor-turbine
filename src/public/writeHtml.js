@@ -13,7 +13,7 @@
 /*eslint no-alert:0*/
 'use strict';
 var hasDomContentLoaded = require('./hasDomContentLoaded');
-var document = require('document');
+var document = require('@adobe/reactor-document');
 
 module.exports = function(html) {
   // Document object in XML files is different from the ones in HTML files. Documents served with

@@ -20,6 +20,13 @@
     "url": "git@github.com:Adobe-Marketing-Cloud/reactor-turbine.git"
   },
   "dependencies": {
+    "@adobe/reactor-cookie": "^1.0.0",
+    "@adobe/reactor-document": "^1.0.0",
+    "@adobe/reactor-load-script": "^1.0.0",
+    "@adobe/reactor-object-assign": "^1.0.0",
+    "@adobe/reactor-promise": "^1.0.0",
+    "@adobe/reactor-query-string": "^1.0.0",
+    "@adobe/reactor-window": "^1.0.0",
     "is-plain-object": "2.0.4",
     "js-cookie": "2.1.4",
     "promise-polyfill": "6.0.2"

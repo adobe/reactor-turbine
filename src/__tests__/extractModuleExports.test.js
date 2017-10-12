@@ -18,9 +18,15 @@ describe('extract module exports', function() {
   it('runs the module code', function() {
     var moduleScript = jasmine.createSpy('module');
     var require = function() {};
-    extractModuleExports(moduleScript, require);
+    var turbine = {};
+    extractModuleExports(moduleScript, require, turbine);
 
-    expect(moduleScript).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object), require);
+    expect(moduleScript).toHaveBeenCalledWith(
+      jasmine.any(Object),
+      jasmine.any(Object),
+      require,
+      turbine
+    );
   });
 
   it('returns the extracted exports', function() {

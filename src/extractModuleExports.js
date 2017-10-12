@@ -10,12 +10,12 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-module.exports = function(script, require) {
+module.exports = function(script, require, turbine) {
   var module = {
     exports: {}
   };
 
-  script.call(module.exports, module, module.exports, require);
+  script.call(module.exports, module, module.exports, require, turbine);
 
   return module.exports;
 };

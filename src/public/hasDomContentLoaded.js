@@ -12,7 +12,7 @@
 
 /*eslint no-alert:0*/
 'use strict';
-var document = require('document');
+var document = require('@adobe/reactor-document');
 
 var domContentLoaded = false;
 

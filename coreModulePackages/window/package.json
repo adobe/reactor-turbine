@@ -1,0 +1,15 @@
+{
+  "name": "@adobe/reactor-window",
+  "version": "1.0.0",
+  "description": "Exposes the window object. Intended for use in Adobe Launch extensions.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Adobe Systems",
+    "url": "http://adobe.com",
+    "email": "reactor@adobe.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Adobe-Marketing-Cloud/reactor-turbine.git"
+  }
+}

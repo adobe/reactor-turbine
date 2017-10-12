@@ -17,7 +17,7 @@ describe('writeHtml', function() {
     var documentWriteSpy = jasmine.createSpy();
     var writeHtml = injectWriteHtml({
       './hasDomContentLoaded': jasmine.createSpy().and.returnValue(false),
-      'document': {
+      '@adobe/reactor-document': {
         write: documentWriteSpy
       }
     });
@@ -38,7 +38,7 @@ describe('writeHtml', function() {
 
   it('should throw an error when `document.write` method is missing', function() {
     var writeHtml = injectWriteHtml({
-      'document': {}
+      '@adobe/reactor-document': {}
     });
 
     expect(function() {

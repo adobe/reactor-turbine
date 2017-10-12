@@ -13,7 +13,7 @@
 var replaceVarTokens = require('./public/replaceTokens');
 var logger = require('./logger');
 var state = require('./state');
-var document = require('document');
+var document = require('@adobe/reactor-document');
 var normalizeSyntheticEvent = require('./normalizeSyntheticEvent');
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';

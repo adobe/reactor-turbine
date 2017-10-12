@@ -25,11 +25,12 @@ var getModule = function(referencePath) {
   return module;
 };
 
-var registerModule = function(referencePath, moduleDefinition, extensionName, require) {
+var registerModule = function(referencePath, moduleDefinition, extensionName, require, turbine) {
   var module = {
     definition: moduleDefinition,
+    extensionName: extensionName,
     require: require,
-    extensionName: extensionName
+    turbine: turbine
   };
   module.require = require;
   moduleByReferencePath[referencePath] = module;
@@ -53,7 +54,7 @@ var getModuleExports = function(referencePath) {
   // Using hasOwnProperty instead of a falsey check because the module could export undefined
   // in which case we don't want to execute the module each time the exports is requested.
   if (!module.hasOwnProperty('exports')) {
-    module.exports = extractModuleExports(module.definition.script, module.require);
+    module.exports = extractModuleExports(module.definition.script, module.require, module.turbine);
   }
 
   return module.exports;

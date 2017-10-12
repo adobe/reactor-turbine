@@ -19,7 +19,7 @@ var mockWindow = {
 };
 
 var getQueryParam = require('inject-loader!../getQueryParam')({
-  window: mockWindow
+  'window': mockWindow
 });
 
 var setSearch = function(search) {

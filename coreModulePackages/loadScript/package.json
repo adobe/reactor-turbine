@@ -11,5 +11,8 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:Adobe-Marketing-Cloud/reactor-turbine.git"
+  },
+  "dependencies": {
+    "@adobe/reactor-promise": "*"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@adobe/reactor-load-script",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Loads a script and returns a promise. Intended for use in Adobe Launch extensions.",
   "license": "Apache-2.0",
   "author": {

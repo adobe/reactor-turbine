@@ -10,8 +10,32 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-// `isPlainObject(thing)`
-// -----------------
-//
-// Returns whether the given thing is a plain object.
-module.exports = require('is-plain-object');
+describe('setCustomVar', function() {
+  var customVars;
+  var setCustomVar;
+
+  beforeEach(function() {
+    customVars = {};
+    setCustomVar = require('inject-loader!../setCustomVar')({
+      './state': {
+        customVars: customVars
+      }
+    });
+  });
+
+  it('sets a single custom var', function() {
+    setCustomVar('foo', 'bar');
+
+    expect(customVars['foo']).toBe('bar');
+  });
+
+  it('sets multiple custom vars', function() {
+    setCustomVar({
+      foo: 'bar',
+      animal: 'unicorn'
+    });
+
+    expect(customVars['foo']).toBe('bar');
+    expect(customVars['animal']).toBe('unicorn');
+  });
+});

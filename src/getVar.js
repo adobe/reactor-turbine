@@ -11,7 +11,7 @@
  ****************************************************************************************/
 
 var state = require('./state');
-var getDataElementValue = require('./public/getDataElementValue');
+var getDataElementValue = require('./getDataElementValue');
 var cleanText = require('./cleanText');
 
 var specialPropertyAccessors = {

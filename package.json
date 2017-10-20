@@ -4,7 +4,7 @@
   "description": "Launch rule engine which processes rules on client websites and delegates logic to extensions.",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "webpack --config webpack.dist.config.js --env && webpack --config webpack.dist.config.js --env.compress && webpack --config webpack.lib.config.js",
+    "build": "rollup -c && uglifyjs -c -m -o dist/engine.min.js -- dist/engine.js",
     "prepublish": "npm run build",
     "test": "karma start",
     "test:watch": "npm test -- --no-single-run --no-coverage",
@@ -26,10 +26,7 @@
     "@adobe/reactor-object-assign": "*",
     "@adobe/reactor-promise": "*",
     "@adobe/reactor-query-string": "*",
-    "@adobe/reactor-window": "*",
-    "is-plain-object": "2.0.4",
-    "js-cookie": "2.1.4",
-    "promise-polyfill": "6.0.2"
+    "@adobe/reactor-window": "*"
   },
   "devDependencies": {
     "eslint": "^4.2.0",
@@ -45,8 +42,8 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sauce-launcher": "^1.1.0",
     "karma-webpack": "^2.0.4",
-    "strict-loader": "^1.2.0",
-    "webpack": "^3.1.0",
-    "yargs": "^9.0.1"
+    "rollup-plugin-commonjs": "^8.2.4",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "webpack": "^3.8.1"
   }
 }

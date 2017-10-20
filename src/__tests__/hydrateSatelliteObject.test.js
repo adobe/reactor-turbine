@@ -12,34 +12,34 @@
 
 'use strict';
 
-var noop = function() {};
-
 describe('hydrateSatelliteObject', function() {
   var injectHydrateSatelliteObject = require('inject-loader!../hydrateSatelliteObject');
+  var noop = function() {};
+  var _satellite;
 
   beforeEach(function() {
-    window._satellite = {};
+    _satellite = {};
   });
 
   it('should add a track function on _satellite', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject({});
-    hydrateSatelliteObject();
-    expect(window._satellite.track).toEqual(jasmine.any(Function));
+    hydrateSatelliteObject(_satellite);
+    expect(_satellite.track).toEqual(jasmine.any(Function));
     // shouldn't throw an error.
-    window._satellite.track();
+    _satellite.track();
   });
 
   it('should add a getVisitorId function on _satellite', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject({});
-    hydrateSatelliteObject();
-    expect(window._satellite.getVisitorId).toEqual(jasmine.any(Function));
-    expect(window._satellite.getVisitorId()).toBe(null);
+    hydrateSatelliteObject(_satellite);
+    expect(_satellite.getVisitorId).toEqual(jasmine.any(Function));
+    expect(_satellite.getVisitorId()).toBe(null);
   });
 
   it('should add a property name on _satellite', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject({});
-    hydrateSatelliteObject(null, 'some property name');
-    expect(window._satellite.property.name).toEqual('some property name');
+    hydrateSatelliteObject(_satellite, null, 'some property name');
+    expect(_satellite.property.name).toEqual('some property name');
   });
 
   it('should add setDebug function on _satellite',
@@ -52,7 +52,7 @@ describe('hydrateSatelliteObject', function() {
       var hydrateSatelliteObject = injectHydrateSatelliteObject({
         './logger': loggerMock
       });
-      hydrateSatelliteObject(null, null, setDebugOutputEnabledSpy);
+      hydrateSatelliteObject(_satellite, null, null, setDebugOutputEnabledSpy);
       _satellite.setDebug(true);
 
       expect(setDebugOutputEnabledSpy).toHaveBeenCalledWith(true);
@@ -61,7 +61,7 @@ describe('hydrateSatelliteObject', function() {
 
   it('successfully allows setting, reading, and removing a cookie', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject({});
-    hydrateSatelliteObject();
+    hydrateSatelliteObject(_satellite);
 
     var cookieName = 'cookiename';
     var cookieValue = 'cookievalue';
@@ -79,7 +79,7 @@ describe('hydrateSatelliteObject', function() {
 
   it('exposes npm cookie package methods', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject({});
-    hydrateSatelliteObject();
+    hydrateSatelliteObject(_satellite);
 
     expect(_satellite.cookie.get).toEqual(jasmine.any(Function));
     expect(_satellite.cookie.set).toEqual(jasmine.any(Function));
@@ -88,7 +88,7 @@ describe('hydrateSatelliteObject', function() {
 
   it('exposes a logger', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject({});
-    hydrateSatelliteObject();
+    hydrateSatelliteObject(_satellite);
 
     expect(_satellite.logger.log).toEqual(jasmine.any(Function));
     expect(_satellite.logger.info).toEqual(jasmine.any(Function));
@@ -115,7 +115,7 @@ describe('hydrateSatelliteObject', function() {
         }
       }
     });
-    hydrateSatelliteObject();
+    hydrateSatelliteObject(_satellite);
 
     _satellite.notify('log test');
     expect(loggerMock.log).toHaveBeenCalledWith('log test');

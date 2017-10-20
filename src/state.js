@@ -18,7 +18,7 @@ var createGetSharedModuleExports = require('./createGetSharedModuleExports');
 var createGetHostedLibFileUrl = require('./createGetHostedLibFileUrl');
 var resolveRelativePath = require('./resolveRelativePath');
 var logger = require('./logger');
-var onPageBottom = require('./public/onPageBottom');
+var onPageBottom = require('./onPageBottom');
 
 var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
 var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
@@ -37,8 +37,8 @@ var init = function(container) {
   // state. This circular dependency would cause issues. Maybe there's a better way?
   var createGetExtensionSettings = require('./createGetExtensionSettings');
   var createPublicRequire = require('./createPublicRequire');
-  var getDataElementValue = require('./public/getDataElementValue');
-  var replaceTokens = require('./public/replaceTokens');
+  var getDataElementValue = require('./getDataElementValue');
+  var replaceTokens = require('./replaceTokens');
 
   rules = container.rules || rules;
   dataElements = container.dataElements || dataElements;
@@ -76,17 +76,7 @@ var init = function(container) {
 
           var module = extension.modules[referencePath];
 
-          // TODO Remove passing in dynamic/contextual modules when we remove support for
-          // require()ing them.
-          var publicRequire = createPublicRequire({
-            logger: prefixedLogger,
-            buildInfo: buildInfo,
-            propertySettings: propertySettings,
-            getExtensionSettings: getExtensionSettings,
-            getSharedModuleExports: getSharedModuleExports,
-            getModuleExportsByRelativePath: getModuleExportsByRelativePath,
-            getHostedLibFileUrl: getHostedLibFileUrl
-          }, extension.displayName);
+          var publicRequire = createPublicRequire(getModuleExportsByRelativePath);
 
           moduleProvider.registerModule(
             referencePath,

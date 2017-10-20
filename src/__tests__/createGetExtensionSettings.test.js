@@ -14,7 +14,7 @@
 
 describe('function returned by createGetExtensionConfiguration', function() {
   var createGetExtensionSettings = require('inject-loader!../createGetExtensionSettings')({
-    './public/replaceTokens': function(obj) {
+    './replaceTokens': function(obj) {
       var replacedObj = {};
 
       // Simulate replacing data element tokens.

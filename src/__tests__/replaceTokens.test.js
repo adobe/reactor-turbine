@@ -16,10 +16,9 @@ var getReplaceTokens = function(options) {
   options = options || {};
 
   return require('inject-loader!../replaceTokens')({
-    './isPlainObject': require('../isPlainObject'),
-    '../isVar': options.isVar || function() { return true; },
-    '../getVar': options.getVar || function() {},
-    '../state': options.state || {
+    './isVar': options.isVar || function() { return true; },
+    './getVar': options.getVar || function() {},
+    './state': options.state || {
       getPropertySettings: function() {
         return {};
       }

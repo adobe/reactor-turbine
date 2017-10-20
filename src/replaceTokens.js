@@ -10,11 +10,9 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var isPlainObject = require('./isPlainObject');
-var getVar = require('../getVar');
-var isVar = require('../isVar');
-var state = require('../state');
-var undefinedVarsReturnEmpty = state.getPropertySettings().undefinedVarsReturnEmpty;
+var getVar = require('./getVar');
+var isVar = require('./isVar');
+var state = require('./state');
 
 var replaceTokensInString;
 var replaceTokensInObject;
@@ -27,7 +25,7 @@ var getVarValue = function(token, variableName, syntheticEvent) {
   }
 
   var val = getVar(variableName, syntheticEvent);
-  return val == null && undefinedVarsReturnEmpty ? '' : val;
+  return val == null && state.getPropertySettings().undefinedVarsReturnEmpty ? '' : val;
 };
 
 /**
@@ -77,7 +75,7 @@ replaceTokens = function(thing, syntheticEvent) {
     return replaceTokensInString(thing, syntheticEvent);
   } else if (Array.isArray(thing)) {
     return replaceTokensInArray(thing, syntheticEvent);
-  } else if (isPlainObject(thing)) {
+  } else if (typeof thing === 'object' && thing !== null) {
     return replaceTokensInObject(thing, syntheticEvent);
   }
 

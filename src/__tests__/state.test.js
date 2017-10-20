@@ -133,11 +133,11 @@ describe('state', function() {
     );
 
     getDataElementValue = jasmine.createSpy().and.callFake(
-      require('../public/getDataElementValue')
+      require('../getDataElementValue')
     );
 
     replaceTokens = jasmine.createSpy().and.callFake(
-      require('../public/replaceTokens')
+      require('../replaceTokens')
     );
 
     logger = require('../logger');
@@ -152,8 +152,8 @@ describe('state', function() {
       './createPublicRequire': createPublicRequire,
       './createGetHostedLibFileUrl': createGetHostedLibFileUrl,
       './logger': logger,
-      './public/getDataElementValue': getDataElementValue,
-      './public/replaceTokens': replaceTokens
+      './getDataElementValue': getDataElementValue,
+      './replaceTokens': replaceTokens
     });
 
     state.init(container);

@@ -9,14 +9,16 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  ****************************************************************************************/
+var _satellite = window._satellite;
 
-var container = window._satellite.container;
+var container = _satellite.container;
 // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
-delete window._satellite.container;
+delete _satellite.container;
 
 var state = require('./state');
 
 require('./hydrateSatelliteObject')(
+  _satellite,
   container.buildInfo,
   container.property.name,
   state.setDebugOutputEnabled
@@ -25,3 +27,5 @@ require('./hydrateSatelliteObject')(
 state.init(container); // Must come first.
 require('./logger').outputEnabled = state.getDebugOutputEnabled();
 require('./initRules')(); // Must come last.
+
+module.exports = _satellite;

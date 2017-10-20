@@ -10,32 +10,15 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-describe('setCustomVar', function() {
-  var customVars;
-  var setCustomVar;
+var customVars = require('./state').customVars;
 
-  beforeEach(function() {
-    customVars = {};
-    setCustomVar = require('inject-loader!../setCustomVar')({
-      '../state': {
-        customVars: customVars
-      }
-    });
-  });
-
-  it('sets a single custom var', function() {
-    setCustomVar('foo', 'bar');
-
-    expect(customVars['foo']).toBe('bar');
-  });
-
-  it('sets multiple custom vars', function() {
-    setCustomVar({
-      foo: 'bar',
-      animal: 'unicorn'
-    });
-
-    expect(customVars['foo']).toBe('bar');
-    expect(customVars['animal']).toBe('unicorn');
-  });
-});
+module.exports = function() {
+  if (typeof arguments[0] === 'string') {
+    customVars[arguments[0]] = arguments[1];
+  } else if (arguments[0]) { // assume an object literal
+    var mapping = arguments[0];
+    for (var key in mapping) {
+      customVars[key] = mapping[key];
+    }
+  }
+};

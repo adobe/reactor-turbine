@@ -14,7 +14,7 @@ var cookie = require('@adobe/reactor-cookie');
 var logger = require('./logger');
 var prefixedLogger = logger.createPrefixedLogger('Custom Script');
 
-module.exports = function(buildInfo, propertyName, setDebugOutputEnabled) {
+module.exports = function(_satellite, buildInfo, propertyName, setDebugOutputEnabled) {
   // Will get replaced by the directCall event delegate from the DTM extension. Exists here in
   // case there are no direct call rules (and therefore the directCall event delegate won't get
   // included) and our customers are still calling the method. In this case, we don't want an error
@@ -59,7 +59,7 @@ module.exports = function(buildInfo, propertyName, setDebugOutputEnabled) {
   };
 
   _satellite.getVar = require('./getVar');
-  _satellite.setVar = require('./public/setCustomVar');
+  _satellite.setVar = require('./setCustomVar');
 
   /**
    * Writes a cookie.

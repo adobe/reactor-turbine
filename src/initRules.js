@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var replaceVarTokens = require('./public/replaceTokens');
+var replaceVarTokens = require('./replaceTokens');
 var logger = require('./logger');
 var state = require('./state');
 var document = require('@adobe/reactor-document');

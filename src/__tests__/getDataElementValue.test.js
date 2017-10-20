@@ -17,9 +17,9 @@ describe('getDataElementValue', function() {
   var getInjectedGetDataElementValue = function(options) {
     var cleanText = options.cleanText || function() {};
     return require('inject-loader!../getDataElementValue')({
-      '../state': options.state,
-      '../cleanText': cleanText,
-      '../logger': logger
+      './state': options.state,
+      './cleanText': cleanText,
+      './logger': logger
     });
   };
 

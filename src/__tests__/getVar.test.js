@@ -18,7 +18,7 @@ var getInjectedGetVar = function(options) {
     './state': options.state || {
       getDataElementDefinition: noop
     },
-    './public/getDataElementValue': options.getDataElementValue || noop,
+    './getDataElementValue': options.getDataElementValue || noop,
     './cleanText': options.cleanText || noop
   });
 };

@@ -4,6 +4,9 @@
     "jasmine": true,
     "node": true
   },
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "rules": {
     "camelcase": [2, {"properties": "always"}],
     "indent": [2, 2, {"SwitchCase": 1}], // 2 spaces indentation

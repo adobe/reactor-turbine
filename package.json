@@ -47,6 +47,6 @@
     "karma-webpack": "^2.0.4",
     "strict-loader": "^1.2.0",
     "webpack": "^3.1.0",
-    "yargs": "^9.0.1"
+    "yargs": "^10.0.3"
   }
 }

@@ -9,24 +9,30 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  ****************************************************************************************/
+var createSetCustomVar = require('../createSetCustomVar');
 
-//Required for mocking out the window object in setLocalStorageItem.test.js
-var window = require('window');
+describe('function returned by setCustomVar', function() {
+  var customVars;
+  var setCustomVar;
 
-/**
- * Saves a value to local storage.
- * @param {string} name The name of the item to be saved.
- * @param {string} value The value of the item to be saved.
- * @returns {boolean} Whether the item was successfully saved to local storage.
- */
-module.exports = function(name, value) {
-  // When local storage is disabled on Safari, the mere act of referencing window.localStorage
-  // throws an error. For this reason, referencing window.localStorage without being inside
-  // a try-catch should be avoided.
-  try {
-    window.localStorage.setItem(name, value);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
+  beforeEach(function() {
+    customVars = {};
+    setCustomVar = createSetCustomVar(customVars);
+  });
+
+  it('sets a single custom var', function() {
+    setCustomVar('foo', 'bar');
+
+    expect(customVars['foo']).toBe('bar');
+  });
+
+  it('sets multiple custom vars', function() {
+    setCustomVar({
+      foo: 'bar',
+      animal: 'unicorn'
+    });
+
+    expect(customVars['foo']).toBe('bar');
+    expect(customVars['animal']).toBe('unicorn');
+  });
+});

@@ -12,9 +12,10 @@
 
 var cookie = require('@adobe/reactor-cookie');
 var logger = require('./logger');
-var prefixedLogger = logger.createPrefixedLogger('Custom Script');
 
-module.exports = function(_satellite, buildInfo, propertyName, setDebugOutputEnabled) {
+module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, setCustomVar) {
+  var prefixedLogger = logger.createPrefixedLogger('Custom Script');
+
   // Will get replaced by the directCall event delegate from the DTM extension. Exists here in
   // case there are no direct call rules (and therefore the directCall event delegate won't get
   // included) and our customers are still calling the method. In this case, we don't want an error
@@ -26,11 +27,13 @@ module.exports = function(_satellite, buildInfo, propertyName, setDebugOutputEna
   // we don't want an error to be thrown. This method existed before Reactor.
   _satellite.getVisitorId = function() { return null; };
 
+  // container.property also has property settings, but it shouldn't concern the user.
+  // By limiting our API exposure to necessities, we provide more flexibility in the future.
   _satellite.property = {
-    name: propertyName
+    name: container.property.name
   };
 
-  _satellite.buildInfo = buildInfo;
+  _satellite.buildInfo = container.buildInfo;
 
   _satellite.logger = prefixedLogger;
 
@@ -58,8 +61,8 @@ module.exports = function(_satellite, buildInfo, propertyName, setDebugOutputEna
     }
   };
 
-  _satellite.getVar = require('./getVar');
-  _satellite.setVar = require('./setCustomVar');
+  _satellite.getVar = getVar;
+  _satellite.setVar = setCustomVar;
 
   /**
    * Writes a cookie.
@@ -101,16 +104,11 @@ module.exports = function(_satellite, buildInfo, propertyName, setDebugOutputEna
    */
   _satellite.removeCookie = function(name) {
     logger.warn('_satellite.removeCookie is deprecated. ' +
-      'Please use _satellite.cookie.remove("' + name + '")');
+      'Please use _satellite.cookie.remove("' + name + '").');
     cookie.remove(name);
   };
 
   _satellite.cookie = cookie;
 
-  _satellite.setDebug = function(value) {
-    setDebugOutputEnabled(value);
-
-    // TODO: Have state emit an event that logger listens to instead?
-    logger.outputEnabled = value;
-  };
+  _satellite.setDebug = setDebugOutputEnabled;
 };

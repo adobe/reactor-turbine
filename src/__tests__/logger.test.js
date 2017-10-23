@@ -94,4 +94,9 @@ describe('logger', function() {
     expect(window.console.error).toHaveBeenCalledWith(messagePrefix +
       ' [test identifier] test error message');
   });
+
+  it('returns outputEnabled value', function() {
+    logger.outputEnabled = true;
+    expect(logger.outputEnabled).toBe(true);
+  });
 });

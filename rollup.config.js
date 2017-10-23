@@ -2,7 +2,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 
 export default {
-  input: 'src/bootstrap.js',
+  input: 'src/index.js',
   output: {
     file: 'dist/engine.js',
     format: 'iife',

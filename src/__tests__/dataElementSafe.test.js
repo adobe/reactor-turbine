@@ -13,21 +13,16 @@
 var cookie = require('@adobe/reactor-cookie');
 
 describe('dataElementSafe', function() {
-  var mockDate = new Date();
   var dataElementSafe = require('inject-loader!../dataElementSafe')({
     '@adobe/reactor-cookie': cookie
   });
 
   beforeEach(function() {
-    jasmine.clock().mockDate(mockDate);
-
     spyOn(cookie, 'set').and.callThrough();
     spyOn(cookie, 'get').and.callThrough();
   });
 
   afterEach(function() {
-    jasmine.clock().uninstall();
-
     cookie.set('_sdsat_foo', '');
   });
 

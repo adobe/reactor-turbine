@@ -10,8 +10,6 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-'use strict';
-
 var window = require('window');
 var document = require('@adobe/reactor-document');
 var once = require('./once');

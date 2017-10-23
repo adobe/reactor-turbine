@@ -17,13 +17,9 @@
  * @returns {Function}
  */
 
-module.exports = function(hostedLibFilesBaseUrl) {
+module.exports = function(hostedLibFilesBaseUrl, minified) {
   return function(file) {
-    // State is required here because otherwise it would be an empty object.
-    var state = require('./state');
-    var buildInfo = state.getBuildInfo();
-
-    if (buildInfo['minified']) {
+    if (minified) {
       var fileParts = file.split('.');
       fileParts.splice(fileParts.length - 1 || 1, 0, 'min');
       file = fileParts.join('.');

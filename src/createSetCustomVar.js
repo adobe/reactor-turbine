@@ -10,22 +10,15 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var state = require('./state');
-
-/**
- * Determines if the provided name is a valid variable, where the variable
- * can be a data element, element, event, target, or custom var.
- * @param variableName
- * @returns {boolean}
- */
-module.exports = function(variableName) {
-  var nameBeforeDot = variableName.split('.')[0];
-
-  return Boolean(
-    state.getDataElementDefinition(variableName) ||
-    nameBeforeDot === 'this' ||
-    nameBeforeDot === 'event' ||
-    nameBeforeDot === 'target' ||
-    state.customVars.hasOwnProperty(nameBeforeDot)
-  );
+module.exports = function(customVars) {
+  return function() {
+    if (typeof arguments[0] === 'string') {
+      customVars[arguments[0]] = arguments[1];
+    } else if (arguments[0]) { // assume an object literal
+      var mapping = arguments[0];
+      for (var key in mapping) {
+        customVars[key] = mapping[key];
+      }
+    }
+  }
 };

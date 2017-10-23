@@ -10,21 +10,22 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-//Required for mocking out the window object in getLocalStorageItem.test.js
-var window = require('window');
-
 /**
- * Reads a value from local storage.
- * @param {string} name The name of the item to be read.
- * @returns {string}
+ * Determines if the provided name is a valid variable, where the variable
+ * can be a data element, element, event, target, or custom var.
+ * @param variableName
+ * @returns {boolean}
  */
-module.exports = function(name) {
-  // When local storage is disabled on Safari, the mere act of referencing window.localStorage
-  // throws an error. For this reason, referencing window.localStorage without being inside
-  // a try-catch should be avoided.
-  try {
-    return window.localStorage.getItem(name);
-  } catch (e) {
-    return null;
-  }
+module.exports = function(customVars, getDataElementDefinition) {
+  return function(variableName) {
+    var nameBeforeDot = variableName.split('.')[0];
+
+    return Boolean(
+      getDataElementDefinition(variableName) ||
+      nameBeforeDot === 'this' ||
+      nameBeforeDot === 'event' ||
+      nameBeforeDot === 'target' ||
+      customVars.hasOwnProperty(nameBeforeDot)
+    );
+  };
 };

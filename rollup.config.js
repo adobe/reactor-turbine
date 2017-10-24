@@ -5,13 +5,7 @@ export default {
   input: 'src/index.js',
   output: {
     file: 'dist/engine.js',
-    format: 'iife',
-    globals: {
-      'window': 'window'
-    },
-    external: [
-      'window'
-    ]
+    format: 'iife'
   },
   name: '_satellite',
   plugins: [

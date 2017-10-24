@@ -40,13 +40,12 @@ describe('localStorage', function() {
     it('returns item', function() {
       // Mocking window because Safari throws an error when setting a local storage item in Private
       // Browser Mode.
-      var storage = {};
       var mockWindow = {
         localStorage: createMockLocalStorage()
       };
 
       var localStorage = require('inject-loader!../localStorage')({
-        window: mockWindow
+        '@adobe/reactor-window': mockWindow
       });
 
       mockWindow.localStorage.setItem('foo', 'something');
@@ -62,7 +61,7 @@ describe('localStorage', function() {
       };
 
       var localStorage = require('inject-loader!../localStorage')({
-        window: mockWindow
+        '@adobe/reactor-window': mockWindow
       });
 
       expect(localStorage.getItem('foo')).toBeNull();
@@ -78,7 +77,7 @@ describe('localStorage', function() {
       };
 
       var localStorage = require('inject-loader!../localStorage')({
-        window: mockWindow
+        '@adobe/reactor-window': mockWindow
       });
 
       localStorage.setItem('foo', 'something');
@@ -91,7 +90,7 @@ describe('localStorage', function() {
       };
 
       var localStorage = require('inject-loader!../localStorage')({
-        window: mockWindow
+        '@adobe/reactor-window': mockWindow
       });
 
       localStorage.setItem('thing', 'something');

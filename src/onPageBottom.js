@@ -10,8 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var window = require('window');
-var document = require('document');
+var window = require('@adobe/reactor-window');
+var document = require('@adobe/reactor-document');
 var once = require('./once');
 var logger = require('./logger');
 

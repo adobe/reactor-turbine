@@ -20,8 +20,8 @@ describe('onPageBottom', function() {
     var documentFakeObject = { addEventListener: function() {} };
 
     var onPageBottom = getInjectedOnPageBottom({
-      window: windowFakeObject,
-      document: documentFakeObject
+      '@adobe/reactor-window': windowFakeObject,
+      '@adobe/reactor-document': documentFakeObject
     });
 
     onPageBottom(done);
@@ -45,8 +45,8 @@ describe('onPageBottom', function() {
     };
 
     var onPageBottom = getInjectedOnPageBottom({
-      window: windowFakeObject,
-      document: documentFakeObject,
+      '@adobe/reactor-window': windowFakeObject,
+      '@adobe/reactor-document': documentFakeObject,
       './logger': loggerFakeObject
     });
 
@@ -75,8 +75,8 @@ describe('onPageBottom', function() {
     };
 
     var onPageBottom = getInjectedOnPageBottom({
-      window: windowFakeObject,
-      document: documentFakeObject
+      '@adobe/reactor-window': windowFakeObject,
+      '@adobe/reactor-document': documentFakeObject
     });
 
     var spy = jasmine.createSpy();
@@ -97,8 +97,8 @@ describe('onPageBottom', function() {
     };
 
     var onPageBottom = getInjectedOnPageBottom({
-      window: windowFakeObject,
-      document: documentFakeObject
+      '@adobe/reactor-window': windowFakeObject,
+      '@adobe/reactor-document': documentFakeObject
     });
 
     windowFakeObject._satellite.pageBottom();

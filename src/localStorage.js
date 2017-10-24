@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var window = require('window');
+var window = require('@adobe/reactor-window');
 
 // When local storage is disabled on Safari, the mere act of referencing window.localStorage
 // throws an error. For this reason, referencing window.localStorage without being inside

@@ -11,7 +11,7 @@
  ****************************************************************************************/
 
 var window = require('window');
-var document = require('@adobe/reactor-document');
+var document = require('document');
 var once = require('./once');
 var logger = require('./logger');
 

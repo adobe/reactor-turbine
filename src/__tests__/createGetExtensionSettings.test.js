@@ -11,15 +11,16 @@
  ****************************************************************************************/
 
 'use strict';
+var createGetExtensionSettings = require('../createGetExtensionSettings');
 
 describe('function returned by createGetExtensionConfiguration', function() {
-  var settingsWithReplacements = {};
+  var settingsWithReplacements = {
+    name: 'shoes'
+  };
 
   var replaceTokens = function() {
     return settingsWithReplacements;
   };
-
-  var createGetExtensionSettings = require('../createGetExtensionSettings');
 
   it('returns settings with data element tokens replaced', function() {
     var getExtensionSettings = createGetExtensionSettings(replaceTokens, {

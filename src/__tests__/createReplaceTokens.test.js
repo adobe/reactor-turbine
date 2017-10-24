@@ -14,10 +14,18 @@
 var createReplaceTokens = require('../createReplaceTokens');
 
 describe('function returned by replaceTokens', function() {
+  var isVar;
+  var getVar;
+  var undefinedVarsReturnEmpty;
+
+  beforeEach(function() {
+    isVar = function() { return true; };
+    getVar = function() { return null; };
+    undefinedVarsReturnEmpty = false;
+  });
+
   it('replaces nested tokens', function() {
-    var isVar = function() { return true; };
-    var getVar = function(variableName) { return 'replaced:' + variableName; };
-    var undefinedVarsReturnEmpty = false;
+    getVar = function(variableName) { return 'replaced:' + variableName; };
     var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
     var result = replaceTokens({
       foo: [
@@ -50,8 +58,6 @@ describe('function returned by replaceTokens', function() {
 
   it('replaces token with empty string if value is null and ' +
     'undefinedVarsReturnEmpty = true', function() {
-    var isVar = function() { return true; };
-    var getVar = function() { return null; };
     var undefinedVarsReturnEmpty = true;
     var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
 
@@ -59,18 +65,13 @@ describe('function returned by replaceTokens', function() {
   });
 
   it('replace token if var value is null and undefinedVarsReturnEmpty = false', function() {
-    var isVar = function() { return true; };
-    var getVar = function() { return null; };
-    var undefinedVarsReturnEmpty = false;
     var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
 
     expect(replaceTokens('foo %bar%')).toBe('foo null');
   });
 
   it('does not replace token if var definition is not found', function() {
-    var isVar = function() { return false; };
-    var getVar = function() {};
-    var undefinedVarsReturnEmpty = false;
+    isVar = function() { return false; };
     var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
 
     expect(replaceTokens('foo %bar%')).toBe('foo %bar%');
@@ -78,10 +79,8 @@ describe('function returned by replaceTokens', function() {
 
   it('returns the data element\'s raw value if only a ' +
     'single data element token is given', function() {
-    var isVar = function() { return true; };
     var objValue = {};
-    var getVar = function() { return objValue; };
-    var undefinedVarsReturnEmpty = false;
+    getVar = function() { return objValue; };
     var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
 
     expect(replaceTokens('%foo%')).toBe(objValue);
@@ -89,9 +88,7 @@ describe('function returned by replaceTokens', function() {
 
   it('does not return the data element\'s raw value if string starts and ends with different ' +
     'data element tokens', function() {
-    var isVar = function() { return true; };
-    var getVar = function() { return 'quux'; };
-    var undefinedVarsReturnEmpty = false;
+    getVar = function() { return 'quux'; };
     var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
 
     // tests regex robustness
@@ -99,9 +96,6 @@ describe('function returned by replaceTokens', function() {
   });
 
   it('returns the argument unmodified if it is an unsupported type', function() {
-    var isVar = function() { return true; };
-    var getVar = function() { };
-    var undefinedVarsReturnEmpty = false;
     var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
 
     var fn = function() {};

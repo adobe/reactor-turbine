@@ -12,11 +12,16 @@
 var createIsVar = require('../createIsVar');
 
 describe('function returned by createIsVar', function() {
-  var noop = function() {};
+  var customVars;
+  var getDataElementDefinition;
+
+  beforeEach(function() {
+    customVars = {};
+    getDataElementDefinition = function() {};
+  });
 
   it('returns true for an existing data element value', function() {
-    var customVars = {};
-    var getDataElementDefinition = function() {
+    getDataElementDefinition = function() {
       return {};
     };
     var isVar = createIsVar(customVars, getDataElementDefinition);
@@ -25,38 +30,31 @@ describe('function returned by createIsVar', function() {
   });
 
   it('returns true for name using "this." prefix', function() {
-    var customVars = {};
-    var getDataElementDefinition = noop;
     var isVar = createIsVar(customVars, getDataElementDefinition);
-    var value = isVar('this.foo');
-    expect(value).toBe(true);
+
+    expect(isVar('this.foo')).toBe(true);
   });
 
   it('returns true for name using "event." prefix', function() {
-    var customVars = {};
-    var getDataElementDefinition = noop;
     var isVar = createIsVar(customVars, getDataElementDefinition);
-    var value = isVar('event.foo');
-    expect(value).toBe(true);
+
+    expect(isVar('event.foo')).toBe(true);
   });
 
   it('returns true for name using "target." prefix', function() {
-    var customVars = {};
-    var getDataElementDefinition = noop;
     var isVar = createIsVar(customVars, getDataElementDefinition);
-    var value = isVar('target.foo');
-    expect(value).toBe(true);
+
+    expect(isVar('target.foo')).toBe(true);
   });
 
   it('returns true for an existing custom var', function() {
-    var customVars = {
+    customVars = {
       foo: {
         bar: 'unicorn'
       }
     };
-    var getDataElementDefinition = noop;
     var isVar = createIsVar(customVars, getDataElementDefinition);
-    var value = isVar('foo.bar');
-    expect(value).toBe(true);
+
+    expect(isVar('foo.bar')).toBe(true);
   });
 });

@@ -73,7 +73,6 @@ describe('localStorage', function() {
     it('sets item', function() {
       // Mocking window because Safari throws an error when setting a local storage item in Private
       // Browser Mode.
-      var storage = {};
       var mockWindow = {
         localStorage: createMockLocalStorage()
       };

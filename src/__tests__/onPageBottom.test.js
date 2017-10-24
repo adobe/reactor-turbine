@@ -11,13 +11,8 @@
  ****************************************************************************************/
 
 describe('onPageBottom', function() {
-  var getInjectedOnPageBottom = function(options) {
-    return require('inject-loader!../onPageBottom')({
-      'window': options.window,
-      '@adobe/reactor-document': options.document,
-      './logger': options.logger || require('../logger'),
-      './once': require('../once')
-    });
+  var getInjectedOnPageBottom = function(mocks) {
+    return require('inject-loader!../onPageBottom')(mocks);
   };
 
   it('calls the callback when `_satellite.pageBottom` is executed', function(done) {
@@ -52,7 +47,7 @@ describe('onPageBottom', function() {
     var onPageBottom = getInjectedOnPageBottom({
       window: windowFakeObject,
       document: documentFakeObject,
-      logger: loggerFakeObject
+      './logger': loggerFakeObject
     });
 
     var spy = jasmine.createSpy();

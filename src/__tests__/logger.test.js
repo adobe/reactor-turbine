@@ -96,6 +96,7 @@ describe('logger', function() {
   });
 
   it('returns outputEnabled value', function() {
+    // A getter/setter pair is used for outputEnabled. This ensures we're testing both.
     logger.outputEnabled = true;
     expect(logger.outputEnabled).toBe(true);
   });

@@ -14,7 +14,6 @@
 
 describe('hydrateSatelliteObject', function() {
   var injectHydrateSatelliteObject = require('inject-loader!../hydrateSatelliteObject');
-  var noop = function() {};
   var _satellite;
 
   var container = {
@@ -121,10 +120,10 @@ describe('hydrateSatelliteObject', function() {
 
     var hydrateSatelliteObject = injectHydrateSatelliteObject({
       './logger': {
-        warn: noop,
-        log: noop,
-        info: noop,
-        error: noop,
+        warn: function() {},
+        log: function() {},
+        info: function() {},
+        error: function() {},
         createPrefixedLogger: function() {
           return loggerMock;
         }

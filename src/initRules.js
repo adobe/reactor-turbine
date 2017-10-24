@@ -11,7 +11,7 @@
  ****************************************************************************************/
 
 var logger = require('./logger');
-var document = require('@adobe/reactor-document');
+var document = require('document');
 var normalizeSyntheticEvent = require('./normalizeSyntheticEvent');
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';

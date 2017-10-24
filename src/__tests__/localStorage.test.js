@@ -25,7 +25,7 @@ describe('localStorage', function() {
       removeItem: function(key) {
         storage[key] = null;
       }
-    }
+    };
   };
 
   var createMockUnavailableLocalStorage = function() {

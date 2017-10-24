@@ -20,5 +20,5 @@ module.exports = function(customVars) {
         customVars[key] = mapping[key];
       }
     }
-  }
+  };
 };

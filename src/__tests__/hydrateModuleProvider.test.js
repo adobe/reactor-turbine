@@ -107,7 +107,7 @@ describe('hydrateModuleProvider', function() {
       jasmine.any(Function),
       jasmine.any(Object)
     );
-  })
+  });
 
   it('hydrates module cache', function() {
     var hydrateModuleProvider = getInjectedHydrateModuleProvider();

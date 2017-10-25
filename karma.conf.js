@@ -7,7 +7,16 @@ var startConnect = false;
 if (process.env.TRAVIS) {
   var buildId =
     'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')';
-  defaultBrowsers = ['SL_IE9', 'SL_IE10', 'SL_IE11', 'SL_CHROME', 'SL_FIREFOX'];
+  defaultBrowsers = [
+    'SL_IE9',
+    'SL_IE10',
+    'SL_IE11',
+    'SL_EDGE',
+    'SL_CHROME',
+    'SL_FIREFOX',
+    'SL_SAFARI',
+    'SL_ANDROID'
+  ];
   reporters.push('saucelabs');
 } else {
   startConnect = true;
@@ -105,20 +114,10 @@ module.exports = function(config) {
         browserName: 'chrome',
         version: 'latest'
       },
-      'SL_CHROMEBETA': {
-        base: 'SauceLabs',
-        browserName: 'chrome',
-        version: 'beta'
-      },
       'SL_FIREFOX': {
         base: 'SauceLabs',
         browserName: 'firefox',
         version: 'latest'
-      },
-      'SL_FIREFOXBETA': {
-        base: 'SauceLabs',
-        browserName: 'firefox',
-        version: 'beta'
       },
       'SL_SAFARI': {
         base: 'SauceLabs',
@@ -145,21 +144,21 @@ module.exports = function(config) {
         browserName: 'MicrosoftEdge',
         version: 'latest'
       },
-      'SL_IOS10': {
+      'SL_IOS': {
         base: 'SauceLabs',
-        deviceName: 'iPhone 7 Simulator',
-        appiumVersion: '1.6.3',
+        deviceName: 'iPhone 8 Simulator',
+        appiumVersion: '1.7.1',
         browserName: 'Safari',
         platformName: 'iOS',
-        platformVersion: '10.2'
+        platformVersion: '11.0'
       },
-      'SL_ANDROID7': {
+      'SL_ANDROID': {
         base: 'SauceLabs',
         deviceName: 'Android GoogleAPI Emulator',
-        appiumVersion: '1.6.3',
+        appiumVersion: '1.7.1',
         browserName: 'Chrome',
         platformName: 'Android',
-        platformVersion: '7.0'
+        platformVersion: '7.1'
       }
     },
 

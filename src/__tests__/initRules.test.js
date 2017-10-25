@@ -11,10 +11,9 @@
  ****************************************************************************************/
 
 'use strict';
+var createModuleProvider = require('../createModuleProvider');
 
 describe('initRules', function() {
-  var createModuleProvider = require('inject-loader?!../moduleProvider');
-
   var TEST_EVENT_PATH = 'hello-world/testEvent.js';
   var TEST_EVENT_NAME = 'test-event';
   var TEST_EVENT_DISPLAY_NAME = 'Test Event';
@@ -35,21 +34,28 @@ describe('initRules', function() {
   var TEST_ACTION2_NAME = 'test-action-2';
   var TEST_ACTION2_DISPLAY_NAME = 'Test Action 2';
 
-  describe('rule execution', function() {
-    var injectInitRules = require('inject-loader?./state!../initRules');
-    var initRules;
+  var replaceTokens;
+  var getShouldExecuteActions;
+  var rules;
+  var moduleProvider;
 
-    var state;
+  beforeEach(function() {
+    replaceTokens = function(value) { return value; };
+
+    getShouldExecuteActions = function() {
+      return true;
+    };
+
+    moduleProvider = createModuleProvider();
+  });
+
+  describe('rule execution', function() {
+    var initRules = require('../initRules');
     var event;
-    var rules;
-    var propertySettings;
-    var moduleProvider;
     var extensionName = 'test-extension';
 
     beforeEach(function() {
       event = {};
-
-      moduleProvider = createModuleProvider();
 
       moduleProvider.registerModule(
         TEST_EVENT_PATH,
@@ -153,33 +159,10 @@ describe('initRules', function() {
           ]
         }
       ];
-
-      propertySettings = {
-        propertyFoo: 'bar'
-      };
-
-      state = {
-        getShouldExecuteActions: function() {
-          return true;
-        },
-        getModuleExports: moduleProvider.getModuleExports,
-        getModuleDefinition: moduleProvider.getModuleDefinition,
-        getModuleExtensionName: moduleProvider.getModuleExtensionName,
-        getPropertySettings: function() {
-          return propertySettings;
-        },
-        getRules: function() {
-          return rules;
-        }
-      };
-
-      initRules = injectInitRules({
-        './state': state
-      });
     });
 
     it('evaluates all conditions and, when all pass, executes all actions', function() {
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var eventExports = moduleProvider.getModuleExports(TEST_EVENT_PATH);
 
@@ -262,7 +245,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       expect(moduleProvider.getModuleExports(TEST_CONDITION1_PATH).calls.count()).toBe(1);
       expect(moduleProvider.getModuleExports(TEST_CONDITION2_PATH).calls.count()).toBe(0);
@@ -274,7 +257,7 @@ describe('initRules', function() {
       'condition fails', function() {
       rules[0].conditions[0].negate = true;
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       expect(moduleProvider.getModuleExports(TEST_CONDITION1_PATH).calls.count()).toBe(1);
       expect(moduleProvider.getModuleExports(TEST_CONDITION2_PATH).calls.count()).toBe(0);
@@ -285,27 +268,27 @@ describe('initRules', function() {
     it('does not throw error when there are no events for a rule', function() {
       delete rules[0].events;
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
     });
 
     it('does not throw error when there are no conditions for a rule', function() {
       delete rules[0].conditions;
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
     });
 
     it('does not throw error when there are no actions for a rule', function() {
       delete rules[0].actions;
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
     });
 
     it('does not execute actions when actionsEnabled is false', function() {
-      state.getShouldExecuteActions = function() {
+      getShouldExecuteActions = function() {
         return false;
       };
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       expect(moduleProvider.getModuleExports(TEST_ACTION1_PATH).calls.count()).toBe(0);
       expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
@@ -315,13 +298,9 @@ describe('initRules', function() {
   describe('error handling and logging', function() {
     var logger;
     var initRules;
-    var rules;
-    var state;
-    var moduleProvider;
 
     beforeEach(function() {
       logger = jasmine.createSpyObj('logger', ['log', 'error']);
-      moduleProvider = createModuleProvider();
 
       moduleProvider.registerModule(
         TEST_EVENT_PATH,
@@ -375,25 +354,13 @@ describe('initRules', function() {
         }
       ];
 
-      state = {
-        getModuleExports: moduleProvider.getModuleExports,
-        getModuleDefinition: moduleProvider.getModuleDefinition,
-        getModuleExtensionName: moduleProvider.getModuleExtensionName,
-        getRules: function() {
-          return rules;
-        },
-        getShouldExecuteActions: function() {
-          return true;
-        }
-      };
-
-      initRules = require('inject-loader?./logger&./state!../initRules')({
-        './logger': logger,
-        './state': state
+      initRules = require('inject-loader!../initRules')({
+        './logger': logger
       });
     });
 
     it('logs an error when retrieving event module exports fails', function() {
+      debugger;
       moduleProvider.registerModule(
         TEST_EVENT_PATH,
         {
@@ -404,7 +371,7 @@ describe('initRules', function() {
           }
         });
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' +
@@ -424,7 +391,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       expect(errorMessage).toBe('Failed to execute ' + TEST_EVENT_DISPLAY_NAME +
@@ -445,7 +412,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' + TEST_EVENT_DISPLAY_NAME +
@@ -465,7 +432,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
@@ -485,7 +452,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       expect(errorMessage).toBe('Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
@@ -506,7 +473,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
@@ -528,7 +495,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
         'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
@@ -537,7 +504,7 @@ describe('initRules', function() {
     it('logs a message when the negated condition doesn\'t pass', function() {
       rules[0].conditions[0].negate = true;
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
         'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
@@ -550,11 +517,13 @@ describe('initRules', function() {
           name: TEST_ACTION1_NAME,
           displayName: TEST_ACTION1_DISPLAY_NAME,
           script: function() {
+            debugger;
             throw new Error('noob tried to divide by zero.');
           }
         });
 
-      initRules();
+      debugger;
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' +
@@ -575,7 +544,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       expect(errorMessage).toBe('Failed to execute ' + TEST_ACTION1_DISPLAY_NAME +
@@ -596,7 +565,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules();
+      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' + TEST_ACTION1_DISPLAY_NAME +

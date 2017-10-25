@@ -9,63 +9,52 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  ****************************************************************************************/
+var createIsVar = require('../createIsVar');
 
-var noop = function() {};
+describe('function returned by createIsVar', function() {
+  var customVars;
+  var getDataElementDefinition;
 
-var getInjectedIsVar = function(options) {
-  options = options || {};
-  return require('inject-loader!../isVar')({
-    './state': options.state || {
-      getDataElementDefinition: noop
-    }
+  beforeEach(function() {
+    customVars = {};
+    getDataElementDefinition = function() {};
   });
-};
 
-describe('isVar', function() {
   it('returns true for an existing data element value', function() {
-    var isVar = getInjectedIsVar({
-      state: {
-        getDataElementDefinition: function() {
-          return {};
-        }
-      }
-    });
+    getDataElementDefinition = function() {
+      return {};
+    };
+    var isVar = createIsVar(customVars, getDataElementDefinition);
 
     expect(isVar('foo.bar.baz')).toBe(true);
   });
 
   it('returns true for name using "this." prefix', function() {
-    var isVar = getInjectedIsVar();
-    var value = isVar('this.foo');
-    expect(value).toBe(true);
+    var isVar = createIsVar(customVars, getDataElementDefinition);
+
+    expect(isVar('this.foo')).toBe(true);
   });
 
   it('returns true for name using "event." prefix', function() {
-    var isVar = getInjectedIsVar();
+    var isVar = createIsVar(customVars, getDataElementDefinition);
 
-    var value = isVar('event.foo');
-    expect(value).toBe(true);
+    expect(isVar('event.foo')).toBe(true);
   });
 
   it('returns true for name using "target." prefix', function() {
-    var isVar = getInjectedIsVar();
+    var isVar = createIsVar(customVars, getDataElementDefinition);
 
-    var value = isVar('target.foo');
-    expect(value).toBe(true);
+    expect(isVar('target.foo')).toBe(true);
   });
 
   it('returns true for an existing custom var', function() {
-    var getVar = getInjectedIsVar({
-      state: {
-        getDataElementDefinition: noop,
-        customVars: {
-          foo: {
-            bar: 'unicorn'
-          }
-        }
+    customVars = {
+      foo: {
+        bar: 'unicorn'
       }
-    });
+    };
+    var isVar = createIsVar(customVars, getDataElementDefinition);
 
-    expect(getVar('foo.bar')).toBe(true);
+    expect(isVar('foo.bar')).toBe(true);
   });
 });

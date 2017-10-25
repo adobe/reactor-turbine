@@ -10,12 +10,10 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-'use strict';
-
-var window = require('window');
+var window = require('@adobe/reactor-window');
 var document = require('@adobe/reactor-document');
 var once = require('./once');
-var logger = require('../logger');
+var logger = require('./logger');
 
 var callbacks = [];
 

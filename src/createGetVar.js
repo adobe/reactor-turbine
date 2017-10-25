@@ -10,8 +10,6 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var state = require('./state');
-var getDataElementValue = require('./public/getDataElementValue');
 var cleanText = require('./cleanText');
 
 var specialPropertyAccessors = {
@@ -70,35 +68,37 @@ var getObjectProperty = function(host, propChain, supportSpecial) {
  * or %target...
  * @returns {*}
  */
-module.exports = function(variable, syntheticEvent) {
-  var value;
+module.exports = function(customVars, getDataElementDefinition, getDataElementValue) {
+  return function(variable, syntheticEvent) {
+    var value;
 
-  if (state.getDataElementDefinition(variable)) {
-    // Accessing nested properties of a data element using dot-notation is unsupported because users
-    // can currently create data elements with periods in the name.
-    value = getDataElementValue(variable);
-  } else {
-    var propChain = variable.split('.');
-    var variableHostName = propChain.shift();
-
-    if (variableHostName === 'this') {
-      if (syntheticEvent) {
-        // I don't know why this is the only one that supports special properties, but that's the
-        // way it was in Satellite.
-        value = getObjectProperty(syntheticEvent.element, propChain, true);
-      }
-    } else if (variableHostName === 'event') {
-      if (syntheticEvent) {
-        value = getObjectProperty(syntheticEvent, propChain);
-      }
-    } else if (variableHostName === 'target') {
-      if (syntheticEvent) {
-        value = getObjectProperty(syntheticEvent.target, propChain);
-      }
+    if (getDataElementDefinition(variable)) {
+      // Accessing nested properties of a data element using dot-notation is unsupported because
+      // users can currently create data elements with periods in the name.
+      value = getDataElementValue(variable);
     } else {
-      value = getObjectProperty(state.customVars[variableHostName], propChain);
-    }
-  }
+      var propChain = variable.split('.');
+      var variableHostName = propChain.shift();
 
-  return value;
+      if (variableHostName === 'this') {
+        if (syntheticEvent) {
+          // I don't know why this is the only one that supports special properties, but that's the
+          // way it was in Satellite.
+          value = getObjectProperty(syntheticEvent.element, propChain, true);
+        }
+      } else if (variableHostName === 'event') {
+        if (syntheticEvent) {
+          value = getObjectProperty(syntheticEvent, propChain);
+        }
+      } else if (variableHostName === 'target') {
+        if (syntheticEvent) {
+          value = getObjectProperty(syntheticEvent.target, propChain);
+        }
+      } else {
+        value = getObjectProperty(customVars[variableHostName], propChain);
+      }
+    }
+
+    return value;
+  };
 };

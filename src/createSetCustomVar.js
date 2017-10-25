@@ -10,24 +10,15 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-/**
- * Debounce function. Returns a proxy function that, when called multiple times, will only execute
- * the target function after a certain delay has passed without the proxy function being called
- * again.
- * @param {Function} fn The target function to call once the delay period has passed.
- * @param {Number} delay The number of milliseconds that must pass before the target function is
- * called.
- * @param {Object} [context] The context in which to call the target function.
- * @returns {Function}
- */
-module.exports = function(fn, delay, context) {
-  var timeoutId = null;
+module.exports = function(customVars) {
   return function() {
-    var ctx = context || this;
-    var args = arguments;
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(function() {
-      fn.apply(ctx, args);
-    }, delay);
+    if (typeof arguments[0] === 'string') {
+      customVars[arguments[0]] = arguments[1];
+    } else if (arguments[0]) { // assume an object literal
+      var mapping = arguments[0];
+      for (var key in mapping) {
+        customVars[key] = mapping[key];
+      }
+    }
   };
 };

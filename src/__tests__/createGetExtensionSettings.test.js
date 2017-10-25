@@ -11,33 +11,27 @@
  ****************************************************************************************/
 
 'use strict';
+var createGetExtensionSettings = require('../createGetExtensionSettings');
 
 describe('function returned by createGetExtensionConfiguration', function() {
-  var createGetExtensionSettings = require('inject-loader!../createGetExtensionSettings')({
-    './public/replaceTokens': function(obj) {
-      var replacedObj = {};
+  var settingsWithReplacements = {
+    name: 'shoes'
+  };
 
-      // Simulate replacing data element tokens.
-      Object.keys(obj).forEach(function(key) {
-        replacedObj[key] = obj[key] + ' - replaced';
-      });
-
-      return replacedObj;
-    }
-  });
+  var replaceTokens = function() {
+    return settingsWithReplacements;
+  };
 
   it('returns settings with data element tokens replaced', function() {
-    var getExtensionSettings = createGetExtensionSettings({
+    var getExtensionSettings = createGetExtensionSettings(replaceTokens, {
       name: '%foo%'
     });
 
-    expect(getExtensionSettings()).toEqual({
-      name: '%foo% - replaced'
-    });
+    expect(getExtensionSettings()).toEqual(settingsWithReplacements);
   });
 
   it('gracefully handles undefined settings', function() {
-    var getExtensionSettings = createGetExtensionSettings();
+    var getExtensionSettings = createGetExtensionSettings(replaceTokens);
 
     expect(getExtensionSettings()).toEqual({});
   });

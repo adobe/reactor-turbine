@@ -10,31 +10,27 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var noop = function() {};
+var createGetVar = require('../createGetVar');
 
-var getInjectedGetVar = function(options) {
-  options = options || {};
-  return require('inject-loader!../getVar')({
-    './state': options.state || {
-      getDataElementDefinition: noop
-    },
-    './public/getDataElementValue': options.getDataElementValue || noop,
-    './cleanText': options.cleanText || noop
+describe('function returned by createGetVar', function() {
+  var customVars;
+  var getDataElementDefinition;
+  var getDataElementValue;
+
+  beforeEach(function() {
+    customVars = {};
+    getDataElementDefinition = function() {};
+    getDataElementValue = function() {};
   });
-};
 
-describe('getVar', function() {
   it('returns data element value', function() {
-    var getVar = getInjectedGetVar({
-      state: {
-        getDataElementDefinition: function() {
-          return {};
-        }
-      },
-      getDataElementValue: function() {
-        return 'baz';
-      }
-    });
+    getDataElementDefinition = function() {
+      return {};
+    };
+    getDataElementValue = function() {
+      return 'baz';
+    };
+    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
 
     expect(getVar('unicorn.foo.bar')).toBe('baz');
   });
@@ -42,26 +38,26 @@ describe('getVar', function() {
   // Accessing nested properties of a data element using dot-notation is unsupported because users
   // can currently create data elements with periods in the name.
   it('does not return nested property of a data element value', function() {
-    var getVar = getInjectedGetVar({
-      state: {
-        getDataElementDefinition: function() {
-          return {};
+    getDataElementDefinition = function() {
+      return {};
+    };
+    getDataElementValue = function() {
+      return {
+        foo: {
+          bar: 'baz'
         }
-      },
-      getDataElementValue: function() {
-        return {
-          foo: {
-            bar: 'baz'
-          }
-        };
-      }
-    });
+      };
+    };
+    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
 
     expect(getVar('unicorn.foo.bar')).not.toBe('baz');
   });
 
   it('returns nested property on element using "this." prefix', function() {
-    var getVar = getInjectedGetVar();
+    getDataElementValue = function() {
+      return 'baz';
+    };
+    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
     var value = getVar('this.foo.bar', {
       element: {
         foo: {
@@ -69,12 +65,13 @@ describe('getVar', function() {
         }
       }
     });
+
     expect(value).toBe('baz');
   });
 
   // This probably sufficiently covers the same use case for the other token prefixes
   it('returns undefined if part of prop chain doesn\'t exist', function() {
-    var getVar = getInjectedGetVar();
+    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
     var value = getVar('this.goo.bar', {
       element: {
         foo: {
@@ -87,8 +84,7 @@ describe('getVar', function() {
   });
 
   it('returns textContent of element when using this.@text', function() {
-    var getVar = getInjectedGetVar();
-
+    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
     var value = getVar('this.@text', {
       element: {
         textContent: 'bar'
@@ -99,9 +95,7 @@ describe('getVar', function() {
   });
 
   it('returns attribute of element when using this.getAttribute()', function() {
-    // This applies to several of the prefix tokens and not just "this.".
-    var getVar = getInjectedGetVar();
-
+    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
     var value = getVar('this.getAttribute(foo)', {
       element: {
         getAttribute: function(name) {
@@ -114,23 +108,19 @@ describe('getVar', function() {
   });
 
   it('returns textContent of element when using this.@cleanText', function() {
-    var getVar = getInjectedGetVar({
-      cleanText: function(value) {
-        return 'cleaned:' + value;
-      }
-    });
+    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
 
     var value = getVar('this.@cleanText', {
       element: {
-        textContent: 'bar'
+        textContent: ' bar '
       }
     });
 
-    expect(value).toBe('cleaned:bar');
+    expect(value).toBe('bar');
   });
 
   it('returns nested property on event using "event." prefix', function() {
-    var getVar = getInjectedGetVar();
+    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
 
     var value = getVar('event.foo.bar', {
       foo: {
@@ -142,7 +132,7 @@ describe('getVar', function() {
   });
 
   it('returns nested property on event.target using "target." prefix', function() {
-    var getVar = getInjectedGetVar();
+    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
 
     var value = getVar('target.foo.bar', {
       target: {
@@ -156,18 +146,14 @@ describe('getVar', function() {
   });
 
   it('returns nested property on a custom var', function() {
-    var getVar = getInjectedGetVar({
-      state: {
-        getDataElementDefinition: noop,
-        customVars: {
-          foo: {
-            bar: {
-              baz: 'unicorn'
-            }
-          }
+    var customVars = {
+      foo: {
+        bar: {
+          baz: 'unicorn'
         }
       }
-    });
+    };
+    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
 
     expect(getVar('foo.bar.baz')).toBe('unicorn');
   });

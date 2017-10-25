@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var cookie = require('cookie');
+var cookie = require('@adobe/reactor-cookie');
 
 var COOKIE_PREFIX = '_sdsat_';
 
@@ -29,13 +29,11 @@ module.exports = {
         pageviewCache[key] = value;
         break;
       case storageDurations.SESSION:
-        document.cookie = cookie.serialize(COOKIE_PREFIX + key, value);
+        cookie.set(COOKIE_PREFIX + key, value);
         break;
       case storageDurations.VISITOR:
-        var expireDate = new Date();
-        expireDate.setTime(expireDate.getTime() + (365 * 2 * 24 * 60 * 60 * 1000)); // 2 years
-        document.cookie = cookie.serialize(COOKIE_PREFIX + key, value, {
-          expires: expireDate
+        cookie.set(COOKIE_PREFIX + key, value, {
+          expires: 730 // 2 years
         });
         break;
     }
@@ -46,7 +44,7 @@ module.exports = {
         return pageviewCache[key];
       case storageDurations.SESSION:
       case storageDurations.VISITOR:
-        return cookie.parse(document.cookie)[COOKIE_PREFIX + key];
+        return cookie.get(COOKIE_PREFIX + key);
     }
   }
 };

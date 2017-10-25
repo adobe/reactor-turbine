@@ -10,8 +10,22 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-// `isPlainObject(thing)`
-// -----------------
-//
-// Returns whether the given thing is a plain object.
-module.exports = require('is-plain-object');
+/**
+ * Determines if the provided name is a valid variable, where the variable
+ * can be a data element, element, event, target, or custom var.
+ * @param variableName
+ * @returns {boolean}
+ */
+module.exports = function(customVars, getDataElementDefinition) {
+  return function(variableName) {
+    var nameBeforeDot = variableName.split('.')[0];
+
+    return Boolean(
+      getDataElementDefinition(variableName) ||
+      nameBeforeDot === 'this' ||
+      nameBeforeDot === 'event' ||
+      nameBeforeDot === 'target' ||
+      customVars.hasOwnProperty(nameBeforeDot)
+    );
+  };
+};

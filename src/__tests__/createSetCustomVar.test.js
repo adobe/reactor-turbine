@@ -9,18 +9,15 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  ****************************************************************************************/
+var createSetCustomVar = require('../createSetCustomVar');
 
-describe('setCustomVar', function() {
+describe('function returned by setCustomVar', function() {
   var customVars;
   var setCustomVar;
 
   beforeEach(function() {
     customVars = {};
-    setCustomVar = require('inject-loader!../setCustomVar')({
-      '../state': {
-        customVars: customVars
-      }
-    });
+    setCustomVar = createSetCustomVar(customVars);
   });
 
   it('sets a single custom var', function() {

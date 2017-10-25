@@ -78,8 +78,26 @@ describe('logger', function() {
     expect(prefixedLogger.warn).toEqual(jasmine.any(Function));
     expect(prefixedLogger.error).toEqual(jasmine.any(Function));
 
-    prefixedLogger.log('test message');
+    prefixedLogger.log('test log message');
     expect(window.console.log).toHaveBeenCalledWith(messagePrefix +
-      ' [test identifier] test message');
+      ' [test identifier] test log message');
+
+    prefixedLogger.info('test info message');
+    expect(window.console.info).toHaveBeenCalledWith(messagePrefix +
+      ' [test identifier] test info message');
+
+    prefixedLogger.warn('test warn message');
+    expect(window.console.warn).toHaveBeenCalledWith(messagePrefix +
+      ' [test identifier] test warn message');
+
+    prefixedLogger.error('test error message');
+    expect(window.console.error).toHaveBeenCalledWith(messagePrefix +
+      ' [test identifier] test error message');
+  });
+
+  it('returns outputEnabled value', function() {
+    // A getter/setter pair is used for outputEnabled. This ensures we're testing both.
+    logger.outputEnabled = true;
+    expect(logger.outputEnabled).toBe(true);
   });
 });

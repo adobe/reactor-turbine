@@ -12,9 +12,9 @@
 
 'use strict';
 
-describe('moduleProvider', function() {
+describe('function returned by createModuleProvider', function() {
   var logger;
-  var injectModuleProvider = require('inject-loader!../moduleProvider');
+  var injectCreateModuleProvider = require('inject-loader!../createModuleProvider');
   var referencePath = 'hello-world/src/foo.js';
   var extensionName = 'test-extension';
   var name = 'foo';
@@ -26,12 +26,15 @@ describe('moduleProvider', function() {
 
   beforeEach(function() {
     logger = jasmine.createSpyObj('logger', ['log', 'error']);
-    extractModuleExportsSpy = jasmine.createSpy('m').and.callFake(extractModuleExports);
+    extractModuleExportsSpy = jasmine.createSpy('extractModuleExports')
+      .and.callFake(extractModuleExports);
 
-    moduleProvider = injectModuleProvider({
+    var createModuleProvider = injectCreateModuleProvider({
       './logger': logger,
       './extractModuleExports': extractModuleExportsSpy
     });
+
+    moduleProvider = createModuleProvider();
 
     var module = {
       name: name,

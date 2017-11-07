@@ -13,7 +13,6 @@
 var window = require('@adobe/reactor-window');
 var document = require('@adobe/reactor-document');
 var once = require('./once');
-var logger = require('./logger');
 
 var callbacks = [];
 
@@ -38,16 +37,18 @@ window._satellite = window._satellite || {};
 window._satellite.pageBottom = pageBottomHandler;
 
 /**
- * Assume page bottom when DOMContentLoaded is fired, in case the hosting site didn't call
- * _satellite.pageBottom at the end of the page.
+ * Assume page bottom when the window load event fires in case the library was
+ * loaded asynchronously and/or _satellite.pageBottom() was not called at the end of the page.
+ * While we could potentially assume page bottom if DOMContentLoaded has fired, this detection
+ * is problematic in IE10 and lower since readyState can be set to 'interactive' before DOM content
+ * has been fully loaded:
+ * https://bugs.jquery.com/ticket/12282
+ * https://www.drupal.org/node/2235425
+ * https://github.com/mobify/mobifyjs/issues/136
  */
-document.addEventListener('DOMContentLoaded', function() {
-  if (!pageBottomTriggered) {
-    logger.error('_satellite.pageBottom() was not called before the document finished loading. ' +
-      'Please call _satellite.pageBottom() at the end of the body tag to ensure proper behavior.');
-    pageBottomHandler();
-  }
-});
+document.readyState === 'complete' ?
+  pageBottomHandler() :
+  window.addEventListener('load', pageBottomHandler);
 
 /**
  * Page bottom utility. Calls the callback when _satellite.pageBottom() is called. If

@@ -15,13 +15,27 @@ describe('onPageBottom', function() {
     return require('inject-loader!../onPageBottom')(mocks);
   };
 
-  it('calls the callback when `_satellite.pageBottom` is executed', function(done) {
-    var windowFakeObject = {};
-    var documentFakeObject = { addEventListener: function() {} };
+  var triggerWindowLoad;
+  var windowFakeObject;
+  var documentFakeObject;
 
+  beforeEach(function() {
+    triggerWindowLoad = null;
+    windowFakeObject = {
+      addEventListener: function(eventName, fn) {
+        if (eventName === 'load') {
+          triggerWindowLoad = fn;
+        }
+      }
+    };
+    documentFakeObject = {
+      readyState: 'loading'
+    };
+  });
+
+  it('calls the callback when `_satellite.pageBottom` is executed', function(done) {
     var onPageBottom = getInjectedOnPageBottom({
-      '@adobe/reactor-window': windowFakeObject,
-      '@adobe/reactor-document': documentFakeObject
+      '@adobe/reactor-window': windowFakeObject
     });
 
     onPageBottom(done);
@@ -29,80 +43,60 @@ describe('onPageBottom', function() {
     windowFakeObject._satellite.pageBottom();
   });
 
-  it('calls the callback when DOMContentLoaded is executed', function() {
-    var triggerDOMContentLoaded = null;
-
-    var windowFakeObject = {};
-    var documentFakeObject = {
-      addEventListener: function(eventName, fn) {
-        if (eventName === 'DOMContentLoaded') {
-          triggerDOMContentLoaded = fn;
-        }
-      }
-    };
-    var loggerFakeObject = {
-      error: jasmine.createSpy()
-    };
-
-    var onPageBottom = getInjectedOnPageBottom({
-      '@adobe/reactor-window': windowFakeObject,
-      '@adobe/reactor-document': documentFakeObject,
-      './logger': loggerFakeObject
-    });
-
-    var spy = jasmine.createSpy();
-
-    onPageBottom(spy);
-
-    triggerDOMContentLoaded();
-
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(loggerFakeObject.error).toHaveBeenCalledWith('_satellite.pageBottom() was not called ' +
-      'before the document finished loading. Please call _satellite.pageBottom() at the end of ' +
-      'the body tag to ensure proper behavior.');
-  });
-
   it('callback is called only once', function() {
-    var triggerDOMContentLoaded = null;
-
-    var windowFakeObject = {};
-    var documentFakeObject = {
-      addEventListener: function(eventName, fn) {
-        if (eventName === 'DOMContentLoaded') {
-          triggerDOMContentLoaded = fn;
-        }
-      }
-    };
-
     var onPageBottom = getInjectedOnPageBottom({
       '@adobe/reactor-window': windowFakeObject,
       '@adobe/reactor-document': documentFakeObject
     });
-
     var spy = jasmine.createSpy();
 
     onPageBottom(spy);
 
     windowFakeObject._satellite.pageBottom();
     windowFakeObject._satellite.pageBottom();
-    triggerDOMContentLoaded();
+    triggerWindowLoad();
 
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
   it('calls callback even after pageBottom has occurred', function(done) {
-    var windowFakeObject = {};
-    var documentFakeObject = {
-      addEventListener: function() {}
-    };
-
     var onPageBottom = getInjectedOnPageBottom({
       '@adobe/reactor-window': windowFakeObject,
-      '@adobe/reactor-document': documentFakeObject
     });
 
     windowFakeObject._satellite.pageBottom();
 
     onPageBottom(done);
+  });
+
+  describe('when _satellite.pageBottom() not called', function() {
+    it('calls the callback if readyState is complete', function() {
+      documentFakeObject.readyState = 'complete';
+
+      var onPageBottom = getInjectedOnPageBottom({
+        '@adobe/reactor-document': documentFakeObject
+      });
+      var spy = jasmine.createSpy();
+
+      onPageBottom(spy);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls the callback on window load', function() {
+      documentFakeObject.readyState = 'interactive';
+
+      var onPageBottom = getInjectedOnPageBottom({
+        '@adobe/reactor-window': windowFakeObject,
+        '@adobe/reactor-document': documentFakeObject,
+      });
+      var spy = jasmine.createSpy();
+
+      onPageBottom(spy);
+
+      triggerWindowLoad();
+
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
   });
 });

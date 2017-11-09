@@ -33,11 +33,23 @@ describe('index', function() {
 
   afterEach(function() {
     delete window._satellite;
+    delete window.__satelliteLoaded;
   });
 
   it('exports the window._satellite object', function() {
     var index = getInjectedIndex();
     expect(index).toBe(window._satellite);
+  });
+
+  it('prevents turbine from executing multiple times', function() {
+    var createModuleProvider = jasmine.createSpy();
+
+    getInjectedIndex();
+    getInjectedIndex({
+      './createModuleProvider': createModuleProvider
+    });
+
+    expect(createModuleProvider).not.toHaveBeenCalled();
   });
 
   it('deletes the container', function() {

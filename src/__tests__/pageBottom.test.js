@@ -11,8 +11,8 @@
  ****************************************************************************************/
 
 describe('onPageBottom', function() {
-  var getInjectedOnPageBottom = function(mocks) {
-    return require('inject-loader!../onPageBottom')(mocks);
+  var getInjectedPageBottom = function(mocks) {
+    return require('inject-loader!../pageBottom')(mocks);
   };
 
   var triggerWindowLoad;
@@ -33,52 +33,49 @@ describe('onPageBottom', function() {
     };
   });
 
-  it('calls the callback when `_satellite.pageBottom` is executed', function(done) {
-    var onPageBottom = getInjectedOnPageBottom({
+  it('calls the callback when `trigger` is executed', function(done) {
+    var pageBottom = getInjectedPageBottom({
       '@adobe/reactor-window': windowFakeObject
     });
 
-    onPageBottom(done);
-
-    windowFakeObject._satellite.pageBottom();
+    pageBottom.addListener(done);
+    pageBottom.trigger();
   });
 
   it('callback is called only once', function() {
-    var onPageBottom = getInjectedOnPageBottom({
+    var pageBottom = getInjectedPageBottom({
       '@adobe/reactor-window': windowFakeObject,
       '@adobe/reactor-document': documentFakeObject
     });
     var spy = jasmine.createSpy();
 
-    onPageBottom(spy);
-
-    windowFakeObject._satellite.pageBottom();
-    windowFakeObject._satellite.pageBottom();
+    pageBottom.addListener(spy);
+    pageBottom.trigger();
+    pageBottom.trigger();
     triggerWindowLoad();
 
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  it('calls callback even after pageBottom has occurred', function(done) {
-    var onPageBottom = getInjectedOnPageBottom({
+  it('calls callback even after pageBottom has been triggered', function(done) {
+    var pageBottom = getInjectedPageBottom({
       '@adobe/reactor-window': windowFakeObject,
     });
 
-    windowFakeObject._satellite.pageBottom();
-
-    onPageBottom(done);
+    pageBottom.trigger();
+    pageBottom.addListener(done);
   });
 
-  describe('when _satellite.pageBottom() not called', function() {
+  describe('when trigger is not called', function() {
     it('calls the callback if readyState is complete', function() {
       documentFakeObject.readyState = 'complete';
 
-      var onPageBottom = getInjectedOnPageBottom({
+      var pageBottom = getInjectedPageBottom({
         '@adobe/reactor-document': documentFakeObject
       });
       var spy = jasmine.createSpy();
 
-      onPageBottom(spy);
+      pageBottom.addListener(spy);
 
       expect(spy).toHaveBeenCalledTimes(1);
     });
@@ -86,14 +83,13 @@ describe('onPageBottom', function() {
     it('calls the callback on window load', function() {
       documentFakeObject.readyState = 'interactive';
 
-      var onPageBottom = getInjectedOnPageBottom({
+      var pageBottom = getInjectedPageBottom({
         '@adobe/reactor-window': windowFakeObject,
         '@adobe/reactor-document': documentFakeObject,
       });
       var spy = jasmine.createSpy();
 
-      onPageBottom(spy);
-
+      pageBottom.addListener(spy);
       triggerWindowLoad();
 
       expect(spy).toHaveBeenCalledTimes(1);

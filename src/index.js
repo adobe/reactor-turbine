@@ -26,86 +26,89 @@ var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
 
 var _satellite = window._satellite;
 
-var container = _satellite.container;
-// Remove container in public scope ASAP so it can't be manipulated by extension or user code.
-delete _satellite.container;
+if (_satellite) {
+  var container = _satellite.container;
 
-var undefinedVarsReturnEmpty = container.property.settings.undefinedVarsReturnEmpty;
+  // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
+  delete _satellite.container;
 
-var dataElements = container.dataElements || {};
-var getDataElementDefinition = function(name) {
-  return dataElements[name];
-};
+  var undefinedVarsReturnEmpty = container.property.settings.undefinedVarsReturnEmpty;
 
-var moduleProvider = createModuleProvider();
+  var dataElements = container.dataElements || {};
+  var getDataElementDefinition = function(name) {
+    return dataElements[name];
+  };
 
-var getDataElementValue = createGetDataElementValue(
-  moduleProvider,
-  getDataElementDefinition,
-  undefinedVarsReturnEmpty
-);
+  var moduleProvider = createModuleProvider();
 
-var customVars = {};
-var setCustomVar = createSetCustomVar(
-  customVars
-);
+  var getDataElementValue = createGetDataElementValue(
+    moduleProvider,
+    getDataElementDefinition,
+    undefinedVarsReturnEmpty
+  );
 
-var isVar = createIsVar(
-  customVars,
-  getDataElementDefinition
-);
+  var customVars = {};
+  var setCustomVar = createSetCustomVar(
+    customVars
+  );
 
-var getVar = createGetVar(
-  customVars,
-  getDataElementDefinition,
-  getDataElementValue
-);
+  var isVar = createIsVar(
+    customVars,
+    getDataElementDefinition
+  );
 
-var replaceTokens = createReplaceTokens(
-  isVar,
-  getVar,
-  undefinedVarsReturnEmpty
-);
+  var getVar = createGetVar(
+    customVars,
+    getDataElementDefinition,
+    getDataElementValue
+  );
 
-var getDebugOutputEnabled = function() {
-  return localStorage.getItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';
-};
+  var replaceTokens = createReplaceTokens(
+    isVar,
+    getVar,
+    undefinedVarsReturnEmpty
+  );
 
-var setDebugOutputEnabled = function(value) {
-  localStorage.setItem(DEBUG_LOCAL_STORAGE_NAME, value);
-  logger.outputEnabled = value;
-};
+  var getDebugOutputEnabled = function() {
+    return localStorage.getItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';
+  };
 
-var getShouldExecuteActions = function() {
-  return localStorage.getItem(HIDE_ACTIVITY_LOCAL_STORAGE_NAME) !== 'true';
-};
+  var setDebugOutputEnabled = function(value) {
+    localStorage.setItem(DEBUG_LOCAL_STORAGE_NAME, value);
+    logger.outputEnabled = value;
+  };
 
-logger.outputEnabled = getDebugOutputEnabled();
+  var getShouldExecuteActions = function() {
+    return localStorage.getItem(HIDE_ACTIVITY_LOCAL_STORAGE_NAME) !== 'true';
+  };
 
-// Important to hydrate satellite object before we hydrate the module provider or init rules.
-// When we hydrate module provider, we also execute extension code which may be
-// accessing _satellite.
-hydrateSatelliteObject(
-  _satellite,
-  container,
-  setDebugOutputEnabled,
-  getVar,
-  setCustomVar
-);
+  logger.outputEnabled = getDebugOutputEnabled();
 
-hydrateModuleProvider(
-  container,
-  moduleProvider,
-  replaceTokens,
-  getDataElementValue
-);
+  // Important to hydrate satellite object before we hydrate the module provider or init rules.
+  // When we hydrate module provider, we also execute extension code which may be
+  // accessing _satellite.
+  hydrateSatelliteObject(
+    _satellite,
+    container,
+    setDebugOutputEnabled,
+    getVar,
+    setCustomVar
+  );
 
-initRules(
-  container.rules || [],
-  moduleProvider,
-  replaceTokens,
-  getShouldExecuteActions
-);
+  hydrateModuleProvider(
+    container,
+    moduleProvider,
+    replaceTokens,
+    getDataElementValue
+  );
+
+  initRules(
+    container.rules || [],
+    moduleProvider,
+    replaceTokens,
+    getShouldExecuteActions
+  );
+}
 
 // Rollup's iife option always sets a global with whatever is exported, so we'll set the
 // _satellite global with the same object it already is (we've only modified it).

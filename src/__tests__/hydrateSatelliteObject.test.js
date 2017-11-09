@@ -146,4 +146,18 @@ describe('hydrateSatelliteObject', function() {
     _satellite.notify('error test', 5);
     expect(loggerMock.error).toHaveBeenCalledWith('error test');
   });
+
+  it('exposes a pageBottom method', function() {
+    var pageBottomMock = {
+      trigger: function() {}
+    };
+
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({
+      './pageBottom': pageBottomMock
+    });
+
+    hydrateSatelliteObject(_satellite, container);
+
+    expect(_satellite.pageBottom).toBe(pageBottomMock.trigger);
+  });
 });

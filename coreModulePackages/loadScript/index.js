@@ -15,23 +15,13 @@ var Promise = require('@adobe/reactor-promise');
 
 var getPromise = function(url, script) {
   return new Promise(function(resolve, reject) {
-    if ('onload' in script) {
-      script.onload = function() {
-        resolve(script);
-      };
+    script.onload = function() {
+      resolve(script);
+    };
 
-      script.onerror = function() {
-        reject(new Error('Failed to load script ' + url));
-      };
-    } else if ('readyState' in script) {
-      script.onreadystatechange = function() {
-        var rs = script.readyState;
-        if (rs === 'loaded' || rs === 'complete') {
-          script.onreadystatechange = null;
-          resolve(script);
-        }
-      };
-    }
+    script.onerror = function() {
+      reject(new Error('Failed to load script ' + url));
+    };
   });
 };
 

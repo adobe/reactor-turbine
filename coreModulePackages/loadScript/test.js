@@ -17,22 +17,22 @@ describe('loadScript', function() {
   // "about:" is used so we don't have to make any actual file requests during testing.
   // Typically you would use a legit URL.
   it('returns a promise', function() {
-    var promise = loadScript('about:blank');
+    var promise = loadScript('./base/testIndex.js');
     expect(promise.then).toBeDefined();
     expect(promise.catch).toBeDefined();
   });
 
   it('should fulfill with script element when the script is loaded', function(done) {
-    loadScript('about:blank').then(function(script) {
+    loadScript('./base/testIndex.js').then(function(script) {
       expect(script).toEqual(jasmine.any(HTMLScriptElement));
       done();
     });
   });
 
   it('should reject with error when script fails to load', function(done) {
-    loadScript('about:nonexistant').catch(function(error) {
+    loadScript('./nonexistant.js').catch(function(error) {
       expect(error).toEqual(jasmine.any(Error));
-      expect(error.message).toBe('Failed to load script about:nonexistant');
+      expect(error.message).toBe('Failed to load script ./nonexistant.js');
       done();
     });
   });

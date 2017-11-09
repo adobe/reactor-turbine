@@ -14,8 +14,6 @@
 var loadScript = require('./index');
 
 describe('loadScript', function() {
-  // "about:" is used so we don't have to make any actual file requests during testing.
-  // Typically you would use a legit URL.
   it('returns a promise', function() {
     var promise = loadScript('./base/testIndex.js');
     expect(promise.then).toBeDefined();
@@ -30,9 +28,9 @@ describe('loadScript', function() {
   });
 
   it('should reject with error when script fails to load', function(done) {
-    loadScript('./nonexistant.js').catch(function(error) {
+    loadScript('nonexistent.js').catch(function(error) {
       expect(error).toEqual(jasmine.any(Error));
-      expect(error.message).toBe('Failed to load script ./nonexistant.js');
+      expect(error.message).toBe('Failed to load script nonexistent.js');
       done();
     });
   });

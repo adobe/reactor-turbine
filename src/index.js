@@ -26,7 +26,10 @@ var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
 
 var _satellite = window._satellite;
 
-if (_satellite) {
+if (_satellite && !window.__satelliteLoaded) {
+  // If a consumer loads the library multiple times, make sure only the first time is effective.
+  window.__satelliteLoaded = true;
+
   var container = _satellite.container;
 
   // Remove container in public scope ASAP so it can't be manipulated by extension or user code.

@@ -360,7 +360,6 @@ describe('initRules', function() {
     });
 
     it('logs an error when retrieving event module exports fails', function() {
-      debugger;
       moduleProvider.registerModule(
         TEST_EVENT_PATH,
         {
@@ -517,12 +516,10 @@ describe('initRules', function() {
           name: TEST_ACTION1_NAME,
           displayName: TEST_ACTION1_DISPLAY_NAME,
           script: function() {
-            debugger;
             throw new Error('noob tried to divide by zero.');
           }
         });
 
-      debugger;
       initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];

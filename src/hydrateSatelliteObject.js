@@ -12,6 +12,7 @@
 
 var cookie = require('@adobe/reactor-cookie');
 var logger = require('./logger');
+var pageBottom = require('./pageBottom');
 
 module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, setCustomVar) {
   var prefixedLogger = logger.createPrefixedLogger('Custom Script');
@@ -109,6 +110,8 @@ module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, 
   };
 
   _satellite.cookie = cookie;
+
+  _satellite.pageBottom = pageBottom.trigger;
 
   _satellite.setDebug = setDebugOutputEnabled;
 };

@@ -38,8 +38,14 @@ var rules = [];
 if (argv.coverage) {
   rules.push({
     test: /\.js$/,
-    include: new RegExp(path.basename(process.cwd()) + '\\' + path.sep + 'src'),
-    exclude: new RegExp('(__tests__)\\' + path.sep),
+    include: path.resolve('src'),
+    exclude: new RegExp('__tests__'),
+    loader: 'istanbul-instrumenter-loader'
+  });
+  rules.push({
+    test: /index.js$/,
+    include: path.resolve('coreModulePackages'),
+    exclude: new RegExp('node_modules'),
     loader: 'istanbul-instrumenter-loader'
   });
   reporters.push('coverage');

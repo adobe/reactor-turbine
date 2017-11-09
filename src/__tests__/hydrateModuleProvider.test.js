@@ -160,7 +160,9 @@ describe('hydrateModuleProvider', function() {
     var createGetSharedModuleExports;
     var prefixedLogger;
     var logger;
-    var onPageBottom = function() {};
+    var pageBottom = {
+      addListener: function() {}
+    };
 
     beforeEach(function() {
       getExtensionSettings = function() {};
@@ -187,7 +189,7 @@ describe('hydrateModuleProvider', function() {
         './createGetHostedLibFileUrl': createGetHostedLibFileUrl,
         './createGetSharedModuleExports': createGetSharedModuleExports,
         './logger': logger,
-        './onPageBottom': onPageBottom
+        './pageBottom': pageBottom
       });
 
       hydrateModuleProvider(container, moduleProvider, replaceTokens, getDataElementValue);
@@ -232,7 +234,7 @@ describe('hydrateModuleProvider', function() {
     });
 
     it('contains onPageBottom', function() {
-      expect(turbine.onPageBottom).toBe(onPageBottom);
+      expect(turbine.onPageBottom).toBe(pageBottom.addListener);
     });
 
     it('contains propertySettings', function() {

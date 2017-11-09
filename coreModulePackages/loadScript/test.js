@@ -11,14 +11,27 @@
  ****************************************************************************************/
 'use strict';
 
-var cookie = require('js-cookie');
+var loadScript = require('./index');
 
-// js-cookie has other methods that we haven't exposed here. By limiting the exposed API,
-// we have a little more flexibility to change the underlying implementation later. If clear
-// use cases come up for needing the other methods js-cookie exposes, we can re-evaluate whether
-// we want to expose them here.
-module.exports = {
-  get: cookie.get,
-  set: cookie.set,
-  remove: cookie.remove
-};
+describe('loadScript', function() {
+  it('returns a promise', function() {
+    var promise = loadScript('./base/testIndex.js');
+    expect(promise.then).toBeDefined();
+    expect(promise.catch).toBeDefined();
+  });
+
+  it('should fulfill with script element when the script is loaded', function(done) {
+    loadScript('./base/testIndex.js').then(function(script) {
+      expect(script).toEqual(jasmine.any(HTMLScriptElement));
+      done();
+    });
+  });
+
+  it('should reject with error when script fails to load', function(done) {
+    loadScript('nonexistent.js').catch(function(error) {
+      expect(error).toEqual(jasmine.any(Error));
+      expect(error.message).toBe('Failed to load script nonexistent.js');
+      done();
+    });
+  });
+});

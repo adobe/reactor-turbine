@@ -11,8 +11,16 @@
  ****************************************************************************************/
 
 var cookie = require('@adobe/reactor-cookie');
+var getNamespacedStorage = require('./getNamespacedStorage');
 
 var COOKIE_PREFIX = '_sdsat_';
+
+var DATA_ELEMENTS_NAMESPACE = 'dataElements.';
+var MIGRATED_KEY = 'dataElementCookiesMigrated';
+
+var reactorLocalStorage = getNamespacedStorage('localStorage');
+var dataElementSessionStorage = getNamespacedStorage('sessionStorage', DATA_ELEMENTS_NAMESPACE);
+var dataElementLocalStorage = getNamespacedStorage('localStorage', DATA_ELEMENTS_NAMESPACE);
 
 var storageDurations = {
   PAGEVIEW: 'pageview',
@@ -22,29 +30,82 @@ var storageDurations = {
 
 var pageviewCache = {};
 
-module.exports = {
-  setValue: function(key, storageDuration, value) {
-    switch (storageDuration) {
-      case storageDurations.PAGEVIEW:
-        pageviewCache[key] = value;
-        break;
-      case storageDurations.SESSION:
-        cookie.set(COOKIE_PREFIX + key, value);
-        break;
-      case storageDurations.VISITOR:
-        cookie.set(COOKIE_PREFIX + key, value, {
-          expires: 730 // 2 years
-        });
-        break;
-    }
-  },
-  getValue: function(key, storageDuration) {
-    switch (storageDuration) {
-      case storageDurations.PAGEVIEW:
-        return pageviewCache[key];
-      case storageDurations.SESSION:
-      case storageDurations.VISITOR:
-        return cookie.get(COOKIE_PREFIX + key);
-    }
+var serialize = function(value) {
+  var serialized;
+
+  try {
+    // On some browsers, with some objects, errors will be thrown during serialization. For example,
+    // in Chrome with the window object, it will throw "TypeError: Converting circular structure
+    // to JSON"
+    serialized = JSON.stringify(value);
+  } catch (e) {}
+
+  return serialized;
+};
+
+var setValue = function(key, storageDuration, value) {
+  var serializedValue;
+
+  switch (storageDuration) {
+    case storageDurations.PAGEVIEW:
+      pageviewCache[key] = value;
+      return;
+    case storageDurations.SESSION:
+      serializedValue = serialize(value);
+      if (serializedValue) {
+        dataElementSessionStorage.setItem(key, serializedValue);
+      }
+      return;
+    case storageDurations.VISITOR:
+      serializedValue = serialize(value);
+      if (serializedValue) {
+        dataElementLocalStorage.setItem(key, serializedValue);
+      }
+      return;
   }
+};
+
+var getValue = function(key, storageDuration) {
+  var value;
+
+  // It should consistently return the same value if no stored item was found. We chose null,
+  // though undefined could be a reasonable value as well.
+  switch (storageDuration) {
+    case storageDurations.PAGEVIEW:
+      return pageviewCache.hasOwnProperty(key) ? pageviewCache[key] : null;
+    case storageDurations.SESSION:
+      value = dataElementSessionStorage.getItem(key);
+      return value === null ? value : JSON.parse(value);
+    case storageDurations.VISITOR:
+      value = dataElementLocalStorage.getItem(key);
+      return value === null ? value : JSON.parse(value);
+  }
+};
+
+// Remove when migration period has ended. We intentionally leave cookies as they are so that if
+// DTM is running on the same domain it can still use the persisted values. Our migration strategy
+// is essentially copying data from cookies and then diverging the storage mechanism between
+// DTM and Launch (DTM uses cookies and Launch uses session and local storage).
+var migrateDataElement = function(dataElementName, storageDuration) {
+  var storedValue = cookie.get(COOKIE_PREFIX + dataElementName);
+
+  if (storedValue !== undefined) {
+    setValue(dataElementName, storageDuration, storedValue);
+  }
+};
+
+var migrateCookieData = function(dataElements) {
+  if (!reactorLocalStorage.getItem(MIGRATED_KEY)) {
+    Object.keys(dataElements).forEach(function(dataElementName) {
+      migrateDataElement(dataElementName, dataElements[dataElementName].storageDuration);
+    });
+
+    reactorLocalStorage.setItem(MIGRATED_KEY, true);
+  }
+};
+
+module.exports = {
+  setValue: setValue,
+  getValue: getValue,
+  migrateCookieData: migrateCookieData
 };

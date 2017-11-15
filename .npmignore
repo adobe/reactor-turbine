@@ -1,10 +1,7 @@
 src
 coreModulePackages
-tasks
 .*
 coverage
-webpack.*.config.js
-sonar-project.properties
 karma.conf.js
 rollup.config.js
 testIndex.js

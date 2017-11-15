@@ -17,12 +17,14 @@ var createIsVar = require('./createIsVar');
 var createGetVar = require('./createGetVar');
 var hydrateModuleProvider = require('./hydrateModuleProvider');
 var hydrateSatelliteObject = require('./hydrateSatelliteObject');
-var localStorage = require('./localStorage');
 var logger = require('./logger');
 var initRules = require('./initRules');
+var dataElementSafe = require('./dataElementSafe');
+var getNamespacedStorage = require('./getNamespacedStorage');
 
-var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'sdsat_hide_activity';
-var DEBUG_LOCAL_STORAGE_NAME = 'sdsat_debug';
+var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'hideActivity';
+var DEBUG_LOCAL_STORAGE_NAME = 'debug';
+
 
 var _satellite = window._satellite;
 
@@ -38,6 +40,10 @@ if (_satellite && !window.__satelliteLoaded) {
   var undefinedVarsReturnEmpty = container.property.settings.undefinedVarsReturnEmpty;
 
   var dataElements = container.dataElements || {};
+
+  // Remove when migration period has ended.
+  dataElementSafe.migrateCookieData(dataElements);
+
   var getDataElementDefinition = function(name) {
     return dataElements[name];
   };
@@ -71,6 +77,8 @@ if (_satellite && !window.__satelliteLoaded) {
     getVar,
     undefinedVarsReturnEmpty
   );
+
+  var localStorage = getNamespacedStorage('localStorage');
 
   var getDebugOutputEnabled = function() {
     return localStorage.getItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';

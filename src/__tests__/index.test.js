@@ -34,6 +34,8 @@ describe('index', function() {
   afterEach(function() {
     delete window._satellite;
     delete window.__satelliteLoaded;
+    window.localStorage.removeItem('com.adobe.reactor.debug');
+    window.localStorage.removeItem('com.adobe.reactor.hideActivity');
   });
 
   it('exports the window._satellite object', function() {
@@ -55,6 +57,27 @@ describe('index', function() {
   it('deletes the container', function() {
     getInjectedIndex();
     expect(window._satellite.container).toBe(undefined);
+  });
+
+  it('migrates cookie data', function() {
+    var migrateCookieDataSpy = jasmine.createSpy();
+
+    var dataElements = {
+      foo: {
+        modulePath: 'core/foo.js',
+        storageDuration: 'visitor'
+      }
+    };
+
+    window._satellite.container.dataElements = dataElements;
+
+    getInjectedIndex({
+      './dataElementSafe': {
+        migrateCookieData: migrateCookieDataSpy
+      }
+    });
+
+    expect(migrateCookieDataSpy).toHaveBeenCalledWith(dataElements);
   });
 
   it('creates moduleProvider', function() {
@@ -138,31 +161,24 @@ describe('index', function() {
 
   it('sets logger output enabled when local storage item is \'true\'', function() {
     var logger = {};
-    var localStorage = {
-      getItem: jasmine.createSpy().and.returnValue('true')
-    };
+    window.localStorage.setItem('com.adobe.reactor.debug', true);
+
     getInjectedIndex({
-      './localStorage': localStorage,
       './logger': logger
     });
 
-    expect(localStorage.getItem).toHaveBeenCalledWith('sdsat_debug');
     expect(logger.outputEnabled).toBe(true);
   });
 
-
-  it('sets logger output enabled when local storage item is anything ' +
+  it('sets logger output disabled when local storage item is anything ' +
     'other than \'true\'', function() {
     var logger = {};
-    var localStorage = {
-      getItem: jasmine.createSpy()
-    };
+    window.localStorage.setItem('com.adobe.reactor.debug', false);
+
     getInjectedIndex({
-      './localStorage': localStorage,
       './logger': logger
     });
 
-    expect(localStorage.getItem).toHaveBeenCalledWith('sdsat_debug');
     expect(logger.outputEnabled).toBe(false);
   });
 
@@ -273,58 +289,45 @@ describe('index', function() {
   describe('setDebugOutputEnabled', function() {
     it('sets localStorage item', function() {
       var setOutputDebugEnabled;
-      var localStorage = {
-        getItem: function() {},
-        setItem: jasmine.createSpy()
-      };
       getInjectedIndex({
         './hydrateSatelliteObject': function(_satellite, container, _setOutputDebugEnabled) {
           setOutputDebugEnabled = _setOutputDebugEnabled;
-        },
-        './localStorage': localStorage
+        }
       });
 
       setOutputDebugEnabled(true);
 
-      expect(localStorage.setItem).toHaveBeenCalledWith('sdsat_debug', true);
+      expect(window.localStorage.getItem('com.adobe.reactor.debug')).toBe('true');
     });
   });
 
   describe('getShouldExecuteActions', function() {
     it('returns false if local storage item\'s value is \'true\'', function() {
       var getShouldExecuteActions;
-      var localStorage = {
-        getItem: jasmine.createSpy().and.returnValue('true')
-      };
+
+      window.localStorage.setItem('com.adobe.reactor.hideActivity', true);
+
       getInjectedIndex({
         './initRules': function(rules, moduleProvider, replaceTokens, _getShouldExecuteActions) {
           getShouldExecuteActions = _getShouldExecuteActions;
-        },
-        './localStorage': localStorage
+        }
       });
 
-      var shouldExecuteActions = getShouldExecuteActions();
-
-      expect(localStorage.getItem).toHaveBeenCalledWith('sdsat_hide_activity');
-      expect(shouldExecuteActions).toBe(false);
+      expect(getShouldExecuteActions()).toBe(false);
     });
 
     it('returns true if local storage item\'s value is anything other than \'true\'', function() {
       var getShouldExecuteActions;
-      var localStorage = {
-        getItem: jasmine.createSpy().and.returnValue()
-      };
+
+      window.localStorage.setItem('com.adobe.reactor.hideActivity', false);
+
       getInjectedIndex({
         './initRules': function(rules, moduleProvider, replaceTokens, _getShouldExecuteActions) {
           getShouldExecuteActions = _getShouldExecuteActions;
-        },
-        './localStorage': localStorage
+        }
       });
 
-      var shouldExecuteActions = getShouldExecuteActions();
-
-      expect(localStorage.getItem).toHaveBeenCalledWith('sdsat_hide_activity');
-      expect(shouldExecuteActions).toBe(true);
+      expect(getShouldExecuteActions()).toBe(true);
     });
   });
 });

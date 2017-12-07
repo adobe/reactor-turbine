@@ -13,6 +13,7 @@
 var logger = require('./logger');
 var document = require('@adobe/reactor-document');
 var normalizeSyntheticEvent = require('./normalizeSyntheticEvent');
+var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 
@@ -105,54 +106,50 @@ module.exports = function(rules, moduleProvider, replaceTokens, getShouldExecute
     runActions(rule, syntheticEvent);
   };
 
-  var initEventModules = function(rule) {
-    if (rule.events) {
-      rule.events.forEach(function(event) {
-        event.settings = event.settings || {};
+  var initEventModule = function(ruleEventPair) {
+    var rule = ruleEventPair.rule;
+    var event = ruleEventPair.event;
+    event.settings = event.settings || {};
 
-        var moduleExports;
-        var moduleName;
-        var extensionName;
+    var moduleExports;
+    var moduleName;
+    var extensionName;
 
-        try {
-          moduleExports = moduleProvider.getModuleExports(event.modulePath);
-          moduleName = moduleProvider.getModuleDefinition(event.modulePath).name;
-          extensionName = moduleProvider.getModuleExtensionName(event.modulePath);
-        } catch (e) {
-          logger.error(getErrorMessage(event, rule, e.message, e.stack));
-          return;
-        }
+    try {
+      moduleExports = moduleProvider.getModuleExports(event.modulePath);
+      moduleName = moduleProvider.getModuleDefinition(event.modulePath).name;
+      extensionName = moduleProvider.getModuleExtensionName(event.modulePath);
+    } catch (e) {
+      logger.error(getErrorMessage(event, rule, e.message, e.stack));
+      return;
+    }
 
-        if (typeof moduleExports !== 'function') {
-          logger.error(getErrorMessage(event, rule, MODULE_NOT_FUNCTION_ERROR));
-          return;
-        }
+    if (typeof moduleExports !== 'function') {
+      logger.error(getErrorMessage(event, rule, MODULE_NOT_FUNCTION_ERROR));
+      return;
+    }
 
-        var settings = replaceTokens(event.settings);
-        var syntheticEventType = extensionName + '.' + moduleName;
+    var settings = replaceTokens(event.settings);
+    var syntheticEventType = extensionName + '.' + moduleName;
 
-        /**
-         * This is the callback that executes a particular rule when an event has occurred.
-         * @callback ruleTrigger
-         * @param {Object} [syntheticEvent] An object that contains detail regarding the event
-         * that occurred.
-         */
-        var trigger = function(syntheticEvent) {
-          checkConditions(rule, normalizeSyntheticEvent(syntheticEventType, syntheticEvent));
-        };
+    /**
+     * This is the callback that executes a particular rule when an event has occurred.
+     * @callback ruleTrigger
+     * @param {Object} [syntheticEvent] An object that contains detail regarding the event
+     * that occurred.
+     */
+    var trigger = function(syntheticEvent) {
+      checkConditions(rule, normalizeSyntheticEvent(syntheticEventType, syntheticEvent));
+    };
 
-        try {
-          moduleExports(settings, trigger);
-        } catch (e) {
-          logger.error(getErrorMessage(event, rule, e.message, e.stack));
-          return;
-        }
-      });
+    try {
+      moduleExports(settings, trigger);
+    } catch (e) {
+      logger.error(getErrorMessage(event, rule, e.message, e.stack));
+      return;
     }
   };
 
-  rules.forEach(function(rule) {
-    initEventModules(rule);
-  });
+  buildRuleExecutionOrder(rules).forEach(initEventModule);
 };
 

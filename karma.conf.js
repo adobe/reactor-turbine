@@ -8,7 +8,6 @@ if (process.env.TRAVIS) {
   var buildId =
     'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')';
   defaultBrowsers = [
-    'SL_IE9',
     'SL_IE10',
     'SL_IE11',
     'SL_EDGE',
@@ -129,11 +128,6 @@ module.exports = function(config) {
         base: 'SauceLabs',
         browserName: 'safari',
         version: 'latest'
-      },
-      'SL_IE9': {
-        base: 'SauceLabs',
-        browserName: 'internet explorer',
-        version: '9'
       },
       'SL_IE10': {
         base: 'SauceLabs',

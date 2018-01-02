@@ -17,11 +17,11 @@ describe('buildRuleExecutionOrder', function() {
     var ruleA = {
       events: [
         {
-          "modulePath": "event1.js",
+          modulePath: 'event1.js',
           ruleOrder: 100
         },
         {
-          "modulePath": "event2.js",
+          modulePath: 'event2.js',
           ruleOrder: 200
         }
       ]
@@ -30,11 +30,11 @@ describe('buildRuleExecutionOrder', function() {
     var ruleB = {
       events: [
         {
-          "modulePath": "event1.js",
+          modulePath: 'event1.js',
           ruleOrder: 200
         },
         {
-          "modulePath": "event2.js",
+          modulePath: 'event2.js',
           ruleOrder: 100
         }
       ]
@@ -73,7 +73,7 @@ describe('buildRuleExecutionOrder', function() {
     var ruleA = {
       events: [
         {
-          "modulePath": "event1.js"
+          modulePath: 'event1.js'
         }
       ]
     };
@@ -81,7 +81,7 @@ describe('buildRuleExecutionOrder', function() {
     var ruleB = {
       events: [
         {
-          "modulePath": "event1.js"
+          modulePath: 'event1.js'
         }
       ]
     };
@@ -89,7 +89,7 @@ describe('buildRuleExecutionOrder', function() {
     var ruleC = {
       events: [
         {
-          "modulePath": "event1.js"
+          modulePath: 'event1.js'
         }
       ]
     };

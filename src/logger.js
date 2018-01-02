@@ -37,10 +37,10 @@ var ROCKET = '\uD83D\uDE80';
 var ieVersion = parseInt((/msie (\d+)/.exec(navigator.userAgent.toLowerCase()) || [])[1]);
 
 /**
- * Prefix to use on all messages. The rocket unicode doesn't work on IE 9 and 10.
+ * Prefix to use on all messages. The rocket unicode doesn't work on IE 10.
  * @type {string}
  */
-var messagePrefix = ieVersion === 9 || ieVersion === 10 ? '[Launch]' : ROCKET;
+var messagePrefix = ieVersion === 10 ? '[Launch]' : ROCKET;
 
 /**
  * History of logged entries capped to a max. Note that while this is private it is accessed

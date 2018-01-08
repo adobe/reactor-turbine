@@ -18,7 +18,7 @@ var ROCKET = '\uD83D\uDE80';
 
 var ieVersion = parseInt((/msie (\d+)/.exec(navigator.userAgent.toLowerCase()) || [])[1]);
 
-var messagePrefix = ieVersion === 9 || ieVersion === 10 ? '[Launch]' : ROCKET;
+var launchPrefix = ieVersion === 10 ? '[Launch]' : ROCKET;
 
 describe('logger', function() {
   var STANDARD_LOG_METHODS = ['log', 'info', 'warn', 'error'];
@@ -28,76 +28,49 @@ describe('logger', function() {
     spyOn(window.console, 'info');
     spyOn(window.console, 'warn');
     spyOn(window.console, 'error');
-    logger.outputEnabled = false;
   });
 
-  it('outputs a message when output is enabled and a logging method is called', function() {
-    STANDARD_LOG_METHODS.forEach(function(fnName) {
+  STANDARD_LOG_METHODS.forEach(function(fnName) {
+    it('logs args when output is enabled and ' + fnName + ' is called', function() {
       logger.outputEnabled = true;
       var calls = window.console[fnName].calls;
-      // Enabling output can flush previously logged messages to the console. We don't want to
-      // include those console calls in this test.
-      calls.reset();
-      logger[fnName]('test ' + fnName);
+      var arg1 = {};
+      var arg2 = {};
+      logger[fnName](arg1, arg2);
       expect(calls.count()).toBe(1);
-      expect(calls.argsFor(0)[0]).toBe(messagePrefix + ' test ' + fnName);
-    });
-  });
-
-  it('outputs all previously logged messages when output is enabled', function() {
-    STANDARD_LOG_METHODS.forEach(function(fnName) {
-      logger[fnName]('test ' + fnName);
-      expect(window.console[fnName].calls.count()).toBe(0);
+      expect(calls.argsFor(0)[0]).toBe(launchPrefix, arg1, arg2);
     });
 
-    logger.outputEnabled = true;
-
-    STANDARD_LOG_METHODS.forEach(function(fnName) {
-      expect(window.console[fnName].calls.argsFor(0)[0]).toBe(messagePrefix + ' test ' + fnName);
+    it('does not log args when output is disabled and ' + fnName + ' is called', function() {
+      logger.outputEnabled = false;
+      var calls = window.console[fnName].calls;
+      var arg1 = {};
+      var arg2 = {};
+      logger[fnName](arg1, arg2);
+      expect(calls.count()).toBe(0);
     });
-  });
 
-  it('caps the log history', function() {
-    for (var i = 0; i < 300; i++) {
-      logger.log('test ' + i);
-    }
+    it('creates a prefixed logger with functional ' + fnName + ' method', function() {
+      logger.outputEnabled = true;
+      var id = 'test identifier';
+      var bracketId = '[' + id + ']';
+      var prefixedLogger = logger.createPrefixedLogger(id);
 
-    logger.outputEnabled = true;
+      expect(prefixedLogger[fnName]).toEqual(jasmine.any(Function));
 
-    expect(window.console.log.calls.count()).toBe(100);
-    expect(window.console.log.calls.argsFor(0)[0]).toBe(messagePrefix + ' test 200');
-    expect(window.console.log.calls.argsFor(99)[0]).toBe(messagePrefix + ' test 299');
-  });
+      var arg1 = {};
+      var arg2 = {};
 
-  it('creates a logger prepared for consumers', function() {
-    logger.outputEnabled = true;
-    var prefixedLogger = logger.createPrefixedLogger('test identifier');
-
-    expect(prefixedLogger.log).toEqual(jasmine.any(Function));
-    expect(prefixedLogger.info).toEqual(jasmine.any(Function));
-    expect(prefixedLogger.warn).toEqual(jasmine.any(Function));
-    expect(prefixedLogger.error).toEqual(jasmine.any(Function));
-
-    prefixedLogger.log('test log message');
-    expect(window.console.log).toHaveBeenCalledWith(messagePrefix +
-      ' [test identifier] test log message');
-
-    prefixedLogger.info('test info message');
-    expect(window.console.info).toHaveBeenCalledWith(messagePrefix +
-      ' [test identifier] test info message');
-
-    prefixedLogger.warn('test warn message');
-    expect(window.console.warn).toHaveBeenCalledWith(messagePrefix +
-      ' [test identifier] test warn message');
-
-    prefixedLogger.error('test error message');
-    expect(window.console.error).toHaveBeenCalledWith(messagePrefix +
-      ' [test identifier] test error message');
+      prefixedLogger[fnName](arg1, arg2);
+      expect(window.console[fnName]).toHaveBeenCalledWith(launchPrefix, bracketId, arg1, arg2);
+    });
   });
 
   it('returns outputEnabled value', function() {
     // A getter/setter pair is used for outputEnabled. This ensures we're testing both.
     logger.outputEnabled = true;
     expect(logger.outputEnabled).toBe(true);
+    logger.outputEnabled = false;
+    expect(logger.outputEnabled).toBe(false);
   });
 });

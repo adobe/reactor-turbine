@@ -40,118 +40,52 @@ var ieVersion = parseInt((/msie (\d+)/.exec(navigator.userAgent.toLowerCase()) |
  * Prefix to use on all messages. The rocket unicode doesn't work on IE 10.
  * @type {string}
  */
-var messagePrefix = ieVersion === 10 ? '[Launch]' : ROCKET;
+var launchPrefix = ieVersion === 10 ? '[Launch]' : ROCKET;
 
 /**
- * History of logged entries capped to a max. Note that while this is private it is accessed
- * by end-to-end tests.
- * @private
- */
-var history = [];
-
-/**
- * The maximum number of log entries to retain in the history.
- * @private
- */
-var maxHistory = 100;
-
-/**
- * Whether logged messages should be output to the console. When set to true, all messages saved
- * in the logging history that have not been previously output to the console will be immediately
- * output to the console.
+ * Whether logged messages should be output to the console.
  * @type {boolean}
  */
 var outputEnabled = false;
 
 /**
- * Flushes a log entry to the web console.
- * @param {Object} entry
- * @private
- */
-var flushEntry = function(entry) {
-  if (!entry.flushed) {
-    if (window.console) {
-
-      window.console[entry.level](messagePrefix + ' ' + entry.message);
-    }
-    entry.flushed = true;
-  }
-};
-
-/**
- * Flushes all stored log entries to the web console if they have not been flushed previously.
- * @private
- */
-var flushHistory = function() {
-  history.forEach(flushEntry);
-};
-
-/**
  * Processes a log message.
- * @param {string} message The message to log.
- * @param level
+ * @param {string} level The level of message to log.
+ * @param {...*} arg Any argument to be logged.
  * @private
  */
-var process = function(message, level) {
-  var entry = {
-    message: message,
-    level: level,
-    flushed: false
-  };
-
-  history.push(entry);
-
-  if (history.length > maxHistory) {
-    history.shift();
+var process = function(level) {
+  if (outputEnabled && window.console) {
+    var logArguments = Array.prototype.slice.call(arguments, 1);
+    logArguments.unshift(launchPrefix);
+    window.console[level].apply(window.console, logArguments);
   }
-
-  if (outputEnabled) {
-    flushEntry(entry);
-  }
-};
-
-/**
- * Prefixes messages with a prefix wrapped in square brackets.
- * @param {String} prefix A prefix for the message.
- * @param {String} message The message that should be prefixed.
- * @returns {string} Prefixed message.
- */
-var prefixWithBrackets = function(prefix, message) {
-  return '[' + prefix + '] ' + message;
 };
 
 /**
  * Outputs a message to the web console.
- * @param {String} message The message to output.
+ * @param {...*} arg Any argument to be logged.
  */
-var log = function(message) {
-  process(message, levels.LOG);
-};
+var log = process.bind(null, levels.LOG);
 
 /**
  * Outputs informational message to the web console. In some browsers a small "i" icon is
  * displayed next to these items in the web console's log.
- * @param {String} message The message to output.
+ * @param {...*} arg Any argument to be logged.
  */
-var info = function(message) {
-  process(message, levels.INFO);
-};
+var info = process.bind(null, levels.INFO);
 
 /**
  * Outputs a warning message to the web console.
- * @param {String} message The message to output.
+ * @param {...*} arg Any argument to be logged.
  */
-var warn = function(message) {
-  process(message, levels.WARN);
-};
+var warn = process.bind(null, levels.WARN);
 
 /**
  * Outputs an error message to the web console.
- * @param {String} message The message to output.
+ * @param {...*} arg Any argument to be logged.
  */
-var error = function(message) {
-  process(message, levels.ERROR);
-};
+var error = process.bind(null, levels.ERROR);
 
 module.exports = {
   log: log,
@@ -159,43 +93,27 @@ module.exports = {
   warn: warn,
   error: error,
   /**
-   * Whether logged messages should be output to the console. When set to true, all messages saved
-   * in the logging history that have not been previously output to the console will be immediately
-   * output to the console.
+   * Whether logged messages should be output to the console.
    * @type {boolean}
    */
   get outputEnabled() {
     return outputEnabled;
   },
   set outputEnabled(value) {
-    if (outputEnabled === value) {
-      return;
-    }
-
     outputEnabled = value;
-
-    if (value) {
-      flushHistory();
-    }
   },
   /**
    * Creates a logging utility that only exposes logging functionality and prefixes all messages
    * with an identifier.
    */
   createPrefixedLogger: function(identifier) {
+    var loggerSpecificPrefix = '[' + identifier + ']';
+
     return {
-      log: function(message) {
-        log(prefixWithBrackets(identifier, message));
-      },
-      info: function(message) {
-        info(prefixWithBrackets(identifier, message));
-      },
-      warn: function(message) {
-        warn(prefixWithBrackets(identifier, message));
-      },
-      error: function(message) {
-        error(prefixWithBrackets(identifier, message));
-      }
+      log: log.bind(null, loggerSpecificPrefix),
+      info: info.bind(null, loggerSpecificPrefix),
+      warn: warn.bind(null, loggerSpecificPrefix),
+      error: error.bind(null, loggerSpecificPrefix)
     };
   }
 };

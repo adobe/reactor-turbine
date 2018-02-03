@@ -6,8 +6,6 @@
 [![dependencies Status](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine/status.svg)](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine)
 [![devDependencies Status](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine/dev-status.svg)](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine?type=dev)
 
-[![Build Status](https://saucelabs.com/browser-matrix/dompuiu.svg)](https://saucelabs.com/u/dompuiu)
-
 Launch rule engine which processes rules on client websites and delegates logic to extensions.
 
 For more information regarding Launch, please visit our [product website](http://www.adobe.com/enterprise/cloud-platform/launch.html).

@@ -45,6 +45,6 @@
     "rollup": "^0.50.0",
     "rollup-plugin-commonjs": "^8.2.4",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "webpack": "^3.8.1"
+    "webpack": "^4.0.0"
   }
 }

@@ -11,7 +11,6 @@
  ****************************************************************************************/
 
 var logger = require('./logger');
-var document = require('@adobe/reactor-document');
 var normalizeSyntheticEvent = require('./normalizeSyntheticEvent');
 var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
 
@@ -130,7 +129,13 @@ module.exports = function(rules, moduleProvider, replaceTokens, getShouldExecute
     }
 
     var settings = replaceTokens(event.settings);
-    var syntheticEventType = extensionName + '.' + moduleName;
+
+    var syntheticEventMeta = {
+      $type: extensionName + '.' + moduleName,
+      $rule: {
+        name: rule.name
+      }
+    };
 
     /**
      * This is the callback that executes a particular rule when an event has occurred.
@@ -139,7 +144,7 @@ module.exports = function(rules, moduleProvider, replaceTokens, getShouldExecute
      * that occurred.
      */
     var trigger = function(syntheticEvent) {
-      checkConditions(rule, normalizeSyntheticEvent(syntheticEventType, syntheticEvent));
+      checkConditions(rule, normalizeSyntheticEvent(syntheticEventMeta, syntheticEvent));
     };
 
     try {

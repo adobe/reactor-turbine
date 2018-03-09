@@ -187,7 +187,10 @@ describe('initRules', function() {
       });
 
       expect(condition1ExportsCall.args[1]).toEqual({
-        type: 'test-extension.test-event'
+        $type: 'test-extension.test-event',
+        $rule: {
+          name: 'Test Rule'
+        }
       });
 
       var condition2Exports = moduleProvider.getModuleExports(TEST_CONDITION2_PATH);
@@ -201,7 +204,10 @@ describe('initRules', function() {
       });
 
       expect(condition2ExportsCall.args[1]).toEqual({
-        type: 'test-extension.test-event'
+        $type: 'test-extension.test-event',
+        $rule: {
+          name: 'Test Rule'
+        }
       });
 
       var action1Exports = moduleProvider.getModuleExports(TEST_ACTION1_PATH);
@@ -215,7 +221,10 @@ describe('initRules', function() {
       });
 
       expect(action1ExportsCall.args[1]).toEqual({
-        type: 'test-extension.test-event'
+        $type: 'test-extension.test-event',
+        $rule: {
+          name: 'Test Rule'
+        }
       });
 
       var action2Exports = moduleProvider.getModuleExports(TEST_ACTION2_PATH);
@@ -229,7 +238,10 @@ describe('initRules', function() {
       });
 
       expect(action2ExportsCall.args[1]).toEqual({
-        type: 'test-extension.test-event'
+        $type: 'test-extension.test-event',
+        $rule: {
+          name: 'Test Rule'
+        }
       });
     });
 

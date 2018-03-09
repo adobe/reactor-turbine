@@ -10,14 +10,29 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var objectAssign = require('@adobe/reactor-object-assign');
+
 /**
- * Normalizes a synthetic event so that it exists and has at least type.
- * @param {string} syntheticEventType
+ * Normalizes a synthetic event so that it exists and has at least meta.
+ * @param {Object} syntheticEventMeta
  * @param {Object} [syntheticEvent]
  * @returns {Object}
  */
-module.exports = function(syntheticEventType, syntheticEvent) {
+module.exports = function(syntheticEventMeta, syntheticEvent) {
   syntheticEvent = syntheticEvent || {};
-  syntheticEvent.type = syntheticEventType;
+  objectAssign(syntheticEvent, syntheticEventMeta);
+
+  // Remove after some arbitrary time period when we think users have had sufficient chance
+  // to move away from event.type
+  if (!syntheticEvent.type) {
+    Object.defineProperty(syntheticEvent, 'type', {
+      get: function() {
+        console.warn('Accessing event.type in Adobe Launch has been deprecated and will be ' +
+          'removed soon. Please use event.$type instead.');
+        return syntheticEvent.$type;
+      }
+    });
+  }
+
   return syntheticEvent;
 };

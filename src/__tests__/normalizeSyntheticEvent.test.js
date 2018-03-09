@@ -14,21 +14,60 @@
 
 var normalizeSyntheticEvent = require('../normalizeSyntheticEvent');
 
-var MOCK_TYPE = 'extension-name.event-name';
+var mockMeta = {
+  $type: 'extension-name.event-name',
+  $rule: {
+    name: 'rule name'
+  }
+};
 
 describe('normalizeSyntheticEvent', function() {
-  it('creates a synthetic event with defaults if synthetic event is undefined', function() {
-    var syntheticEvent = normalizeSyntheticEvent(MOCK_TYPE);
+  it('creates a synthetic event with meta if synthetic event is undefined', function() {
+    var syntheticEvent = normalizeSyntheticEvent(mockMeta);
     expect(syntheticEvent).toEqual({
-      type: MOCK_TYPE
+      $type: 'extension-name.event-name',
+      $rule: {
+        name: 'rule name'
+      }
     });
   });
 
-  it('overwrites type even if provided', function() {
-    var syntheticEvent = normalizeSyntheticEvent(MOCK_TYPE, {
-      type: 'oh nos'
+  it('overwrites meta even if same properties are provided by extension', function() {
+    var syntheticEvent = normalizeSyntheticEvent(mockMeta, {
+      $type: 'oh nos',
+      $rule: 'oh nos'
     });
 
-    expect(syntheticEvent.type).toBe(MOCK_TYPE);
+    expect(syntheticEvent).toEqual({
+      $type: 'extension-name.event-name',
+      $rule: {
+        name: 'rule name'
+      }
+    });
+  });
+
+  it('sets a deprecated type property for backward compatibility', function() {
+    var syntheticEvent = normalizeSyntheticEvent(mockMeta);
+
+    spyOn(console, 'warn');
+    // Note that the type property is non-enumerable, which is why the other tests pass without
+    // accounting for the type property.
+    expect(syntheticEvent.type).toBe('extension-name.event-name');
+    expect(console.warn).toHaveBeenCalledWith('Accessing event.type in Adobe Launch has been ' +
+      'deprecated and will be removed soon. Please use event.$type instead.');
+  });
+
+  it('does not overwrite existing type property with deprecated type property', function() {
+    var syntheticEvent = normalizeSyntheticEvent(mockMeta, {
+      type: 'don\'t overwrite me'
+    });
+
+    expect(syntheticEvent).toEqual({
+      type: 'don\'t overwrite me',
+      $type: 'extension-name.event-name',
+      $rule: {
+        name: 'rule name'
+      }
+    });
   });
 });

@@ -24,7 +24,7 @@ module.exports = function(syntheticEventMeta, syntheticEvent) {
 
   // Remove after some arbitrary time period when we think users have had sufficient chance
   // to move away from event.type
-  if (!syntheticEvent.type) {
+  if (!syntheticEvent.hasOwnProperty('type')) {
     Object.defineProperty(syntheticEvent, 'type', {
       get: function() {
         console.warn('Accessing event.type in Adobe Launch has been deprecated and will be ' +

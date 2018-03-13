@@ -15,13 +15,13 @@ var loadScript = require('./index');
 
 describe('loadScript', function() {
   it('returns a promise', function() {
-    var promise = loadScript('./base/testIndex.js');
+    var promise = loadScript('/base/coreModulePackages/loadScript/empty.js');
     expect(promise.then).toBeDefined();
     expect(promise.catch).toBeDefined();
   });
 
   it('should fulfill with script element when the script is loaded', function(done) {
-    loadScript('./base/testIndex.js').then(function(script) {
+    loadScript('/base/coreModulePackages/loadScript/empty.js').then(function(script) {
       expect(script).toEqual(jasmine.any(HTMLScriptElement));
       done();
     });

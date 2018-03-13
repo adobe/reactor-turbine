@@ -1,20 +1,11 @@
 language: node_js
 node_js:
   - "node"
-env:
-  - CXX=g++-4.8
 addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
   code_climate:
     repo_token: f2b3d8098cb4578112ed889d0f0f1d548b0d7832ac2aeedd91a5656873cca5ff
   sauce_connect:
     username: "dompuiu"
-  jwt:
-    secure: "cRP3TUZcmsC9vCF64hw0nevT4gZR6lTl2LXro4SpGEi5Ru8ckUdPjZdyMF6GeirL/r3x3F1KmkrGXfzMzzSVR9Qn5nAYgNzMJNCsousyzqCRJVCaYKxX10V+rcYlzuRmUTma/+p/SzPwfNN2sGWRU1/o3tf3REDshOy9njm8oIdpS98UTsHivIweKOAhtC5gWX3EsuW4xjPlIHj42cIUrePf4oqrzIzj0mG9uyYhtXPMqhUwPcJakCrCRReYAid5WI0LALB+RSckPAZXuKm6hx6Jt2oO6vIFbtgsEcBUi9TKCFuoAXQTRI0BJGBa6bpQ/CI/3KoaparS1RXViF43TbebDJlJC3PbmjKRQxt20I8iU0HDAooR/pbtiSC2cCpifmdzX45zRb4uou5RyeAgfM7HZsUwZAfNvTv1u0oAvXPJcDQX3F+EK0Ou61vsK+wZPPNJrSZ03rhUn2kmc2oYVQ46uohQkyNyw+VJjQHyfbB06lSRJ6S7Cq3ubkQ0AP19bFWZh+6aimPX3PHzrFjqbGcGy7r4Gyd/cvw1cc74hDdMk3PlphNF3d3WFVvO7uKSyR/UWiSBI2JqvSQAmeSKrrNytyEolgTIYz6oJy71z6JelxzpY3rpLN3ukzmc2x/7Uf2hQ63zthGiPDX4y69PYXVJBihmuutcy5SgEw9bilk="
 after_script:
   - "npm install -g coveralls"
   - "cat coverage/lcov.dat | coveralls"

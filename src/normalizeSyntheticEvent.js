@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var logger = require('./logger');
 var objectAssign = require('@adobe/reactor-object-assign');
 
 /**
@@ -27,7 +28,7 @@ module.exports = function(syntheticEventMeta, syntheticEvent) {
   if (!syntheticEvent.hasOwnProperty('type')) {
     Object.defineProperty(syntheticEvent, 'type', {
       get: function() {
-        console.warn('Accessing event.type in Adobe Launch has been deprecated and will be ' +
+        logger.warn('Accessing event.type in Adobe Launch has been deprecated and will be ' +
           'removed soon. Please use event.$type instead.');
         return syntheticEvent.$type;
       }

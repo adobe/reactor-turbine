@@ -13,10 +13,19 @@
 var logger = require('./logger');
 var normalizeSyntheticEvent = require('./normalizeSyntheticEvent');
 var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
+var createNotifyMonitors = require('./createNotifyMonitors');
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 
-module.exports = function(rules, moduleProvider, replaceTokens, getShouldExecuteActions) {
+module.exports = function(
+  _satellite,
+  rules,
+  moduleProvider,
+  replaceTokens,
+  getShouldExecuteActions
+) {
+  var notifyMonitors = createNotifyMonitors(_satellite);
+
   var getModuleDisplayNameByRuleComponent = function(ruleComponent) {
     var moduleDefinition = moduleProvider.getModuleDefinition(ruleComponent.modulePath);
     return (moduleDefinition && moduleDefinition.displayName) || ruleComponent.modulePath;
@@ -59,6 +68,9 @@ module.exports = function(rules, moduleProvider, replaceTokens, getShouldExecute
     }
 
     logger.log('Rule "' + rule.name + '" fired.');
+    notifyMonitors('ruleCompleted', {
+      rule: rule
+    });
   };
 
   var checkConditions = function(rule, syntheticEvent) {
@@ -89,6 +101,10 @@ module.exports = function(rules, moduleProvider, replaceTokens, getShouldExecute
           result = moduleExports(settings, syntheticEvent);
         } catch (e) {
           logger.error(getErrorMessage(condition, rule, e.message, e.stack));
+          notifyMonitors('ruleConditionFailed', {
+            rule: rule,
+            condition: condition
+          });
           // We return because we want to assume the condition would have failed and therefore
           // we don't want to run the following conditions or the rule's actions.
           return;
@@ -97,6 +113,10 @@ module.exports = function(rules, moduleProvider, replaceTokens, getShouldExecute
         if ((!result && !condition.negate) || (result && condition.negate)) {
           var conditionDisplayName = getModuleDisplayNameByRuleComponent(condition);
           logger.log('Condition ' + conditionDisplayName + ' for rule ' + rule.name + ' not met.');
+          notifyMonitors('ruleConditionFailed', {
+            rule: rule,
+            condition: condition
+          });
           return;
         }
       }
@@ -144,6 +164,9 @@ module.exports = function(rules, moduleProvider, replaceTokens, getShouldExecute
      * that occurred.
      */
     var trigger = function(syntheticEvent) {
+      notifyMonitors('ruleTriggered', {
+        rule: rule
+      });
       checkConditions(rule, normalizeSyntheticEvent(syntheticEventMeta, syntheticEvent));
     };
 

@@ -11,11 +11,9 @@
  ****************************************************************************************/
 
 var cookie = require('@adobe/reactor-cookie');
+var dataElementSafe = require('../dataElementSafe');
 
 describe('dataElementSafe', function() {
-  var dataElementSafe = require('inject-loader!../dataElementSafe')({
-    '@adobe/reactor-cookie': cookie
-  });
 
   afterEach(function() {
     cookie.set('_sdsat_foo', '');

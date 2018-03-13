@@ -12,6 +12,7 @@
 
 'use strict';
 var createModuleProvider = require('../createModuleProvider');
+var injectInitRules = require('inject-loader!../initRules');
 
 describe('initRules', function() {
   var TEST_EVENT_PATH = 'hello-world/testEvent.js';
@@ -34,6 +35,7 @@ describe('initRules', function() {
   var TEST_ACTION2_NAME = 'test-action-2';
   var TEST_ACTION2_DISPLAY_NAME = 'Test Action 2';
 
+  var _satellite = {};
   var replaceTokens;
   var getShouldExecuteActions;
   var rules;
@@ -162,7 +164,7 @@ describe('initRules', function() {
     });
 
     it('evaluates all conditions and, when all pass, executes all actions', function() {
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var eventExports = moduleProvider.getModuleExports(TEST_EVENT_PATH);
 
@@ -257,7 +259,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       expect(moduleProvider.getModuleExports(TEST_CONDITION1_PATH).calls.count()).toBe(1);
       expect(moduleProvider.getModuleExports(TEST_CONDITION2_PATH).calls.count()).toBe(0);
@@ -269,7 +271,7 @@ describe('initRules', function() {
       'condition fails', function() {
       rules[0].conditions[0].negate = true;
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       expect(moduleProvider.getModuleExports(TEST_CONDITION1_PATH).calls.count()).toBe(1);
       expect(moduleProvider.getModuleExports(TEST_CONDITION2_PATH).calls.count()).toBe(0);
@@ -280,19 +282,19 @@ describe('initRules', function() {
     it('does not throw error when there are no events for a rule', function() {
       delete rules[0].events;
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
     });
 
     it('does not throw error when there are no conditions for a rule', function() {
       delete rules[0].conditions;
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
     });
 
     it('does not throw error when there are no actions for a rule', function() {
       delete rules[0].actions;
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
     });
 
     it('does not execute actions when actionsEnabled is false', function() {
@@ -300,7 +302,7 @@ describe('initRules', function() {
         return false;
       };
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       expect(moduleProvider.getModuleExports(TEST_ACTION1_PATH).calls.count()).toBe(0);
       expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
@@ -366,7 +368,7 @@ describe('initRules', function() {
         }
       ];
 
-      initRules = require('inject-loader!../initRules')({
+      initRules = injectInitRules({
         './logger': logger
       });
     });
@@ -382,7 +384,7 @@ describe('initRules', function() {
           }
         });
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' +
@@ -402,7 +404,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       expect(errorMessage).toBe('Failed to execute ' + TEST_EVENT_DISPLAY_NAME +
@@ -423,7 +425,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' + TEST_EVENT_DISPLAY_NAME +
@@ -443,7 +445,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
@@ -463,7 +465,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       expect(errorMessage).toBe('Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
@@ -484,7 +486,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
@@ -506,7 +508,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
         'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
@@ -515,7 +517,7 @@ describe('initRules', function() {
     it('logs a message when the negated condition doesn\'t pass', function() {
       rules[0].conditions[0].negate = true;
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
         'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
@@ -532,7 +534,7 @@ describe('initRules', function() {
           }
         });
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' +
@@ -553,7 +555,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       expect(errorMessage).toBe('Failed to execute ' + TEST_ACTION1_DISPLAY_NAME +
@@ -574,7 +576,7 @@ describe('initRules', function() {
         }
       );
 
-      initRules(rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
       var expectedErrorMessage = 'Failed to execute ' + TEST_ACTION1_DISPLAY_NAME +

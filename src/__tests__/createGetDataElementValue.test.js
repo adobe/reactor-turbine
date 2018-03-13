@@ -12,12 +12,14 @@
 
 'use strict';
 
+var injectCreateGetDataElementValue = require('inject-loader!../createGetDataElementValue');
+
 describe('function returned by createGetDataElementValue', function() {
   var logger;
   var getInjectedCreateGetDataElementValue = function(mocks) {
     mocks = mocks || {};
     mocks['./logger'] = logger;
-    return require('inject-loader!../createGetDataElementValue')(mocks);
+    return injectCreateGetDataElementValue(mocks);
   };
 
   beforeEach(function() {

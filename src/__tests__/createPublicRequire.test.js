@@ -12,8 +12,9 @@
 
 'use strict';
 
+var injectCreatePublicRequire = require('inject-loader!../createPublicRequire');
+
 describe('function returned by createPublicRequire', function() {
-  var injectCreatePublicRequire = require('inject-loader!../createPublicRequire');
 
   it('should return the static core modules', function() {
     var cookieMock = {};

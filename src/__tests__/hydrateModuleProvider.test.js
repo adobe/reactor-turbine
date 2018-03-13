@@ -12,11 +12,9 @@
 
 'use strict';
 
-describe('hydrateModuleProvider', function() {
-  var getInjectedHydrateModuleProvider = function(mocks) {
-    return require('inject-loader!../hydrateModuleProvider')(mocks);
-  };
+var injectHydrateModuleProvider = require('inject-loader!../hydrateModuleProvider');
 
+describe('hydrateModuleProvider', function() {
   var container;
   var moduleProvider;
   var replaceTokens;
@@ -53,7 +51,7 @@ describe('hydrateModuleProvider', function() {
   });
 
   it('registers all modules', function() {
-    var hydrateModuleProvider = getInjectedHydrateModuleProvider();
+    var hydrateModuleProvider = injectHydrateModuleProvider();
     var a1Module = function() {};
     var a2Module = function() {};
     var b1Module = function() {};
@@ -110,7 +108,7 @@ describe('hydrateModuleProvider', function() {
   });
 
   it('hydrates module cache', function() {
-    var hydrateModuleProvider = getInjectedHydrateModuleProvider();
+    var hydrateModuleProvider = injectHydrateModuleProvider();
 
     hydrateModuleProvider(container, moduleProvider);
 
@@ -131,7 +129,7 @@ describe('hydrateModuleProvider', function() {
         }
       );
 
-      var hydrateModuleProvider = getInjectedHydrateModuleProvider({
+      var hydrateModuleProvider = injectHydrateModuleProvider({
         './createPublicRequire': createPublicRequire
       });
 
@@ -184,7 +182,7 @@ describe('hydrateModuleProvider', function() {
         })
       };
 
-      var hydrateModuleProvider = getInjectedHydrateModuleProvider({
+      var hydrateModuleProvider = injectHydrateModuleProvider({
         './createGetExtensionSettings': createGetExtensionSettings,
         './createGetHostedLibFileUrl': createGetHostedLibFileUrl,
         './createGetSharedModuleExports': createGetSharedModuleExports,

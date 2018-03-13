@@ -12,7 +12,7 @@
 
 'use strict';
 
-var normalizeSyntheticEvent = require('../normalizeSyntheticEvent');
+var injectNormalizeSyntheticEvent = require('inject-loader!../normalizeSyntheticEvent');
 
 var mockMeta = {
   $type: 'extension-name.event-name',
@@ -22,6 +22,19 @@ var mockMeta = {
 };
 
 describe('normalizeSyntheticEvent', function() {
+  var logger;
+  var normalizeSyntheticEvent;
+
+  beforeEach(function() {
+    logger = {
+      warn: jasmine.createSpy()
+    };
+
+    normalizeSyntheticEvent = injectNormalizeSyntheticEvent({
+      './logger': logger
+    });
+  });
+
   it('creates a synthetic event with meta if synthetic event is undefined', function() {
     var syntheticEvent = normalizeSyntheticEvent(mockMeta);
     expect(syntheticEvent).toEqual({
@@ -49,11 +62,10 @@ describe('normalizeSyntheticEvent', function() {
   it('sets a deprecated type property for backward compatibility', function() {
     var syntheticEvent = normalizeSyntheticEvent(mockMeta);
 
-    spyOn(console, 'warn');
     // Note that the type property is non-enumerable, which is why the other tests pass without
     // accounting for the type property.
     expect(syntheticEvent.type).toBe('extension-name.event-name');
-    expect(console.warn).toHaveBeenCalledWith('Accessing event.type in Adobe Launch has been ' +
+    expect(logger.warn).toHaveBeenCalledWith('Accessing event.type in Adobe Launch has been ' +
       'deprecated and will be removed soon. Please use event.$type instead.');
   });
 

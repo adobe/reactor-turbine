@@ -114,6 +114,7 @@ if (_satellite && !window.__satelliteLoaded) {
   );
 
   initRules(
+    _satellite,
     container.rules || [],
     moduleProvider,
     replaceTokens,

@@ -12,13 +12,9 @@
 
 'use strict';
 
+var injectIndex = require('inject-loader!../index');
+
 describe('index', function() {
-  var index;
-
-  var getInjectedIndex = function(mocks) {
-    return require('inject-loader!../index')(mocks);
-  };
-
   beforeEach(function() {
     window._satellite = {
       container: {
@@ -39,15 +35,15 @@ describe('index', function() {
   });
 
   it('exports the window._satellite object', function() {
-    var index = getInjectedIndex();
+    var index = injectIndex();
     expect(index).toBe(window._satellite);
   });
 
   it('prevents turbine from executing multiple times', function() {
     var createModuleProvider = jasmine.createSpy();
 
-    getInjectedIndex();
-    getInjectedIndex({
+    injectIndex();
+    injectIndex({
       './createModuleProvider': createModuleProvider
     });
 
@@ -55,7 +51,7 @@ describe('index', function() {
   });
 
   it('deletes the container', function() {
-    getInjectedIndex();
+    injectIndex();
     expect(window._satellite.container).toBe(undefined);
   });
 
@@ -71,7 +67,7 @@ describe('index', function() {
 
     window._satellite.container.dataElements = dataElements;
 
-    getInjectedIndex({
+    injectIndex({
       './dataElementSafe': {
         migrateCookieData: migrateCookieDataSpy
       }
@@ -82,7 +78,7 @@ describe('index', function() {
 
   it('creates moduleProvider', function() {
     var createModuleProvider = jasmine.createSpy();
-    getInjectedIndex({
+    injectIndex({
       './createModuleProvider': createModuleProvider
     });
 
@@ -92,7 +88,7 @@ describe('index', function() {
   it('creates getDataElementValue', function() {
     var createGetDataElementValue = jasmine.createSpy();
     var moduleProvider = function() {};
-    getInjectedIndex({
+    injectIndex({
       './createGetDataElementValue': createGetDataElementValue,
       './createModuleProvider': function() { return moduleProvider; }
     });
@@ -106,7 +102,7 @@ describe('index', function() {
 
   it('creates setCustomVar', function() {
     var createSetCustomVar = jasmine.createSpy();
-    getInjectedIndex({
+    injectIndex({
       './createSetCustomVar': createSetCustomVar
     });
 
@@ -117,7 +113,7 @@ describe('index', function() {
 
   it('creates isVar', function() {
     var createIsVar = jasmine.createSpy();
-    getInjectedIndex({
+    injectIndex({
       './createIsVar': createIsVar
     });
 
@@ -130,7 +126,7 @@ describe('index', function() {
   it('creates getVar', function() {
     var createGetVar = jasmine.createSpy();
     var getDataElementValue = function() {};
-    getInjectedIndex({
+    injectIndex({
       './createGetVar': createGetVar,
       './createGetDataElementValue': function() { return getDataElementValue; }
     });
@@ -146,7 +142,7 @@ describe('index', function() {
     var createReplaceTokens = jasmine.createSpy();
     var isVar = function() {};
     var getVar = function() {};
-    getInjectedIndex({
+    injectIndex({
       './createReplaceTokens': createReplaceTokens,
       './createIsVar': function() { return isVar; },
       './createGetVar': function() { return getVar; }
@@ -163,7 +159,7 @@ describe('index', function() {
     var logger = {};
     window.localStorage.setItem('com.adobe.reactor.debug', true);
 
-    getInjectedIndex({
+    injectIndex({
       './logger': logger
     });
 
@@ -175,7 +171,7 @@ describe('index', function() {
     var logger = {};
     window.localStorage.setItem('com.adobe.reactor.debug', false);
 
-    getInjectedIndex({
+    injectIndex({
       './logger': logger
     });
 
@@ -187,7 +183,7 @@ describe('index', function() {
     var hydrateSatelliteObject = jasmine.createSpy();
     var getVar = function() {};
     var setCustomVar = function() {};
-    getInjectedIndex({
+    injectIndex({
       './hydrateSatelliteObject': hydrateSatelliteObject,
       './createGetVar': function() { return getVar; },
       './createSetCustomVar': function() { return setCustomVar; }
@@ -208,7 +204,7 @@ describe('index', function() {
     var moduleProvider = {};
     var replaceTokens = function() {};
     var getDataElementValue = function() {};
-    getInjectedIndex({
+    injectIndex({
       './hydrateModuleProvider': hydrateModuleProvider,
       './createModuleProvider': function() { return moduleProvider; },
       './createReplaceTokens': function() { return replaceTokens; },
@@ -229,13 +225,14 @@ describe('index', function() {
     var initRules = jasmine.createSpy();
     var moduleProvider = {};
     var replaceTokens = function() {};
-    getInjectedIndex({
+    injectIndex({
       './initRules': initRules,
       './createModuleProvider': function() { return moduleProvider; },
       './createReplaceTokens': function() { return replaceTokens; }
     });
 
     expect(initRules).toHaveBeenCalledWith(
+      window._satellite,
       rules,
       moduleProvider,
       replaceTokens,
@@ -246,8 +243,8 @@ describe('index', function() {
   it('provides an empty array for rules when container doesn\'t have rules', function() {
     delete window._satellite.container.rules;
     var rules;
-    getInjectedIndex({
-      './initRules': function(_rules) {
+    injectIndex({
+      './initRules': function(_satellite, _rules) {
         rules = _rules;
       }
     });
@@ -262,7 +259,7 @@ describe('index', function() {
         'foo': dataElementDefinition
       };
       var getDataElementDefinition;
-      getInjectedIndex({
+      injectIndex({
         './createIsVar': function(customVars, _getDataElementDefinition) {
           getDataElementDefinition = _getDataElementDefinition;
           return function() {};
@@ -275,7 +272,7 @@ describe('index', function() {
     it('doesn\'t throw an error when container doesn\'t have data elements', function() {
       delete window._satellite.container.dataElements;
       var getDataElementDefinition;
-      getInjectedIndex({
+      injectIndex({
         './createIsVar': function(customVars, _getDataElementDefinition) {
           getDataElementDefinition = _getDataElementDefinition;
           return function() {};
@@ -289,7 +286,7 @@ describe('index', function() {
   describe('setDebugOutputEnabled', function() {
     it('sets localStorage item', function() {
       var setOutputDebugEnabled;
-      getInjectedIndex({
+      injectIndex({
         './hydrateSatelliteObject': function(_satellite, container, _setOutputDebugEnabled) {
           setOutputDebugEnabled = _setOutputDebugEnabled;
         }
@@ -307,8 +304,14 @@ describe('index', function() {
 
       window.localStorage.setItem('com.adobe.reactor.hideActivity', true);
 
-      getInjectedIndex({
-        './initRules': function(rules, moduleProvider, replaceTokens, _getShouldExecuteActions) {
+      injectIndex({
+        './initRules': function(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          _getShouldExecuteActions
+        ) {
           getShouldExecuteActions = _getShouldExecuteActions;
         }
       });
@@ -321,8 +324,14 @@ describe('index', function() {
 
       window.localStorage.setItem('com.adobe.reactor.hideActivity', false);
 
-      getInjectedIndex({
-        './initRules': function(rules, moduleProvider, replaceTokens, _getShouldExecuteActions) {
+      injectIndex({
+        './initRules': function(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          _getShouldExecuteActions
+        ) {
           getShouldExecuteActions = _getShouldExecuteActions;
         }
       });

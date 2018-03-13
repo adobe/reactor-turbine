@@ -12,6 +12,8 @@
 
 'use strict';
 
+var injectGetNamespacedStorage = require('inject-loader!../getNamespacedStorage');
+
 describe('getNamespacedStorage', function() {
   var createMockWindowUnavailableStorage = function() {
     return {
@@ -31,7 +33,7 @@ describe('getNamespacedStorage', function() {
   ['sessionStorage', 'localStorage'].forEach(function(storageType) {
     describe('getItem', function() {
       it('returns item', function() {
-        var getNamespacedStorage = require('inject-loader!../getNamespacedStorage')();
+        var getNamespacedStorage = injectGetNamespacedStorage();
         var storage = getNamespacedStorage(storageType);
 
         window[storageType].setItem('com.adobe.reactor.foo', 'something');
@@ -41,7 +43,7 @@ describe('getNamespacedStorage', function() {
       it('proper error handling if storage is disabled', function() {
         var mockWindow = createMockWindowUnavailableStorage();
 
-        var getNamespacedStorage = require('inject-loader!../getNamespacedStorage')({
+        var getNamespacedStorage = injectGetNamespacedStorage({
           '@adobe/reactor-window': mockWindow
         });
 
@@ -53,7 +55,7 @@ describe('getNamespacedStorage', function() {
 
     describe('setItem', function() {
       it('sets item', function() {
-        var getNamespacedStorage = require('inject-loader!../getNamespacedStorage')();
+        var getNamespacedStorage = injectGetNamespacedStorage();
         var storage = getNamespacedStorage(storageType);
 
         storage.setItem('foo', 'something');
@@ -63,7 +65,7 @@ describe('getNamespacedStorage', function() {
       it('proper error handling if storage is disabled', function() {
         var mockWindow = createMockWindowUnavailableStorage();
 
-        var getNamespacedStorage = require('inject-loader!../getNamespacedStorage')({
+        var getNamespacedStorage = injectGetNamespacedStorage({
           '@adobe/reactor-window': mockWindow
         });
 

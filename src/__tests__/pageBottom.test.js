@@ -10,11 +10,9 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-describe('onPageBottom', function() {
-  var getInjectedPageBottom = function(mocks) {
-    return require('inject-loader!../pageBottom')(mocks);
-  };
+var injectPageBottom = require('inject-loader!../pageBottom');
 
+describe('onPageBottom', function() {
   var triggerWindowLoad;
   var windowFakeObject;
   var documentFakeObject;
@@ -34,7 +32,7 @@ describe('onPageBottom', function() {
   });
 
   it('calls the callback when `trigger` is executed', function(done) {
-    var pageBottom = getInjectedPageBottom({
+    var pageBottom = injectPageBottom({
       '@adobe/reactor-window': windowFakeObject
     });
 
@@ -43,7 +41,7 @@ describe('onPageBottom', function() {
   });
 
   it('callback is called only once', function() {
-    var pageBottom = getInjectedPageBottom({
+    var pageBottom = injectPageBottom({
       '@adobe/reactor-window': windowFakeObject,
       '@adobe/reactor-document': documentFakeObject
     });
@@ -58,7 +56,7 @@ describe('onPageBottom', function() {
   });
 
   it('calls callback even after pageBottom has been triggered', function(done) {
-    var pageBottom = getInjectedPageBottom({
+    var pageBottom = injectPageBottom({
       '@adobe/reactor-window': windowFakeObject,
     });
 
@@ -70,7 +68,7 @@ describe('onPageBottom', function() {
     it('calls the callback if readyState is complete', function() {
       documentFakeObject.readyState = 'complete';
 
-      var pageBottom = getInjectedPageBottom({
+      var pageBottom = injectPageBottom({
         '@adobe/reactor-document': documentFakeObject
       });
       var spy = jasmine.createSpy();
@@ -83,7 +81,7 @@ describe('onPageBottom', function() {
     it('calls the callback on window load', function() {
       documentFakeObject.readyState = 'interactive';
 
-      var pageBottom = getInjectedPageBottom({
+      var pageBottom = injectPageBottom({
         '@adobe/reactor-window': windowFakeObject,
         '@adobe/reactor-document': documentFakeObject,
       });

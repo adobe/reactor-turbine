@@ -114,4 +114,18 @@ module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, 
   _satellite.pageBottom = pageBottom.trigger;
 
   _satellite.setDebug = setDebugOutputEnabled;
+
+  var warningLogged = false;
+
+  Object.defineProperty(_satellite, '_container', {
+    get: function() {
+      if (!warningLogged) {
+        logger.warn('_satellite._container may change at any time and should only ' +
+          'be used for debugging.');
+        warningLogged = true;
+      }
+
+      return container;
+    }
+  });
 };

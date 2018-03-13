@@ -12,9 +12,10 @@
 
 'use strict';
 
+var injectCreateModuleProvider = require('inject-loader!../createModuleProvider');
+
 describe('function returned by createModuleProvider', function() {
   var logger;
-  var injectCreateModuleProvider = require('inject-loader!../createModuleProvider');
   var referencePath = 'hello-world/src/foo.js';
   var extensionName = 'test-extension';
   var name = 'foo';

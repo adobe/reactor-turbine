@@ -12,8 +12,9 @@
 
 'use strict';
 
+var injectHydrateSatelliteObject = require('inject-loader!../hydrateSatelliteObject');
+
 describe('hydrateSatelliteObject', function() {
-  var injectHydrateSatelliteObject = require('inject-loader!../hydrateSatelliteObject');
   var _satellite;
 
   var container = {
@@ -159,5 +160,25 @@ describe('hydrateSatelliteObject', function() {
     hydrateSatelliteObject(_satellite, container);
 
     expect(_satellite.pageBottom).toBe(pageBottomMock.trigger);
+  });
+
+  it('exposes the container', function() {
+    var logger = {
+      warn: jasmine.createSpy(),
+      createPrefixedLogger: function() {}
+    };
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({
+      './logger': logger
+    });
+
+    hydrateSatelliteObject(_satellite, container);
+
+    spyOn(console, 'warn');
+    expect(_satellite._container).toBe(container);
+    expect(logger.warn).toHaveBeenCalledWith('_satellite._container may change at any time and ' +
+      'should only be used for debugging.');
+    // It shouldn't warn again.
+    expect(_satellite._container).toBe(container);
+    expect(logger.warn.calls.count()).toBe(1);
   });
 });

@@ -69,6 +69,13 @@ module.exports = function(config) {
         watched: false,
         included: true,
         served: true
+      },
+      // Used in load-script core module test.
+      {
+        pattern: 'coreModulePackages/loadScript/empty.js',
+        watched: false,
+        included: false,
+        served: true
       }
     ],
 

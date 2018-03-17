@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var logger = require('./logger');
+
 /**
  * Replacing any variable tokens (%myDataElement%, %this.foo%, etc.) with their associated values.
  * A new string, object, or array will be created; the thing being processed will never be
@@ -27,13 +29,16 @@ module.exports = function(isVar, getVar, undefinedVarsReturnEmpty) {
   var replaceTokensInObject;
   var replaceTokensInArray;
   var replaceTokens;
+  var variablesBeingRetrieved = [];
 
   var getVarValue = function(token, variableName, syntheticEvent) {
     if (!isVar(variableName)) {
       return token;
     }
 
+    variablesBeingRetrieved.push(variableName);
     var val = getVar(variableName, syntheticEvent);
+    variablesBeingRetrieved.pop();
     return val == null && undefinedVarsReturnEmpty ? '' : val;
   };
 
@@ -91,5 +96,15 @@ module.exports = function(isVar, getVar, undefinedVarsReturnEmpty) {
     return thing;
   };
 
-  return replaceTokens;
+  return function(thing, syntheticEvent) {
+    // It's possible for a data element to reference another data element. Because of this,
+    // we need to prevent circular dependencies from causing an infinite loop.
+    if (variablesBeingRetrieved.length > 10) {
+      logger.error('Data element circular reference detected: ' +
+        variablesBeingRetrieved.join(' -> '));
+      return thing;
+    }
+
+    return replaceTokens(thing, syntheticEvent);
+  };
 };

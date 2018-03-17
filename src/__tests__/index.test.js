@@ -96,6 +96,7 @@ describe('index', function() {
     expect(createGetDataElementValue).toHaveBeenCalledWith(
       moduleProvider,
       jasmine.any(Function),
+      jasmine.any(Function),
       true
     );
   });

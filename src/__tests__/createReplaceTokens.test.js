@@ -11,17 +11,23 @@
  ****************************************************************************************/
 
 'use strict';
-var createReplaceTokens = require('../createReplaceTokens');
+var injectCreateReplaceTokens = require('inject-loader!../createReplaceTokens');
 
 describe('function returned by replaceTokens', function() {
   var isVar;
   var getVar;
   var undefinedVarsReturnEmpty;
+  var logger;
+  var createReplaceTokens;
 
   beforeEach(function() {
+    logger = jasmine.createSpyObj('logger', ['error']);
     isVar = function() { return true; };
     getVar = function() { return null; };
     undefinedVarsReturnEmpty = false;
+    createReplaceTokens = injectCreateReplaceTokens({
+      './logger': logger
+    });
   });
 
   it('replaces nested tokens', function() {
@@ -100,5 +106,30 @@ describe('function returned by replaceTokens', function() {
 
     var fn = function() {};
     expect(replaceTokens(fn)).toBe(fn);
+  });
+
+  it('handles recursive data element references', function() {
+    var replaceTokens;
+
+    var de1Settings = {
+      foo: '%de2%'
+    };
+
+    var de2Settings = {
+      foo: '%de1%'
+    };
+
+    getVar = function(variableName) {
+      var result = replaceTokens(variableName === 'de1' ? de1Settings : de2Settings);
+      return result.foo;
+    };
+
+    replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
+
+    expect(replaceTokens(de1Settings)).toEqual({
+      foo: '%de1%'
+    });
+    expect(logger.error).toHaveBeenCalledWith('Data element circular reference detected: ' +
+      'de2 -> de1 -> de2 -> de1 -> de2 -> de1 -> de2 -> de1 -> de2 -> de1 -> de2');
   });
 });

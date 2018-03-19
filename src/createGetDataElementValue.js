@@ -26,6 +26,7 @@ var isDataElementValuePresent = function(value) {
 module.exports = function(
   moduleProvider,
   getDataElementDefinition,
+  replaceTokens,
   undefinedVarsReturnEmpty
 ) {
   return function(name) {
@@ -53,7 +54,7 @@ module.exports = function(
     var value;
 
     try {
-      value = moduleExports(dataDef.settings);
+      value = moduleExports(replaceTokens(dataDef.settings));
     } catch (e) {
       logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
       return;

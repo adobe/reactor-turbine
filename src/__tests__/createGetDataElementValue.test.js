@@ -16,6 +16,7 @@ var injectCreateGetDataElementValue = require('inject-loader!../createGetDataEle
 
 describe('function returned by createGetDataElementValue', function() {
   var logger;
+  var replaceTokens;
   var getInjectedCreateGetDataElementValue = function(mocks) {
     mocks = mocks || {};
     mocks['./logger'] = logger;
@@ -23,7 +24,10 @@ describe('function returned by createGetDataElementValue', function() {
   };
 
   beforeEach(function() {
-    logger = jasmine.createSpyObj('logger', ['log', 'error']);;
+    logger = jasmine.createSpyObj('logger', ['log', 'error']);
+    replaceTokens = function(settings) {
+      return settings;
+    };
   });
 
   it('returns a data element value using data element settings', function() {
@@ -43,8 +47,12 @@ describe('function returned by createGetDataElementValue', function() {
       };
     };
     var undefinedVarsReturnEmpty = false;
-    var getDataElementValue =
-      createGetDataElementValue(moduleProvider, getDataElementDefinition, undefinedVarsReturnEmpty);
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
     var value = getDataElementValue('testDataElement');
 
     expect(value).toBe('bar');
@@ -73,8 +81,12 @@ describe('function returned by createGetDataElementValue', function() {
       };
     };
     var undefinedVarsReturnEmpty = false;
-    var getDataElementValue =
-      createGetDataElementValue(moduleProvider, getDataElementDefinition, undefinedVarsReturnEmpty);
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
     getDataElementValue('testDataElement');
 
     expect(dataElementSafe.setValue).toHaveBeenCalledWith('testDataElement', 'visitor', 'bar');
@@ -100,8 +112,12 @@ describe('function returned by createGetDataElementValue', function() {
       };
     };
     var undefinedVarsReturnEmpty = false;
-    var getDataElementValue =
-      createGetDataElementValue(moduleProvider, getDataElementDefinition, undefinedVarsReturnEmpty);
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
     var value = getDataElementValue('testDataElement');
 
     expect(value).toBe('cleaned:bar');
@@ -126,8 +142,12 @@ describe('function returned by createGetDataElementValue', function() {
       };
     };
     var undefinedVarsReturnEmpty = false;
-    var getDataElementValue =
-      createGetDataElementValue(moduleProvider, getDataElementDefinition, undefinedVarsReturnEmpty);
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
     var value = getDataElementValue('testDataElement');
 
     expect(value).toBe('cleaned:bar');
@@ -151,8 +171,12 @@ describe('function returned by createGetDataElementValue', function() {
       };
     };
     var undefinedVarsReturnEmpty = true;
-    var getDataElementValue =
-      createGetDataElementValue(moduleProvider, getDataElementDefinition, undefinedVarsReturnEmpty);
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
     var value = getDataElementValue('testDataElement');
 
     expect(value).toBe('');
@@ -164,8 +188,12 @@ describe('function returned by createGetDataElementValue', function() {
     var moduleProvider = {};
     var getDataElementDefinition = function() {};
     var undefinedVarsReturnEmpty = false;
-    var getDataElementValue =
-      createGetDataElementValue(moduleProvider, getDataElementDefinition, undefinedVarsReturnEmpty);
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
     var value = getDataElementValue('testDataElement');
 
     expect(value).toBe(null);
@@ -192,8 +220,12 @@ describe('function returned by createGetDataElementValue', function() {
       };
     };
     var undefinedVarsReturnEmpty = false;
-    var getDataElementValue =
-      createGetDataElementValue(moduleProvider, getDataElementDefinition, undefinedVarsReturnEmpty);
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
     var value = getDataElementValue('testDataElement');
 
     expect(value).toBe('cachedValue');
@@ -222,8 +254,12 @@ describe('function returned by createGetDataElementValue', function() {
         };
       };
       var undefinedVarsReturnEmpty = false;
-      var getDataElementValue = createGetDataElementValue(moduleProvider,
-        getDataElementDefinition, undefinedVarsReturnEmpty);
+      var getDataElementValue = createGetDataElementValue(
+        moduleProvider,
+        getDataElementDefinition,
+        replaceTokens,
+        undefinedVarsReturnEmpty
+      );
       var value = getDataElementValue('testDataElement');
 
       expect(value).toBe('cachedValue');
@@ -245,8 +281,12 @@ describe('function returned by createGetDataElementValue', function() {
         };
       };
       var undefinedVarsReturnEmpty = false;
-      var getDataElementValue = createGetDataElementValue(moduleProvider,
-        getDataElementDefinition, undefinedVarsReturnEmpty);
+      var getDataElementValue = createGetDataElementValue(
+        moduleProvider,
+        getDataElementDefinition,
+        replaceTokens,
+        undefinedVarsReturnEmpty
+      );
       var value = getDataElementValue('testDataElement');
 
       expect(value).toBe('defaultValue');
@@ -268,8 +308,12 @@ describe('function returned by createGetDataElementValue', function() {
         };
       };
       var undefinedVarsReturnEmpty = false;
-      var getDataElementValue = createGetDataElementValue(moduleProvider,
-        getDataElementDefinition, undefinedVarsReturnEmpty);
+      var getDataElementValue = createGetDataElementValue(
+        moduleProvider,
+        getDataElementDefinition,
+        replaceTokens,
+        undefinedVarsReturnEmpty
+      );
       var value = getDataElementValue('testDataElement');
 
       expect(value).toBe('');
@@ -293,8 +337,12 @@ describe('function returned by createGetDataElementValue', function() {
         };
       };
       var undefinedVarsReturnEmpty = false;
-      var getDataElementValue = createGetDataElementValue(moduleProvider,
-        getDataElementDefinition, undefinedVarsReturnEmpty);
+      var getDataElementValue = createGetDataElementValue(
+        moduleProvider,
+        getDataElementDefinition,
+        replaceTokens,
+        undefinedVarsReturnEmpty
+      );
       var value = getDataElementValue('testDataElement');
 
       expect(value).toEqual(dataElementValue);
@@ -319,8 +367,12 @@ describe('function returned by createGetDataElementValue', function() {
       };
     };
     var undefinedVarsReturnEmpty = false;
-    var getDataElementValue = createGetDataElementValue(moduleProvider, 
-      getDataElementDefinition, undefinedVarsReturnEmpty);
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
     var value = getDataElementValue('testDataElement');
 
     expect(value).toBe('bar');
@@ -343,11 +395,50 @@ describe('function returned by createGetDataElementValue', function() {
       };
     };
     var undefinedVarsReturnEmpty = false;
-    var getDataElementValue = createGetDataElementValue(moduleProvider, 
-      getDataElementDefinition, undefinedVarsReturnEmpty);
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
     var value = getDataElementValue('testDataElement');
 
     expect(value).toBe('bar');
+  });
+
+  it('replaces tokens in settings object', function() {
+    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
+    var moduleProvider = {
+      getModuleExports: function() {
+        return function(settings) {
+          return settings.foo;
+        };
+      }
+    };
+    var getDataElementDefinition = function() {
+      return {
+        settings: {
+          foo: '%bar%'
+        }
+      };
+    };
+
+    var replaceTokens = function() {
+      return {
+        foo: 'valueOfBar'
+      };
+    };
+
+    var undefinedVarsReturnEmpty = false;
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
+    var value = getDataElementValue('testDataElement');
+
+    expect(value).toBe('valueOfBar');
   });
 
   describe('error handling', function() {
@@ -365,8 +456,12 @@ describe('function returned by createGetDataElementValue', function() {
         };
       };
       var undefinedVarsReturnEmpty = false;
-      var getDataElementValue = createGetDataElementValue(moduleProvider, 
-        getDataElementDefinition, undefinedVarsReturnEmpty);
+      var getDataElementValue = createGetDataElementValue(
+        moduleProvider,
+        getDataElementDefinition,
+        replaceTokens,
+        undefinedVarsReturnEmpty
+      );
       var value = getDataElementValue('testDataElement');
 
       expect(value).toBeUndefined();
@@ -392,8 +487,12 @@ describe('function returned by createGetDataElementValue', function() {
         };
       };
       var undefinedVarsReturnEmpty = false;
-      var getDataElementValue = createGetDataElementValue(moduleProvider, 
-        getDataElementDefinition, undefinedVarsReturnEmpty);
+      var getDataElementValue = createGetDataElementValue(
+        moduleProvider,
+        getDataElementDefinition,
+        replaceTokens,
+        undefinedVarsReturnEmpty
+      );
       var value = getDataElementValue('testDataElement');
 
       expect(value).toBeUndefined();
@@ -417,8 +516,12 @@ describe('function returned by createGetDataElementValue', function() {
         };
       };
       var undefinedVarsReturnEmpty = false;
-      var getDataElementValue = createGetDataElementValue(moduleProvider, 
-        getDataElementDefinition, undefinedVarsReturnEmpty);
+      var getDataElementValue = createGetDataElementValue(
+        moduleProvider,
+        getDataElementDefinition,
+        replaceTokens,
+        undefinedVarsReturnEmpty
+      );
       var value = getDataElementValue('testDataElement');
 
       expect(value).toBeUndefined();

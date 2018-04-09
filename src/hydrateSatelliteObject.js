@@ -12,12 +12,11 @@
 
 var cookie = require('@adobe/reactor-cookie');
 var logger = require('./logger');
-var pageBottom = require('./pageBottom');
 
 module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, setCustomVar) {
   var prefixedLogger = logger.createPrefixedLogger('Custom Script');
 
-  // Will get replaced by the directCall event delegate from the DTM extension. Exists here in
+  // Will get replaced by the directCall event delegate from the Core extension. Exists here in
   // case there are no direct call rules (and therefore the directCall event delegate won't get
   // included) and our customers are still calling the method. In this case, we don't want an error
   // to be thrown. This method existed before Reactor.
@@ -111,7 +110,11 @@ module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, 
 
   _satellite.cookie = cookie;
 
-  _satellite.pageBottom = pageBottom.trigger;
+  // Will get replaced by the pageBottom event delegate from the Core extension. Exists here in
+  // case the customers are not using core (and therefore the pageBottom event delegate won't get
+  // included) and they are still calling the method. In this case, we don't want an error
+  // to be thrown. This method existed before Reactor.
+  _satellite.pageBottom = function() {};
 
   _satellite.setDebug = setDebugOutputEnabled;
 

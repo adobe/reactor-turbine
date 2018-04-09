@@ -15,7 +15,6 @@ var createGetExtensionSettings = require('./createGetExtensionSettings');
 var createGetHostedLibFileUrl = require('./createGetHostedLibFileUrl');
 var logger = require('./logger');
 var resolveRelativePath = require('./resolveRelativePath');
-var pageBottom = require('./pageBottom');
 var createPublicRequire = require('./createPublicRequire');
 
 module.exports = function(container, moduleProvider, replaceTokens, getDataElementValue) {
@@ -43,7 +42,6 @@ module.exports = function(container, moduleProvider, replaceTokens, getDataEleme
           getHostedLibFileUrl: getHostedLibFileUrl,
           getSharedModule: getSharedModuleExports,
           logger: prefixedLogger,
-          onPageBottom: pageBottom.addListener,
           propertySettings: propertySettings,
           replaceTokens: replaceTokens
         };

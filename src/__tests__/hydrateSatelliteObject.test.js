@@ -149,17 +149,11 @@ describe('hydrateSatelliteObject', function() {
   });
 
   it('exposes a pageBottom method', function() {
-    var pageBottomMock = {
-      trigger: function() {}
-    };
-
-    var hydrateSatelliteObject = injectHydrateSatelliteObject({
-      './pageBottom': pageBottomMock
-    });
-
+    var hydrateSatelliteObject = injectHydrateSatelliteObject();
     hydrateSatelliteObject(_satellite, container);
-
-    expect(_satellite.pageBottom).toBe(pageBottomMock.trigger);
+    expect(_satellite.pageBottom).toEqual(jasmine.any(Function));
+    // shouldn't throw an error.
+    _satellite.pageBottom();
   });
 
   it('exposes the container', function() {

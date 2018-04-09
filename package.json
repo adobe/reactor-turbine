@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "eslint": "^4.2.0",
-    "inject-loader": "^3.0.0",
+    "inject-loader": "^4.0.1",
     "istanbul-instrumenter-loader": "^3.0.0",
     "jasmine-core": "^2.6.4",
     "karma": "^2.0.0",

@@ -158,9 +158,6 @@ describe('hydrateModuleProvider', function() {
     var createGetSharedModuleExports;
     var prefixedLogger;
     var logger;
-    var pageBottom = {
-      addListener: function() {}
-    };
 
     beforeEach(function() {
       getExtensionSettings = function() {};
@@ -186,8 +183,7 @@ describe('hydrateModuleProvider', function() {
         './createGetExtensionSettings': createGetExtensionSettings,
         './createGetHostedLibFileUrl': createGetHostedLibFileUrl,
         './createGetSharedModuleExports': createGetSharedModuleExports,
-        './logger': logger,
-        './pageBottom': pageBottom
+        './logger': logger
       });
 
       hydrateModuleProvider(container, moduleProvider, replaceTokens, getDataElementValue);
@@ -229,10 +225,6 @@ describe('hydrateModuleProvider', function() {
     it('contains logger', function() {
       expect(logger.createPrefixedLogger).toHaveBeenCalledWith('Extension A');
       expect(turbine.logger).toBe(prefixedLogger);
-    });
-
-    it('contains onPageBottom', function() {
-      expect(turbine.onPageBottom).toBe(pageBottom.addListener);
     });
 
     it('contains propertySettings', function() {

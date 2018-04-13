@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "rollup -c --intro \"if (!window.atob) { console.warn('Adobe Launch is unsupported in IE 9 and below.'); return; }\" && uglifyjs dist/engine.js -c -m -o dist/engine.min.js",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "test": "karma start",
     "test:watch": "npm test -- --no-single-run --no-coverage",
     "lint": "eslint 'src/**/*.js'"

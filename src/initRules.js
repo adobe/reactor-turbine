@@ -153,6 +153,7 @@ module.exports = function(
     var syntheticEventMeta = {
       $type: extensionName + '.' + moduleName,
       $rule: {
+        id: rule.id,
         name: rule.name
       }
     };

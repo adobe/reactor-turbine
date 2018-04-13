@@ -122,6 +122,7 @@ describe('initRules', function() {
       rules = [
         {
           name: 'Test Rule',
+          id: 'RL123',
           events: [
             {
               modulePath: TEST_EVENT_PATH,
@@ -191,6 +192,7 @@ describe('initRules', function() {
       expect(condition1ExportsCall.args[1]).toEqual({
         $type: 'test-extension.test-event',
         $rule: {
+          id: 'RL123',
           name: 'Test Rule'
         }
       });
@@ -208,6 +210,7 @@ describe('initRules', function() {
       expect(condition2ExportsCall.args[1]).toEqual({
         $type: 'test-extension.test-event',
         $rule: {
+          id: 'RL123',
           name: 'Test Rule'
         }
       });
@@ -225,6 +228,7 @@ describe('initRules', function() {
       expect(action1ExportsCall.args[1]).toEqual({
         $type: 'test-extension.test-event',
         $rule: {
+          id: 'RL123',
           name: 'Test Rule'
         }
       });
@@ -242,6 +246,7 @@ describe('initRules', function() {
       expect(action2ExportsCall.args[1]).toEqual({
         $type: 'test-extension.test-event',
         $rule: {
+          id: 'RL123',
           name: 'Test Rule'
         }
       });

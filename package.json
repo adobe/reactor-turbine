@@ -1,6 +1,6 @@
 {
   "name": "@adobe/reactor-turbine",
-  "version": "25.1.0",
+  "version": "25.1.1",
   "description": "Launch rule engine which processes rules on client websites and delegates logic to extensions.",
   "license": "Apache-2.0",
   "scripts": {

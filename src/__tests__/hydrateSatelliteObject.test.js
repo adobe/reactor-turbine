@@ -100,6 +100,48 @@ describe('hydrateSatelliteObject', function() {
     expect(_satellite.cookie.set).toEqual(jasmine.any(Function));
     expect(_satellite.cookie.remove).toEqual(jasmine.any(Function));
   });
+  
+  it('can read query parameters', function() {
+	var hydrateSatelliteObject = injectHydrateSatelliteObject();
+    hydrateSatelliteObject(_satellite, container);  
+	  
+	var oldSearch = window.location.search;
+	var testString = 'foo=bar&Buzz=Fizz&spaceIncluded=space%20included';
+	
+	expect(_satellite.query.read("foo", undefined, testString)).toEqual("bar");
+	expect(_satellite.query.read("buzz", undefined, testString)).toBeUndefined();
+	expect(_satellite.query.read("Buzz", undefined, testString)).toEqual("Fizz");
+	expect(_satellite.query.read("spaceIncluded", undefined, testString)).toEqual("space included");
+	
+	expect(_satellite.query.readCaseInsensitive("foo", testString)).toEqual("bar");
+	expect(_satellite.query.readCaseInsensitive("buzz", testString)).toEqual("Fizz");
+	expect(_satellite.query.readCaseInsensitive("Buzz", testString)).toEqual("Fizz");
+	expect(_satellite.query.readCaseInsensitive("spaceincluded", testString)).toEqual("space included");
+	
+  });
+  
+  it('exposes querystring read methods', function() {
+    var logger = {
+      warn: jasmine.createSpy(),
+      createPrefixedLogger: function() {}
+    };
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({
+      './logger': logger
+    });
+    hydrateSatelliteObject(_satellite, container);
+
+    expect(_satellite.getQueryParam).toEqual(jasmine.any(Function));
+    expect(_satellite.getQueryParamCaseInsensitive).toEqual(jasmine.any(Function));
+	
+	//test that deprecation warnings are issued
+	_satellite.getQueryParam("queryParam");
+	expect(logger.warn).toHaveBeenCalledWith(
+      '_satellite.getQueryParam is deprecated. Please use _satellite.query.read("queryParam").');
+	  
+	 _satellite.getQueryParamCaseInsensitive("queryParam");
+	expect(logger.warn).toHaveBeenCalledWith(
+      '_satellite.getQueryParamCaseInsensitive is deprecated. Please use _satellite.query.readCaseInsensitive("queryParam").');
+  });
 
   it('exposes a logger', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject();

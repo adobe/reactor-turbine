@@ -12,6 +12,7 @@
 
 var cookie = require('@adobe/reactor-cookie');
 var logger = require('./logger');
+var queryString = require('@adobe/reactor-query-string');
 
 module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, setCustomVar) {
   var prefixedLogger = logger.createPrefixedLogger('Custom Script');
@@ -109,6 +110,68 @@ module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, 
   };
 
   _satellite.cookie = cookie;
+  
+   _satellite.query = {};
+ 
+/**
+ * Returns query string parameters
+ * @param {string} name The query string parameter name.
+ * @param {string} locale Used for dependency injection on testing. Defaults to window.location.search.
+ * @param {string} [caseInsensitive] (optional, intended for use by getQueryParamCaseInsensitive) Whether casing should be ignored.
+ * @returns {string}
+ */
+  var queryRead = function(name, caseInsensitive, locale){
+	var queryParams = '';
+	if (locale){queryParams = queryString.parse(locale);}
+	else{queryParams = queryString.parse(window.location.search);}
+
+	if (caseInsensitive) {
+		var lowerCaseName = name.toLowerCase();
+		var keys = Object.keys(queryParams);
+		for (var i = 0; i < keys.length; i++) {
+		  var key = keys[i];
+		  if (key.toLowerCase() === lowerCaseName) {
+			return decodeURIComponent(queryParams[key]);
+		  }
+		}
+		return undefined;
+	} 
+	else {
+		if (queryParams.hasOwnProperty(name)){
+			return decodeURIComponent(queryParams[name]);
+		}
+		return undefined;
+	}
+	
+	};
+	
+	_satellite.getQueryParam = function(name){
+	  //included for legacy reasons
+	  logger.warn('_satellite.getQueryParam is deprecated. ' +
+      'Please use _satellite.query.read("' + name + '").');
+	  
+	  return _satellite.query.read(name);
+	};
+  /**
+  * Returns query string parameters, ignoring case.
+  * Included for compatibility with DTM _satellite object
+  * @param {string} name The query string parameter name.
+  * @param {string} locale optional. Used for dependency injection on testing. Defaults to window.location.search otherwise.
+  * @returns {string}
+  */
+  var readCaseInsensitive = function(name, locale) {
+	return _satellite.query.read(name, true, locale);
+  };
+  
+  _satellite.getQueryParamCaseInsensitive = function(name){
+	//included for legacy reasons
+	logger.warn('_satellite.getQueryParamCaseInsensitive is deprecated. ' +
+	  'Please use _satellite.query.readCaseInsensitive("' + name + '").');
+	  
+	return _satellite.query.readCaseInsensitive(name);
+  };
+  
+  _satellite.query = {"read":queryRead, "readCaseInsensitive": readCaseInsensitive};
 
   // Will get replaced by the pageBottom event delegate from the Core extension. Exists here in
   // case the customers are not using core (and therefore the pageBottom event delegate won't get

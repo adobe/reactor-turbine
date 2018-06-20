@@ -52,11 +52,19 @@ describe('initRules', function() {
   });
 
   describe('rule execution', function() {
-    var initRules = require('../initRules');
+    var initRules;
+    var notifyMonitors;
     var event;
     var extensionName = 'test-extension';
 
     beforeEach(function() {
+      initRules = injectInitRules({
+        './createNotifyMonitors': function() {
+          notifyMonitors = jasmine.createSpy();
+          return notifyMonitors;
+        }
+      });
+
       event = {};
 
       moduleProvider.registerModule(
@@ -250,6 +258,13 @@ describe('initRules', function() {
           name: 'Test Rule'
         }
       });
+
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleTriggered', {
+        rule: rules[0]
+      });
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
+        rule: rules[0]
+      });
     });
 
     it('ceases to execute remaining conditions and any actions when condition fails', function() {
@@ -270,6 +285,11 @@ describe('initRules', function() {
       expect(moduleProvider.getModuleExports(TEST_CONDITION2_PATH).calls.count()).toBe(0);
       expect(moduleProvider.getModuleExports(TEST_ACTION1_PATH).calls.count()).toBe(0);
       expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
+
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+        rule: rules[0],
+        condition: rules[0].conditions[0]
+      });
     });
 
     it('ceases to execute remaining conditions and any actions when negated ' +
@@ -282,6 +302,11 @@ describe('initRules', function() {
       expect(moduleProvider.getModuleExports(TEST_CONDITION2_PATH).calls.count()).toBe(0);
       expect(moduleProvider.getModuleExports(TEST_ACTION1_PATH).calls.count()).toBe(0);
       expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
+
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+        rule: rules[0],
+        condition: rules[0].conditions[0]
+      });
     });
 
     it('does not throw error when there are no events for a rule', function() {
@@ -316,6 +341,7 @@ describe('initRules', function() {
 
   describe('error handling and logging', function() {
     var logger;
+    var notifyMonitors;
     var initRules;
 
     beforeEach(function() {
@@ -374,7 +400,11 @@ describe('initRules', function() {
       ];
 
       initRules = injectInitRules({
-        './logger': logger
+        './logger': logger,
+        './createNotifyMonitors': function() {
+          notifyMonitors = jasmine.createSpy();
+          return notifyMonitors;
+        }
       });
     });
 
@@ -456,6 +486,10 @@ describe('initRules', function() {
       var expectedErrorMessage = 'Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
         ' for Test Rule rule. noob tried to divide by zero.';
       expect(errorMessage).toStartWith(expectedErrorMessage);
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+        rule: rules[0],
+        condition: rules[0].conditions[0]
+      });
     });
 
     it('logs an error when the condition module exports is not a function', function() {
@@ -475,6 +509,10 @@ describe('initRules', function() {
       var errorMessage = logger.error.calls.mostRecent().args[0];
       expect(errorMessage).toBe('Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
         ' for Test Rule rule. Module did not export a function.');
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+        rule: rules[0],
+        condition: rules[0].conditions[0]
+      });
     });
 
     it('logs an error when executing condition module exports fails', function() {
@@ -497,6 +535,10 @@ describe('initRules', function() {
       var expectedErrorMessage = 'Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
         ' for Test Rule rule. noob tried to divide by zero.';
       expect(errorMessage).toStartWith(expectedErrorMessage);
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+        rule: rules[0],
+        condition: rules[0].conditions[0]
+      });
     });
 
     it('logs a message when the condition doesn\'t pass', function() {
@@ -517,6 +559,10 @@ describe('initRules', function() {
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
         'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+        rule: rules[0],
+        condition: rules[0].conditions[0]
+      });
     });
 
     it('logs a message when the negated condition doesn\'t pass', function() {
@@ -526,6 +572,10 @@ describe('initRules', function() {
 
       expect(logger.log.calls.mostRecent().args[0]).toEqual(
         'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+        rule: rules[0],
+        condition: rules[0].conditions[0]
+      });
     });
 
     it('logs an error when retrieving action module exports fails', function() {
@@ -546,6 +596,9 @@ describe('initRules', function() {
         TEST_ACTION1_DISPLAY_NAME + ' for Test Rule rule. noob tried to divide ' +
         'by zero.';
       expect(errorMessage).toStartWith(expectedErrorMessage);
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
+        rule: rules[0]
+      });
     });
 
     it('logs an error when the action module exports is not a function', function() {
@@ -565,6 +618,9 @@ describe('initRules', function() {
       var errorMessage = logger.error.calls.mostRecent().args[0];
       expect(errorMessage).toBe('Failed to execute ' + TEST_ACTION1_DISPLAY_NAME +
         ' for Test Rule rule. Module did not export a function.');
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
+        rule: rules[0]
+      });
     });
 
     it('logs an error when executing action module exports fails', function() {
@@ -587,6 +643,9 @@ describe('initRules', function() {
       var expectedErrorMessage = 'Failed to execute ' + TEST_ACTION1_DISPLAY_NAME +
         ' for Test Rule rule. noob tried to divide by zero.';
       expect(errorMessage).toStartWith(expectedErrorMessage);
+      expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
+        rule: rules[0]
+      });
     });
   });
 });

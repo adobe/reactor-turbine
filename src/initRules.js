@@ -74,9 +74,12 @@ module.exports = function(
   };
 
   var checkConditions = function(rule, syntheticEvent) {
+    var conditionFailed;
+    var condition;
+
     if (rule.conditions) {
       for (var i = 0; i < rule.conditions.length; i++) {
-        var condition = rule.conditions[i];
+        condition = rule.conditions[i];
         condition.settings = condition.settings || {};
 
         var moduleExports;
@@ -85,12 +88,14 @@ module.exports = function(
           moduleExports = moduleProvider.getModuleExports(condition.modulePath);
         } catch (e) {
           logger.error(getErrorMessage(condition, rule, e.message, e.stack));
-          return;
+          conditionFailed = true;
+          break;
         }
 
         if (typeof moduleExports !== 'function') {
           logger.error(getErrorMessage(condition, rule, MODULE_NOT_FUNCTION_ERROR));
-          return;
+          conditionFailed = true;
+          break;
         }
 
         var settings = replaceTokens(condition.settings, syntheticEvent);
@@ -101,25 +106,25 @@ module.exports = function(
           result = moduleExports(settings, syntheticEvent);
         } catch (e) {
           logger.error(getErrorMessage(condition, rule, e.message, e.stack));
-          notifyMonitors('ruleConditionFailed', {
-            rule: rule,
-            condition: condition
-          });
-          // We return because we want to assume the condition would have failed and therefore
-          // we don't want to run the following conditions or the rule's actions.
-          return;
+          conditionFailed = true;
+          break;
         }
 
         if ((!result && !condition.negate) || (result && condition.negate)) {
           var conditionDisplayName = getModuleDisplayNameByRuleComponent(condition);
           logger.log('Condition ' + conditionDisplayName + ' for rule ' + rule.name + ' not met.');
-          notifyMonitors('ruleConditionFailed', {
-            rule: rule,
-            condition: condition
-          });
-          return;
+          conditionFailed = true;
+          break;
         }
       }
+    }
+
+    if (conditionFailed) {
+      notifyMonitors('ruleConditionFailed', {
+        rule: rule,
+        condition: condition
+      });
+      return;
     }
 
     runActions(rule, syntheticEvent);

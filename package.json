@@ -29,13 +29,13 @@
     "@adobe/reactor-window": "*"
   },
   "devDependencies": {
-    "eslint": "^4.2.0",
+    "eslint": "^4.19.1",
     "inject-loader": "^4.0.1",
     "istanbul-instrumenter-loader": "^3.0.0",
     "jasmine-core": "^2.6.4",
-    "karma": "^2.0.0",
+    "karma": "^2.0.3",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-coverage": "^1.1.1",
+    "karma-coverage": "^1.1.2",
     "karma-firefox-launcher": "^1.0.1",
     "karma-jasmine": "^1.1.0",
     "karma-jasmine-matchers": "^3.7.0",

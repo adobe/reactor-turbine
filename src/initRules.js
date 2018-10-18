@@ -14,12 +14,10 @@ var logger = require('./logger');
 var normalizeSyntheticEvent = require('./normalizeSyntheticEvent');
 var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
 var createNotifyMonitors = require('./createNotifyMonitors');
-var createGetDelegatesChain = require('./createGetDelegatesChain');
 var getNamespacedStorage = require('./getNamespacedStorage');
-var createRunModule = require('./createRunModule');
+var createExecuteDelegateModule = require('./createExecuteDelegateModule');
 var localStorage = getNamespacedStorage('localStorage');
-var lastPromiseInQueue = Promise.resolve(null);
-var CONDITION_NOT_MET = 'condition not met';
+var Promise = require('@adobe/reactor-promise');
 
 module.exports = function(
   _satellite,
@@ -28,8 +26,9 @@ module.exports = function(
   replaceTokens,
   getShouldExecuteActions
 ) {
+  var lastPromiseInQueue = Promise.resolve();
   var notifyMonitors = createNotifyMonitors(_satellite);
-  var runModule = createRunModule(moduleProvider, replaceTokens);
+  var executeDelegateModule = createExecuteDelegateModule(moduleProvider, replaceTokens);
 
   var getModuleDisplayNameByRuleComponent = function(ruleComponent) {
     var moduleDefinition = moduleProvider.getModuleDefinition(
@@ -59,16 +58,16 @@ module.exports = function(
     );
   };
 
-  var logActionError = function(component, rule, e) {
-    logger.error(getErrorMessage(component, rule, e.message, e.stack));
+  var logActionError = function(action, rule, e) {
+    logger.error(getErrorMessage(action, rule, e.message, e.stack));
   };
 
-  var logConditionError = function(component, rule, e) {
-    logger.error(getErrorMessage(component, rule, e.message, e.stack));
+  var logConditionError = function(condition, rule, e) {
+    logger.error(getErrorMessage(condition, rule, e.message, e.stack));
 
     notifyMonitors('ruleConditionFailed', {
       rule: rule,
-      condition: component,
+      condition: condition,
     });
   };
 
@@ -96,58 +95,68 @@ module.exports = function(
     });
   };
 
-  var getDelegatesChain = createGetDelegatesChain(runModule);
+  // var getDelegatesChain = createGetDelegatesChain(runModule);
 
-  var checkConditionResult = function(data) {
-    var result = data.result;
-    var condition = data.component;
-
-    if ((!result && !condition.negate) || (result && condition.negate)) {
-      throw new Error(CONDITION_NOT_MET);
-    }
+  var isConditionMet = function(condition, result) {
+    return (!result && !condition.negate) || (result && condition.negate);
   };
 
   var addRuleToQueue = function(rule, syntheticEvent) {
-    var conditionsChain = Promise.resolve();
+    var chain = Promise.resolve();
 
     if (rule.conditions) {
-      conditionsChain = getDelegatesChain(
-        rule.conditions,
-        rule,
-        syntheticEvent,
-        logConditionError,
-        function(condition, conditionResult) {
-          try {
-            checkConditionResult({
-              component: condition,
-              result: conditionResult,
-            });
-          } catch (e) {
-            logConditionNotMet(rule, condition);
-            throw e;
-          }
-        },
-        true
-      );
+      rule.conditions.forEach(function(condition) {
+        chain = chain.then(function() {
+          var conditionPromise = new Promise(function(resolve) {
+            resolve(executeDelegateModule(condition, syntheticEvent, [syntheticEvent]));
+          }).catch(function(e) {
+            logConditionError(condition, rule, e);
+            return Promise.reject(e);
+          }).then(function(result) {
+            if (!isConditionMet(condition, result)) {
+              logConditionNotMet(rule, condition);
+              return Promise.reject();
+            }
+          });
+
+          var timeoutPromise = new Promise(function(resolve, reject) {
+            // We reject instead of resolve because we don't want
+            // remaining conditions and actions to run.
+            setTimeout(reject, 5000);
+          });
+
+          return Promise.race([conditionPromise, timeoutPromise]);
+        });
+      });
     }
 
     if (getShouldExecuteActions() && rule.actions) {
-      var actionsChain = getDelegatesChain(
-        rule.actions,
-        rule,
-        syntheticEvent,
-        logActionError
-      );
+      rule.actions.forEach(function(action) {
+        chain = chain.then(function() {
+          var actionPromise = new Promise(function(resolve) {
+            resolve(executeDelegateModule(action, syntheticEvent, [syntheticEvent]));
+          }).catch(function(e) {
+            logActionError(action, rule, e);
+          });
 
-      lastPromiseInQueue = lastPromiseInQueue
-        .then(conditionsChain)
-        .then(actionsChain)
-        .then(logRuleCompleted.bind(null, rule))
-        // The only errors that should get to this catch are `condition not met`
-        // errors or promises that are rejected. This catch will allow the
-        // promises of the following rules in the chain to run like nothing happened.
-        .catch(function() {});
+          var timeoutPromise = new Promise(function(resolve) {
+            // We resolve instead of reject because we want remaining actions to run.
+            setTimeout(resolve, 5000);
+          });
+
+          return Promise.race([actionPromise, timeoutPromise]);
+        });
+      });
     }
+
+    chain = chain.then(function() {
+      logRuleCompleted(rule);
+    });
+
+    // Allows later rules to keep running when an error occurs within this rule.
+    chain = chain.catch(function() {});
+
+    lastPromiseInQueue = chain;
   };
 
   var checkConditions = function(rule, syntheticEvent) {
@@ -158,10 +167,10 @@ module.exports = function(
         condition = rule.conditions[i];
 
         try {
-          var result = runModule(condition, syntheticEvent, [syntheticEvent]);
+          var result = executeDelegateModule(condition, syntheticEvent, [syntheticEvent]);
 
           try {
-            checkConditionResult({
+            isConditionMet({
               result: result,
               component: condition,
             });
@@ -182,7 +191,7 @@ module.exports = function(
     if (getShouldExecuteActions()) {
       (rule.actions || []).forEach(function(action) {
         try {
-          runModule(action, syntheticEvent, [syntheticEvent]);
+          executeDelegateModule(action, syntheticEvent, [syntheticEvent]);
         } catch (e) {
           logActionError(action, rule, e);
         }
@@ -235,7 +244,7 @@ module.exports = function(
         }
       };
 
-      runModule(event, null, [trigger]);
+      executeDelegateModule(event, null, [trigger]);
     } catch (e) {
       logger.error(getErrorMessage(event, rule, e.message, e.stack));
     }

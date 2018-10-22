@@ -200,7 +200,7 @@ module.exports = function(config) {
     browserNoActivityTimeout: 300000,
 
     webpack: {
-      mode: 'production',
+      mode: 'development',
       externals: {
         window: 'window',
         document: 'document'

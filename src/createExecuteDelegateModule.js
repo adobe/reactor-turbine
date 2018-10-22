@@ -15,14 +15,18 @@ var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 module.exports = function(moduleProvider, replaceTokens) {
   return function(moduleDescriptor, syntheticEvent, moduleCallParameters) {
     moduleCallParameters = moduleCallParameters || [];
-    var settings = replaceTokens(moduleDescriptor.settings || {}, syntheticEvent);
-    var moduleExports = moduleProvider.getModuleExports(moduleDescriptor.modulePath);
+    var moduleExports = moduleProvider.getModuleExports(
+      moduleDescriptor.modulePath
+    );
 
     if (typeof moduleExports !== 'function') {
       throw new Error(MODULE_NOT_FUNCTION_ERROR);
     }
 
-    moduleCallParameters.unshift(settings);
-    return moduleExports.apply(null, moduleCallParameters);
+    var settings = replaceTokens(
+      moduleDescriptor.settings || {},
+      syntheticEvent
+    );
+    return moduleExports.bind(null, settings).apply(null, moduleCallParameters);
   };
 };

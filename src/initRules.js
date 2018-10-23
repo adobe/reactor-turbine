@@ -71,7 +71,7 @@ module.exports = function(
 
     notifyMonitors('ruleConditionFailed', {
       rule: rule,
-      condition: condition,
+      condition: condition
     });
   };
 
@@ -88,14 +88,14 @@ module.exports = function(
 
     notifyMonitors('ruleConditionFailed', {
       rule: rule,
-      condition: condition,
+      condition: condition
     });
   };
 
   var logRuleCompleted = function(rule) {
     logger.log('Rule "' + rule.name + '" fired.');
     notifyMonitors('ruleCompleted', {
-      rule: rule,
+      rule: rule
     });
   };
 
@@ -188,7 +188,7 @@ module.exports = function(
 
         try {
           var result = executeDelegateModule(condition, syntheticEvent, [
-            syntheticEvent,
+            syntheticEvent
           ]);
 
           if (!isConditionMet(condition, result)) {
@@ -234,8 +234,8 @@ module.exports = function(
         $type: extensionName + '.' + moduleName,
         $rule: {
           id: rule.id,
-          name: rule.name,
-        },
+          name: rule.name
+        }
       };
 
       /**
@@ -246,7 +246,7 @@ module.exports = function(
        */
       var trigger = function(syntheticEvent) {
         notifyMonitors('ruleTriggered', {
-          rule: rule,
+          rule: rule
         });
 
         var normalizedSyntethicEvent = normalizeSyntheticEvent(

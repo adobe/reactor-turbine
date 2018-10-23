@@ -13,638 +13,880 @@
 'use strict';
 var createModuleProvider = require('../createModuleProvider');
 var injectInitRules = require('inject-loader!../initRules');
+var ModuleHelper = require('./helpers/module');
+
+var generateDelegate = function(name, scriptFn, settings) {
+  return {
+    name: name || 'Event',
+    settings: settings,
+    script:
+      scriptFn ||
+      function(module) {
+        module.exports = jasmine
+          .createSpy()
+          .and.callFake(function(settings, trigger) {
+            trigger(event);
+          });
+      }
+  };
+};
+
+var generateEvent = generateDelegate;
+var generateCondition = generateDelegate;
+var generateAction = generateDelegate;
+
+var setupRules = function(rulesDefinition) {
+  var rules = [];
+  var counter = 1;
+
+  rulesDefinition.forEach(function(ruleDefinition) {
+    var rule = {
+      name: 'Test Rule ' + counter,
+      id: 'RL' + counter
+    };
+
+    // If we don't setup an event, generate automatically one that will be called.
+    if (!ruleDefinition.events) {
+      ruleDefinition.events = [generateEvent('ImpliedEvent')];
+    }
+
+    ['events', 'conditions', 'actions'].forEach(function(delegateType) {
+      rule[delegateType] = [];
+
+      (ruleDefinition[delegateType] || []).forEach(function(
+        delegateDefinition
+      ) {
+        moduleProvider.registerModule.apply(
+          null,
+          ModuleHelper.createModule(
+            delegateDefinition.name,
+            delegateDefinition.script
+          )
+        );
+
+        var delegate = {
+          modulePath: ModuleHelper.getPath(delegateDefinition.name),
+          settings: delegateDefinition.settings
+        };
+
+        if (
+          delegateType === 'conditions' &&
+          delegateDefinition.negate != null
+        ) {
+          delegate.negate = delegateDefinition.negate;
+        }
+
+        rule[delegateType].push(delegate);
+      });
+    });
+
+    rules.push(rule);
+    counter += 1;
+  });
+
+  return rules;
+};
+
+var runInitRules = function(rules) {
+  return initRules(
+    _satellite,
+    rules,
+    moduleProvider,
+    replaceTokens,
+    getShouldExecuteActions
+  );
+};
+
+var _satellite = {};
+var replaceTokens = function(value) {
+  return value;
+};
+var getShouldExecuteActions;
+var moduleProvider;
+var initRules;
+var notifyMonitors;
+var logger;
 
 describe('initRules', function() {
-  var TEST_EVENT_PATH = 'hello-world/testEvent.js';
-  var TEST_EVENT_NAME = 'test-event';
-  var TEST_EVENT_DISPLAY_NAME = 'Test Event';
-
-  var TEST_CONDITION1_PATH = 'hello-world/testCondition1.js';
-  var TEST_CONDITION1_NAME = 'test-condition-1';
-  var TEST_CONDITION1_DISPLAY_NAME = 'Test Condition 1';
-
-  var TEST_CONDITION2_PATH = 'hello-world/testCondition2.js';
-  var TEST_CONDITION2_NAME = 'test-condition-2';
-  var TEST_CONDITION2_DISPLAY_NAME = 'Test Condition 2';
-
-  var TEST_ACTION1_PATH = 'hello-world/testAction1.js';
-  var TEST_ACTION1_NAME = 'test-action-1';
-  var TEST_ACTION1_DISPLAY_NAME = 'Test Action 1';
-
-  var TEST_ACTION2_PATH = 'hello-world/testAction2.js';
-  var TEST_ACTION2_NAME = 'test-action-2';
-  var TEST_ACTION2_DISPLAY_NAME = 'Test Action 2';
-
-  var _satellite = {};
-  var replaceTokens;
-  var getShouldExecuteActions;
-  var rules;
-  var moduleProvider;
-
   beforeEach(function() {
-    replaceTokens = function(value) { return value; };
-
     getShouldExecuteActions = function() {
       return true;
     };
 
     moduleProvider = createModuleProvider();
-  });
 
-  describe('rule execution', function() {
-    var initRules;
-    var notifyMonitors;
-    var event;
-    var extensionName = 'test-extension';
-
-    beforeEach(function() {
-      initRules = injectInitRules({
-        './createNotifyMonitors': function() {
-          notifyMonitors = jasmine.createSpy();
-          return notifyMonitors;
-        }
-      });
-
-      event = {};
-
-      moduleProvider.registerModule(
-        TEST_EVENT_PATH,
-        {
-          name: TEST_EVENT_NAME,
-          displayName: TEST_EVENT_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = jasmine
-              .createSpy()
-              .and
-              .callFake(function(settings, trigger) {
-                trigger(event);
-              });
-          }
-        },
-        extensionName);
-
-      moduleProvider.registerModule(
-        TEST_CONDITION1_PATH,
-        {
-          name: TEST_CONDITION1_NAME,
-          displayName: TEST_CONDITION1_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = jasmine.createSpy().and.returnValue(true);
-          }
-        },
-        extensionName);
-
-      moduleProvider.registerModule(
-        TEST_CONDITION2_PATH,
-        {
-          name: TEST_CONDITION2_NAME,
-          displayName: TEST_CONDITION2_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = jasmine.createSpy().and.returnValue(false);
-          }
-        },
-        extensionName);
-
-      moduleProvider.registerModule(
-        TEST_ACTION1_PATH,
-        {
-          name: TEST_ACTION1_NAME,
-          displayName: TEST_ACTION1_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = jasmine.createSpy();
-          }
-        },
-        extensionName);
-
-      moduleProvider.registerModule(
-        TEST_ACTION2_PATH,
-        {
-          name: TEST_ACTION2_NAME,
-          displayName: TEST_ACTION2_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = jasmine.createSpy();
-          }
-        },
-        extensionName);
-
-      rules = [
-        {
-          name: 'Test Rule',
-          id: 'RL123',
-          events: [
-            {
-              modulePath: TEST_EVENT_PATH,
-              settings: {
-                testEventFoo: 'bar'
-              }
-            }
-          ],
-          conditions: [
-            {
-              modulePath: TEST_CONDITION1_PATH,
-              settings: {
-                testCondition1Foo: 'bar'
-              }
-            },
-            {
-              modulePath: TEST_CONDITION2_PATH,
-              settings: {
-                testCondition2Foo: 'bar'
-              },
-              negate: true
-            }
-          ],
-          actions: [
-            {
-              modulePath: TEST_ACTION1_PATH,
-              settings: {
-                testAction1Foo: 'bar'
-              }
-            },
-            {
-              modulePath: TEST_ACTION2_PATH,
-              settings: {
-                testAction2Foo: 'bar'
-              }
-            }
-          ]
-        }
-      ];
-    });
-
-    it('evaluates all conditions and, when all pass, executes all actions', function() {
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      var eventExports = moduleProvider.getModuleExports(TEST_EVENT_PATH);
-
-      expect(eventExports.calls.count()).toBe(1);
-
-      var eventExportsCalls = eventExports.calls.mostRecent();
-
-      expect(eventExportsCalls.args[0]).toEqual({
-        testEventFoo: 'bar'
-      });
-
-      expect(typeof eventExportsCalls.args[1]).toBe('function');
-
-      var condition1Exports = moduleProvider.getModuleExports(TEST_CONDITION1_PATH);
-
-      expect(condition1Exports.calls.count()).toBe(1);
-
-      var condition1ExportsCall = condition1Exports.calls.mostRecent();
-
-      expect(condition1ExportsCall.args[0]).toEqual({
-        testCondition1Foo: 'bar'
-      });
-
-      expect(condition1ExportsCall.args[1]).toEqual({
-        $type: 'test-extension.test-event',
-        $rule: {
-          id: 'RL123',
-          name: 'Test Rule'
-        }
-      });
-
-      var condition2Exports = moduleProvider.getModuleExports(TEST_CONDITION2_PATH);
-
-      expect(condition2Exports.calls.count()).toBe(1);
-
-      var condition2ExportsCall = condition2Exports.calls.mostRecent();
-
-      expect(condition2ExportsCall.args[0]).toEqual({
-        testCondition2Foo: 'bar'
-      });
-
-      expect(condition2ExportsCall.args[1]).toEqual({
-        $type: 'test-extension.test-event',
-        $rule: {
-          id: 'RL123',
-          name: 'Test Rule'
-        }
-      });
-
-      var action1Exports = moduleProvider.getModuleExports(TEST_ACTION1_PATH);
-
-      expect(action1Exports.calls.count()).toBe(1);
-
-      var action1ExportsCall = action1Exports.calls.mostRecent();
-
-      expect(action1ExportsCall.args[0]).toEqual({
-        testAction1Foo: 'bar'
-      });
-
-      expect(action1ExportsCall.args[1]).toEqual({
-        $type: 'test-extension.test-event',
-        $rule: {
-          id: 'RL123',
-          name: 'Test Rule'
-        }
-      });
-
-      var action2Exports = moduleProvider.getModuleExports(TEST_ACTION2_PATH);
-
-      expect(action2Exports.calls.count()).toBe(1);
-
-      var action2ExportsCall = action2Exports.calls.mostRecent();
-
-      expect(action2ExportsCall.args[0]).toEqual({
-        testAction2Foo: 'bar'
-      });
-
-      expect(action2ExportsCall.args[1]).toEqual({
-        $type: 'test-extension.test-event',
-        $rule: {
-          id: 'RL123',
-          name: 'Test Rule'
-        }
-      });
-
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleTriggered', {
-        rule: rules[0]
-      });
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-        rule: rules[0]
-      });
-    });
-
-    it('ceases to execute remaining conditions and any actions when condition fails', function() {
-      moduleProvider.registerModule(
-        TEST_CONDITION1_PATH,
-        {
-          name: TEST_CONDITION1_NAME,
-          displayName: TEST_CONDITION1_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = jasmine.createSpy().and.returnValue(false);
-          }
-        }
-      );
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      expect(moduleProvider.getModuleExports(TEST_CONDITION1_PATH).calls.count()).toBe(1);
-      expect(moduleProvider.getModuleExports(TEST_CONDITION2_PATH).calls.count()).toBe(0);
-      expect(moduleProvider.getModuleExports(TEST_ACTION1_PATH).calls.count()).toBe(0);
-      expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
-
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
-        rule: rules[0],
-        condition: rules[0].conditions[0]
-      });
-    });
-
-    it('ceases to execute remaining conditions and any actions when negated ' +
-      'condition fails', function() {
-      rules[0].conditions[0].negate = true;
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      expect(moduleProvider.getModuleExports(TEST_CONDITION1_PATH).calls.count()).toBe(1);
-      expect(moduleProvider.getModuleExports(TEST_CONDITION2_PATH).calls.count()).toBe(0);
-      expect(moduleProvider.getModuleExports(TEST_ACTION1_PATH).calls.count()).toBe(0);
-      expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
-
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
-        rule: rules[0],
-        condition: rules[0].conditions[0]
-      });
-    });
-
-    it('does not throw error when there are no events for a rule', function() {
-      delete rules[0].events;
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-    });
-
-    it('does not throw error when there are no conditions for a rule', function() {
-      delete rules[0].conditions;
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-    });
-
-    it('does not throw error when there are no actions for a rule', function() {
-      delete rules[0].actions;
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-    });
-
-    it('does not execute actions when actionsEnabled is false', function() {
-      getShouldExecuteActions = function() {
-        return false;
-      };
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      expect(moduleProvider.getModuleExports(TEST_ACTION1_PATH).calls.count()).toBe(0);
-      expect(moduleProvider.getModuleExports(TEST_ACTION2_PATH).calls.count()).toBe(0);
+    initRules = injectInitRules({
+      './createNotifyMonitors': function() {
+        notifyMonitors = jasmine.createSpy();
+        return notifyMonitors;
+      }
     });
   });
 
-  describe('error handling and logging', function() {
-    var logger;
-    var notifyMonitors;
-    var initRules;
+  describe('when not queue local storage flag is set', function() {
+    describe('rule execution', function() {
+      it('executes the rule event', function() {
+        var rules = setupRules([
+          {
+            events: [generateEvent('Event1')]
+          }
+        ]);
 
-    beforeEach(function() {
-      logger = jasmine.createSpyObj('logger', ['log', 'error']);
+        runInitRules(rules);
 
-      moduleProvider.registerModule(
-        TEST_EVENT_PATH,
-        {
-          name: TEST_EVENT_NAME,
-          displayName: TEST_EVENT_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = function(settings, trigger) { trigger(); };
+        var eventExports = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Event1')
+        );
+        expect(eventExports.calls.count()).toBe(1);
+      });
+
+      it('calls the rule event with the provided settings', function() {
+        var rules = setupRules([
+          {
+            events: [
+              generateEvent(
+                'Event1',
+                function(module) {
+                  module.exports = jasmine.createSpy();
+                },
+                {
+                  testEvent1Foo: 1
+                }
+              )
+            ]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var eventExports = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Event1')
+        );
+        var eventExportsCall = eventExports.calls.mostRecent();
+
+        expect(eventExportsCall.args[0]).toEqual({
+          testEvent1Foo: 1
+        });
+      });
+
+      it('executes the rule condition', function() {
+        var rules = setupRules([
+          {
+            conditions: [generateCondition('Condition1')]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var conditionExport = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Condition1')
+        );
+        expect(conditionExport.calls.count()).toBe(1);
+      });
+
+      it('calls the rule condition with the provided settings', function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateCondition(
+                'Condition1',
+                function(module) {
+                  module.exports = jasmine.createSpy();
+                },
+                {
+                  testCondition1Foo: 1
+                }
+              )
+            ]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var conditionExport = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Condition1')
+        );
+        var conditionExportsCall = conditionExport.calls.mostRecent();
+
+        expect(conditionExportsCall.args[0]).toEqual({
+          testCondition1Foo: 1
+        });
+      });
+
+      it('executes all the rule conditions provided', function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateCondition('Condition1', function(module) {
+                module.exports = jasmine.createSpy().and.returnValue(true);
+              }),
+              generateCondition('Condition2')
+            ]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var conditionExport1 = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Condition1')
+        );
+        var conditionExport2 = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Condition2')
+        );
+
+        expect(conditionExport1.calls.count()).toBe(1);
+        expect(conditionExport2.calls.count()).toBe(1);
+      });
+
+      it('executes all the rule conditions in the order provided', function() {
+        var callOrder = [];
+        var rules = setupRules([
+          {
+            conditions: [
+              generateCondition('Condition1', function(module) {
+                callOrder.push('Condition1');
+                module.exports = jasmine.createSpy().and.returnValue(true);
+              }),
+              generateCondition('Condition2', function(module) {
+                callOrder.push('Condition2');
+                module.exports = jasmine.createSpy().and.returnValue(true);
+              })
+            ]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        expect(callOrder).toEqual(['Condition1', 'Condition2']);
+      });
+
+      it('executes the rule action', function() {
+        var rules = setupRules([
+          {
+            actions: [generateAction('Action1')]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var actionExport = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Action1')
+        );
+        expect(actionExport.calls.count()).toBe(1);
+      });
+
+      it('calls the rule action with the provided settings', function() {
+        var rules = setupRules([
+          {
+            actions: [
+              generateAction(
+                'Action1',
+                function(module) {
+                  module.exports = jasmine.createSpy();
+                },
+                {
+                  testAction1Foo: 1
+                }
+              )
+            ]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var actionExport = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Action1')
+        );
+        var actionExportsCall = actionExport.calls.mostRecent();
+
+        expect(actionExportsCall.args[0]).toEqual({
+          testAction1Foo: 1
+        });
+      });
+
+      it('executes all the rule actions provided', function() {
+        var rules = setupRules([
+          {
+            actions: [generateAction('Action1'), generateAction('Action2')]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var actionExport1 = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Action1')
+        );
+        var actionExport2 = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Action2')
+        );
+        expect(actionExport1.calls.count()).toBe(1);
+        expect(actionExport2.calls.count()).toBe(1);
+      });
+
+      it('executes all the rule actions in the order provided', function() {
+        var callOrder = [];
+        var rules = setupRules([
+          {
+            actions: [
+              generateAction('Action1', function(module) {
+                callOrder.push('Action1');
+                module.exports = jasmine.createSpy();
+              }),
+              generateAction('Action2', function(module) {
+                callOrder.push('Action2');
+                module.exports = jasmine.createSpy();
+              })
+            ]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        expect(callOrder).toEqual(['Action1', 'Action2']);
+      });
+
+      it('ceases to execute remaining conditions when condition fails', function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateCondition('Condition1', function(module) {
+                module.exports = jasmine.createSpy().and.returnValue(false);
+              }),
+              generateCondition('Condition2')
+            ]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var conditionExport1 = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Condition1')
+        );
+        var conditionExport2 = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Condition2')
+        );
+
+        expect(conditionExport1.calls.count()).toBe(1);
+        expect(conditionExport2.calls.count()).toBe(0);
+      });
+
+      it('ceases to execute remaining conditions when negated condition fails', function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              Object.assign(
+                { negate: true },
+                generateCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.returnValue(true);
+                })
+              ),
+              generateCondition('Condition2')
+            ]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var conditionExport1 = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Condition1')
+        );
+        var conditionExport2 = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Condition2')
+        );
+
+        expect(conditionExport1.calls.count()).toBe(1);
+        expect(conditionExport2.calls.count()).toBe(0);
+      });
+
+      it('does not execute actions when condition fails', function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateCondition('Condition1', function(module) {
+                module.exports = jasmine.createSpy().and.returnValue(false);
+              })
+            ],
+            actions: [generateAction('Action1')]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var conditionExport = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Condition1')
+        );
+        var actionExport = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Action1')
+        );
+
+        expect(conditionExport.calls.count()).toBe(1);
+        expect(actionExport.calls.count()).toBe(0);
+      });
+
+      it('does not execute actions when negated condition fails', function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              Object.assign(
+                { negate: true },
+                generateCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.returnValue(true);
+                })
+              )
+            ],
+            actions: [generateAction('Action1')]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var conditionExport = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Condition1')
+        );
+        var actionExport = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Action1')
+        );
+
+        expect(conditionExport.calls.count()).toBe(1);
+        expect(actionExport.calls.count()).toBe(0);
+      });
+
+      it('executes the events then the conditions then the actions', function() {
+        var callOrder = [];
+        var rules = setupRules([
+          {
+            events: [
+              generateAction('Event1', function(module) {
+                callOrder.push('Event1');
+                module.exports = jasmine
+                  .createSpy()
+                  .and.callFake(function(settings, trigger) {
+                    trigger(event);
+                  });
+              })
+            ],
+            conditions: [
+              generateAction('Condition1', function(module) {
+                callOrder.push('Condition1');
+                module.exports = jasmine.createSpy().and.returnValue(true);
+              })
+            ],
+            actions: [
+              generateAction('Action1', function(module) {
+                callOrder.push('Action1');
+                module.exports = jasmine.createSpy();
+              })
+            ]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        expect(callOrder).toEqual(['Event1', 'Condition1', 'Action1']);
+      });
+
+      it('does not throw error when there are no events for a rule', function() {
+        var rules = setupRules([{}]);
+        delete rules[0].events;
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+      });
+
+      it('does not throw error when there are no conditions for a rule', function() {
+        var rules = setupRules([
+          {
+            conditions: [generateCondition('Condition')]
+          }
+        ]);
+        delete rules[0].conditions;
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+      });
+
+      it('does not throw error when there are no actions for a rule', function() {
+        var rules = setupRules([
+          {
+            actions: [generateAction('Action')]
+          }
+        ]);
+        delete rules[0].actions;
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+      });
+
+      it('does not execute actions when actionsEnabled is false', function() {
+        getShouldExecuteActions = function() {
+          return false;
+        };
+
+        var rules = setupRules([
+          {
+            actions: [generateAction('Action1')]
+          }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var actionExport = moduleProvider.getModuleExports(
+          ModuleHelper.getPath('Action1')
+        );
+
+        expect(actionExport.calls.count()).toBe(0);
+      });
+    });
+
+    describe('error handling and logging', function() {
+      beforeEach(function() {
+        logger = jasmine.createSpyObj('logger', ['log', 'error']);
+
+        initRules = injectInitRules({
+          './logger': logger,
+          './createNotifyMonitors': function() {
+            notifyMonitors = jasmine.createSpy();
+            return notifyMonitors;
           }
         });
+      });
 
-      moduleProvider.registerModule(
-        TEST_CONDITION1_PATH,
-        {
-          name: TEST_CONDITION1_NAME,
-          displayName: TEST_CONDITION1_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = function() { return true; };
+      it('logs an error when retrieving event module exports fails', function() {
+        var rules = setupRules([
+          {
+            events: [
+              generateEvent('Event1', function() {
+                throw new Error('noob tried to divide by zero.');
+              })
+            ]
           }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var errorMessage = logger.error.calls.mostRecent().args[0];
+        var expectedErrorMessage =
+          'Failed to execute Event1 for Test Rule 1 rule. noob tried to divide by zero.';
+        expect(errorMessage).toStartWith(expectedErrorMessage);
+      });
+
+      it('logs an error when the event module exports is not a function', function() {
+        var rules = setupRules([
+          {
+            events: [
+              generateEvent('Event1', function(module) {
+                module.exports = {};
+              })
+            ]
+          }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var errorMessage = logger.error.calls.mostRecent().args[0];
+        expect(errorMessage).toStartWith(
+          'Failed to execute Event1 for Test Rule 1 rule. Module did not export a function.'
+        );
+      });
+
+      it('logs an error when executing event module exports fails', function() {
+        var rules = setupRules([
+          {
+            events: [
+              generateEvent('Event1', function(module) {
+                module.exports = function() {
+                  throw new Error('noob tried to divide by zero.');
+                };
+              })
+            ]
+          }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var errorMessage = logger.error.calls.mostRecent().args[0];
+        var expectedErrorMessage =
+          'Failed to execute Event1 for Test Rule 1 rule. noob tried to divide by zero.';
+        expect(errorMessage).toStartWith(expectedErrorMessage);
+      });
+
+      it('logs an error when retrieving condition module exports fails', function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateEvent('Condition1', function() {
+                throw new Error('noob tried to divide by zero.');
+              })
+            ]
+          }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var errorMessage = logger.error.calls.mostRecent().args[0];
+        var expectedErrorMessage =
+          'Failed to execute Condition1 for Test Rule 1 rule. noob tried to divide by zero.';
+        expect(errorMessage).toStartWith(expectedErrorMessage);
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+          rule: rules[0],
+          condition: rules[0].conditions[0]
         });
-
-      moduleProvider.registerModule(
-        TEST_ACTION1_PATH,
-        {
-          name: TEST_ACTION1_NAME,
-          displayName: TEST_ACTION2_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = function() {};
-          }
-        }
-      );
-
-      rules = [
-        {
-          name: 'Test Rule',
-          events: [
-            {
-              modulePath: TEST_EVENT_PATH
-            }
-          ],
-          conditions: [
-            {
-              modulePath: TEST_CONDITION1_PATH
-            }
-          ],
-          actions: [
-            {
-              modulePath: TEST_ACTION1_PATH
-            }
-          ]
-        }
-      ];
-
-      initRules = injectInitRules({
-        './logger': logger,
-        './createNotifyMonitors': function() {
-          notifyMonitors = jasmine.createSpy();
-          return notifyMonitors;
-        }
       });
-    });
 
-    it('logs an error when retrieving event module exports fails', function() {
-      moduleProvider.registerModule(
-        TEST_EVENT_PATH,
-        {
-          name: TEST_EVENT_NAME,
-          displayName: TEST_EVENT_DISPLAY_NAME,
-          script: function() {
-            throw new Error('noob tried to divide by zero.');
+      it('logs an error when the condition module exports is not a function', function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateEvent('Condition1', function(module) {
+                module.exports = {};
+              })
+            ]
           }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var errorMessage = logger.error.calls.mostRecent().args[0];
+        expect(errorMessage).toStartWith(
+          'Failed to execute Condition1 for Test Rule 1 rule. Module did not export a function.'
+        );
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+          rule: rules[0],
+          condition: rules[0].conditions[0]
         });
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      var errorMessage = logger.error.calls.mostRecent().args[0];
-      var expectedErrorMessage = 'Failed to execute ' +
-        TEST_EVENT_DISPLAY_NAME + ' for Test Rule rule. noob tried to divide by zero.';
-      expect(errorMessage).toStartWith(expectedErrorMessage);
-    });
-
-    it('logs an error when the event module exports is not a function', function() {
-      moduleProvider.registerModule(
-        TEST_EVENT_PATH,
-        {
-          name: TEST_EVENT_NAME,
-          displayName: TEST_EVENT_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = {};
-          }
-        }
-      );
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      var errorMessage = logger.error.calls.mostRecent().args[0];
-      expect(errorMessage).toStartWith('Failed to execute ' + TEST_EVENT_DISPLAY_NAME +
-        ' for Test Rule rule. Module did not export a function.');
-    });
-
-    it('logs an error when executing event module exports fails', function() {
-      moduleProvider.registerModule(
-        TEST_EVENT_PATH,
-        {
-          name: TEST_EVENT_NAME,
-          displayName: TEST_EVENT_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = function() {
-              throw new Error('noob tried to divide by zero.');
-            };
-          }
-        }
-      );
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      var errorMessage = logger.error.calls.mostRecent().args[0];
-      var expectedErrorMessage = 'Failed to execute ' + TEST_EVENT_DISPLAY_NAME +
-        ' for Test Rule rule. noob tried to divide by zero.';
-      expect(errorMessage).toStartWith(expectedErrorMessage);
-    });
-
-    it('logs an error when retrieving condition module exports fails', function() {
-      moduleProvider.registerModule(
-        TEST_CONDITION1_PATH,
-        {
-          name: TEST_CONDITION1_NAME,
-          displayName: TEST_CONDITION1_DISPLAY_NAME,
-          script: function() {
-            throw new Error('noob tried to divide by zero.');
-          }
-        }
-      );
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      var errorMessage = logger.error.calls.mostRecent().args[0];
-      var expectedErrorMessage = 'Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
-        ' for Test Rule rule. noob tried to divide by zero.';
-      expect(errorMessage).toStartWith(expectedErrorMessage);
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
-        rule: rules[0],
-        condition: rules[0].conditions[0]
       });
-    });
 
-    it('logs an error when the condition module exports is not a function', function() {
-      moduleProvider.registerModule(
-        TEST_CONDITION1_PATH,
-        {
-          name: TEST_CONDITION1_NAME,
-          displayName: TEST_CONDITION1_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = {};
+      it('logs an error when executing condition module exports fails', function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateEvent('Condition1', function(module) {
+                module.exports = function() {
+                  throw new Error('noob tried to divide by zero.');
+                };
+              })
+            ]
           }
-        }
-      );
+        ]);
 
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
 
-      var errorMessage = logger.error.calls.mostRecent().args[0];
-      expect(errorMessage).toStartWith('Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
-        ' for Test Rule rule. Module did not export a function.');
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
-        rule: rules[0],
-        condition: rules[0].conditions[0]
-      });
-    });
-
-    it('logs an error when executing condition module exports fails', function() {
-      moduleProvider.registerModule(
-        TEST_CONDITION1_PATH,
-        {
-          name: TEST_CONDITION1_NAME,
-          displayName: TEST_CONDITION1_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = function() {
-              throw new Error('noob tried to divide by zero.');
-            };
-          }
-        }
-      );
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      var errorMessage = logger.error.calls.mostRecent().args[0];
-      var expectedErrorMessage = 'Failed to execute ' + TEST_CONDITION1_DISPLAY_NAME +
-        ' for Test Rule rule. noob tried to divide by zero.';
-      expect(errorMessage).toStartWith(expectedErrorMessage);
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
-        rule: rules[0],
-        condition: rules[0].conditions[0]
-      });
-    });
-
-    it('logs a message when the condition doesn\'t pass', function() {
-      moduleProvider.registerModule(
-        TEST_CONDITION1_PATH,
-        {
-          name: TEST_CONDITION1_NAME,
-          displayName: TEST_CONDITION1_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = function() {
-              return false;
-            };
-          }
-        }
-      );
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      expect(logger.log.calls.mostRecent().args[0]).toEqual(
-        'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
-        rule: rules[0],
-        condition: rules[0].conditions[0]
-      });
-    });
-
-    it('logs a message when the negated condition doesn\'t pass', function() {
-      rules[0].conditions[0].negate = true;
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      expect(logger.log.calls.mostRecent().args[0]).toEqual(
-        'Condition ' + TEST_CONDITION1_DISPLAY_NAME + ' for rule Test Rule not met.');
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
-        rule: rules[0],
-        condition: rules[0].conditions[0]
-      });
-    });
-
-    it('logs an error when retrieving action module exports fails', function() {
-      moduleProvider.registerModule(
-        TEST_ACTION1_PATH,
-        {
-          name: TEST_ACTION1_NAME,
-          displayName: TEST_ACTION1_DISPLAY_NAME,
-          script: function() {
-            throw new Error('noob tried to divide by zero.');
-          }
+        var errorMessage = logger.error.calls.mostRecent().args[0];
+        var expectedErrorMessage =
+          'Failed to execute Condition1 for Test Rule 1 rule. noob tried to divide by zero.';
+        expect(errorMessage).toStartWith(expectedErrorMessage);
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+          rule: rules[0],
+          condition: rules[0].conditions[0]
         });
-
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
-
-      var errorMessage = logger.error.calls.mostRecent().args[0];
-      var expectedErrorMessage = 'Failed to execute ' +
-        TEST_ACTION1_DISPLAY_NAME + ' for Test Rule rule. noob tried to divide ' +
-        'by zero.';
-      expect(errorMessage).toStartWith(expectedErrorMessage);
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-        rule: rules[0]
       });
-    });
 
-    it('logs an error when the action module exports is not a function', function() {
-      moduleProvider.registerModule(
-        TEST_ACTION1_PATH,
-        {
-          name: TEST_ACTION1_NAME,
-          displayName: TEST_ACTION1_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = {};
+      it("logs a message when the condition doesn't pass", function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateEvent('Condition1', function(module) {
+                module.exports = function() {
+                  return false;
+                };
+              })
+            ]
           }
-        }
-      );
+        ]);
 
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
 
-      var errorMessage = logger.error.calls.mostRecent().args[0];
-      expect(errorMessage).toStartWith('Failed to execute ' + TEST_ACTION1_DISPLAY_NAME +
-        ' for Test Rule rule. Module did not export a function.');
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-        rule: rules[0]
+        expect(logger.log.calls.mostRecent().args[0]).toEqual(
+          'Condition Condition1 for rule Test Rule 1 not met.'
+        );
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+          rule: rules[0],
+          condition: rules[0].conditions[0]
+        });
       });
-    });
 
-    it('logs an error when executing action module exports fails', function() {
-      moduleProvider.registerModule(
-        TEST_ACTION1_PATH,
-        {
-          name: TEST_ACTION1_NAME,
-          displayName: TEST_ACTION1_DISPLAY_NAME,
-          script: function(module) {
-            module.exports = function() {
-              throw new Error('noob tried to divide by zero.');
-            };
+      it("logs a message when the negated condition doesn't pass", function() {
+        var rules = setupRules([
+          {
+            conditions: [
+              Object.assign(
+                {
+                  negate: true
+                },
+                generateEvent('Condition1', function(module) {
+                  module.exports = function() {
+                    return true;
+                  };
+                })
+              )
+            ]
           }
-        }
-      );
+        ]);
 
-      initRules(_satellite, rules, moduleProvider, replaceTokens, getShouldExecuteActions);
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
 
-      var errorMessage = logger.error.calls.mostRecent().args[0];
-      var expectedErrorMessage = 'Failed to execute ' + TEST_ACTION1_DISPLAY_NAME +
-        ' for Test Rule rule. noob tried to divide by zero.';
-      expect(errorMessage).toStartWith(expectedErrorMessage);
-      expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-        rule: rules[0]
+        expect(logger.log.calls.mostRecent().args[0]).toEqual(
+          'Condition Condition1 for rule Test Rule 1 not met.'
+        );
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+          rule: rules[0],
+          condition: rules[0].conditions[0]
+        });
+      });
+
+      it('logs an error when retrieving action module exports fails', function() {
+        var rules = setupRules([
+          {
+            actions: [
+              generateEvent('Action1', function() {
+                throw new Error('noob tried to divide by zero.');
+              })
+            ]
+          }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var errorMessage = logger.error.calls.mostRecent().args[0];
+        var expectedErrorMessage =
+          'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
+        expect(errorMessage).toStartWith(expectedErrorMessage);
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
+          rule: rules[0]
+        });
+      });
+
+      it('logs an error when the action module exports is not a function', function() {
+        var rules = setupRules([
+          {
+            actions: [
+              generateEvent('Action1', function(module) {
+                module.exports = {};
+              })
+            ]
+          }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var errorMessage = logger.error.calls.mostRecent().args[0];
+        expect(errorMessage).toStartWith(
+          'Failed to execute Action1 for Test Rule 1 rule. Module did not export a function.'
+        );
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
+          rule: rules[0]
+        });
+      });
+
+      it('logs an error when executing action module exports fails', function() {
+        var rules = setupRules([
+          {
+            actions: [
+              generateEvent('Action1', function(module) {
+                module.exports = function() {
+                  throw new Error('noob tried to divide by zero.');
+                };
+              })
+            ]
+          }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var errorMessage = logger.error.calls.mostRecent().args[0];
+        var expectedErrorMessage =
+          'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
+        expect(errorMessage).toStartWith(expectedErrorMessage);
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
+          rule: rules[0]
+        });
       });
     });
   });

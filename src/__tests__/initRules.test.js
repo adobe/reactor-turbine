@@ -14,6 +14,7 @@
 var createModuleProvider = require('../createModuleProvider');
 var injectInitRules = require('inject-loader!../initRules');
 var ModuleHelper = require('./helpers/module');
+var Promise = require('@adobe/reactor-promise');
 
 var generateDelegate = function(name, scriptFn, settings) {
   return {

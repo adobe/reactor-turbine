@@ -1551,7 +1551,6 @@ describe('initRules', function() {
           runInitRules(rules);
 
           rulesQueue.lastPromiseInQueue.then(function() {
-            debugger;
             var conditionExport = moduleProvider.getModuleExports(
               ModuleHelper.getPath('Condition1')
             );
@@ -1594,7 +1593,6 @@ describe('initRules', function() {
           runInitRules(rules);
 
           rulesQueue.lastPromiseInQueue.then(function() {
-            debugger;
             var conditionExport = moduleProvider.getModuleExports(
               ModuleHelper.getPath('Condition1')
             );

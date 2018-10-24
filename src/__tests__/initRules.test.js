@@ -1206,6 +1206,78 @@ describe('initRules', function() {
         });
       });
 
+      it(
+        'ceases to execute remaining conditions when a condition that ' +
+          'returns a promise that returns false is encountered',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                generateCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
+                    return Promise.resolve(false);
+                  });
+                }),
+                generateCondition('Condition2')
+              ]
+            }
+          ]);
+
+          runInitRules(rules);
+
+          rulesQueue.lastPromiseInQueue.then(function() {
+            var conditionExport1 = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition1')
+            );
+            var conditionExport2 = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition2')
+            );
+
+            expect(conditionExport1.calls.count()).toBe(1);
+            expect(conditionExport2.calls.count()).toBe(0);
+
+            done();
+          });
+        }
+      );
+
+      it(
+        'ceases to execute remaining conditions when a condition that ' +
+          'returns a promise that will reject in the future is encountered',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                generateCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
+                    return new Promise(function(resolve, reject) {
+                      setTimeout(reject, 100);
+                    });
+                  });
+                }),
+                generateCondition('Condition2')
+              ]
+            }
+          ]);
+
+          runInitRules(rules);
+
+          rulesQueue.lastPromiseInQueue.then(function() {
+            var conditionExport1 = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition1')
+            );
+            var conditionExport2 = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition2')
+            );
+
+            expect(conditionExport1.calls.count()).toBe(1);
+            expect(conditionExport2.calls.count()).toBe(0);
+
+            done();
+          });
+        }
+      );
+
       it('ceases to execute remaining conditions when negated condition fails', function(done) {
         var rules = setupRules([
           {
@@ -1238,6 +1310,88 @@ describe('initRules', function() {
         });
       });
 
+      it(
+        'ceases to execute remaining conditions when negated condition that returns a ' +
+          'promise that returns true is encountered',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                Object.assign(
+                  { negate: true },
+                  generateCondition('Condition1', function(module) {
+                    module.exports = jasmine
+                      .createSpy()
+                      .and.callFake(function() {
+                        return Promise.resolve(true);
+                      });
+                  })
+                ),
+                generateCondition('Condition2')
+              ]
+            }
+          ]);
+
+          runInitRules(rules);
+
+          rulesQueue.lastPromiseInQueue.then(function() {
+            var conditionExport1 = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition1')
+            );
+            var conditionExport2 = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition2')
+            );
+
+            expect(conditionExport1.calls.count()).toBe(1);
+            expect(conditionExport2.calls.count()).toBe(0);
+
+            done();
+          });
+        }
+      );
+
+      it(
+        'ceases to execute remaining conditions when negated condition that returns a ' +
+          'promise that will reject in the future is encountered',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                Object.assign(
+                  { negate: true },
+                  generateCondition('Condition1', function(module) {
+                    module.exports = jasmine
+                      .createSpy()
+                      .and.callFake(function() {
+                        return new Promise(function(resolve, reject) {
+                          setTimeout(reject, 200);
+                        });
+                      });
+                  })
+                ),
+                generateCondition('Condition2')
+              ]
+            }
+          ]);
+
+          runInitRules(rules);
+
+          rulesQueue.lastPromiseInQueue.then(function() {
+            var conditionExport1 = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition1')
+            );
+            var conditionExport2 = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition2')
+            );
+
+            expect(conditionExport1.calls.count()).toBe(1);
+            expect(conditionExport2.calls.count()).toBe(0);
+
+            done();
+          });
+        }
+      );
+
       it('does not execute actions when condition fails', function(done) {
         var rules = setupRules([
           {
@@ -1266,6 +1420,78 @@ describe('initRules', function() {
           done();
         });
       });
+
+      it(
+        'does not execute actions when condition that returns a ' +
+          'promise that returns false is encountered',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                generateCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
+                    return Promise.resolve(false);
+                  });
+                })
+              ],
+              actions: [generateAction('Action1')]
+            }
+          ]);
+
+          runInitRules(rules);
+
+          rulesQueue.lastPromiseInQueue.then(function() {
+            var conditionExport = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition1')
+            );
+            var actionExport = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Action1')
+            );
+
+            expect(conditionExport.calls.count()).toBe(1);
+            expect(actionExport.calls.count()).toBe(0);
+
+            done();
+          });
+        }
+      );
+
+      it(
+        'does not execute actions when condition that returns a ' +
+          'promise that will reject in the future is encountered',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                generateCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
+                    return new Promise(function(resolve, reject) {
+                      setTimeout(reject, 200);
+                    });
+                  });
+                })
+              ],
+              actions: [generateAction('Action1')]
+            }
+          ]);
+
+          runInitRules(rules);
+
+          rulesQueue.lastPromiseInQueue.then(function() {
+            var conditionExport = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition1')
+            );
+            var actionExport = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Action1')
+            );
+
+            expect(conditionExport.calls.count()).toBe(1);
+            expect(actionExport.calls.count()).toBe(0);
+
+            done();
+          });
+        }
+      );
 
       it('does not execute actions when negated condition fails', function(done) {
         var rules = setupRules([
@@ -1298,6 +1524,90 @@ describe('initRules', function() {
           done();
         });
       });
+
+      it(
+        'does not execute actions when negated condition that ' +
+          'returns a promise that returns true is encountered',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                Object.assign(
+                  { negate: true },
+                  generateCondition('Condition1', function(module) {
+                    module.exports = jasmine
+                      .createSpy()
+                      .and.callFake(function() {
+                        return Promise.resolve(true);
+                      });
+                  })
+                )
+              ],
+              actions: [generateAction('Action1')]
+            }
+          ]);
+
+          runInitRules(rules);
+
+          rulesQueue.lastPromiseInQueue.then(function() {
+            debugger;
+            var conditionExport = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition1')
+            );
+            var actionExport = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Action1')
+            );
+
+            expect(conditionExport.calls.count()).toBe(1);
+            expect(actionExport.calls.count()).toBe(0);
+
+            done();
+          });
+        }
+      );
+
+      it(
+        'does not execute actions when negated condition that ' +
+          'returns a promise that will reject in the future is encountered',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                Object.assign(
+                  { negate: true },
+                  generateCondition('Condition1', function(module) {
+                    module.exports = jasmine
+                      .createSpy()
+                      .and.callFake(function() {
+                        return new Promise(function(resolve, reject) {
+                          setTimeout(reject, 100);
+                        });
+                      });
+                  })
+                )
+              ],
+              actions: [generateAction('Action1')]
+            }
+          ]);
+
+          runInitRules(rules);
+
+          rulesQueue.lastPromiseInQueue.then(function() {
+            debugger;
+            var conditionExport = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Condition1')
+            );
+            var actionExport = moduleProvider.getModuleExports(
+              ModuleHelper.getPath('Action1')
+            );
+
+            expect(conditionExport.calls.count()).toBe(1);
+            expect(actionExport.calls.count()).toBe(0);
+
+            done();
+          });
+        }
+      );
 
       it('executes the events then the conditions then the actions', function(done) {
         var callOrder = [];

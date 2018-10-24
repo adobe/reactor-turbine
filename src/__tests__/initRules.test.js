@@ -43,6 +43,11 @@ var generateEvent = function(name, scriptFn, settings) {
 };
 
 var generateCondition = generateDelegate;
+var generateNegatedCondition = function(name, scriptFn, settings) {
+  var condition = generateCondition(name, scriptFn, settings);
+  condition.negate = true;
+  return condition;
+};
 var generateAction = generateDelegate;
 
 var setupRules = function(rulesDefinition) {
@@ -387,12 +392,9 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              Object.assign(
-                { negate: true },
-                generateCondition('Condition1', function(module) {
-                  module.exports = jasmine.createSpy().and.returnValue(true);
-                })
-              ),
+              generateNegatedCondition('Condition1', function(module) {
+                module.exports = jasmine.createSpy().and.returnValue(true);
+              }),
               generateCondition('Condition2')
             ]
           }
@@ -440,12 +442,9 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              Object.assign(
-                { negate: true },
-                generateCondition('Condition1', function(module) {
-                  module.exports = jasmine.createSpy().and.returnValue(true);
-                })
-              )
+              generateNegatedCondition('Condition1', function(module) {
+                module.exports = jasmine.createSpy().and.returnValue(true);
+              })
             ],
             actions: [generateAction('Action1')]
           }
@@ -469,7 +468,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             events: [
-              generateAction('Event1', function(module) {
+              generateEvent('Event1', function(module) {
                 callOrder.push('Event1');
                 module.exports = jasmine
                   .createSpy()
@@ -479,7 +478,7 @@ describe('initRules', function() {
               })
             ],
             conditions: [
-              generateAction('Condition1', function(module) {
+              generateCondition('Condition1', function(module) {
                 callOrder.push('Condition1');
                 module.exports = jasmine.createSpy().and.returnValue(true);
               })
@@ -666,7 +665,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              generateEvent('Condition1', function() {
+              generateCondition('Condition1', function() {
                 throw new Error('noob tried to divide by zero.');
               })
             ]
@@ -695,7 +694,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              generateEvent('Condition1', function(module) {
+              generateCondition('Condition1', function(module) {
                 module.exports = {};
               })
             ]
@@ -724,7 +723,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              generateEvent('Condition1', function(module) {
+              generateCondition('Condition1', function(module) {
                 module.exports = function() {
                   throw new Error('noob tried to divide by zero.');
                 };
@@ -755,7 +754,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              generateEvent('Condition1', function(module) {
+              generateCondition('Condition1', function(module) {
                 module.exports = function() {
                   return false;
                 };
@@ -785,16 +784,11 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              Object.assign(
-                {
-                  negate: true
-                },
-                generateEvent('Condition1', function(module) {
-                  module.exports = function() {
-                    return true;
-                  };
-                })
-              )
+              generateNegatedCondition('Condition1', function(module) {
+                module.exports = function() {
+                  return true;
+                };
+              })
             ]
           }
         ]);
@@ -820,7 +814,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             actions: [
-              generateEvent('Action1', function() {
+              generateAction('Action1', function() {
                 throw new Error('noob tried to divide by zero.');
               })
             ]
@@ -848,7 +842,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             actions: [
-              generateEvent('Action1', function(module) {
+              generateAction('Action1', function(module) {
                 module.exports = {};
               })
             ]
@@ -876,7 +870,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             actions: [
-              generateEvent('Action1', function(module) {
+              generateAction('Action1', function(module) {
                 module.exports = function() {
                   throw new Error('noob tried to divide by zero.');
                 };
@@ -1286,12 +1280,9 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              Object.assign(
-                { negate: true },
-                generateCondition('Condition1', function(module) {
-                  module.exports = jasmine.createSpy().and.returnValue(true);
-                })
-              ),
+              generateNegatedCondition('Condition1', function(module) {
+                module.exports = jasmine.createSpy().and.returnValue(true);
+              }),
               generateCondition('Condition2')
             ]
           }
@@ -1321,16 +1312,11 @@ describe('initRules', function() {
           var rules = setupRules([
             {
               conditions: [
-                Object.assign(
-                  { negate: true },
-                  generateCondition('Condition1', function(module) {
-                    module.exports = jasmine
-                      .createSpy()
-                      .and.callFake(function() {
-                        return Promise.resolve(true);
-                      });
-                  })
-                ),
+                generateNegatedCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
+                    return Promise.resolve(true);
+                  });
+                }),
                 generateCondition('Condition2')
               ]
             }
@@ -1361,18 +1347,13 @@ describe('initRules', function() {
           var rules = setupRules([
             {
               conditions: [
-                Object.assign(
-                  { negate: true },
-                  generateCondition('Condition1', function(module) {
-                    module.exports = jasmine
-                      .createSpy()
-                      .and.callFake(function() {
-                        return new Promise(function(resolve, reject) {
-                          setTimeout(reject, 200);
-                        });
-                      });
-                  })
-                ),
+                generateNegatedCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
+                    return new Promise(function(resolve, reject) {
+                      setTimeout(reject, 200);
+                    });
+                  });
+                }),
                 generateCondition('Condition2')
               ]
             }
@@ -1501,12 +1482,9 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              Object.assign(
-                { negate: true },
-                generateCondition('Condition1', function(module) {
-                  module.exports = jasmine.createSpy().and.returnValue(true);
-                })
-              )
+              generateNegatedCondition('Condition1', function(module) {
+                module.exports = jasmine.createSpy().and.returnValue(true);
+              })
             ],
             actions: [generateAction('Action1')]
           }
@@ -1536,16 +1514,11 @@ describe('initRules', function() {
           var rules = setupRules([
             {
               conditions: [
-                Object.assign(
-                  { negate: true },
-                  generateCondition('Condition1', function(module) {
-                    module.exports = jasmine
-                      .createSpy()
-                      .and.callFake(function() {
-                        return Promise.resolve(true);
-                      });
-                  })
-                )
+                generateNegatedCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
+                    return Promise.resolve(true);
+                  });
+                })
               ],
               actions: [generateAction('Action1')]
             }
@@ -1576,18 +1549,13 @@ describe('initRules', function() {
           var rules = setupRules([
             {
               conditions: [
-                Object.assign(
-                  { negate: true },
-                  generateCondition('Condition1', function(module) {
-                    module.exports = jasmine
-                      .createSpy()
-                      .and.callFake(function() {
-                        return new Promise(function(resolve, reject) {
-                          setTimeout(reject, 100);
-                        });
-                      });
-                  })
-                )
+                generateNegatedCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
+                    return new Promise(function(resolve, reject) {
+                      setTimeout(reject, 100);
+                    });
+                  });
+                })
               ],
               actions: [generateAction('Action1')]
             }
@@ -1616,7 +1584,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             events: [
-              generateAction('Event1', function(module) {
+              generateEvent('Event1', function(module) {
                 callOrder.push('Event1');
                 module.exports = jasmine
                   .createSpy()
@@ -1626,7 +1594,7 @@ describe('initRules', function() {
               })
             ],
             conditions: [
-              generateAction('Condition1', function(module) {
+              generateCondition('Condition1', function(module) {
                 callOrder.push('Condition1');
                 module.exports = jasmine.createSpy().and.returnValue(true);
               })
@@ -1656,7 +1624,7 @@ describe('initRules', function() {
           var rules = setupRules([
             {
               events: [
-                generateAction('Event1', function(module) {
+                generateEvent('Event1', function(module) {
                   callOrder.push('Event1');
                   module.exports = jasmine
                     .createSpy()
@@ -1666,7 +1634,7 @@ describe('initRules', function() {
                 })
               ],
               conditions: [
-                generateAction('Condition1', function(module) {
+                generateCondition('Condition1', function(module) {
                   module.exports = function() {
                     return new Promise(function(resolve, reject) {
                       setTimeout(function() {
@@ -1872,7 +1840,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              generateEvent('Condition1', function() {
+              generateCondition('Condition1', function() {
                 throw new Error('noob tried to divide by zero.');
               })
             ]
@@ -1905,7 +1873,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              generateEvent('Condition1', function(module) {
+              generateCondition('Condition1', function(module) {
                 module.exports = {};
               })
             ]
@@ -1938,7 +1906,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              generateEvent('Condition1', function(module) {
+              generateCondition('Condition1', function(module) {
                 module.exports = function() {
                   throw new Error('noob tried to divide by zero.');
                 };
@@ -1973,7 +1941,7 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              generateEvent('Condition1', function(module) {
+              generateCondition('Condition1', function(module) {
                 module.exports = function() {
                   return false;
                 };
@@ -2007,16 +1975,11 @@ describe('initRules', function() {
         var rules = setupRules([
           {
             conditions: [
-              Object.assign(
-                {
-                  negate: true
-                },
-                generateEvent('Condition1', function(module) {
-                  module.exports = function() {
-                    return true;
-                  };
-                })
-              )
+              generateNegatedCondition('Condition1', function(module) {
+                module.exports = function() {
+                  return true;
+                };
+              })
             ]
           }
         ]);

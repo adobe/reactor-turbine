@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var Promise = require('@adobe/reactor-promise');
+
 module.exports = function() {
   return {
     lastPromiseInQueue: Promise.resolve()

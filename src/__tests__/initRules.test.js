@@ -116,12 +116,15 @@ var moduleProvider;
 var initRules;
 var notifyMonitors;
 var logger;
+var event;
 
 describe('initRules', function() {
   beforeEach(function() {
     getShouldExecuteActions = function() {
       return true;
     };
+
+    event = {};
 
     moduleProvider = createModuleProvider();
 

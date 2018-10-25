@@ -15,9 +15,8 @@ var normalizeSyntheticEvent = require('./normalizeSyntheticEvent');
 var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
 var createNotifyMonitors = require('./createNotifyMonitors');
 var createRulesPromiseQueue = require('./createRulesPromiseQueue');
-var getNamespacedStorage = require('./getNamespacedStorage');
 var createExecuteDelegateModule = require('./createExecuteDelegateModule');
-var localStorage = getNamespacedStorage('localStorage');
+var isRuleQueueActive = require('./isRuleQueueActive');
 var Promise = require('@adobe/reactor-promise');
 var PROMISE_TIMEOUT = 5000;
 
@@ -265,7 +264,7 @@ module.exports = function(
           syntheticEvent
         );
 
-        if (localStorage.getItem('queue')) {
+        if (isRuleQueueActive()) {
           addRuleToQueue(rule, normalizedSyntethicEvent);
         } else {
           checkConditions(rule, normalizedSyntethicEvent);

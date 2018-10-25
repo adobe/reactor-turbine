@@ -134,6 +134,9 @@ describe('initRules', function() {
     moduleProvider = createModuleProvider();
 
     initRules = injectInitRules({
+      './isRuleQueueActive': function() {
+        return false;
+      },
       './createNotifyMonitors': function() {
         notifyMonitors = jasmine.createSpy();
         return notifyMonitors;
@@ -141,7 +144,7 @@ describe('initRules', function() {
     });
   });
 
-  describe('when not queue local storage flag is set', function() {
+  describe('when no queue local storage flag is set', function() {
     describe('rule execution', function() {
       it('executes the rule event', function() {
         var rules = setupRules([
@@ -901,18 +904,13 @@ describe('initRules', function() {
   describe('when queue local storage flag is set', function() {
     var rulesQueue;
 
-    beforeAll(function() {
-      window.localStorage.setItem('com.adobe.reactor.queue', 'true');
-    });
-
-    afterAll(function() {
-      window.localStorage.removeItem('com.adobe.reactor.queue');
-    });
-
     beforeEach(function() {
       rulesQueue = { lastPromiseInQueue: Promise.resolve() };
 
       initRules = injectInitRules({
+        './isRuleQueueActive': function() {
+          return true;
+        },
         './createNotifyMonitors': function() {
           notifyMonitors = jasmine.createSpy();
           return notifyMonitors;
@@ -1749,6 +1747,9 @@ describe('initRules', function() {
 
         initRules = injectInitRules({
           './logger': logger,
+          './isRuleQueueActive': function() {
+            return true;
+          },
           './createNotifyMonitors': function() {
             notifyMonitors = jasmine.createSpy();
             return notifyMonitors;

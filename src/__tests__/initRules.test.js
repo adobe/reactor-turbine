@@ -13,7 +13,7 @@
 'use strict';
 var createModuleProvider = require('../createModuleProvider');
 var injectInitRules = require('inject-loader!../initRules');
-var ModuleHelper = require('./helpers/module');
+var moduleHelper = require('./helpers/module');
 var Promise = require('@adobe/reactor-promise');
 
 var generateDelegate = function(name, scriptFn, settings) {
@@ -73,14 +73,14 @@ var setupRules = function(rulesDefinition) {
       ) {
         moduleProvider.registerModule.apply(
           null,
-          ModuleHelper.createModule(
+          moduleHelper.createModule(
             delegateDefinition.name,
             delegateDefinition.script
           )
         );
 
         var delegate = {
-          modulePath: ModuleHelper.getPath(delegateDefinition.name),
+          modulePath: moduleHelper.getPath(delegateDefinition.name),
           settings: delegateDefinition.settings
         };
 
@@ -156,7 +156,7 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var eventExports = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Event1')
+          moduleHelper.getPath('Event1')
         );
         expect(eventExports.calls.count()).toBe(1);
       });
@@ -181,7 +181,7 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var eventExports = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Event1')
+          moduleHelper.getPath('Event1')
         );
         var eventExportsCall = eventExports.calls.mostRecent();
 
@@ -200,7 +200,7 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var conditionExport = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Condition1')
+          moduleHelper.getPath('Condition1')
         );
         expect(conditionExport.calls.count()).toBe(1);
       });
@@ -225,7 +225,7 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var conditionExport = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Condition1')
+          moduleHelper.getPath('Condition1')
         );
         var conditionExportsCall = conditionExport.calls.mostRecent();
 
@@ -249,10 +249,10 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var conditionExport1 = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Condition1')
+          moduleHelper.getPath('Condition1')
         );
         var conditionExport2 = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Condition2')
+          moduleHelper.getPath('Condition2')
         );
 
         expect(conditionExport1.calls.count()).toBe(1);
@@ -266,11 +266,15 @@ describe('initRules', function() {
             conditions: [
               generateCondition('Condition1', function(module) {
                 callOrder.push('Condition1');
-                module.exports = jasmine.createSpy().and.returnValue(true);
+                module.exports = function() {
+                  return true;
+                };
               }),
               generateCondition('Condition2', function(module) {
                 callOrder.push('Condition2');
-                module.exports = jasmine.createSpy().and.returnValue(true);
+                module.exports = function() {
+                  return true;
+                };
               })
             ]
           }
@@ -291,7 +295,7 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var actionExport = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Action1')
+          moduleHelper.getPath('Action1')
         );
         expect(actionExport.calls.count()).toBe(1);
       });
@@ -316,7 +320,7 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var actionExport = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Action1')
+          moduleHelper.getPath('Action1')
         );
         var actionExportsCall = actionExport.calls.mostRecent();
 
@@ -335,10 +339,10 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var actionExport1 = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Action1')
+          moduleHelper.getPath('Action1')
         );
         var actionExport2 = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Action2')
+          moduleHelper.getPath('Action2')
         );
         expect(actionExport1.calls.count()).toBe(1);
         expect(actionExport2.calls.count()).toBe(1);
@@ -351,11 +355,11 @@ describe('initRules', function() {
             actions: [
               generateAction('Action1', function(module) {
                 callOrder.push('Action1');
-                module.exports = jasmine.createSpy();
+                module.exports = function() {};
               }),
               generateAction('Action2', function(module) {
                 callOrder.push('Action2');
-                module.exports = jasmine.createSpy();
+                module.exports = function() {};
               })
             ]
           }
@@ -381,10 +385,10 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var conditionExport1 = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Condition1')
+          moduleHelper.getPath('Condition1')
         );
         var conditionExport2 = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Condition2')
+          moduleHelper.getPath('Condition2')
         );
 
         expect(conditionExport1.calls.count()).toBe(1);
@@ -406,10 +410,10 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var conditionExport1 = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Condition1')
+          moduleHelper.getPath('Condition1')
         );
         var conditionExport2 = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Condition2')
+          moduleHelper.getPath('Condition2')
         );
 
         expect(conditionExport1.calls.count()).toBe(1);
@@ -431,10 +435,10 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var conditionExport = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Condition1')
+          moduleHelper.getPath('Condition1')
         );
         var actionExport = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Action1')
+          moduleHelper.getPath('Action1')
         );
 
         expect(conditionExport.calls.count()).toBe(1);
@@ -456,10 +460,10 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var conditionExport = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Condition1')
+          moduleHelper.getPath('Condition1')
         );
         var actionExport = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Action1')
+          moduleHelper.getPath('Action1')
         );
 
         expect(conditionExport.calls.count()).toBe(1);
@@ -473,23 +477,23 @@ describe('initRules', function() {
             events: [
               generateEvent('Event1', function(module) {
                 callOrder.push('Event1');
-                module.exports = jasmine
-                  .createSpy()
-                  .and.callFake(function(settings, trigger) {
-                    trigger(event);
-                  });
+                module.exports = function(settings, trigger) {
+                  trigger(event);
+                };
               })
             ],
             conditions: [
               generateCondition('Condition1', function(module) {
                 callOrder.push('Condition1');
-                module.exports = jasmine.createSpy().and.returnValue(true);
+                module.exports = function() {
+                  return true;
+                };
               })
             ],
             actions: [
               generateAction('Action1', function(module) {
                 callOrder.push('Action1');
-                module.exports = jasmine.createSpy();
+                module.exports = function() {};
               })
             ]
           }
@@ -567,7 +571,7 @@ describe('initRules', function() {
         );
 
         var actionExport = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Action1')
+          moduleHelper.getPath('Action1')
         );
 
         expect(actionExport.calls.count()).toBe(0);
@@ -902,11 +906,7 @@ describe('initRules', function() {
   });
 
   describe('when queue local storage flag is set', function() {
-    var rulesQueue;
-
     beforeEach(function() {
-      rulesQueue = { lastPromiseInQueue: Promise.resolve() };
-
       initRules = injectInitRules({
         './isRuleQueueActive': function() {
           return true;
@@ -914,9 +914,6 @@ describe('initRules', function() {
         './createNotifyMonitors': function() {
           notifyMonitors = jasmine.createSpy();
           return notifyMonitors;
-        },
-        './createRulesPromiseQueue': function() {
-          return rulesQueue;
         }
       });
     });
@@ -932,7 +929,7 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var eventExports = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Event1')
+          moduleHelper.getPath('Event1')
         );
         expect(eventExports.calls.count()).toBe(1);
       });
@@ -957,7 +954,7 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var eventExports = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Event1')
+          moduleHelper.getPath('Event1')
         );
         var eventExportsCall = eventExports.calls.mostRecent();
 
@@ -973,11 +970,11 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var conditionExport = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Condition1')
+            moduleHelper.getPath('Condition1')
           );
           expect(conditionExport.calls.count()).toBe(1);
           done();
@@ -1001,11 +998,11 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var conditionExport = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Condition1')
+            moduleHelper.getPath('Condition1')
           );
           var conditionExportsCall = conditionExport.calls.mostRecent();
 
@@ -1031,14 +1028,14 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var conditionExport1 = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Condition1')
+            moduleHelper.getPath('Condition1')
           );
           var conditionExport2 = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Condition2')
+            moduleHelper.getPath('Condition2')
           );
 
           expect(conditionExport1.calls.count()).toBe(1);
@@ -1055,19 +1052,23 @@ describe('initRules', function() {
             conditions: [
               generateCondition('Condition1', function(module) {
                 callOrder.push('Condition1');
-                module.exports = jasmine.createSpy().and.returnValue(true);
+                module.exports = function() {
+                  return true;
+                };
               }),
               generateCondition('Condition2', function(module) {
                 callOrder.push('Condition2');
-                module.exports = jasmine.createSpy().and.returnValue(true);
+                module.exports = function() {
+                  return true;
+                };
               })
             ]
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           expect(callOrder).toEqual(['Condition1', 'Condition2']);
           done();
         });
@@ -1080,11 +1081,11 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var actionExport = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Action1')
+            moduleHelper.getPath('Action1')
           );
           expect(actionExport.calls.count()).toBe(1);
 
@@ -1109,11 +1110,11 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var actionExport = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Action1')
+            moduleHelper.getPath('Action1')
           );
           var actionExportsCall = actionExport.calls.mostRecent();
 
@@ -1132,14 +1133,14 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var actionExport1 = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Action1')
+            moduleHelper.getPath('Action1')
           );
           var actionExport2 = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Action2')
+            moduleHelper.getPath('Action2')
           );
           expect(actionExport1.calls.count()).toBe(1);
           expect(actionExport2.calls.count()).toBe(1);
@@ -1155,19 +1156,19 @@ describe('initRules', function() {
             actions: [
               generateAction('Action1', function(module) {
                 callOrder.push('Action1');
-                module.exports = jasmine.createSpy();
+                module.exports = function() {};
               }),
               generateAction('Action2', function(module) {
                 callOrder.push('Action2');
-                module.exports = jasmine.createSpy();
+                module.exports = function() {};
               })
             ]
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           expect(callOrder).toEqual(['Action1', 'Action2']);
           done();
         });
@@ -1185,14 +1186,14 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var conditionExport1 = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Condition1')
+            moduleHelper.getPath('Condition1')
           );
           var conditionExport2 = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Condition2')
+            moduleHelper.getPath('Condition2')
           );
 
           expect(conditionExport1.calls.count()).toBe(1);
@@ -1219,14 +1220,14 @@ describe('initRules', function() {
             }
           ]);
 
-          runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules);
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var conditionExport1 = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition1')
+              moduleHelper.getPath('Condition1')
             );
             var conditionExport2 = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition2')
+              moduleHelper.getPath('Condition2')
             );
 
             expect(conditionExport1.calls.count()).toBe(1);
@@ -1239,7 +1240,7 @@ describe('initRules', function() {
 
       it(
         'ceases to execute remaining conditions when a condition that ' +
-          'returns a promise that will reject in the future is encountered',
+          'returns a promise that will reject in the `future` is encountered',
         function(done) {
           var rules = setupRules([
             {
@@ -1256,14 +1257,14 @@ describe('initRules', function() {
             }
           ]);
 
-          runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules);
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var conditionExport1 = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition1')
+              moduleHelper.getPath('Condition1')
             );
             var conditionExport2 = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition2')
+              moduleHelper.getPath('Condition2')
             );
 
             expect(conditionExport1.calls.count()).toBe(1);
@@ -1286,14 +1287,14 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var conditionExport1 = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Condition1')
+            moduleHelper.getPath('Condition1')
           );
           var conditionExport2 = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Condition2')
+            moduleHelper.getPath('Condition2')
           );
 
           expect(conditionExport1.calls.count()).toBe(1);
@@ -1320,14 +1321,14 @@ describe('initRules', function() {
             }
           ]);
 
-          runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules);
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var conditionExport1 = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition1')
+              moduleHelper.getPath('Condition1')
             );
             var conditionExport2 = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition2')
+              moduleHelper.getPath('Condition2')
             );
 
             expect(conditionExport1.calls.count()).toBe(1);
@@ -1357,14 +1358,14 @@ describe('initRules', function() {
             }
           ]);
 
-          runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules);
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var conditionExport1 = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition1')
+              moduleHelper.getPath('Condition1')
             );
             var conditionExport2 = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition2')
+              moduleHelper.getPath('Condition2')
             );
 
             expect(conditionExport1.calls.count()).toBe(1);
@@ -1387,14 +1388,14 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var conditionExport = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Condition1')
+            moduleHelper.getPath('Condition1')
           );
           var actionExport = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Action1')
+            moduleHelper.getPath('Action1')
           );
 
           expect(conditionExport.calls.count()).toBe(1);
@@ -1421,14 +1422,14 @@ describe('initRules', function() {
             }
           ]);
 
-          runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules);
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var conditionExport = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition1')
+              moduleHelper.getPath('Condition1')
             );
             var actionExport = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Action1')
+              moduleHelper.getPath('Action1')
             );
 
             expect(conditionExport.calls.count()).toBe(1);
@@ -1458,14 +1459,14 @@ describe('initRules', function() {
             }
           ]);
 
-          runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules);
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var conditionExport = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition1')
+              moduleHelper.getPath('Condition1')
             );
             var actionExport = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Action1')
+              moduleHelper.getPath('Action1')
             );
 
             expect(conditionExport.calls.count()).toBe(1);
@@ -1488,14 +1489,14 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var conditionExport = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Condition1')
+            moduleHelper.getPath('Condition1')
           );
           var actionExport = moduleProvider.getModuleExports(
-            ModuleHelper.getPath('Action1')
+            moduleHelper.getPath('Action1')
           );
 
           expect(conditionExport.calls.count()).toBe(1);
@@ -1522,14 +1523,14 @@ describe('initRules', function() {
             }
           ]);
 
-          runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules);
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var conditionExport = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition1')
+              moduleHelper.getPath('Condition1')
             );
             var actionExport = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Action1')
+              moduleHelper.getPath('Action1')
             );
 
             expect(conditionExport.calls.count()).toBe(1);
@@ -1559,14 +1560,14 @@ describe('initRules', function() {
             }
           ]);
 
-          runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules);
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var conditionExport = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Condition1')
+              moduleHelper.getPath('Condition1')
             );
             var actionExport = moduleProvider.getModuleExports(
-              ModuleHelper.getPath('Action1')
+              moduleHelper.getPath('Action1')
             );
 
             expect(conditionExport.calls.count()).toBe(1);
@@ -1584,31 +1585,31 @@ describe('initRules', function() {
             events: [
               generateEvent('Event1', function(module) {
                 callOrder.push('Event1');
-                module.exports = jasmine
-                  .createSpy()
-                  .and.callFake(function(settings, trigger) {
-                    trigger(event);
-                  });
+                module.exports = function(settings, trigger) {
+                  trigger(event);
+                };
               })
             ],
             conditions: [
               generateCondition('Condition1', function(module) {
                 callOrder.push('Condition1');
-                module.exports = jasmine.createSpy().and.returnValue(true);
+                module.exports = function() {
+                  return true;
+                };
               })
             ],
             actions: [
               generateAction('Action1', function(module) {
                 callOrder.push('Action1');
-                module.exports = jasmine.createSpy();
+                module.exports = function() {};
               })
             ]
           }
         ]);
 
-        runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           expect(callOrder).toEqual(['Event1', 'Condition1', 'Action1']);
           done();
         });
@@ -1624,17 +1625,15 @@ describe('initRules', function() {
               events: [
                 generateEvent('Event1', function(module) {
                   callOrder.push('Event1');
-                  module.exports = jasmine
-                    .createSpy()
-                    .and.callFake(function(settings, trigger) {
-                      trigger(event);
-                    });
+                  module.exports = function(settings, trigger) {
+                    trigger(event);
+                  };
                 })
               ],
               conditions: [
                 generateCondition('Condition1', function(module) {
                   module.exports = function() {
-                    return new Promise(function(resolve, reject) {
+                    return new Promise(function(resolve) {
                       setTimeout(function() {
                         callOrder.push('Condition1');
                         resolve(true);
@@ -1646,7 +1645,7 @@ describe('initRules', function() {
               actions: [
                 generateAction('Action1', function(module) {
                   module.exports = function() {
-                    return new Promise(function(resolve, reject) {
+                    return new Promise(function(resolve) {
                       setTimeout(function() {
                         callOrder.push('Action1');
                         resolve('some');
@@ -1658,9 +1657,9 @@ describe('initRules', function() {
             }
           ]);
 
-          runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules);
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             expect(callOrder).toEqual(['Event1', 'Condition1', 'Action1']);
             done();
           });
@@ -1734,7 +1733,7 @@ describe('initRules', function() {
         );
 
         var actionExport = moduleProvider.getModuleExports(
-          ModuleHelper.getPath('Action1')
+          moduleHelper.getPath('Action1')
         );
 
         expect(actionExport.calls.count()).toBe(0);
@@ -1753,9 +1752,6 @@ describe('initRules', function() {
           './createNotifyMonitors': function() {
             notifyMonitors = jasmine.createSpy();
             return notifyMonitors;
-          },
-          './createRulesPromiseQueue': function() {
-            return rulesQueue;
           }
         });
       });
@@ -1848,7 +1844,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
+        var lastPromiseInQueue = initRules(
           _satellite,
           rules,
           moduleProvider,
@@ -1856,7 +1852,7 @@ describe('initRules', function() {
           getShouldExecuteActions
         );
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var errorMessage = logger.error.calls.mostRecent().args[0];
           var expectedErrorMessage =
             'Failed to execute Condition1 for Test Rule 1 rule. noob tried to divide by zero.';
@@ -1881,7 +1877,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
+        var lastPromiseInQueue = initRules(
           _satellite,
           rules,
           moduleProvider,
@@ -1889,7 +1885,7 @@ describe('initRules', function() {
           getShouldExecuteActions
         );
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var errorMessage = logger.error.calls.mostRecent().args[0];
           expect(errorMessage).toStartWith(
             'Failed to execute Condition1 for Test Rule 1 rule. Module did not export a function.'
@@ -1916,7 +1912,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
+        var lastPromiseInQueue = initRules(
           _satellite,
           rules,
           moduleProvider,
@@ -1924,7 +1920,7 @@ describe('initRules', function() {
           getShouldExecuteActions
         );
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var errorMessage = logger.error.calls.mostRecent().args[0];
           var expectedErrorMessage =
             'Failed to execute Condition1 for Test Rule 1 rule. noob tried to divide by zero.';
@@ -1951,7 +1947,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
+        var lastPromiseInQueue = initRules(
           _satellite,
           rules,
           moduleProvider,
@@ -1959,7 +1955,7 @@ describe('initRules', function() {
           getShouldExecuteActions
         );
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           expect(logger.log.calls.mostRecent().args[0]).toEqual(
             'Condition Condition1 for rule Test Rule 1 not met.'
           );
@@ -1985,7 +1981,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
+        var lastPromiseInQueue = initRules(
           _satellite,
           rules,
           moduleProvider,
@@ -1993,7 +1989,7 @@ describe('initRules', function() {
           getShouldExecuteActions
         );
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           expect(logger.log.calls.mostRecent().args[0]).toEqual(
             'Condition Condition1 for rule Test Rule 1 not met.'
           );
@@ -2006,7 +2002,7 @@ describe('initRules', function() {
         });
       });
 
-      it('logs an error when an condition module promise throws an error', function(done) {
+      it('logs an error when a condition module promise throws an error', function(done) {
         var rules = setupRules([
           {
             conditions: [
@@ -2021,7 +2017,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
+        var lastPromiseInQueue = initRules(
           _satellite,
           rules,
           moduleProvider,
@@ -2029,7 +2025,7 @@ describe('initRules', function() {
           getShouldExecuteActions
         );
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var errorMessage = logger.error.calls.mostRecent().args[0];
           var expectedErrorMessage =
             'Failed to execute Condition1 for Test Rule 1 rule. noob tried to divide by zero.';
@@ -2040,8 +2036,8 @@ describe('initRules', function() {
       });
 
       it(
-        'logs an error when an condition module promise rejects some time in ' +
-          'the fututre',
+        'logs an error when a condition module promise rejects some time in ' +
+          'the future',
         function(done) {
           var rules = setupRules([
             {
@@ -2059,7 +2055,7 @@ describe('initRules', function() {
             }
           ]);
 
-          initRules(
+          var lastPromiseInQueue = initRules(
             _satellite,
             rules,
             moduleProvider,
@@ -2067,7 +2063,7 @@ describe('initRules', function() {
             getShouldExecuteActions
           );
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var errorMessage = logger.error.calls.mostRecent().args[0];
             var expectedErrorMessage =
               'Failed to execute Condition1 for Test Rule 1 rule. noob tried to divide by zero.';
@@ -2079,8 +2075,8 @@ describe('initRules', function() {
       );
 
       it(
-        'logs an error when an condition module promise rejects some time in the ' +
-          'fututre without a reason',
+        'logs an error when a condition module promise rejects some time in the ' +
+          'future without a reason',
         function(done) {
           var rules = setupRules([
             {
@@ -2098,7 +2094,7 @@ describe('initRules', function() {
             }
           ]);
 
-          initRules(
+          var lastPromiseInQueue = initRules(
             _satellite,
             rules,
             moduleProvider,
@@ -2106,7 +2102,7 @@ describe('initRules', function() {
             getShouldExecuteActions
           );
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var errorMessage = logger.error.calls.mostRecent().args[0];
             var expectedErrorMessage =
               'Failed to execute Condition1 for Test Rule 1 rule. The extension triggered an ' +
@@ -2129,7 +2125,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
+        var lastPromiseInQueue = initRules(
           _satellite,
           rules,
           moduleProvider,
@@ -2137,7 +2133,7 @@ describe('initRules', function() {
           getShouldExecuteActions
         );
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var errorMessage = logger.error.calls.mostRecent().args[0];
           var expectedErrorMessage =
             'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
@@ -2161,7 +2157,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
+        var lastPromiseInQueue = initRules(
           _satellite,
           rules,
           moduleProvider,
@@ -2169,7 +2165,7 @@ describe('initRules', function() {
           getShouldExecuteActions
         );
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var errorMessage = logger.error.calls.mostRecent().args[0];
           expect(errorMessage).toStartWith(
             'Failed to execute Action1 for Test Rule 1 rule. Module did not export a function.'
@@ -2195,7 +2191,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
+        var lastPromiseInQueue = initRules(
           _satellite,
           rules,
           moduleProvider,
@@ -2203,7 +2199,7 @@ describe('initRules', function() {
           getShouldExecuteActions
         );
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var errorMessage = logger.error.calls.mostRecent().args[0];
           var expectedErrorMessage =
             'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
@@ -2231,7 +2227,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
+        var lastPromiseInQueue = initRules(
           _satellite,
           rules,
           moduleProvider,
@@ -2239,7 +2235,7 @@ describe('initRules', function() {
           getShouldExecuteActions
         );
 
-        rulesQueue.lastPromiseInQueue.then(function() {
+        lastPromiseInQueue.then(function() {
           var errorMessage = logger.error.calls.mostRecent().args[0];
           var expectedErrorMessage =
             'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
@@ -2254,7 +2250,7 @@ describe('initRules', function() {
 
       it(
         'logs an error when an action module promise rejects some time in ' +
-          'the fututre',
+          'the future',
         function(done) {
           var rules = setupRules([
             {
@@ -2272,7 +2268,7 @@ describe('initRules', function() {
             }
           ]);
 
-          initRules(
+          var lastPromiseInQueue = initRules(
             _satellite,
             rules,
             moduleProvider,
@@ -2280,7 +2276,7 @@ describe('initRules', function() {
             getShouldExecuteActions
           );
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var errorMessage = logger.error.calls.mostRecent().args[0];
             var expectedErrorMessage =
               'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
@@ -2296,7 +2292,7 @@ describe('initRules', function() {
 
       it(
         'logs an error when an action module promise rejects some time in the ' +
-          'fututre without a reason',
+          'future without a reason',
         function(done) {
           var rules = setupRules([
             {
@@ -2314,7 +2310,7 @@ describe('initRules', function() {
             }
           ]);
 
-          initRules(
+          var lastPromiseInQueue = initRules(
             _satellite,
             rules,
             moduleProvider,
@@ -2322,7 +2318,7 @@ describe('initRules', function() {
             getShouldExecuteActions
           );
 
-          rulesQueue.lastPromiseInQueue.then(function() {
+          lastPromiseInQueue.then(function() {
             var errorMessage = logger.error.calls.mostRecent().args[0];
             var expectedErrorMessage =
               'Failed to execute Action1 for Test Rule 1 rule. The extension triggered an error, ' +

@@ -1,32 +1,16 @@
+var camelCase = require('camelize');
+var kebabCase = require('kebab-case');
+
 module.exports = {
   extensionName: 'test-extension',
-  toCamelCase: function(str) {
-    return str
-      .replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
-        return index === 0 ? letter.toLowerCase() : letter.toUpperCase();
-      })
-      .replace(/\s+/g, '');
-  },
-  toSnakeCase: function toSnakeCase(str) {
-    if (!str) return '';
-
-    return String(str)
-      .replace(/^[^A-Za-z0-9]*|[^A-Za-z0-9]*$/g, '')
-      .replace(/([a-z])([A-Z])/g, function(m, a, b) {
-        return a + '-' + b.toLowerCase();
-      })
-      .replace(/[^A-Za-z0-9]+|_-+/g, '-')
-      .toLowerCase();
-  },
-
   createModule: function(name, scriptFn) {
-    var cName = this.toCamelCase(name);
-    var sName = this.toSnakeCase(name);
+    var cName = camelCase(name);
+    var kName = kebabCase(name);
 
     return [
       this.getPath(cName),
       {
-        name: sName,
+        name: kName,
         displayName: name,
         script: scriptFn
       },
@@ -35,10 +19,6 @@ module.exports = {
   },
 
   getPath: function(name) {
-    return this.extensionName + '/' + this.toCamelCase(name) + '.js';
-  },
-
-  getType: function(name) {
-    return this.extensionName + '.' + this.toSnakeCase(name);
+    return this.extensionName + '/' + camelCase(name) + '.js';
   }
 };

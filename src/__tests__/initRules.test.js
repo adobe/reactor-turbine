@@ -1020,15 +1020,22 @@ describe('initRules', function() {
         });
       });
 
-      it('executes all the rule conditions provided', function(done) {
+      it('executes all the rule conditions in the order provided', function(done) {
+        var callOrder = [];
         var rules = setupRules([
           {
             conditions: [
               generateCondition('Condition1', function(module) {
-                module.exports = jasmine.createSpy().and.returnValue(true);
+                module.exports = jasmine.createSpy().and.callFake(function() {
+                  callOrder.push('Condition1');
+                  return true;
+                });
               }),
               generateCondition('Condition2', function(module) {
-                module.exports = jasmine.createSpy().and.returnValue(true);
+                module.exports = jasmine.createSpy().and.callFake(function() {
+                  callOrder.push('Condition2');
+                  return true;
+                });
               })
             ]
           }
@@ -1046,35 +1053,6 @@ describe('initRules', function() {
 
           expect(conditionExport1.calls.count()).toBe(1);
           expect(conditionExport2.calls.count()).toBe(1);
-
-          done();
-        });
-      });
-
-      it('executes all the rule conditions in the order provided', function(done) {
-        var callOrder = [];
-        var rules = setupRules([
-          {
-            conditions: [
-              generateCondition('Condition1', function(module) {
-                callOrder.push('Condition1');
-                module.exports = function() {
-                  return true;
-                };
-              }),
-              generateCondition('Condition2', function(module) {
-                callOrder.push('Condition2');
-                module.exports = function() {
-                  return true;
-                };
-              })
-            ]
-          }
-        ]);
-
-        var lastPromiseInQueue = runInitRules(rules);
-
-        lastPromiseInQueue.then(function() {
           expect(callOrder).toEqual(['Condition1', 'Condition2']);
           done();
         });
@@ -1132,10 +1110,22 @@ describe('initRules', function() {
         });
       });
 
-      it('executes all the rule actions provided', function(done) {
+      it('executes all the rule actions in the order provided', function(done) {
+        var callOrder = [];
         var rules = setupRules([
           {
-            actions: [generateAction('Action1'), generateAction('Action2')]
+            actions: [
+              generateAction('Action1', function(module) {
+                module.exports = jasmine.createSpy().and.callFake(function() {
+                  callOrder.push('Action1');
+                });
+              }),
+              generateAction('Action2', function(module) {
+                module.exports = jasmine.createSpy().and.callFake(function() {
+                  callOrder.push('Action2');
+                });
+              })
+            ]
           }
         ]);
 
@@ -1148,33 +1138,9 @@ describe('initRules', function() {
           var actionExport2 = moduleProvider.getModuleExports(
             moduleHelper.getPath('Action2')
           );
+
           expect(actionExport1.calls.count()).toBe(1);
           expect(actionExport2.calls.count()).toBe(1);
-
-          done();
-        });
-      });
-
-      it('executes all the rule actions in the order provided', function(done) {
-        var callOrder = [];
-        var rules = setupRules([
-          {
-            actions: [
-              generateAction('Action1', function(module) {
-                callOrder.push('Action1');
-                module.exports = function() {};
-              }),
-              generateAction('Action2', function(module) {
-                callOrder.push('Action2');
-                module.exports = function() {};
-              })
-            ]
-          }
-        ]);
-
-        var lastPromiseInQueue = runInitRules(rules);
-
-        lastPromiseInQueue.then(function() {
           expect(callOrder).toEqual(['Action1', 'Action2']);
           done();
         });

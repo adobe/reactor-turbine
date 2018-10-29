@@ -125,6 +125,8 @@ var event;
 
 describe('initRules', function() {
   beforeEach(function() {
+    jasmine.clock().install();
+
     getShouldExecuteActions = function() {
       return true;
     };
@@ -142,6 +144,10 @@ describe('initRules', function() {
         return notifyMonitors;
       }
     });
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
   });
 
   describe('when no queue local storage flag is set', function() {
@@ -370,7 +376,7 @@ describe('initRules', function() {
         expect(callOrder).toEqual(['Action1', 'Action2']);
       });
 
-      it('ceases to execute remaining conditions when condition fails', function() {
+      it('ceases to execute remaining conditions when condition is not met', function() {
         var rules = setupRules([
           {
             conditions: [
@@ -395,7 +401,7 @@ describe('initRules', function() {
         expect(conditionExport2.calls.count()).toBe(0);
       });
 
-      it('ceases to execute remaining conditions when negated condition fails', function() {
+      it('ceases to execute remaining conditions when negated condition is not met', function() {
         var rules = setupRules([
           {
             conditions: [
@@ -420,7 +426,7 @@ describe('initRules', function() {
         expect(conditionExport2.calls.count()).toBe(0);
       });
 
-      it('does not execute actions when condition fails', function() {
+      it('does not execute actions when condition is not met', function() {
         var rules = setupRules([
           {
             conditions: [
@@ -445,7 +451,7 @@ describe('initRules', function() {
         expect(actionExport.calls.count()).toBe(0);
       });
 
-      it('does not execute actions when negated condition fails', function() {
+      it('does not execute actions when negated condition is not met', function() {
         var rules = setupRules([
           {
             conditions: [
@@ -1247,9 +1253,7 @@ describe('initRules', function() {
               conditions: [
                 generateCondition('Condition1', function(module) {
                   module.exports = jasmine.createSpy().and.callFake(function() {
-                    return new Promise(function(resolve, reject) {
-                      setTimeout(reject, 100);
-                    });
+                    return Promise.reject();
                   });
                 }),
                 generateCondition('Condition2')
@@ -1348,9 +1352,7 @@ describe('initRules', function() {
               conditions: [
                 generateNegatedCondition('Condition1', function(module) {
                   module.exports = jasmine.createSpy().and.callFake(function() {
-                    return new Promise(function(resolve, reject) {
-                      setTimeout(reject, 200);
-                    });
+                    return Promise.reject();
                   });
                 }),
                 generateCondition('Condition2')
@@ -1449,9 +1451,7 @@ describe('initRules', function() {
               conditions: [
                 generateCondition('Condition1', function(module) {
                   module.exports = jasmine.createSpy().and.callFake(function() {
-                    return new Promise(function(resolve, reject) {
-                      setTimeout(reject, 200);
-                    });
+                    return Promise.reject();
                   });
                 })
               ],
@@ -1550,8 +1550,44 @@ describe('initRules', function() {
               conditions: [
                 generateNegatedCondition('Condition1', function(module) {
                   module.exports = jasmine.createSpy().and.callFake(function() {
-                    return new Promise(function(resolve, reject) {
-                      setTimeout(reject, 100);
+                    return Promise.reject();
+                  });
+                })
+              ],
+              actions: [generateAction('Action1')]
+            }
+          ]);
+
+          var lastPromiseInQueue = runInitRules(rules);
+
+          lastPromiseInQueue.then(function() {
+            var conditionExport = moduleProvider.getModuleExports(
+              moduleHelper.getPath('Condition1')
+            );
+            var actionExport = moduleProvider.getModuleExports(
+              moduleHelper.getPath('Action1')
+            );
+
+            expect(conditionExport.calls.count()).toBe(1);
+            expect(actionExport.calls.count()).toBe(0);
+
+            done();
+          });
+        }
+      );
+
+      it(
+        'does not execute actions when a condition takes ' +
+          'longer than 2 seconds to complete',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                generateCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
+                    return new Promise(function(resolve) {
+                      setTimeout(resolve, 3000);
+                      jasmine.clock().tick(2000);
                     });
                   });
                 })
@@ -1573,6 +1609,45 @@ describe('initRules', function() {
             expect(conditionExport.calls.count()).toBe(1);
             expect(actionExport.calls.count()).toBe(0);
 
+            done();
+          });
+        }
+      );
+
+      it(
+        'does execute the next action in the chain if any action takes' +
+          ' longer than 2 seconds to complete',
+        function(done) {
+          var callOrder = [];
+
+          var rules = setupRules([
+            {
+              actions: [
+                generateAction('Action1', function(module) {
+                  module.exports = function() {
+                    return new Promise(function(resolve) {
+                      setTimeout(function() {
+                        callOrder.push('Action1');
+                        resolve();
+                      }, 3000);
+
+                      jasmine.clock().tick(2000);
+                    });
+                  };
+                }),
+                generateAction('Action2', function(module) {
+                  module.exports = function() {
+                    callOrder.push('Action2');
+                  };
+                })
+              ]
+            }
+          ]);
+
+          var lastPromiseInQueue = runInitRules(rules);
+
+          lastPromiseInQueue.then(function() {
+            expect(callOrder).toEqual(['Action2']);
             done();
           });
         }
@@ -1634,10 +1709,8 @@ describe('initRules', function() {
                 generateCondition('Condition1', function(module) {
                   module.exports = function() {
                     return new Promise(function(resolve) {
-                      setTimeout(function() {
-                        callOrder.push('Condition1');
-                        resolve(true);
-                      }, 250);
+                      callOrder.push('Condition1');
+                      resolve(true);
                     });
                   };
                 })
@@ -1646,10 +1719,8 @@ describe('initRules', function() {
                 generateAction('Action1', function(module) {
                   module.exports = function() {
                     return new Promise(function(resolve) {
-                      setTimeout(function() {
-                        callOrder.push('Action1');
-                        resolve('some');
-                      }, 250);
+                      callOrder.push('Action1');
+                      resolve('some value');
                     });
                   };
                 })
@@ -2044,11 +2115,7 @@ describe('initRules', function() {
               conditions: [
                 generateCondition('Condition1', function(module) {
                   module.exports = function() {
-                    return new Promise(function(resolve, reject) {
-                      setTimeout(function() {
-                        reject('noob tried to divide by zero.');
-                      }, 250);
-                    });
+                    return Promise.reject('noob tried to divide by zero.');
                   };
                 })
               ]
@@ -2083,11 +2150,7 @@ describe('initRules', function() {
               conditions: [
                 generateCondition('Condition1', function(module) {
                   module.exports = function() {
-                    return new Promise(function(resolve, reject) {
-                      setTimeout(function() {
-                        reject();
-                      }, 250);
-                    });
+                    return Promise.reject();
                   };
                 })
               ]
@@ -2257,11 +2320,7 @@ describe('initRules', function() {
               actions: [
                 generateAction('Action1', function(module) {
                   module.exports = function() {
-                    return new Promise(function(resolve, reject) {
-                      setTimeout(function() {
-                        reject('noob tried to divide by zero.');
-                      }, 250);
-                    });
+                    return Promise.reject('noob tried to divide by zero.');
                   };
                 })
               ]
@@ -2299,11 +2358,7 @@ describe('initRules', function() {
               actions: [
                 generateAction('Action1', function(module) {
                   module.exports = function() {
-                    return new Promise(function(resolve, reject) {
-                      setTimeout(function() {
-                        reject();
-                      }, 250);
-                    });
+                    return Promise.reject();
                   };
                 })
               ]
@@ -2328,6 +2383,90 @@ describe('initRules', function() {
               rule: rules[0]
             });
 
+            done();
+          });
+        }
+      );
+
+      it(
+        'logs an error when a condition module take longer than 2 seconds' +
+          ' to complete',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                generateCondition('Condition1', function(module) {
+                  module.exports = function() {
+                    return new Promise(function(resolve) {
+                      setTimeout(resolve, 3000);
+                      jasmine.clock().tick(2000);
+                    });
+                  };
+                })
+              ]
+            }
+          ]);
+
+          var lastPromiseInQueue = initRules(
+            _satellite,
+            rules,
+            moduleProvider,
+            replaceTokens,
+            getShouldExecuteActions
+          );
+
+          lastPromiseInQueue.then(function() {
+            var errorMessage = logger.error.calls.mostRecent().args[0];
+            var expectedErrorMessage =
+              'Failed to execute Condition1 for Test Rule 1 rule. A timeout occurred because the ' +
+              'condition took longer than 2 seconds to complete.';
+            expect(errorMessage).toStartWith(expectedErrorMessage);
+            expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+              rule: rules[0],
+              condition: rules[0].conditions[0]
+            });
+
+            done();
+          });
+        }
+      );
+
+      it(
+        'logs an error when an action module take longer than 2 seconds' +
+          ' to complete',
+        function(done) {
+          var rules = setupRules([
+            {
+              actions: [
+                generateAction('Action1', function(module) {
+                  module.exports = function() {
+                    return new Promise(function(resolve) {
+                      setTimeout(resolve, 3000);
+                      jasmine.clock().tick(2000);
+                    });
+                  };
+                })
+              ]
+            }
+          ]);
+
+          var lastPromiseInQueue = initRules(
+            _satellite,
+            rules,
+            moduleProvider,
+            replaceTokens,
+            getShouldExecuteActions
+          );
+
+          lastPromiseInQueue.then(function() {
+            var errorMessage = logger.error.calls.mostRecent().args[0];
+            var expectedErrorMessage =
+              'Failed to execute Action1 for Test Rule 1 rule. A timeout occurred because the ' +
+              'action took longer than 2 seconds to complete.';
+            expect(errorMessage).toStartWith(expectedErrorMessage);
+            expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
+              rule: rules[0]
+            });
             done();
           });
         }

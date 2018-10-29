@@ -17,7 +17,7 @@ var createNotifyMonitors = require('./createNotifyMonitors');
 var createExecuteDelegateModule = require('./createExecuteDelegateModule');
 var isRuleQueueActive = require('./isRuleQueueActive');
 var Promise = require('@adobe/reactor-promise');
-var PROMISE_TIMEOUT = 5000;
+var PROMISE_TIMEOUT = 2000;
 
 module.exports = function(
   _satellite,
@@ -98,6 +98,18 @@ module.exports = function(
     });
   };
 
+  var logActionTimeoutWarning = function(condition, rule) {
+    logger.error(
+      getErrorMessage(
+        condition,
+        rule,
+        'A timeout occurred because the action took longer than ' +
+          PROMISE_TIMEOUT / 1000 +
+          ' seconds to complete.'
+      )
+    );
+  };
+
   var normalizeError = function(e) {
     if (!e) {
       e = new Error(
@@ -120,10 +132,25 @@ module.exports = function(
     if (rule.conditions) {
       rule.conditions.forEach(function(condition) {
         lastPromiseInQueue = lastPromiseInQueue.then(function() {
-          var conditionPromise = new Promise(function(resolve) {
-            resolve(
+          return new Promise(function(resolve, reject) {
+            var timeoutId = setTimeout(function() {
+              reject(
+                'A timeout occurred because the condition took longer than ' +
+                  PROMISE_TIMEOUT / 1000 +
+                  ' seconds to complete. '
+              );
+            }, PROMISE_TIMEOUT);
+
+            Promise.resolve(
               executeDelegateModule(condition, syntheticEvent, [syntheticEvent])
-            );
+            )
+              .then(function(result) {
+                clearTimeout(timeoutId);
+                resolve(result);
+              })
+              .catch(function(e) {
+                reject(e);
+              });
           })
             .catch(function(e) {
               e = normalizeError(e, condition);
@@ -136,36 +163,36 @@ module.exports = function(
                 return Promise.reject();
               }
             });
-
-          var timeoutPromise = new Promise(function(resolve, reject) {
-            // We reject instead of resolve because we don't want
-            // remaining conditions and actions to run.
-            setTimeout(reject, PROMISE_TIMEOUT);
-          });
-
-          return Promise.race([conditionPromise, timeoutPromise]);
         });
       });
     }
 
     if (getShouldExecuteActions() && rule.actions) {
       rule.actions.forEach(function(action) {
+        var timeoutId;
+
         lastPromiseInQueue = lastPromiseInQueue.then(function() {
-          var actionPromise = new Promise(function(resolve) {
-            resolve(
+          return new Promise(function(resolve, reject) {
+            timeoutId = setTimeout(function() {
+              logActionTimeoutWarning(action, rule);
+              resolve();
+            }, PROMISE_TIMEOUT);
+
+            Promise.resolve(
               executeDelegateModule(action, syntheticEvent, [syntheticEvent])
-            );
+            )
+              .then(function() {
+                clearTimeout(timeoutId);
+                resolve();
+              })
+              .catch(function(e) {
+                reject(e);
+              });
           }).catch(function(e) {
+            clearTimeout(timeoutId);
             e = normalizeError(e);
             logActionError(action, rule, e);
           });
-
-          var timeoutPromise = new Promise(function(resolve) {
-            // We resolve instead of reject because we want remaining actions to run.
-            setTimeout(resolve, PROMISE_TIMEOUT);
-          });
-
-          return Promise.race([actionPromise, timeoutPromise]);
         });
       });
     }

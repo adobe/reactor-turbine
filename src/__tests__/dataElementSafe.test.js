@@ -15,7 +15,7 @@ var dataElementSafe = require('../dataElementSafe');
 
 describe('dataElementSafe', function() {
 
-  afterEach(function() {
+  beforeEach(function() {
     cookie.set('_sdsat_foo', '');
     window.sessionStorage.removeItem('com.adobe.reactor.dataElements.foo');
     window.localStorage.removeItem('com.adobe.reactor.dataElements.foo');

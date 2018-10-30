@@ -135,7 +135,10 @@ describe('initRules', function() {
 
     moduleProvider = createModuleProvider();
 
+    logger = jasmine.createSpyObj('logger', ['log', 'error']);
+
     initRules = injectInitRules({
+      './logger': logger,
       './isRuleQueueActive': function() {
         return false;
       },
@@ -510,6 +513,35 @@ describe('initRules', function() {
         expect(callOrder).toEqual(['Event1', 'Condition1', 'Action1']);
       });
 
+      it('ceases to execute remaining actions when an action throws an error', function() {
+        var rules = setupRules([
+          {
+            actions: [
+              generateAction('Action1', function(module) {
+                module.exports = jasmine.createSpy().and.callFake(function() {
+                  throw new Error('noob tried to divide by zero.');
+                });
+              }),
+              generateAction('Action2', function(module) {
+                module.exports = jasmine.createSpy();
+              })
+            ]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var action1Export = moduleProvider.getModuleExports(
+          moduleHelper.getPath('Action1')
+        );
+        var action2Export = moduleProvider.getModuleExports(
+          moduleHelper.getPath('Action1')
+        );
+
+        expect(action1Export.calls.count()).toBe(1);
+        expect(action2Export.calls.count()).toBe(1);
+      });
+
       it('does not throw error when there are no events for a rule', function() {
         var rules = setupRules([{}]);
         delete rules[0].events;
@@ -585,18 +617,6 @@ describe('initRules', function() {
     });
 
     describe('error handling and logging', function() {
-      beforeEach(function() {
-        logger = jasmine.createSpyObj('logger', ['log', 'error']);
-
-        initRules = injectInitRules({
-          './logger': logger,
-          './createNotifyMonitors': function() {
-            notifyMonitors = jasmine.createSpy();
-            return notifyMonitors;
-          }
-        });
-      });
-
       it('logs an error when retrieving event module exports fails', function() {
         var rules = setupRules([
           {
@@ -846,9 +866,6 @@ describe('initRules', function() {
         var expectedErrorMessage =
           'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
         expect(errorMessage).toStartWith(expectedErrorMessage);
-        expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-          rule: rules[0]
-        });
       });
 
       it('logs an error when the action module exports is not a function', function() {
@@ -874,9 +891,6 @@ describe('initRules', function() {
         expect(errorMessage).toStartWith(
           'Failed to execute Action1 for Test Rule 1 rule. Module did not export a function.'
         );
-        expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-          rule: rules[0]
-        });
       });
 
       it('logs an error when executing action module exports fails', function() {
@@ -904,16 +918,16 @@ describe('initRules', function() {
         var expectedErrorMessage =
           'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
         expect(errorMessage).toStartWith(expectedErrorMessage);
-        expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-          rule: rules[0]
-        });
       });
     });
   });
 
   describe('when queue local storage flag is set', function() {
     beforeEach(function() {
+      logger = jasmine.createSpyObj('logger', ['log', 'error']);
+
       initRules = injectInitRules({
+        './logger': logger,
         './isRuleQueueActive': function() {
           return true;
         },
@@ -1584,13 +1598,11 @@ describe('initRules', function() {
         'does execute the next action in the chain if any action takes' +
           ' longer than 2 seconds to complete',
         function(done) {
-          var callOrder = [];
-
           var rules = setupRules([
             {
               actions: [
                 generateAction('Action1', function(module) {
-                  module.exports = function() {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
                     return new Promise(function(resolve) {
                       setTimeout(function() {
                         callOrder.push('Action1');
@@ -1599,12 +1611,10 @@ describe('initRules', function() {
 
                       jasmine.clock().tick(2000);
                     });
-                  };
+                  });
                 }),
                 generateAction('Action2', function(module) {
-                  module.exports = function() {
-                    callOrder.push('Action2');
-                  };
+                  module.exports = jasmine.createSpy();
                 })
               ]
             }
@@ -1613,7 +1623,16 @@ describe('initRules', function() {
           var lastPromiseInQueue = runInitRules(rules);
 
           lastPromiseInQueue.then(function() {
-            expect(callOrder).toEqual(['Action2']);
+            var action1Export = moduleProvider.getModuleExports(
+              moduleHelper.getPath('Action1')
+            );
+            var action2Export = moduleProvider.getModuleExports(
+              moduleHelper.getPath('Action2')
+            );
+
+            expect(action1Export.calls.count()).toBe(1);
+            expect(action2Export.calls.count()).toBe(0);
+
             done();
           });
         }
@@ -1778,21 +1797,6 @@ describe('initRules', function() {
     });
 
     describe('error handling and logging', function() {
-      beforeEach(function() {
-        logger = jasmine.createSpyObj('logger', ['log', 'error']);
-
-        initRules = injectInitRules({
-          './logger': logger,
-          './isRuleQueueActive': function() {
-            return true;
-          },
-          './createNotifyMonitors': function() {
-            notifyMonitors = jasmine.createSpy();
-            return notifyMonitors;
-          }
-        });
-      });
-
       it('logs an error when retrieving event module exports fails', function() {
         var rules = setupRules([
           {
@@ -2167,9 +2171,6 @@ describe('initRules', function() {
           var expectedErrorMessage =
             'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
           expect(errorMessage).toStartWith(expectedErrorMessage);
-          expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-            rule: rules[0]
-          });
 
           done();
         });
@@ -2199,9 +2200,6 @@ describe('initRules', function() {
           expect(errorMessage).toStartWith(
             'Failed to execute Action1 for Test Rule 1 rule. Module did not export a function.'
           );
-          expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-            rule: rules[0]
-          });
 
           done();
         });
@@ -2233,9 +2231,6 @@ describe('initRules', function() {
           var expectedErrorMessage =
             'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
           expect(errorMessage).toStartWith(expectedErrorMessage);
-          expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-            rule: rules[0]
-          });
 
           done();
         });
@@ -2269,9 +2264,6 @@ describe('initRules', function() {
           var expectedErrorMessage =
             'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
           expect(errorMessage).toStartWith(expectedErrorMessage);
-          expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-            rule: rules[0]
-          });
 
           done();
         });
@@ -2306,9 +2298,6 @@ describe('initRules', function() {
             var expectedErrorMessage =
               'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
             expect(errorMessage).toStartWith(expectedErrorMessage);
-            expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-              rule: rules[0]
-            });
 
             done();
           });
@@ -2345,9 +2334,6 @@ describe('initRules', function() {
               'Failed to execute Action1 for Test Rule 1 rule. The extension triggered an error, ' +
               'but no error information was provided.';
             expect(errorMessage).toStartWith(expectedErrorMessage);
-            expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-              rule: rules[0]
-            });
 
             done();
           });
@@ -2430,9 +2416,7 @@ describe('initRules', function() {
               'Failed to execute Action1 for Test Rule 1 rule. A timeout occurred because the ' +
               'action took longer than 2 seconds to complete.';
             expect(errorMessage).toStartWith(expectedErrorMessage);
-            expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
-              rule: rules[0]
-            });
+
             done();
           });
         }

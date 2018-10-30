@@ -98,18 +98,6 @@ module.exports = function(
     });
   };
 
-  var logActionTimeoutError = function(condition, rule) {
-    logger.error(
-      getErrorMessage(
-        condition,
-        rule,
-        'A timeout occurred because the action took longer than ' +
-          PROMISE_TIMEOUT / 1000 +
-          ' seconds to complete.'
-      )
-    );
-  };
-
   var normalizeError = function(e) {
     if (!e) {
       e = new Error(
@@ -132,8 +120,10 @@ module.exports = function(
     if (rule.conditions) {
       rule.conditions.forEach(function(condition) {
         lastPromiseInQueue = lastPromiseInQueue.then(function() {
+          var timeoutId;
+
           return new Promise(function(resolve, reject) {
-            var timeoutId = setTimeout(function() {
+            timeoutId = setTimeout(function() {
               // Reject instead of resolve to prevent subsequent
               // conditions and actions from executing.
               reject(
@@ -143,24 +133,18 @@ module.exports = function(
               );
             }, PROMISE_TIMEOUT);
 
-            Promise.resolve(
+            resolve(
               executeDelegateModule(condition, syntheticEvent, [syntheticEvent])
-            )
-              .then(function(result) {
-                clearTimeout(timeoutId);
-                resolve(result);
-              })
-              .catch(function(e) {
-                clearTimeout(timeoutId);
-                reject(e);
-              });
+            );
           })
             .catch(function(e) {
+              clearTimeout(timeoutId);
               e = normalizeError(e, condition);
               logConditionError(condition, rule, e);
               return Promise.reject(e);
             })
             .then(function(result) {
+              clearTimeout(timeoutId);
               if (!isConditionMet(condition, result)) {
                 logConditionNotMet(condition, rule);
                 return Promise.reject();
@@ -177,13 +161,16 @@ module.exports = function(
 
           return new Promise(function(resolve, reject) {
             timeoutId = setTimeout(function() {
-              logActionTimeoutError(action, rule);
-              // Resolve instead of reject to allow subsequent
-              // conditions and actions to execute.
-              resolve();
+              reject(
+                'A timeout occurred because the action took longer than ' +
+                  PROMISE_TIMEOUT / 1000 +
+                  ' seconds to complete. '
+              );
             }, PROMISE_TIMEOUT);
 
-            resolve(executeDelegateModule(action, syntheticEvent, [syntheticEvent]));
+            resolve(
+              executeDelegateModule(action, syntheticEvent, [syntheticEvent])
+            );
           })
             .then(function() {
               clearTimeout(timeoutId);
@@ -192,6 +179,7 @@ module.exports = function(
               clearTimeout(timeoutId);
               e = normalizeError(e);
               logActionError(action, rule, e);
+              return Promise.reject(e);
             });
         });
       });
@@ -231,14 +219,18 @@ module.exports = function(
   };
 
   var runActions = function(rule, syntheticEvent) {
-    if (getShouldExecuteActions()) {
-      (rule.actions || []).forEach(function(action) {
+    var action;
+
+    if (getShouldExecuteActions() && rule.actions) {
+      for (var i = 0; i < rule.actions.length; i++) {
+        action = rule.actions[i];
         try {
           executeDelegateModule(action, syntheticEvent, [syntheticEvent]);
         } catch (e) {
           logActionError(action, rule, e);
+          return;
         }
-      });
+      }
 
       logRuleCompleted(rule);
     }

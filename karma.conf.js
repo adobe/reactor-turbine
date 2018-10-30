@@ -52,6 +52,7 @@ if (argv.coverage) {
 
 module.exports = function(config) {
   config.set({
+    hostname: '0.0.0.0',
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
@@ -176,7 +177,11 @@ module.exports = function(config) {
       startConnect: startConnect,
       retryLimit: 3,
       recordVideo: false,
-      recordScreenshots: false
+      recordScreenshots: false,
+      // https://support.saucelabs.com/hc/en-us/articles/115010079868-Issues-with-Safari-and-Karma-Test-Runner
+      connectOptions: {
+        noSslBumpDomains: 'all'
+      }
     },
 
     // Continuous Integration mode

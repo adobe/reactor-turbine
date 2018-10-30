@@ -98,7 +98,7 @@ module.exports = function(
     });
   };
 
-  var logActionTimeoutWarning = function(condition, rule) {
+  var logActionTimeoutError = function(condition, rule) {
     logger.error(
       getErrorMessage(
         condition,
@@ -134,6 +134,8 @@ module.exports = function(
         lastPromiseInQueue = lastPromiseInQueue.then(function() {
           return new Promise(function(resolve, reject) {
             var timeoutId = setTimeout(function() {
+              // Reject instead of resolve to prevent subsequent
+              // conditions and actions from executing.
               reject(
                 'A timeout occurred because the condition took longer than ' +
                   PROMISE_TIMEOUT / 1000 +
@@ -149,6 +151,7 @@ module.exports = function(
                 resolve(result);
               })
               .catch(function(e) {
+                clearTimeout(timeoutId);
                 reject(e);
               });
           })
@@ -169,30 +172,27 @@ module.exports = function(
 
     if (getShouldExecuteActions() && rule.actions) {
       rule.actions.forEach(function(action) {
-        var timeoutId;
-
         lastPromiseInQueue = lastPromiseInQueue.then(function() {
+          var timeoutId;
+
           return new Promise(function(resolve, reject) {
             timeoutId = setTimeout(function() {
-              logActionTimeoutWarning(action, rule);
+              logActionTimeoutError(action, rule);
+              // Resolve instead of reject to allow subsequent
+              // conditions and actions to execute.
               resolve();
             }, PROMISE_TIMEOUT);
 
-            Promise.resolve(
-              executeDelegateModule(action, syntheticEvent, [syntheticEvent])
-            )
-              .then(function() {
-                clearTimeout(timeoutId);
-                resolve();
-              })
-              .catch(function(e) {
-                reject(e);
-              });
-          }).catch(function(e) {
-            clearTimeout(timeoutId);
-            e = normalizeError(e);
-            logActionError(action, rule, e);
-          });
+            resolve(executeDelegateModule(action, syntheticEvent, [syntheticEvent]));
+          })
+            .then(function() {
+              clearTimeout(timeoutId);
+            })
+            .catch(function(e) {
+              clearTimeout(timeoutId);
+              e = normalizeError(e);
+              logActionError(action, rule, e);
+            });
         });
       });
     }

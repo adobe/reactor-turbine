@@ -535,11 +535,11 @@ describe('initRules', function() {
           moduleHelper.getPath('Action1')
         );
         var action2Export = moduleProvider.getModuleExports(
-          moduleHelper.getPath('Action1')
+          moduleHelper.getPath('Action2')
         );
 
         expect(action1Export.calls.count()).toBe(1);
-        expect(action2Export.calls.count()).toBe(1);
+        expect(action2Export.calls.count()).toBe(0);
       });
 
       it('does not throw error when there are no events for a rule', function() {
@@ -866,6 +866,10 @@ describe('initRules', function() {
         var expectedErrorMessage =
           'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
         expect(errorMessage).toStartWith(expectedErrorMessage);
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+          rule: rules[0],
+          action: rules[0].actions[0]
+        });
       });
 
       it('logs an error when the action module exports is not a function', function() {
@@ -891,6 +895,10 @@ describe('initRules', function() {
         expect(errorMessage).toStartWith(
           'Failed to execute Action1 for Test Rule 1 rule. Module did not export a function.'
         );
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+          rule: rules[0],
+          action: rules[0].actions[0]
+        });
       });
 
       it('logs an error when executing action module exports fails', function() {
@@ -918,6 +926,10 @@ describe('initRules', function() {
         var expectedErrorMessage =
           'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
         expect(errorMessage).toStartWith(expectedErrorMessage);
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+          rule: rules[0],
+          action: rules[0].actions[0]
+        });
       });
     });
   });
@@ -1594,8 +1606,41 @@ describe('initRules', function() {
         }
       );
 
+      it('ceases to execute remaining actions when an action throws an error', function(done) {
+        var rules = setupRules([
+          {
+            actions: [
+              generateAction('Action1', function(module) {
+                module.exports = jasmine.createSpy().and.callFake(function() {
+                  throw new Error('noob tried to divide by zero.');
+                });
+              }),
+              generateAction('Action2', function(module) {
+                module.exports = jasmine.createSpy();
+              })
+            ]
+          }
+        ]);
+
+        var lastPromiseInQueue = runInitRules(rules);
+
+        lastPromiseInQueue.then(function() {
+          var action1Export = moduleProvider.getModuleExports(
+            moduleHelper.getPath('Action1')
+          );
+          var action2Export = moduleProvider.getModuleExports(
+            moduleHelper.getPath('Action2')
+          );
+
+          expect(action1Export.calls.count()).toBe(1);
+          expect(action2Export.calls.count()).toBe(0);
+
+          done();
+        });
+      });
+
       it(
-        'does execute the next action in the chain if any action takes' +
+        'ceases to execute remaining actions if any action takes' +
           ' longer than 2 seconds to complete',
         function(done) {
           var rules = setupRules([
@@ -2171,6 +2216,10 @@ describe('initRules', function() {
           var expectedErrorMessage =
             'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
           expect(errorMessage).toStartWith(expectedErrorMessage);
+          expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+            rule: rules[0],
+            action: rules[0].actions[0]
+          });
 
           done();
         });
@@ -2200,6 +2249,10 @@ describe('initRules', function() {
           expect(errorMessage).toStartWith(
             'Failed to execute Action1 for Test Rule 1 rule. Module did not export a function.'
           );
+          expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+            rule: rules[0],
+            action: rules[0].actions[0]
+          });
 
           done();
         });
@@ -2231,6 +2284,10 @@ describe('initRules', function() {
           var expectedErrorMessage =
             'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
           expect(errorMessage).toStartWith(expectedErrorMessage);
+          expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+            rule: rules[0],
+            action: rules[0].actions[0]
+          });
 
           done();
         });
@@ -2264,6 +2321,10 @@ describe('initRules', function() {
           var expectedErrorMessage =
             'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
           expect(errorMessage).toStartWith(expectedErrorMessage);
+          expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+            rule: rules[0],
+            action: rules[0].actions[0]
+          });
 
           done();
         });
@@ -2298,6 +2359,10 @@ describe('initRules', function() {
             var expectedErrorMessage =
               'Failed to execute Action1 for Test Rule 1 rule. noob tried to divide by zero.';
             expect(errorMessage).toStartWith(expectedErrorMessage);
+            expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+              rule: rules[0],
+              action: rules[0].actions[0]
+            });
 
             done();
           });
@@ -2334,6 +2399,10 @@ describe('initRules', function() {
               'Failed to execute Action1 for Test Rule 1 rule. The extension triggered an error, ' +
               'but no error information was provided.';
             expect(errorMessage).toStartWith(expectedErrorMessage);
+            expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+              rule: rules[0],
+              action: rules[0].actions[0]
+            });
 
             done();
           });
@@ -2416,7 +2485,11 @@ describe('initRules', function() {
               'Failed to execute Action1 for Test Rule 1 rule. A timeout occurred because the ' +
               'action took longer than 2 seconds to complete.';
             expect(errorMessage).toStartWith(expectedErrorMessage);
-
+            expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+              rule: rules[0],
+              action: rules[0].actions[0]
+            });
+            
             done();
           });
         }

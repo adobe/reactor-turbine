@@ -63,6 +63,11 @@ module.exports = function(
 
   var logActionError = function(action, rule, e) {
     logger.error(getErrorMessage(action, rule, e.message, e.stack));
+
+    notifyMonitors('ruleActionFailed', {
+      rule: rule,
+      action: action
+    });
   };
 
   var logConditionError = function(condition, rule, e) {

@@ -154,16 +154,16 @@ module.exports = function(config) {
       },
       'SL_IOS': {
         base: 'SauceLabs',
-        deviceName: 'iPhone 8 Simulator',
-        appiumVersion: '1.7.1',
+        deviceName: 'iPhone XS Simulator',
+        appiumVersion: '1.9.1',
         browserName: 'Safari',
         platformName: 'iOS',
-        platformVersion: '11.0'
+        platformVersion: '12.0'
       },
       'SL_ANDROID': {
         base: 'SauceLabs',
         deviceName: 'Android GoogleAPI Emulator',
-        appiumVersion: '1.7.1',
+        appiumVersion: '1.9.1',
         browserName: 'Chrome',
         platformName: 'Android',
         platformVersion: '7.1'

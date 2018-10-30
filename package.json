@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "rollup -c --intro \"if (!window.atob) { console.warn('Adobe Launch is unsupported in IE 9 and below.'); return; }\" && uglifyjs dist/engine.js -c -m -o dist/engine.min.js",
+    "build:watch": "rollup --watch -c --intro \"if (!window.atob) { console.warn('Adobe Launch is unsupported in IE 9 and below.'); return; }\" && uglifyjs dist/engine.js -c -m -o dist/engine.min.js",
     "prepublishOnly": "npm run build",
     "test": "karma start",
     "test:watch": "npm test -- --no-single-run --no-coverage",
@@ -29,22 +30,25 @@
     "@adobe/reactor-window": "*"
   },
   "devDependencies": {
-    "eslint": "^4.19.1",
+    "camelize": "1.0.0",
+    "eslint": "^5.7.0",
     "inject-loader": "^4.0.1",
-    "istanbul-instrumenter-loader": "^3.0.0",
-    "jasmine-core": "^2.6.4",
-    "karma": "^2.0.3",
+    "istanbul-instrumenter-loader": "^3.0.1",
+    "jasmine-core": "^3.2.1",
+    "karma": "^3.0.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.2",
     "karma-firefox-launcher": "^1.0.1",
-    "karma-jasmine": "^1.1.0",
-    "karma-jasmine-matchers": "^3.7.0",
+    "karma-jasmine": "^1.1.2",
+    "karma-jasmine-matchers": "^3.8.3",
     "karma-safari-launcher": "^1.0.0",
     "karma-sauce-launcher": "^1.1.0",
-    "karma-webpack": "^3.0.0",
+    "karma-webpack": "^3.0.5",
+    "kebab-case": "1.0.0",
     "rollup": "^0.50.0",
     "rollup-plugin-commonjs": "^8.2.4",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "webpack": "^4.5.0"
+    "webpack": "^4.22.0",
+    "yargs": "^12.0.2"
   }
 }

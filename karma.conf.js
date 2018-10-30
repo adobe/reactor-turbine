@@ -13,8 +13,8 @@ if (process.env.TRAVIS) {
     'SL_EDGE',
     'SL_CHROME',
     'SL_FIREFOX',
-    'SL_SAFARI',
-    'SL_ANDROID'
+    'SL_ANDROID',
+    'SL_SAFARI'
   ];
   reporters.push('saucelabs');
 } else {
@@ -52,6 +52,7 @@ if (argv.coverage) {
 
 module.exports = function(config) {
   config.set({
+    hostname: '0.0.0.0',
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
@@ -153,16 +154,16 @@ module.exports = function(config) {
       },
       'SL_IOS': {
         base: 'SauceLabs',
-        deviceName: 'iPhone 8 Simulator',
-        appiumVersion: '1.7.1',
+        deviceName: 'iPhone XS Simulator',
+        appiumVersion: '1.9.1',
         browserName: 'Safari',
         platformName: 'iOS',
-        platformVersion: '11.0'
+        platformVersion: '12.0'
       },
       'SL_ANDROID': {
         base: 'SauceLabs',
         deviceName: 'Android GoogleAPI Emulator',
-        appiumVersion: '1.7.1',
+        appiumVersion: '1.9.1',
         browserName: 'Chrome',
         platformName: 'Android',
         platformVersion: '7.1'
@@ -176,7 +177,11 @@ module.exports = function(config) {
       startConnect: startConnect,
       retryLimit: 3,
       recordVideo: false,
-      recordScreenshots: false
+      recordScreenshots: false,
+      // https://support.saucelabs.com/hc/en-us/articles/115010079868-Issues-with-Safari-and-Karma-Test-Runner
+      connectOptions: {
+        noSslBumpDomains: 'all'
+      }
     },
 
     // Continuous Integration mode
@@ -200,7 +205,7 @@ module.exports = function(config) {
     browserNoActivityTimeout: 300000,
 
     webpack: {
-      mode: 'production',
+      mode: 'development',
       externals: {
         window: 'window',
         document: 'document'

@@ -135,7 +135,7 @@ describe('initRules', function() {
 
     moduleProvider = createModuleProvider();
 
-    logger = jasmine.createSpyObj('logger', ['log', 'error']);
+    logger = jasmine.createSpyObj('logger', ['log', 'warn', 'error']);
 
     initRules = injectInitRules({
       './logger': logger,
@@ -936,7 +936,7 @@ describe('initRules', function() {
 
   describe('when queue local storage flag is set', function() {
     beforeEach(function() {
-      logger = jasmine.createSpyObj('logger', ['log', 'error']);
+      logger = jasmine.createSpyObj('logger', ['log', 'warn', 'error']);
 
       initRules = injectInitRules({
         './logger': logger,
@@ -1838,6 +1838,46 @@ describe('initRules', function() {
         );
 
         expect(actionExport.calls.count()).toBe(0);
+      });
+
+      it('logs a warning message', function() {
+        var rules = setupRules([
+          {
+            actions: [generateAction('Action1')]
+          }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var warningMessage = logger.warn.calls.mostRecent().args[0];
+        expect(warningMessage).toBe(
+          'Rule queueing is only intended for testing purposes. Queueing behavior may be ' +
+          'changed or removed at any time.'
+        );
+      });
+
+      it('logs the warning message only once', function() {
+        var rules = setupRules([
+          {
+            actions: [generateAction('Action1'), generateAction('Action2')]
+          }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        expect(logger.warn.calls.all().length).toBe(1);
       });
     });
 

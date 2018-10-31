@@ -19,6 +19,17 @@ var isRuleQueueActive = require('./isRuleQueueActive');
 var Promise = require('@adobe/reactor-promise');
 var PROMISE_TIMEOUT = 2000;
 
+var queueWarningLogged = false;
+var logQueueWarningOnce = function() {
+  if (!queueWarningLogged) {
+    queueWarningLogged = true;
+    logger.warn(
+      'Rule queueing is only intended for testing purposes. Queueing behavior may be ' +
+      'changed or removed at any time.'
+    );
+  }
+};
+
 module.exports = function(
   _satellite,
   rules,
@@ -278,6 +289,7 @@ module.exports = function(
         );
 
         if (isRuleQueueActive()) {
+          logQueueWarningOnce();
           addRuleToQueue(rule, normalizedSyntethicEvent);
         } else {
           checkConditions(rule, normalizedSyntethicEvent);

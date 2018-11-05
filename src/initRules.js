@@ -252,6 +252,9 @@ module.exports = function(
     }
   };
 
+  var eventModulesInitialized = false;
+  var triggerCallQueue = [];
+
   var initEventModule = function(ruleEventPair) {
     var rule = ruleEventPair.rule;
     var event = ruleEventPair.event;
@@ -279,20 +282,33 @@ module.exports = function(
        * that occurred.
        */
       var trigger = function(syntheticEvent) {
+        // DTM-11871
+        // If we're still in the process of initializing event modules,
+        // we need to queue up any calls to trigger, otherwise if the triggered
+        // rule does something that triggers a different rule whose event module
+        // has not been initialized, that secondary rule will never get executed.
+        // This can be removed if we decide to always use the rule queue, since
+        // conditions and actions will be processed asynchronously, which
+        // would give time for all event modules to be initialized.
+        if (!eventModulesInitialized) {
+          triggerCallQueue.push(trigger.bind(null, syntheticEvent));
+          return;
+        }
+
         notifyMonitors('ruleTriggered', {
           rule: rule
         });
 
-        var normalizedSyntethicEvent = normalizeSyntheticEvent(
+        var normalizedSyntheticEvent = normalizeSyntheticEvent(
           syntheticEventMeta,
           syntheticEvent
         );
 
         if (isRuleQueueActive()) {
           logQueueWarningOnce();
-          addRuleToQueue(rule, normalizedSyntethicEvent);
+          addRuleToQueue(rule, normalizedSyntheticEvent);
         } else {
-          checkConditions(rule, normalizedSyntethicEvent);
+          checkConditions(rule, normalizedSyntheticEvent);
         }
       };
 
@@ -303,6 +319,11 @@ module.exports = function(
   };
 
   buildRuleExecutionOrder(rules).forEach(initEventModule);
+  eventModulesInitialized = true;
+  triggerCallQueue.forEach(function(triggerCall) {
+    triggerCall();
+  });
+  triggerCallQueue = null;
 
   // We are returing the promise chain only for testing purposes.
   return lastPromiseInQueue;

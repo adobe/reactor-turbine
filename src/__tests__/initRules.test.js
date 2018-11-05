@@ -614,6 +614,65 @@ describe('initRules', function() {
 
         expect(actionExport.calls.count()).toBe(0);
       });
+
+      it('queues trigger calls that occur before all event ' +
+          'modules have been initialized', function() {
+        var rules = setupRules([
+          {
+            events: [
+              generateEvent(
+                'Event1',
+                function(module) {
+                  module.exports = function(settings, trigger) {
+                    trigger({
+                      foo: 'bar'
+                    });
+                  };
+                }
+              )
+            ],
+            actions: [
+              generateAction(
+                'Action1',
+                function(module) {
+                  module.exports = jasmine.createSpy();
+                }
+              )
+            ]
+          },
+          {
+            events: [
+              generateEvent(
+                'Event2',
+                function(module) {
+                  module.exports = jasmine.createSpy();
+                }
+              )
+            ]
+          }
+        ]);
+
+        initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          getShouldExecuteActions
+        );
+
+        var action1Export = moduleProvider.getModuleExports(
+          moduleHelper.getPath('Action1')
+        );
+
+        var event2Export = moduleProvider.getModuleExports(
+          moduleHelper.getPath('Event2')
+        );
+
+        expect(event2Export).toHaveBeenCalledBefore(action1Export);
+        // Make sure additional event detail makes it down to the action
+        // when trigger calls are queued.
+        expect(action1Export.calls.first().args[1].foo).toEqual('bar');
+      });
     });
 
     describe('error handling and logging', function() {
@@ -2529,7 +2588,7 @@ describe('initRules', function() {
               rule: rules[0],
               action: rules[0].actions[0]
             });
-            
+
             done();
           });
         }

@@ -122,9 +122,19 @@ var initRules;
 var notifyMonitors;
 var logger;
 var event;
+var windowSetTimeout;
 
 describe('initRules', function() {
   beforeEach(function() {
+    // We store a copy of the original setTimeout here. We need it in order to be able
+    // to delay the Jasmine clock tick method in a way that won't break how Promises
+    // work inside the tests. Normally, if you call resolve on a promise and later call
+    // the reject of the same promise, the reject won't have any side effect. We had a
+    // bug where inside the tests, where because of mocking this sequence was out of order.
+    // Sometimes when calling setTimeout in IE, you will get `"Invalid calling object"
+    // error`. The context is lost, so we need to rebind it again.
+    // Read more here: https://github.com/vuejs/vue/issues/4465
+    windowSetTimeout = window.setTimeout.bind(window);
     jasmine.clock().install();
 
     getShouldExecuteActions = function() {
@@ -615,64 +625,58 @@ describe('initRules', function() {
         expect(actionExport.calls.count()).toBe(0);
       });
 
-      it('queues trigger calls that occur before all event ' +
-          'modules have been initialized', function() {
-        var rules = setupRules([
-          {
-            events: [
-              generateEvent(
-                'Event1',
-                function(module) {
+      it(
+        'queues trigger calls that occur before all event ' +
+          'modules have been initialized',
+        function() {
+          var rules = setupRules([
+            {
+              events: [
+                generateEvent('Event1', function(module) {
                   module.exports = function(settings, trigger) {
                     trigger({
                       foo: 'bar'
                     });
                   };
-                }
-              )
-            ],
-            actions: [
-              generateAction(
-                'Action1',
-                function(module) {
+                })
+              ],
+              actions: [
+                generateAction('Action1', function(module) {
                   module.exports = jasmine.createSpy();
-                }
-              )
-            ]
-          },
-          {
-            events: [
-              generateEvent(
-                'Event2',
-                function(module) {
+                })
+              ]
+            },
+            {
+              events: [
+                generateEvent('Event2', function(module) {
                   module.exports = jasmine.createSpy();
-                }
-              )
-            ]
-          }
-        ]);
+                })
+              ]
+            }
+          ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+          initRules(
+            _satellite,
+            rules,
+            moduleProvider,
+            replaceTokens,
+            getShouldExecuteActions
+          );
 
-        var action1Export = moduleProvider.getModuleExports(
-          moduleHelper.getPath('Action1')
-        );
+          var action1Export = moduleProvider.getModuleExports(
+            moduleHelper.getPath('Action1')
+          );
 
-        var event2Export = moduleProvider.getModuleExports(
-          moduleHelper.getPath('Event2')
-        );
+          var event2Export = moduleProvider.getModuleExports(
+            moduleHelper.getPath('Event2')
+          );
 
-        expect(event2Export).toHaveBeenCalledBefore(action1Export);
-        // Make sure additional event detail makes it down to the action
-        // when trigger calls are queued.
-        expect(action1Export.calls.first().args[1].foo).toEqual('bar');
-      });
+          expect(event2Export).toHaveBeenCalledBefore(action1Export);
+          // Make sure additional event detail makes it down to the action
+          // when trigger calls are queued.
+          expect(action1Export.calls.first().args[1].foo).toEqual('bar');
+        }
+      );
     });
 
     describe('error handling and logging', function() {
@@ -1638,7 +1642,9 @@ describe('initRules', function() {
                   module.exports = jasmine.createSpy().and.callFake(function() {
                     return new Promise(function(resolve) {
                       setTimeout(resolve, 3000);
-                      jasmine.clock().tick(2000);
+                      windowSetTimeout(function() {
+                        jasmine.clock().tick(2000);
+                      }, 0);
                     });
                   });
                 })
@@ -1709,11 +1715,12 @@ describe('initRules', function() {
                   module.exports = jasmine.createSpy().and.callFake(function() {
                     return new Promise(function(resolve) {
                       setTimeout(function() {
-                        callOrder.push('Action1');
                         resolve();
                       }, 3000);
 
-                      jasmine.clock().tick(2000);
+                      windowSetTimeout(function() {
+                        jasmine.clock().tick(2000);
+                      }, 0);
                     });
                   });
                 }),
@@ -1917,7 +1924,7 @@ describe('initRules', function() {
         var warningMessage = logger.warn.calls.mostRecent().args[0];
         expect(warningMessage).toBe(
           'Rule queueing is only intended for testing purposes. Queueing behavior may be ' +
-          'changed or removed at any time.'
+            'changed or removed at any time.'
         );
       });
 
@@ -2519,7 +2526,9 @@ describe('initRules', function() {
                   module.exports = function() {
                     return new Promise(function(resolve) {
                       setTimeout(resolve, 3000);
-                      jasmine.clock().tick(2000);
+                      windowSetTimeout(function() {
+                        jasmine.clock().tick(2000);
+                      }, 0);
                     });
                   };
                 })
@@ -2562,7 +2571,9 @@ describe('initRules', function() {
                   module.exports = function() {
                     return new Promise(function(resolve) {
                       setTimeout(resolve, 3000);
-                      jasmine.clock().tick(2000);
+                      windowSetTimeout(function() {
+                        jasmine.clock().tick(2000);
+                      }, 0);
                     });
                   };
                 })

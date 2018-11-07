@@ -14,13 +14,15 @@ var cookie = require('@adobe/reactor-cookie');
 var logger = require('./logger');
 
 module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, setCustomVar) {
-  var prefixedLogger = logger.createPrefixedLogger('Custom Script');
+  var customScriptPrefixedLogger = logger.createPrefixedLogger('Custom Script');
 
   // Will get replaced by the directCall event delegate from the Core extension. Exists here in
   // case there are no direct call rules (and therefore the directCall event delegate won't get
   // included) and our customers are still calling the method. In this case, we don't want an error
   // to be thrown. This method existed before Reactor.
-  _satellite.track = function() {};
+  _satellite.track = function(identifier) {
+    logger.log('"' + identifier + '" does not match any direct call identifiers.');
+  };
 
   // Will get replaced by the Marketing Cloud ID extension if installed. Exists here in case
   // the extension is not installed and our customers are still calling the method. In this case,
@@ -35,7 +37,7 @@ module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, 
 
   _satellite.buildInfo = container.buildInfo;
 
-  _satellite.logger = prefixedLogger;
+  _satellite.logger = customScriptPrefixedLogger;
 
   /**
    * Log a message. We keep this due to legacy baggage.
@@ -48,16 +50,16 @@ module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, 
 
     switch (level) {
       case 3:
-        prefixedLogger.info(message);
+        customScriptPrefixedLogger.info(message);
         break;
       case 4:
-        prefixedLogger.warn(message);
+        customScriptPrefixedLogger.warn(message);
         break;
       case 5:
-        prefixedLogger.error(message);
+        customScriptPrefixedLogger.error(message);
         break;
       default:
-        prefixedLogger.log(message);
+        customScriptPrefixedLogger.log(message);
     }
   };
 

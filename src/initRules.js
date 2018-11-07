@@ -34,8 +34,7 @@ module.exports = function(
   _satellite,
   rules,
   moduleProvider,
-  replaceTokens,
-  getShouldExecuteActions
+  replaceTokens
 ) {
   var lastPromiseInQueue = Promise.resolve();
   var notifyMonitors = createNotifyMonitors(_satellite);
@@ -170,7 +169,7 @@ module.exports = function(
       });
     }
 
-    if (getShouldExecuteActions() && rule.actions) {
+    if (rule.actions) {
       rule.actions.forEach(function(action) {
         lastPromiseInQueue = lastPromiseInQueue.then(function() {
           var timeoutId;
@@ -237,7 +236,7 @@ module.exports = function(
   var runActions = function(rule, syntheticEvent) {
     var action;
 
-    if (getShouldExecuteActions() && rule.actions) {
+    if (rule.actions) {
       for (var i = 0; i < rule.actions.length; i++) {
         action = rule.actions[i];
         try {

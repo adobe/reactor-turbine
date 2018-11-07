@@ -29,11 +29,20 @@ describe('hydrateSatelliteObject', function() {
   });
 
   it('should add a track function on _satellite', function() {
-    var hydrateSatelliteObject = injectHydrateSatelliteObject();
+    var logger = {
+      log: jasmine.createSpy(),
+      createPrefixedLogger: function() {}
+    };
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({
+      './logger': logger
+    });
     hydrateSatelliteObject(_satellite, container);
     expect(_satellite.track).toEqual(jasmine.any(Function));
     // shouldn't throw an error.
-    _satellite.track();
+    _satellite.track('checkout');
+    expect(logger.log).toHaveBeenCalledWith(
+      '"checkout" does not match any direct call identifiers.'
+    );
   });
 
   it('should add a getVisitorId function on _satellite', function() {

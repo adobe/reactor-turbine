@@ -25,7 +25,7 @@ var logQueueWarningOnce = function() {
     queueWarningLogged = true;
     logger.warn(
       'Rule queueing is only intended for testing purposes. Queueing behavior may be ' +
-      'changed or removed at any time.'
+        'changed or removed at any time.'
     );
   }
 };
@@ -149,9 +149,9 @@ module.exports = function(
               );
             }, PROMISE_TIMEOUT);
 
-            resolve(
+            Promise.resolve(
               executeDelegateModule(condition, syntheticEvent, [syntheticEvent])
-            );
+            ).then(resolve, reject);
           })
             .catch(function(e) {
               clearTimeout(timeoutId);
@@ -184,9 +184,9 @@ module.exports = function(
               );
             }, PROMISE_TIMEOUT);
 
-            resolve(
+            Promise.resolve(
               executeDelegateModule(action, syntheticEvent, [syntheticEvent])
-            );
+            ).then(resolve, reject);
           })
             .then(function() {
               clearTimeout(timeoutId);

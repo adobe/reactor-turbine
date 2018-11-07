@@ -103,20 +103,13 @@ var setupRules = function(rulesDefinition) {
 };
 
 var runInitRules = function(rules) {
-  return initRules(
-    _satellite,
-    rules,
-    moduleProvider,
-    replaceTokens,
-    getShouldExecuteActions
-  );
+  return initRules(_satellite, rules, moduleProvider, replaceTokens);
 };
 
 var _satellite = {};
 var replaceTokens = function(value) {
   return value;
 };
-var getShouldExecuteActions;
 var moduleProvider;
 var initRules;
 var notifyMonitors;
@@ -136,10 +129,6 @@ describe('initRules', function() {
     // Read more here: https://github.com/vuejs/vue/issues/4465
     windowSetTimeout = window.setTimeout.bind(window);
     jasmine.clock().install();
-
-    getShouldExecuteActions = function() {
-      return true;
-    };
 
     event = {};
 
@@ -556,13 +545,7 @@ describe('initRules', function() {
         var rules = setupRules([{}]);
         delete rules[0].events;
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
       });
 
       it('does not throw error when there are no conditions for a rule', function() {
@@ -573,13 +556,7 @@ describe('initRules', function() {
         ]);
         delete rules[0].conditions;
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
       });
 
       it('does not throw error when there are no actions for a rule', function() {
@@ -590,39 +567,7 @@ describe('initRules', function() {
         ]);
         delete rules[0].actions;
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
-      });
-
-      it('does not execute actions when actionsEnabled is false', function() {
-        getShouldExecuteActions = function() {
-          return false;
-        };
-
-        var rules = setupRules([
-          {
-            actions: [generateAction('Action1')]
-          }
-        ]);
-
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
-
-        var actionExport = moduleProvider.getModuleExports(
-          moduleHelper.getPath('Action1')
-        );
-
-        expect(actionExport.calls.count()).toBe(0);
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
       });
 
       it(
@@ -655,13 +600,7 @@ describe('initRules', function() {
             }
           ]);
 
-          initRules(
-            _satellite,
-            rules,
-            moduleProvider,
-            replaceTokens,
-            getShouldExecuteActions
-          );
+          initRules(_satellite, rules, moduleProvider, replaceTokens);
 
           var action1Export = moduleProvider.getModuleExports(
             moduleHelper.getPath('Action1')
@@ -691,13 +630,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -716,13 +649,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         expect(errorMessage).toStartWith(
@@ -743,13 +670,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -768,13 +689,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -797,13 +712,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         expect(errorMessage).toStartWith(
@@ -828,13 +737,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -859,13 +762,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         expect(logger.log.calls.mostRecent().args[0]).toEqual(
           'Condition Condition1 for rule Test Rule 1 not met.'
@@ -889,13 +786,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         expect(logger.log.calls.mostRecent().args[0]).toEqual(
           'Condition Condition1 for rule Test Rule 1 not met.'
@@ -917,13 +808,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -946,13 +831,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         expect(errorMessage).toStartWith(
@@ -977,13 +856,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -1837,13 +1710,7 @@ describe('initRules', function() {
         var rules = setupRules([{}]);
         delete rules[0].events;
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
       });
 
       it('does not throw error when there are no conditions for a rule', function() {
@@ -1854,13 +1721,7 @@ describe('initRules', function() {
         ]);
         delete rules[0].conditions;
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
       });
 
       it('does not throw error when there are no actions for a rule', function() {
@@ -1871,39 +1732,7 @@ describe('initRules', function() {
         ]);
         delete rules[0].actions;
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
-      });
-
-      it('does not execute actions when actionsEnabled is false', function() {
-        getShouldExecuteActions = function() {
-          return false;
-        };
-
-        var rules = setupRules([
-          {
-            actions: [generateAction('Action1')]
-          }
-        ]);
-
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
-
-        var actionExport = moduleProvider.getModuleExports(
-          moduleHelper.getPath('Action1')
-        );
-
-        expect(actionExport.calls.count()).toBe(0);
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
       });
 
       it('logs a warning message', function() {
@@ -1913,13 +1742,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var warningMessage = logger.warn.calls.mostRecent().args[0];
         expect(warningMessage).toBe(
@@ -1935,13 +1758,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         expect(logger.warn.calls.all().length).toBe(1);
       });
@@ -1959,13 +1776,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -1984,13 +1795,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         expect(errorMessage).toStartWith(
@@ -2011,13 +1816,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
-        );
+        initRules(_satellite, rules, moduleProvider, replaceTokens);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -2040,8 +1839,7 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
+          replaceTokens
         );
 
         lastPromiseInQueue.then(function() {
@@ -2073,8 +1871,7 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
+          replaceTokens
         );
 
         lastPromiseInQueue.then(function() {
@@ -2108,8 +1905,7 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
+          replaceTokens
         );
 
         lastPromiseInQueue.then(function() {
@@ -2143,8 +1939,7 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
+          replaceTokens
         );
 
         lastPromiseInQueue.then(function() {
@@ -2177,8 +1972,7 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
+          replaceTokens
         );
 
         lastPromiseInQueue.then(function() {
@@ -2213,8 +2007,7 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
+          replaceTokens
         );
 
         lastPromiseInQueue.then(function() {
@@ -2247,8 +2040,7 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens,
-            getShouldExecuteActions
+            replaceTokens
           );
 
           lastPromiseInQueue.then(function() {
@@ -2282,8 +2074,7 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens,
-            getShouldExecuteActions
+            replaceTokens
           );
 
           lastPromiseInQueue.then(function() {
@@ -2313,8 +2104,7 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
+          replaceTokens
         );
 
         lastPromiseInQueue.then(function() {
@@ -2346,8 +2136,7 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
+          replaceTokens
         );
 
         lastPromiseInQueue.then(function() {
@@ -2381,8 +2170,7 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
+          replaceTokens
         );
 
         lastPromiseInQueue.then(function() {
@@ -2418,8 +2206,7 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens,
-          getShouldExecuteActions
+          replaceTokens
         );
 
         lastPromiseInQueue.then(function() {
@@ -2456,8 +2243,7 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens,
-            getShouldExecuteActions
+            replaceTokens
           );
 
           lastPromiseInQueue.then(function() {
@@ -2495,8 +2281,7 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens,
-            getShouldExecuteActions
+            replaceTokens
           );
 
           lastPromiseInQueue.then(function() {
@@ -2540,8 +2325,7 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens,
-            getShouldExecuteActions
+            replaceTokens
           );
 
           lastPromiseInQueue.then(function() {
@@ -2585,8 +2369,7 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens,
-            getShouldExecuteActions
+            replaceTokens
           );
 
           lastPromiseInQueue.then(function() {

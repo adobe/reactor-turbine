@@ -22,7 +22,6 @@ var initRules = require('./initRules');
 var dataElementSafe = require('./dataElementSafe');
 var getNamespacedStorage = require('./getNamespacedStorage');
 
-var HIDE_ACTIVITY_LOCAL_STORAGE_NAME = 'hideActivity';
 var DEBUG_LOCAL_STORAGE_NAME = 'debug';
 
 
@@ -105,10 +104,6 @@ if (_satellite && !window.__satelliteLoaded) {
     logger.outputEnabled = value;
   };
 
-  var getShouldExecuteActions = function() {
-    return localStorage.getItem(HIDE_ACTIVITY_LOCAL_STORAGE_NAME) !== 'true';
-  };
-
   logger.outputEnabled = getDebugOutputEnabled();
 
   // Important to hydrate satellite object before we hydrate the module provider or init rules.
@@ -133,8 +128,7 @@ if (_satellite && !window.__satelliteLoaded) {
     _satellite,
     container.rules || [],
     moduleProvider,
-    replaceTokens,
-    getShouldExecuteActions
+    replaceTokens
   );
 }
 

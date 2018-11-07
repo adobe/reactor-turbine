@@ -236,8 +236,7 @@ describe('index', function() {
       window._satellite,
       rules,
       moduleProvider,
-      replaceTokens,
-      jasmine.any(Function)
+      replaceTokens
     );
   });
 
@@ -296,48 +295,6 @@ describe('index', function() {
       setOutputDebugEnabled(true);
 
       expect(window.localStorage.getItem('com.adobe.reactor.debug')).toBe('true');
-    });
-  });
-
-  describe('getShouldExecuteActions', function() {
-    it('returns false if local storage item\'s value is \'true\'', function() {
-      var getShouldExecuteActions;
-
-      window.localStorage.setItem('com.adobe.reactor.hideActivity', true);
-
-      injectIndex({
-        './initRules': function(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          _getShouldExecuteActions
-        ) {
-          getShouldExecuteActions = _getShouldExecuteActions;
-        }
-      });
-
-      expect(getShouldExecuteActions()).toBe(false);
-    });
-
-    it('returns true if local storage item\'s value is anything other than \'true\'', function() {
-      var getShouldExecuteActions;
-
-      window.localStorage.setItem('com.adobe.reactor.hideActivity', false);
-
-      injectIndex({
-        './initRules': function(
-          _satellite,
-          rules,
-          moduleProvider,
-          replaceTokens,
-          _getShouldExecuteActions
-        ) {
-          getShouldExecuteActions = _getShouldExecuteActions;
-        }
-      });
-
-      expect(getShouldExecuteActions()).toBe(true);
     });
   });
 });

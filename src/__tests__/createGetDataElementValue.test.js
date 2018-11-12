@@ -25,12 +25,12 @@ describe('function returned by createGetDataElementValue', function() {
 
   beforeEach(function() {
     logger = jasmine.createSpyObj('logger', ['log', 'error']);
-    replaceTokens = function(settings) {
+    replaceTokens = jasmine.createSpy().and.callFake(function(settings) {
       return settings;
-    };
+    });
   });
 
-  it('returns a data element value using data element settings', function() {
+  it('returns a data element value using data from settings', function() {
     var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
       getModuleExports: function() {
@@ -54,6 +54,37 @@ describe('function returned by createGetDataElementValue', function() {
       undefinedVarsReturnEmpty
     );
     var value = getDataElementValue('testDataElement');
+
+    expect(value).toBe('bar');
+  });
+
+  // DTM-12602 Allows data elements to reference event
+  // data when retrieved within the context of a rule execution
+  it('returns a data element value using data from event', function() {
+    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
+    var moduleProvider = {
+      getModuleExports: function() {
+        return function(settings, event) {
+          return event.foo;
+        };
+      }
+    };
+    var getDataElementDefinition = function() {
+      return {
+        settings: {}
+      };
+    };
+    var undefinedVarsReturnEmpty = false;
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
+    var event = {
+      foo: 'bar'
+    };
+    var value = getDataElementValue('testDataElement', event);
 
     expect(value).toBe('bar');
   });

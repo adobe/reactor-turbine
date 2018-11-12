@@ -75,7 +75,7 @@ module.exports = function(customVars, getDataElementDefinition, getDataElementVa
     if (getDataElementDefinition(variable)) {
       // Accessing nested properties of a data element using dot-notation is unsupported because
       // users can currently create data elements with periods in the name.
-      value = getDataElementValue(variable);
+      value = getDataElementValue(variable, syntheticEvent);
     } else {
       var propChain = variable.split('.');
       var variableHostName = propChain.shift();

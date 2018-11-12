@@ -29,7 +29,7 @@ module.exports = function(
   replaceTokens,
   undefinedVarsReturnEmpty
 ) {
-  return function(name) {
+  return function(name, syntheticEvent) {
     var dataDef = getDataElementDefinition(name);
 
     if (!dataDef) {
@@ -54,7 +54,7 @@ module.exports = function(
     var value;
 
     try {
-      value = moduleExports(replaceTokens(dataDef.settings));
+      value = moduleExports(replaceTokens(dataDef.settings, syntheticEvent), syntheticEvent);
     } catch (e) {
       logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
       return;

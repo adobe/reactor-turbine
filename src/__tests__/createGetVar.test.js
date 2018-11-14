@@ -27,12 +27,15 @@ describe('function returned by createGetVar', function() {
     getDataElementDefinition = function() {
       return {};
     };
-    getDataElementValue = function() {
+    getDataElementValue = jasmine.createSpy().and.callFake(function() {
       return 'baz';
-    };
+    });
     var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+    var event = {};
 
-    expect(getVar('unicorn.foo.bar')).toBe('baz');
+    var value = getVar('unicorn.foo.bar', event);
+    expect(value).toBe('baz');
+    expect(getDataElementValue).toHaveBeenCalledWith('unicorn.foo.bar', event);
   });
 
   // Accessing nested properties of a data element using dot-notation is unsupported because users
@@ -50,7 +53,8 @@ describe('function returned by createGetVar', function() {
     };
     var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
 
-    expect(getVar('unicorn.foo.bar')).not.toBe('baz');
+    var value = getVar('unicorn.foo.bar');
+    expect(value).not.toBe('baz');
   });
 
   it('returns nested property on element using "this." prefix', function() {

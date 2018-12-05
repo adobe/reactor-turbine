@@ -24,17 +24,15 @@ var getNamespacedStorage = require('./getNamespacedStorage');
 
 var DEBUG_LOCAL_STORAGE_NAME = 'debug';
 
+function initialize(extensionEntries, container) {
+  if (window.__satelliteLoaded) {
+    return;
+  }
 
-var _satellite = window._satellite;
-
-if (_satellite && !window.__satelliteLoaded) {
   // If a consumer loads the library multiple times, make sure only the first time is effective.
   window.__satelliteLoaded = true;
-
-  var container = _satellite.container;
-
-  // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
-  delete _satellite.container;
+  window._satellite = window._satellite || {};
+  var _satellite = window._satellite;
 
   var undefinedVarsReturnEmpty = container.property.settings.undefinedVarsReturnEmpty;
 
@@ -132,6 +130,11 @@ if (_satellite && !window.__satelliteLoaded) {
   );
 }
 
-// Rollup's iife option always sets a global with whatever is exported, so we'll set the
-// _satellite global with the same object it already is (we've only modified it).
-module.exports = _satellite;
+function getScopedExtensionUtilities(extensionPackageId) {
+  // TODO
+}
+
+module.exports = {
+  initialize: initialize,
+  getScopedExtensionUtilities: getScopedExtensionUtilities
+};

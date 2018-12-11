@@ -35,6 +35,8 @@ module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, 
     name: container.property.name
   };
 
+  _satellite.company = container.company;
+
   _satellite.buildInfo = container.buildInfo;
 
   _satellite.logger = customScriptPrefixedLogger;

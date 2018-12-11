@@ -18,10 +18,21 @@ describe('hydrateSatelliteObject', function() {
   var _satellite;
 
   var container = {
-    property: {
-      name: 'Test Property'
+    company: {
+      orgId: 'CB20F0CC53FCF3AC0A4C98A1@AdobeOrg'
     },
-    buildInfo: {}
+    property: {
+      name: 'Test Property',
+      settings: {
+        foo: 'bar'
+      }
+    },
+    buildInfo: {
+      buildDate: '2018-11-08T23:46:28Z',
+      environment: 'development',
+      turbineBuildDate: '2018-11-07T23:14:07Z',
+      turbineVersion: '25.2.2'
+    }
   };
 
   beforeEach(function() {
@@ -52,10 +63,23 @@ describe('hydrateSatelliteObject', function() {
     expect(_satellite.getVisitorId()).toBe(null);
   });
 
-  it('should add a property name on _satellite', function() {
+  it('should add a property name on _satellite but not settings', function() {
     var hydrateSatelliteObject = injectHydrateSatelliteObject();
     hydrateSatelliteObject(_satellite, container);
     expect(_satellite.property.name).toEqual('Test Property');
+    expect(_satellite.property.settings).toBeUndefined();
+  });
+
+  it('should add company info on _satellite', function() {
+    var hydrateSatelliteObject = injectHydrateSatelliteObject();
+    hydrateSatelliteObject(_satellite, container);
+    expect(_satellite.company.orgId).toEqual('CB20F0CC53FCF3AC0A4C98A1@AdobeOrg');
+  });
+
+  it('should add build info on _satellite', function() {
+    var hydrateSatelliteObject = injectHydrateSatelliteObject();
+    hydrateSatelliteObject(_satellite, container);
+    expect(_satellite.buildInfo.environment).toEqual('development');
   });
 
   it('should add setDebug function on _satellite', function() {

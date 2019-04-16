@@ -1765,7 +1765,6 @@ describe('initRules', function() {
 
         runInitRules(rules);
 
-        console.log(logger.warn.calls.count());
         var warningMessage = logger.warn.calls.mostRecent().args[0];
         expect(warningMessage).toBe(
           'Rule queueing is only intended for testing purposes. Queueing behavior may be ' +

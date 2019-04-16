@@ -66,8 +66,6 @@ var setupRules = function(rulesDefinition) {
     }
 
     ['events', 'conditions', 'actions'].forEach(function(delegateType) {
-      rule[delegateType] = [];
-
       (ruleDefinition[delegateType] || []).forEach(function(
         delegateDefinition
       ) {
@@ -91,6 +89,7 @@ var setupRules = function(rulesDefinition) {
           delegate.negate = delegateDefinition.negate;
         }
 
+        rule[delegateType] = rule[delegateType] || [];
         rule[delegateType].push(delegate);
       });
     });
@@ -545,7 +544,7 @@ describe('initRules', function() {
         var rules = setupRules([{}]);
         delete rules[0].events;
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
       });
 
       it('does not throw error when there are no conditions for a rule', function() {
@@ -556,7 +555,7 @@ describe('initRules', function() {
         ]);
         delete rules[0].conditions;
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
       });
 
       it('does not throw error when there are no actions for a rule', function() {
@@ -567,7 +566,7 @@ describe('initRules', function() {
         ]);
         delete rules[0].actions;
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
       });
 
       it(
@@ -600,7 +599,7 @@ describe('initRules', function() {
             }
           ]);
 
-          initRules(_satellite, rules, moduleProvider, replaceTokens);
+          runInitRules(rules);
 
           var action1Export = moduleProvider.getModuleExports(
             moduleHelper.getPath('Action1')
@@ -619,6 +618,24 @@ describe('initRules', function() {
     });
 
     describe('error handling and logging', function() {
+      it('logs a message when a rule completes', function() {
+        var rules = setupRules([
+          {
+            events: [generateEvent('Event1')]
+          }
+        ]);
+
+        runInitRules(rules);
+
+        var errorMessage = logger.log.calls.mostRecent().args[0];
+        var expectedErrorMessage =
+          'Rule "Test Rule 1" fired.';
+        expect(errorMessage).toBe(expectedErrorMessage);
+        expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
+          rule: rules[0]
+        });
+      });
+
       it('logs an error when retrieving event module exports fails', function() {
         var rules = setupRules([
           {
@@ -630,7 +647,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -649,7 +666,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         expect(errorMessage).toStartWith(
@@ -670,7 +687,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -689,7 +706,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -712,7 +729,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         expect(errorMessage).toStartWith(
@@ -737,7 +754,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -762,7 +779,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         expect(logger.log.calls.mostRecent().args[0]).toEqual(
           'Condition Condition1 for rule Test Rule 1 not met.'
@@ -786,7 +803,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         expect(logger.log.calls.mostRecent().args[0]).toEqual(
           'Condition Condition1 for rule Test Rule 1 not met.'
@@ -808,7 +825,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -831,7 +848,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         expect(errorMessage).toStartWith(
@@ -856,7 +873,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -1710,7 +1727,7 @@ describe('initRules', function() {
         var rules = setupRules([{}]);
         delete rules[0].events;
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
       });
 
       it('does not throw error when there are no conditions for a rule', function() {
@@ -1721,7 +1738,7 @@ describe('initRules', function() {
         ]);
         delete rules[0].conditions;
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
       });
 
       it('does not throw error when there are no actions for a rule', function() {
@@ -1732,39 +1749,54 @@ describe('initRules', function() {
         ]);
         delete rules[0].actions;
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
       });
+    });
 
-      it('logs a warning message', function() {
+    describe('error handling and logging', function() {
+      it('logs a warning message a single time about queuing being only ' +
+        'for testing purposes', function() {
+
         var rules = setupRules([
           {
             actions: [generateAction('Action1')]
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var warningMessage = logger.warn.calls.mostRecent().args[0];
         expect(warningMessage).toBe(
           'Rule queueing is only intended for testing purposes. Queueing behavior may be ' +
-            'changed or removed at any time.'
+          'changed or removed at any time.'
         );
+
+        runInitRules(rules);
+
+        expect(logger.warn.calls.count()).toBe(1);
       });
 
-      it('logs the warning message only once', function() {
+      it('logs a message when a rule completes', function() {
         var rules = setupRules([
           {
-            actions: [generateAction('Action1'), generateAction('Action2')]
+            events: [generateEvent('Event1')]
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        var lastPromiseInQueue = runInitRules(rules);
 
-        expect(logger.warn.calls.all().length).toBe(1);
+        lastPromiseInQueue.then(function() {
+          var errorMessage = logger.log.calls.mostRecent().args[0];
+          var expectedErrorMessage =
+            'Rule "Test Rule 1" fired.';
+          expect(errorMessage).toBe(expectedErrorMessage);
+          expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
+            rule: rules[0]
+          });
+          done();
+        });
       });
-    });
 
-    describe('error handling and logging', function() {
       it('logs an error when retrieving event module exports fails', function() {
         var rules = setupRules([
           {
@@ -1776,7 +1808,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -1795,7 +1827,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         expect(errorMessage).toStartWith(
@@ -1816,7 +1848,7 @@ describe('initRules', function() {
           }
         ]);
 
-        initRules(_satellite, rules, moduleProvider, replaceTokens);
+        runInitRules(rules);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =

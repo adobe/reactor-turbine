@@ -246,9 +246,9 @@ module.exports = function(
           return;
         }
       }
-
-      logRuleCompleted(rule);
     }
+
+    logRuleCompleted(rule);
   };
 
   var eventModulesInitialized = false;

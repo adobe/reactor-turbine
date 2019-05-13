@@ -13,8 +13,7 @@ if (process.env.TRAVIS) {
     'SL_EDGE',
     'SL_CHROME',
     'SL_FIREFOX',
-    'SL_ANDROID',
-    'SL_SAFARI'
+    'SL_ANDROID'
   ];
   reporters.push('saucelabs');
 } else {

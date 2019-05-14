@@ -13,6 +13,6 @@
     "url": "git@github.com:Adobe-Marketing-Cloud/reactor-turbine.git"
   },
   "dependencies": {
-    "promise-polyfill": "6.0.2"
+    "promise-polyfill": "8.1.0"
   }
 }

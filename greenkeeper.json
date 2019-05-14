@@ -1,0 +1,16 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "coreModulePackages/cookie/package.json",
+        "coreModulePackages/document/package.json",
+        "coreModulePackages/loadScript/package.json",
+        "coreModulePackages/objectAssign/package.json",
+        "coreModulePackages/promise/package.json",
+        "coreModulePackages/query-string/package.json",
+        "coreModulePackages/window/package.json",
+        "package.json"
+      ]
+    }
+  }
+}

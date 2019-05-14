@@ -13,6 +13,6 @@
     "url": "git@github.com:Adobe-Marketing-Cloud/reactor-turbine.git"
   },
   "dependencies": {
-    "js-cookie": "2.1.4"
+    "js-cookie": "2.2.0"
   }
 }

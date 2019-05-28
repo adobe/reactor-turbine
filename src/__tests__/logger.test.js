@@ -21,11 +21,12 @@ var ieVersion = parseInt((/msie (\d+)/.exec(navigator.userAgent.toLowerCase()) |
 var launchPrefix = ieVersion === 10 ? '[Launch]' : ROCKET;
 
 describe('logger', function() {
-  var STANDARD_LOG_METHODS = ['log', 'info', 'warn', 'error'];
+  var STANDARD_LOG_METHODS = ['log', 'info', 'debug', 'warn', 'error'];
 
   beforeEach(function() {
     spyOn(window.console, 'log');
     spyOn(window.console, 'info');
+    spyOn(window.console, 'debug');
     spyOn(window.console, 'warn');
     spyOn(window.console, 'error');
   });

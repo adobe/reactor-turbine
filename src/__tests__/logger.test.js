@@ -26,44 +26,53 @@ describe('logger', function() {
   beforeEach(function() {
     spyOn(window.console, 'log');
     spyOn(window.console, 'info');
-    spyOn(window.console, 'debug');
+
+    if (ieVersion !== 10) {
+      spyOn(window.console, 'debug');
+    }
+
     spyOn(window.console, 'warn');
     spyOn(window.console, 'error');
   });
 
-  STANDARD_LOG_METHODS.forEach(function(fnName) {
-    it('logs args when output is enabled and ' + fnName + ' is called', function() {
+  STANDARD_LOG_METHODS.forEach(function(loggerMethodName) {
+    var consoleMethodName = loggerMethodName === 'debug' && ieVersion === 10 ?
+      'info' : loggerMethodName;
+
+    it('logs args when output is enabled and ' + loggerMethodName + ' is called', function() {
       logger.outputEnabled = true;
-      var calls = window.console[fnName].calls;
+      var calls = window.console[consoleMethodName].calls;
       var arg1 = {};
       var arg2 = {};
-      logger[fnName](arg1, arg2);
+      logger[loggerMethodName](arg1, arg2);
       expect(calls.count()).toBe(1);
       expect(calls.argsFor(0)[0]).toBe(launchPrefix, arg1, arg2);
     });
 
-    it('does not log args when output is disabled and ' + fnName + ' is called', function() {
-      logger.outputEnabled = false;
-      var calls = window.console[fnName].calls;
-      var arg1 = {};
-      var arg2 = {};
-      logger[fnName](arg1, arg2);
-      expect(calls.count()).toBe(0);
-    });
+    it('does not log args when output is disabled and ' + loggerMethodName + ' is called',
+      function() {
+        logger.outputEnabled = false;
+        var calls = window.console[consoleMethodName].calls;
+        var arg1 = {};
+        var arg2 = {};
+        logger[loggerMethodName](arg1, arg2);
+        expect(calls.count()).toBe(0);
+      });
 
-    it('creates a prefixed logger with functional ' + fnName + ' method', function() {
+    it('creates a prefixed logger with functional ' + loggerMethodName + ' method', function() {
       logger.outputEnabled = true;
       var id = 'test identifier';
       var bracketId = '[' + id + ']';
       var prefixedLogger = logger.createPrefixedLogger(id);
 
-      expect(prefixedLogger[fnName]).toEqual(jasmine.any(Function));
+      expect(prefixedLogger[loggerMethodName]).toEqual(jasmine.any(Function));
 
       var arg1 = {};
       var arg2 = {};
 
-      prefixedLogger[fnName](arg1, arg2);
-      expect(window.console[fnName]).toHaveBeenCalledWith(launchPrefix, bracketId, arg1, arg2);
+      prefixedLogger[loggerMethodName](arg1, arg2);
+      expect(window.console[consoleMethodName])
+        .toHaveBeenCalledWith(launchPrefix, bracketId, arg1, arg2);
     });
   });
 

@@ -59,6 +59,7 @@ var process = function(level) {
   if (outputEnabled && window.console) {
     var logArguments = Array.prototype.slice.call(arguments, 1);
     logArguments.unshift(launchPrefix);
+    // window.debug is unsupported in IE 10
     if (level === levels.DEBUG && !window.console[level]) {
       level = levels.INFO;
     }

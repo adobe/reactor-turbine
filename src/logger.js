@@ -19,6 +19,7 @@
 var levels = {
   LOG: 'log',
   INFO: 'info',
+  DEBUG: 'debug',
   WARN: 'warn',
   ERROR: 'error'
 };
@@ -58,6 +59,9 @@ var process = function(level) {
   if (outputEnabled && window.console) {
     var logArguments = Array.prototype.slice.call(arguments, 1);
     logArguments.unshift(launchPrefix);
+    if (level === levels.DEBUG && !window.console[level]) {
+      level = levels.INFO;
+    }
     window.console[level].apply(window.console, logArguments);
   }
 };
@@ -76,6 +80,13 @@ var log = process.bind(null, levels.LOG);
 var info = process.bind(null, levels.INFO);
 
 /**
+ * Outputs debug message to the web console. In browsers that do not support
+ * console.debug, console.info is used instead.
+ * @param {...*} arg Any argument to be logged.
+ */
+var debug = process.bind(null, levels.DEBUG);
+
+/**
  * Outputs a warning message to the web console.
  * @param {...*} arg Any argument to be logged.
  */
@@ -90,6 +101,7 @@ var error = process.bind(null, levels.ERROR);
 module.exports = {
   log: log,
   info: info,
+  debug: debug,
   warn: warn,
   error: error,
   /**
@@ -112,6 +124,7 @@ module.exports = {
     return {
       log: log.bind(null, loggerSpecificPrefix),
       info: info.bind(null, loggerSpecificPrefix),
+      debug: debug.bind(null, loggerSpecificPrefix),
       warn: warn.bind(null, loggerSpecificPrefix),
       error: error.bind(null, loggerSpecificPrefix)
     };

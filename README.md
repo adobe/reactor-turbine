@@ -1,6 +1,6 @@
 # Launch Turbine
 
-[![Build Status](https://travis-ci.org/Adobe-Marketing-Cloud/reactor-turbine.svg?branch=master)](https://travis-ci.org/Adobe-Marketing-Cloud/reactor-turbine)
+[![Build Status](https://travis-ci.com/adobe/reactor-turbine.svg?branch=master)](https://travis-ci.com/adobe/reactor-turbine)
 [![Coverage Status](https://coveralls.io/repos/github/Adobe-Marketing-Cloud/reactor-turbine/badge.svg)](https://coveralls.io/github/Adobe-Marketing-Cloud/reactor-turbine)
 [![npm (scoped with tag)](https://img.shields.io/npm/v/@adobe/reactor-turbine.svg?style=flat)](https://www.npmjs.com/package/@adobe/reactor-turbine)
 [![dependencies Status](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine/status.svg)](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine)

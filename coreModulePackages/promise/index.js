@@ -11,4 +11,11 @@
  ****************************************************************************************/
 'use strict';
 
-module.exports = window.Promise || require('promise-polyfill');
+// For building Turbine we are using Rollup. For running the turbine tests we are using
+// Karma + Webpack. You need to specify the default import when using promise-polyfill`
+// with Webpack 2+. We need `require('promise-polyfill').default` for running the tests
+// and `require('promise-polyfill')` for building Turbine.
+module.exports =
+  window.Promise ||
+  require('promise-polyfill').default ||
+  require('promise-polyfill');

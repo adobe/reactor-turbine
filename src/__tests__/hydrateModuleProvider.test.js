@@ -12,7 +12,7 @@
 
 'use strict';
 
-var injectHydrateModuleProvider = require('inject-loader!../hydrateModuleProvider');
+var injectHydrateModuleProvider = require('inject-loader!../hydrateScopedUtilities');
 
 describe('hydrateModuleProvider', function() {
   var container;

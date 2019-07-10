@@ -30,12 +30,7 @@ var logQueueWarningOnce = function() {
   }
 };
 
-module.exports = function(
-  _satellite,
-  rules,
-  moduleProvider,
-  replaceTokens
-) {
+module.exports = function(_satellite, rules, replaceTokens, moduleProvider) {
   var lastPromiseInQueue = Promise.resolve();
   var notifyMonitors = createNotifyMonitors(_satellite);
   var executeDelegateModule = createExecuteDelegateModule(
@@ -45,11 +40,14 @@ module.exports = function(
 
   var getModuleDisplayNameByRuleComponent = function(ruleComponent) {
     var moduleDefinition = moduleProvider.getModuleDefinition(
-      ruleComponent.modulePath
+      ruleComponent.extensionName,
+      'condition',
+      ruleComponent.delegateName
     );
+
     return (
       (moduleDefinition && moduleDefinition.displayName) ||
-      ruleComponent.modulePath
+      ruleComponent.extensionName + '.' + ruleComponent.delegateName
     );
   };
 
@@ -149,7 +147,9 @@ module.exports = function(
             }, PROMISE_TIMEOUT);
 
             Promise.resolve(
-              executeDelegateModule(condition, syntheticEvent, [syntheticEvent])
+              executeDelegateModule(condition, 'conditions', syntheticEvent, [
+                syntheticEvent
+              ])
             ).then(resolve, reject);
           })
             .catch(function(e) {
@@ -184,7 +184,9 @@ module.exports = function(
             }, PROMISE_TIMEOUT);
 
             Promise.resolve(
-              executeDelegateModule(action, syntheticEvent, [syntheticEvent])
+              executeDelegateModule(action, 'actions', syntheticEvent, [
+                syntheticEvent
+              ])
             ).then(resolve, reject);
           })
             .then(function() {
@@ -216,9 +218,12 @@ module.exports = function(
         condition = rule.conditions[i];
 
         try {
-          var result = executeDelegateModule(condition, syntheticEvent, [
-            syntheticEvent
-          ]);
+          var result = executeDelegateModule(
+            condition,
+            'conditions',
+            syntheticEvent,
+            [syntheticEvent]
+          );
 
           if (!isConditionMet(condition, result)) {
             logConditionNotMet(condition, rule);
@@ -240,7 +245,9 @@ module.exports = function(
       for (var i = 0; i < rule.actions.length; i++) {
         action = rule.actions[i];
         try {
-          executeDelegateModule(action, syntheticEvent, [syntheticEvent]);
+          executeDelegateModule(action, 'actions', syntheticEvent, [
+            syntheticEvent
+          ]);
         } catch (e) {
           logActionError(action, rule, e);
           return;
@@ -263,8 +270,8 @@ module.exports = function(
     var extensionName;
 
     try {
-      moduleName = moduleProvider.getModuleDefinition(event.modulePath).name;
-      extensionName = moduleProvider.getModuleExtensionName(event.modulePath);
+      moduleName = event.delegateName;
+      extensionName = event.extensionName;
 
       var syntheticEventMeta = {
         $type: extensionName + '.' + moduleName,
@@ -311,7 +318,7 @@ module.exports = function(
         }
       };
 
-      executeDelegateModule(event, null, [trigger]);
+      executeDelegateModule(event, 'events', null, [trigger]);
     } catch (e) {
       logger.error(getErrorMessage(event, rule, e.message, e.stack));
     }

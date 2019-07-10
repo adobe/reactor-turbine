@@ -15,16 +15,19 @@ var createGetDataElementValue = require('./createGetDataElementValue');
 var createModuleProvider = require('./createModuleProvider');
 var createIsVar = require('./createIsVar');
 var createGetVar = require('./createGetVar');
-var hydrateModuleProvider = require('./hydrateModuleProvider');
+var hydrateScopedUtilities = require('./hydrateScopedUtilities');
 var hydrateSatelliteObject = require('./hydrateSatelliteObject');
 var logger = require('./logger');
 var initRules = require('./initRules');
 var dataElementSafe = require('./dataElementSafe');
 var getNamespacedStorage = require('./getNamespacedStorage');
 
+var scopedTurbineVariable = {};
+var moduleProvider = createModuleProvider();
+
 var DEBUG_LOCAL_STORAGE_NAME = 'debug';
 
-function initialize(extensionEntries, container) {
+var initialize = function(container, modules) {
   if (window.__satelliteLoaded) {
     return;
   }
@@ -34,7 +37,8 @@ function initialize(extensionEntries, container) {
   window._satellite = window._satellite || {};
   var _satellite = window._satellite;
 
-  var undefinedVarsReturnEmpty = container.property.settings.undefinedVarsReturnEmpty;
+  var undefinedVarsReturnEmpty =
+    container.property.settings.undefinedVarsReturnEmpty;
 
   var dataElements = container.dataElements || {};
 
@@ -44,8 +48,6 @@ function initialize(extensionEntries, container) {
   var getDataElementDefinition = function(name) {
     return dataElements[name];
   };
-
-  var moduleProvider = createModuleProvider();
 
   var replaceTokens;
 
@@ -70,14 +72,9 @@ function initialize(extensionEntries, container) {
   );
 
   var customVars = {};
-  var setCustomVar = createSetCustomVar(
-    customVars
-  );
+  var setCustomVar = createSetCustomVar(customVars);
 
-  var isVar = createIsVar(
-    customVars,
-    getDataElementDefinition
-  );
+  var isVar = createIsVar(customVars, getDataElementDefinition);
 
   var getVar = createGetVar(
     customVars,
@@ -85,11 +82,7 @@ function initialize(extensionEntries, container) {
     getDataElementValue
   );
 
-  replaceTokens = createReplaceTokens(
-    isVar,
-    getVar,
-    undefinedVarsReturnEmpty
-  );
+  replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
 
   var localStorage = getNamespacedStorage('localStorage');
 
@@ -115,26 +108,22 @@ function initialize(extensionEntries, container) {
     setCustomVar
   );
 
-  hydrateModuleProvider(
+  scopedTurbineVariable = hydrateScopedUtilities(
     container,
-    moduleProvider,
     replaceTokens,
     getDataElementValue
   );
 
-  initRules(
-    _satellite,
-    container.rules || [],
-    moduleProvider,
-    replaceTokens
-  );
-}
+  moduleProvider.registerModules(modules);
 
-function getScopedExtensionUtilities(extensionPackageId) {
-  // TODO
-}
+  initRules(_satellite, container.rules || [], replaceTokens, moduleProvider);
+};
 
 module.exports = {
   initialize: initialize,
-  getScopedExtensionUtilities: getScopedExtensionUtilities
+  getScopedExtensionUtilities: function getScopedExtensionUtilities(
+    extensionPackageId
+  ) {
+    return scopedTurbineVariable[extensionPackageId];
+  }
 };

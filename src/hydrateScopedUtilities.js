@@ -34,7 +34,6 @@ module.exports = function(container, replaceTokens, getDataElementValue) {
 
       scopedTurbine[extensionName] = {
         buildInfo: buildInfo,
-        getSharedModule: function() {},
         getDataElementValue: getDataElementValue,
         getExtensionSettings: getExtensionSettings,
         getHostedLibFileUrl: getHostedLibFileUrl,

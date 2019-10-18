@@ -5,6 +5,7 @@
 [![npm (scoped with tag)](https://img.shields.io/npm/v/@adobe/reactor-turbine.svg?style=flat)](https://www.npmjs.com/package/@adobe/reactor-turbine)
 [![dependencies Status](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine/status.svg)](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine)
 [![devDependencies Status](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine/dev-status.svg)](https://david-dm.org/Adobe-Marketing-Cloud/reactor-turbine?type=dev)
+[![GitHub stars](https://img.shields.io/github/stars/adobe/reactor-turbine.svg?style=social&label=Star&maxAge=2592000)](https://github.com/adobe/reactor-turbine/stargazers/)
 
 Launch, by Adobe, is a next-generation tag management solution enabling simplified deployment of marketing technologies. For more information regarding Launch, please visit our [product website](http://www.adobe.com/enterprise/cloud-platform/launch.html).
 

@@ -1,3 +1,5 @@
+'use strict';
+
 var path = require('path');
 
 var defaultBrowsers = ['Chrome'];
@@ -6,7 +8,11 @@ var startConnect = false;
 
 if (process.env.TRAVIS) {
   var buildId =
-    'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')';
+    'TRAVIS #' +
+    process.env.TRAVIS_BUILD_NUMBER +
+    ' (' +
+    process.env.TRAVIS_BUILD_ID +
+    ')';
   defaultBrowsers = [
     'SL_IE10',
     'SL_IE11',
@@ -29,8 +35,7 @@ var argv = require('yargs')
   .array('browsers')
   .default('browsers', defaultBrowsers)
   .default('singleRun', true)
-  .default('coverage', true)
-  .argv;
+  .default('coverage', true).argv;
 
 var rules = [];
 
@@ -57,11 +62,9 @@ module.exports = function(config) {
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
-
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine', 'jasmine-matchers'],
-
 
     // list of files / patterns to load in the browser
     files: [
@@ -80,12 +83,8 @@ module.exports = function(config) {
       }
     ],
 
-
     // list of files to exclude
-    exclude: [
-      '**/*.test.js'
-    ],
-
+    exclude: ['**/*.test.js'],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
@@ -93,68 +92,63 @@ module.exports = function(config) {
       'testIndex.js': ['webpack']
     },
 
-
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: reporters,
 
-
     // web server port
     port: 9876,
-
 
     // enable / disable colors in the output (reporters and logs)
     colors: true,
 
-
     // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN
+    //    || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
-
 
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
-
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: argv.browsers,
 
     customLaunchers: {
-      'SL_CHROME': {
+      SL_CHROME: {
         base: 'SauceLabs',
         browserName: 'chrome',
         version: 'latest'
       },
-      'SL_FIREFOX': {
+      SL_FIREFOX: {
         base: 'SauceLabs',
         browserName: 'firefox',
         version: 'latest'
       },
-      'SL_SAFARI': {
+      SL_SAFARI: {
         base: 'SauceLabs',
         browserName: 'safari',
         // https://support.saucelabs.com/hc/en-us/community/posts/360016821133-Tests-on-Safari-11-started-failing-between-2018-07-19-and-2018-07-20
         platform: 'macOS 10.13',
         version: 'latest'
       },
-      'SL_IE10': {
+      SL_IE10: {
         base: 'SauceLabs',
         browserName: 'internet explorer',
         version: '10'
       },
-      'SL_IE11': {
+      SL_IE11: {
         base: 'SauceLabs',
         browserName: 'internet explorer',
         version: '11'
       },
-      'SL_EDGE': {
+      SL_EDGE: {
         base: 'SauceLabs',
         browserName: 'MicrosoftEdge',
         version: 'latest'
       },
-      'SL_IOS': {
+      SL_IOS: {
         base: 'SauceLabs',
         deviceName: 'iPhone XS Simulator',
         appiumVersion: '1.9.1',
@@ -162,7 +156,7 @@ module.exports = function(config) {
         platformName: 'iOS',
         platformVersion: '12.0'
       },
-      'SL_ANDROID': {
+      SL_ANDROID: {
         base: 'SauceLabs',
         deviceName: 'Android GoogleAPI Emulator',
         appiumVersion: '1.9.1',
@@ -221,10 +215,9 @@ module.exports = function(config) {
     },
 
     webpackServer: {
-      stats: true,
       debug: false,
       progress: true,
       quiet: false
     }
-  })
+  });
 };

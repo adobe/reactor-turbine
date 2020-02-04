@@ -187,14 +187,14 @@ module.exports = function(
               executeDelegateModule(action, syntheticEvent, [syntheticEvent])
             ).then(resolve, reject);
           })
-            .then(function() {
-              clearTimeout(timeoutId);
-            })
             .catch(function(e) {
               clearTimeout(timeoutId);
               e = normalizeError(e);
               logActionError(action, rule, e);
               return Promise.reject(e);
+            })
+            .then(function() {
+              clearTimeout(timeoutId);
             });
         });
       });

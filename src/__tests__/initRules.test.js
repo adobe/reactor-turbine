@@ -1776,7 +1776,7 @@ describe('initRules', function() {
         expect(logger.warn.calls.count()).toBe(1);
       });
 
-      it('logs a message when a rule completes', function() {
+      it('logs a message when a rule completes', function(done) {
         var rules = setupRules([
           {
             events: [generateEvent('Event1')]

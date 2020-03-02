@@ -20,8 +20,7 @@ var objectAssign = require('@adobe/reactor-object-assign');
  * @returns {Object}
  */
 module.exports = function(syntheticEventMeta, syntheticEvent) {
-  syntheticEvent = syntheticEvent || {};
-  objectAssign(syntheticEvent, syntheticEventMeta);
+  syntheticEvent = objectAssign({}, syntheticEvent, syntheticEventMeta);
 
   // Remove after some arbitrary time period when we think users have had sufficient chance
   // to move away from event.type

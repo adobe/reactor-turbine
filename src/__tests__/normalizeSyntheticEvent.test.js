@@ -45,6 +45,21 @@ describe('normalizeSyntheticEvent', function() {
     });
   });
 
+  // JIRA-14142
+  it('does not override meta of first normalized event if synthetic event is ' +
+    'normalized multiple times', function() {
+
+    var syntheticEvent = {};
+    var syntheticEventMeta1 = { $rule: { id: "ABC123" }};
+    var syntheticEventMeta2 = { $rule: { id: "ABC456" }};
+    var normalizedSyntheticEvent1 = normalizeSyntheticEvent(syntheticEventMeta1, syntheticEvent);
+    var normalizedSyntheticEvent2 = normalizeSyntheticEvent(syntheticEventMeta2, syntheticEvent);
+
+    expect(normalizedSyntheticEvent1.$rule.id).toEqual("ABC123");
+    expect(normalizedSyntheticEvent2.$rule.id).toEqual("ABC456");
+  });
+
+
   it('overwrites meta even if same properties are provided by extension', function() {
     var syntheticEvent = normalizeSyntheticEvent(mockMeta, {
       $type: 'oh nos',

@@ -59,11 +59,12 @@ describe('normalizeSyntheticEvent', function() {
   // not return properties from the prototype.
   // See DTM-14142
   it('modifies the original syntheticEvent rather than creating a new object', function() {
-    var syntheticEvent = new CustomEvent('test', { detail: 'foo' });
+    var syntheticEvent = document.createEvent('CustomEvent');
+    syntheticEvent.initCustomEvent('test', true, true, { foo: 'bar' });
     var normalizedSyntheticEvent = normalizeSyntheticEvent(mockMeta, syntheticEvent);
 
     expect(normalizedSyntheticEvent).toBe(syntheticEvent);
-    expect(normalizedSyntheticEvent.detail).toBe('foo');
+    expect(normalizedSyntheticEvent.detail.foo).toBe('bar');
     expect(normalizedSyntheticEvent.$type).toBe('extension-name.event-name');
     expect(normalizedSyntheticEvent.$rule.name).toBe('rule name');
   });

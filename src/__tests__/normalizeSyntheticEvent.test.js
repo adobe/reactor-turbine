@@ -45,6 +45,30 @@ describe('normalizeSyntheticEvent', function() {
     });
   });
 
+  // This test exists because issues could occur if we modify the way we normalize
+  // events in certain ways that may not be obvious. For example:
+  // (1) In the example in this test, if normalizeSyntheticEvent were to use Object.assign to
+  // copy properties from the synthetic event to a new object, "detail" would not be copied
+  // from the CustomEvent instance. This is because Object.assign only copies
+  // "enumerable own properties", or, in other words, properties on the object itself
+  // and not its prototype chain. The "detail" property is on the custom event's prototype.
+  // (2) If normalizeSyntheticEvent were to create a new object that extends from the
+  // synthetic event (using Object.create(syntheticEvent)) and then added the meta onto
+  // that new object, user code that currently does something like Object.keys(event) will
+  // suddenly start returning only the meta keys ($rule, $type), since Object.keys would
+  // not return properties from the prototype.
+  // See DTM-14142
+  it('modifies the original syntheticEvent rather than creating a new object', function() {
+    var syntheticEvent = document.createEvent('CustomEvent');
+    syntheticEvent.initCustomEvent('test', true, true, { foo: 'bar' });
+    var normalizedSyntheticEvent = normalizeSyntheticEvent(mockMeta, syntheticEvent);
+
+    expect(normalizedSyntheticEvent).toBe(syntheticEvent);
+    expect(normalizedSyntheticEvent.detail.foo).toBe('bar');
+    expect(normalizedSyntheticEvent.$type).toBe('extension-name.event-name');
+    expect(normalizedSyntheticEvent.$rule.name).toBe('rule name');
+  });
+
   it('overwrites meta even if same properties are provided by extension', function() {
     var syntheticEvent = normalizeSyntheticEvent(mockMeta, {
       $type: 'oh nos',

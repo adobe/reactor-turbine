@@ -20,7 +20,8 @@ describe('index', function() {
       container: {
         property: {
           settings: {
-            undefinedVarsReturnEmpty: true
+            undefinedVarsReturnEmpty: true,
+            ruleComponentSequencing: false
           }
         }
       }
@@ -236,7 +237,8 @@ describe('index', function() {
       window._satellite,
       rules,
       moduleProvider,
-      replaceTokens
+      replaceTokens,
+      false
     );
   });
 

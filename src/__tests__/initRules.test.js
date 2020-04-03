@@ -101,8 +101,12 @@ var setupRules = function(rulesDefinition) {
   return rules;
 };
 
-var runInitRules = function(rules) {
-  return initRules(_satellite, rules, moduleProvider, replaceTokens);
+var runInitRules = function(rules, ruleComponentSequencing) {
+  if (!ruleComponentSequencing) {
+    ruleComponentSequencing = false;
+  }
+
+  return initRules(_satellite, rules, moduleProvider, replaceTokens, ruleComponentSequencing);
 };
 
 var _satellite = {};
@@ -137,9 +141,6 @@ describe('initRules', function() {
 
     initRules = injectInitRules({
       './logger': logger,
-      './isRuleQueueActive': function() {
-        return false;
-      },
       './createNotifyMonitors': function() {
         notifyMonitors = jasmine.createSpy();
         return notifyMonitors;
@@ -151,7 +152,7 @@ describe('initRules', function() {
     jasmine.clock().uninstall();
   });
 
-  describe('when no queue local storage flag is set', function() {
+  describe('when ruleComponentSequencing is false', function() {
     describe('rule execution', function() {
       it('executes the rule event', function() {
         var rules = setupRules([
@@ -887,15 +888,12 @@ describe('initRules', function() {
     });
   });
 
-  describe('when queue local storage flag is set', function() {
+  describe('when ruleComponentSequencing is true', function() {
     beforeEach(function() {
       logger = jasmine.createSpyObj('logger', ['log', 'warn', 'error']);
 
       initRules = injectInitRules({
         './logger': logger,
-        './isRuleQueueActive': function() {
-          return true;
-        },
         './createNotifyMonitors': function() {
           notifyMonitors = jasmine.createSpy();
           return notifyMonitors;
@@ -911,7 +909,7 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        runInitRules(rules, true);
 
         var eventExports = moduleProvider.getModuleExports(
           moduleHelper.getPath('Event1')
@@ -936,7 +934,7 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        runInitRules(rules, true);
 
         var eventExports = moduleProvider.getModuleExports(
           moduleHelper.getPath('Event1')
@@ -955,7 +953,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var conditionExport = moduleProvider.getModuleExports(
@@ -983,7 +981,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var conditionExport = moduleProvider.getModuleExports(
@@ -1020,7 +1018,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var conditionExport1 = moduleProvider.getModuleExports(
@@ -1044,7 +1042,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var actionExport = moduleProvider.getModuleExports(
@@ -1073,7 +1071,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var actionExport = moduleProvider.getModuleExports(
@@ -1108,7 +1106,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var actionExport1 = moduleProvider.getModuleExports(
@@ -1137,7 +1135,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var conditionExport1 = moduleProvider.getModuleExports(
@@ -1171,7 +1169,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             var conditionExport1 = moduleProvider.getModuleExports(
@@ -1206,7 +1204,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             var conditionExport1 = moduleProvider.getModuleExports(
@@ -1236,7 +1234,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var conditionExport1 = moduleProvider.getModuleExports(
@@ -1270,7 +1268,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             var conditionExport1 = moduleProvider.getModuleExports(
@@ -1305,7 +1303,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             var conditionExport1 = moduleProvider.getModuleExports(
@@ -1335,7 +1333,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var conditionExport = moduleProvider.getModuleExports(
@@ -1369,7 +1367,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             var conditionExport = moduleProvider.getModuleExports(
@@ -1404,7 +1402,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             var conditionExport = moduleProvider.getModuleExports(
@@ -1434,7 +1432,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var conditionExport = moduleProvider.getModuleExports(
@@ -1468,7 +1466,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             var conditionExport = moduleProvider.getModuleExports(
@@ -1503,7 +1501,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             var conditionExport = moduleProvider.getModuleExports(
@@ -1543,7 +1541,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             var conditionExport = moduleProvider.getModuleExports(
@@ -1577,7 +1575,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var action1Export = moduleProvider.getModuleExports(
@@ -1621,7 +1619,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             var action1Export = moduleProvider.getModuleExports(
@@ -1668,7 +1666,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           expect(callOrder).toEqual(['Event1', 'Condition1', 'Action1']);
@@ -1714,7 +1712,7 @@ describe('initRules', function() {
             }
           ]);
 
-          var lastPromiseInQueue = runInitRules(rules);
+          var lastPromiseInQueue = runInitRules(rules, true);
 
           lastPromiseInQueue.then(function() {
             expect(callOrder).toEqual(['Event1', 'Condition1', 'Action1']);
@@ -1727,7 +1725,7 @@ describe('initRules', function() {
         var rules = setupRules([{}]);
         delete rules[0].events;
 
-        runInitRules(rules);
+        runInitRules(rules, true);
       });
 
       it('does not throw error when there are no conditions for a rule', function() {
@@ -1738,7 +1736,7 @@ describe('initRules', function() {
         ]);
         delete rules[0].conditions;
 
-        runInitRules(rules);
+        runInitRules(rules, true);
       });
 
       it('does not throw error when there are no actions for a rule', function() {
@@ -1749,7 +1747,7 @@ describe('initRules', function() {
         ]);
         delete rules[0].actions;
 
-        runInitRules(rules);
+        runInitRules(rules, true);
       });
     });
 
@@ -1763,7 +1761,7 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        runInitRules(rules, true);
 
         var warningMessage = logger.warn.calls.mostRecent().args[0];
         expect(warningMessage).toBe(
@@ -1771,7 +1769,7 @@ describe('initRules', function() {
           'changed or removed at any time.'
         );
 
-        runInitRules(rules);
+        runInitRules(rules, true);
 
         expect(logger.warn.calls.count()).toBe(1);
       });
@@ -1783,7 +1781,7 @@ describe('initRules', function() {
           }
         ]);
 
-        var lastPromiseInQueue = runInitRules(rules);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
         lastPromiseInQueue.then(function() {
           var errorMessage = logger.log.calls.mostRecent().args[0];
@@ -1808,7 +1806,7 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        runInitRules(rules, true);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -1827,7 +1825,7 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        runInitRules(rules, true);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         expect(errorMessage).toStartWith(
@@ -1848,7 +1846,7 @@ describe('initRules', function() {
           }
         ]);
 
-        runInitRules(rules);
+        runInitRules(rules, true);
 
         var errorMessage = logger.error.calls.mostRecent().args[0];
         var expectedErrorMessage =
@@ -1871,7 +1869,8 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens
+          replaceTokens,
+          true
         );
 
         lastPromiseInQueue.then(function() {
@@ -1903,7 +1902,8 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens
+          replaceTokens,
+          true
         );
 
         lastPromiseInQueue.then(function() {
@@ -1937,7 +1937,8 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens
+          replaceTokens,
+          true
         );
 
         lastPromiseInQueue.then(function() {
@@ -1971,7 +1972,8 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens
+          replaceTokens,
+          true
         );
 
         lastPromiseInQueue.then(function() {
@@ -2004,7 +2006,8 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens
+          replaceTokens,
+          true
         );
 
         lastPromiseInQueue.then(function() {
@@ -2039,7 +2042,8 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens
+          replaceTokens,
+          true
         );
 
         lastPromiseInQueue.then(function() {
@@ -2072,7 +2076,8 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens
+            replaceTokens,
+            true
           );
 
           lastPromiseInQueue.then(function() {
@@ -2106,7 +2111,8 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens
+            replaceTokens,
+            true
           );
 
           lastPromiseInQueue.then(function() {
@@ -2136,7 +2142,8 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens
+          replaceTokens,
+          true
         );
 
         lastPromiseInQueue.then(function() {
@@ -2168,7 +2175,8 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens
+          replaceTokens,
+          true
         );
 
         lastPromiseInQueue.then(function() {
@@ -2202,7 +2210,8 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens
+          replaceTokens,
+          true
         );
 
         lastPromiseInQueue.then(function() {
@@ -2238,7 +2247,8 @@ describe('initRules', function() {
           _satellite,
           rules,
           moduleProvider,
-          replaceTokens
+          replaceTokens,
+          true
         );
 
         lastPromiseInQueue.then(function() {
@@ -2275,7 +2285,8 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens
+            replaceTokens,
+            true
           );
 
           lastPromiseInQueue.then(function() {
@@ -2313,7 +2324,8 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens
+            replaceTokens,
+            true
           );
 
           lastPromiseInQueue.then(function() {
@@ -2357,7 +2369,8 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens
+            replaceTokens,
+            true
           );
 
           lastPromiseInQueue.then(function() {
@@ -2401,7 +2414,8 @@ describe('initRules', function() {
             _satellite,
             rules,
             moduleProvider,
-            replaceTokens
+            replaceTokens,
+            true
           );
 
           lastPromiseInQueue.then(function() {

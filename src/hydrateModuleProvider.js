@@ -17,7 +17,13 @@ var logger = require('./logger');
 var resolveRelativePath = require('./resolveRelativePath');
 var createPublicRequire = require('./createPublicRequire');
 
-module.exports = function(container, moduleProvider, replaceTokens, getDataElementValue) {
+module.exports = function(
+  container,
+  moduleProvider,
+  debugController,
+  replaceTokens,
+  getDataElementValue
+) {
   var extensions = container.extensions;
   var buildInfo = container.buildInfo;
   var propertySettings = container.property.settings;
@@ -43,7 +49,11 @@ module.exports = function(container, moduleProvider, replaceTokens, getDataEleme
           getSharedModule: getSharedModuleExports,
           logger: prefixedLogger,
           propertySettings: propertySettings,
-          replaceTokens: replaceTokens
+          replaceTokens: replaceTokens,
+          onDebugChanged: debugController.onDebugChanged,
+          get debugEnabled() {
+            return debugController.getDebugEnabled();
+          }
         };
 
         Object.keys(extension.modules).forEach(function(referencePath) {

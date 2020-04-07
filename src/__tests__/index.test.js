@@ -156,6 +156,32 @@ describe('index', function() {
     );
   });
 
+  it('creates namespaced storage', function() {
+    var getNamespacedStorage = jasmine.createSpy().and.returnValue({
+      getItem: function() {}
+    });
+    injectIndex({
+      './getNamespacedStorage': getNamespacedStorage,
+    });
+
+    expect(getNamespacedStorage).toHaveBeenCalledWith(
+      'localStorage'
+    );
+  });
+
+  it('creates namespaced storage', function() {
+    var getNamespacedStorage = jasmine.createSpy().and.returnValue({
+      getItem: function() {}
+    });
+    injectIndex({
+      './getNamespacedStorage': getNamespacedStorage,
+    });
+
+    expect(getNamespacedStorage).toHaveBeenCalledWith(
+      'localStorage'
+    );
+  });
+
   it('sets logger output enabled when local storage item is \'true\'', function() {
     var logger = {};
     window.localStorage.setItem('com.adobe.reactor.debug', true);
@@ -202,12 +228,14 @@ describe('index', function() {
   it('hydrates module provider', function() {
     var container = window._satellite.container;
     var hydrateModuleProvider = jasmine.createSpy();
-    var moduleProvider = {};
+    var moduleProvider = { type: 'moduleProvider' };
+    var debugController = { type: 'debugController' };
     var replaceTokens = function() {};
     var getDataElementValue = function() {};
     injectIndex({
       './hydrateModuleProvider': hydrateModuleProvider,
       './createModuleProvider': function() { return moduleProvider; },
+      './createDebugController': function() { return debugController; },
       './createReplaceTokens': function() { return replaceTokens; },
       './createGetDataElementValue': function() { return getDataElementValue; }
     });
@@ -215,6 +243,7 @@ describe('index', function() {
     expect(hydrateModuleProvider).toHaveBeenCalledWith(
       container,
       moduleProvider,
+      debugController,
       replaceTokens,
       getDataElementValue
     );

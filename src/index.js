@@ -21,9 +21,7 @@ var logger = require('./logger');
 var initRules = require('./initRules');
 var dataElementSafe = require('./dataElementSafe');
 var getNamespacedStorage = require('./getNamespacedStorage');
-
-var DEBUG_LOCAL_STORAGE_NAME = 'debug';
-
+var createDebugController = require("./createDebugController");
 
 var _satellite = window._satellite;
 
@@ -94,17 +92,7 @@ if (_satellite && !window.__satelliteLoaded) {
   );
 
   var localStorage = getNamespacedStorage('localStorage');
-
-  var getDebugOutputEnabled = function() {
-    return localStorage.getItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';
-  };
-
-  var setDebugOutputEnabled = function(value) {
-    localStorage.setItem(DEBUG_LOCAL_STORAGE_NAME, value);
-    logger.outputEnabled = value;
-  };
-
-  logger.outputEnabled = getDebugOutputEnabled();
+  var debugController = createDebugController(localStorage, logger);
 
   // Important to hydrate satellite object before we hydrate the module provider or init rules.
   // When we hydrate module provider, we also execute extension code which may be
@@ -112,7 +100,7 @@ if (_satellite && !window.__satelliteLoaded) {
   hydrateSatelliteObject(
     _satellite,
     container,
-    setDebugOutputEnabled,
+    debugController.setDebugEnabled,
     getVar,
     setCustomVar
   );
@@ -120,6 +108,7 @@ if (_satellite && !window.__satelliteLoaded) {
   hydrateModuleProvider(
     container,
     moduleProvider,
+    debugController,
     replaceTokens,
     getDataElementValue
   );

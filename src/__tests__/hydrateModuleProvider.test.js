@@ -19,6 +19,7 @@ describe('hydrateModuleProvider', function() {
   var moduleProvider;
   var replaceTokens;
   var getDataElementValue;
+  var debugController;
 
   beforeEach(function() {
     container = {
@@ -48,6 +49,10 @@ describe('hydrateModuleProvider', function() {
 
     replaceTokens = function() {};
     getDataElementValue = function() {};
+    debugController = jasmine.createSpyObj('debugController', {
+      onDebugChanged: undefined,
+      getDebugEnabled: true
+    });
   });
 
   it('registers all modules', function() {
@@ -72,7 +77,7 @@ describe('hydrateModuleProvider', function() {
       }
     };
 
-    hydrateModuleProvider(container, moduleProvider);
+    hydrateModuleProvider(container, moduleProvider, debugController);
 
     expect(moduleProvider.registerModule).toHaveBeenCalledWith(
       'ext-a/a1.js',
@@ -110,7 +115,7 @@ describe('hydrateModuleProvider', function() {
   it('hydrates module cache', function() {
     var hydrateModuleProvider = injectHydrateModuleProvider();
 
-    hydrateModuleProvider(container, moduleProvider);
+    hydrateModuleProvider(container, moduleProvider, debugController);
 
     expect(moduleProvider.hydrateCache).toHaveBeenCalled();
   });
@@ -133,7 +138,7 @@ describe('hydrateModuleProvider', function() {
         './createPublicRequire': createPublicRequire
       });
 
-      hydrateModuleProvider(container, moduleProvider);
+      hydrateModuleProvider(container, moduleProvider, debugController);
     });
 
     it('is the publicRequire returned from createPublicRequire', function() {
@@ -186,7 +191,13 @@ describe('hydrateModuleProvider', function() {
         './logger': logger
       });
 
-      hydrateModuleProvider(container, moduleProvider, replaceTokens, getDataElementValue);
+      hydrateModuleProvider(
+        container,
+        moduleProvider,
+        debugController,
+        replaceTokens,
+        getDataElementValue
+      );
       turbine = moduleProvider.registerModule.calls.mostRecent().args[4];
     });
 
@@ -233,6 +244,16 @@ describe('hydrateModuleProvider', function() {
 
     it('contains replaceTokens', function() {
       expect(turbine.replaceTokens).toBe(replaceTokens);
+    });
+
+    it('contains onDebugChanged', function() {
+      expect(turbine.onDebugChanged).toBe(debugController.onDebugChanged);
+    });
+
+    it('contains debugEnabled', function() {
+      expect(turbine.debugEnabled).toBe(true);
+      expect(debugController.getDebugEnabled.and.returnValue(false));
+      expect(turbine.debugEnabled).toBe(false);
     });
   });
 });

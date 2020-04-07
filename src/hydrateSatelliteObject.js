@@ -13,7 +13,7 @@
 var cookie = require('@adobe/reactor-cookie');
 var logger = require('./logger');
 
-module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, setCustomVar) {
+module.exports = function(_satellite, container, setDebugEnabled, getVar, setCustomVar) {
   var customScriptPrefixedLogger = logger.createPrefixedLogger('Custom Script');
 
   // Will get replaced by the directCall event delegate from the Core extension. Exists here in
@@ -120,7 +120,7 @@ module.exports = function(_satellite, container, setDebugOutputEnabled, getVar, 
   // to be thrown. This method existed before Reactor.
   _satellite.pageBottom = function() {};
 
-  _satellite.setDebug = setDebugOutputEnabled;
+  _satellite.setDebug = setDebugEnabled;
 
   var warningLogged = false;
 

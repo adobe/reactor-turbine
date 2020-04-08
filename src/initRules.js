@@ -16,18 +16,6 @@ var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
 var createNotifyMonitors = require('./createNotifyMonitors');
 var createExecuteDelegateModule = require('./createExecuteDelegateModule');
 var Promise = require('@adobe/reactor-promise');
-var PROMISE_TIMEOUT = 2000;
-
-var queueWarningLogged = false;
-var logQueueWarningOnce = function() {
-  if (!queueWarningLogged) {
-    queueWarningLogged = true;
-    logger.warn(
-      'Rule queueing is only intended for testing purposes. Queueing behavior may be ' +
-        'changed or removed at any time.'
-    );
-  }
-};
 
 module.exports = function(
   _satellite,
@@ -138,15 +126,23 @@ module.exports = function(
           var timeoutId;
 
           return new Promise(function(resolve, reject) {
+            var promiseTimeout = condition.settings.timeout;
+
+            if (isNaN(promiseTimeout) || promiseTimeout < 0) {
+              reject(new Error('Condition timeout is not correctly defined.'));
+            }
+
             timeoutId = setTimeout(function() {
               // Reject instead of resolve to prevent subsequent
               // conditions and actions from executing.
               reject(
-                'A timeout occurred because the condition took longer than ' +
-                  PROMISE_TIMEOUT / 1000 +
-                  ' seconds to complete. '
+                new Error(
+                  'A timeout occurred because the condition took longer than ' +
+                    promiseTimeout / 1000 +
+                    ' seconds to complete. '
+                )
               );
-            }, PROMISE_TIMEOUT);
+            }, promiseTimeout);
 
             Promise.resolve(
               executeDelegateModule(condition, syntheticEvent, [syntheticEvent])
@@ -175,17 +171,34 @@ module.exports = function(
           var timeoutId;
 
           return new Promise(function(resolve, reject) {
-            timeoutId = setTimeout(function() {
-              reject(
-                'A timeout occurred because the action took longer than ' +
-                  PROMISE_TIMEOUT / 1000 +
-                  ' seconds to complete. '
-              );
-            }, PROMISE_TIMEOUT);
+            var promiseTimeout = action.settings.timeout;
 
-            Promise.resolve(
-              executeDelegateModule(action, syntheticEvent, [syntheticEvent])
-            ).then(resolve, reject);
+            if (
+              promiseTimeout &&
+              (isNaN(promiseTimeout) || promiseTimeout < 0)
+            ) {
+              reject(new Error('Action timeout is not correctly defined.'));
+            }
+
+            var moduleResult = executeDelegateModule(action, syntheticEvent, [
+              syntheticEvent
+            ]);
+
+            if (promiseTimeout) {
+              timeoutId = setTimeout(function() {
+                reject(
+                  new Error(
+                    'A timeout occurred because the action took longer than ' +
+                      promiseTimeout / 1000 +
+                      ' seconds to complete. '
+                  )
+                );
+              }, promiseTimeout);
+            } else {
+              moduleResult = null;
+            }
+
+            Promise.resolve(moduleResult).then(resolve, reject);
           })
             .catch(function(e) {
               clearTimeout(timeoutId);
@@ -304,7 +317,6 @@ module.exports = function(
         );
 
         if (ruleComponentSequencing) {
-          logQueueWarningOnce();
           addRuleToQueue(rule, normalizedSyntheticEvent);
         } else {
           checkConditions(rule, normalizedSyntheticEvent);

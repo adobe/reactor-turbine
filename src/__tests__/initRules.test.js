@@ -19,7 +19,7 @@ var Promise = require('@adobe/reactor-promise');
 var generateDelegate = function(name, scriptFn, settings) {
   return {
     name: name || 'Event',
-    settings: settings,
+    settings: settings || { timeout: 10000 },
     script:
       scriptFn ||
       function(module) {
@@ -106,7 +106,13 @@ var runInitRules = function(rules, ruleComponentSequencing) {
     ruleComponentSequencing = false;
   }
 
-  return initRules(_satellite, rules, moduleProvider, replaceTokens, ruleComponentSequencing);
+  return initRules(
+    _satellite,
+    rules,
+    moduleProvider,
+    replaceTokens,
+    ruleComponentSequencing
+  );
 };
 
 var _satellite = {};
@@ -629,8 +635,7 @@ describe('initRules', function() {
         runInitRules(rules);
 
         var errorMessage = logger.log.calls.mostRecent().args[0];
-        var expectedErrorMessage =
-          'Rule "Test Rule 1" fired.';
+        var expectedErrorMessage = 'Rule "Test Rule 1" fired.';
         expect(errorMessage).toBe(expectedErrorMessage);
         expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
           rule: rules[0]
@@ -1519,14 +1524,13 @@ describe('initRules', function() {
         }
       );
 
-      it(
-        'does not execute actions when a condition takes ' +
-          'longer than 2 seconds to complete',
-        function(done) {
-          var rules = setupRules([
-            {
-              conditions: [
-                generateCondition('Condition1', function(module) {
+      it('does not execute actions when a condition exceeds the timeout', function(done) {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateCondition(
+                'Condition1',
+                function(module) {
                   module.exports = jasmine.createSpy().and.callFake(function() {
                     return new Promise(function(resolve) {
                       setTimeout(resolve, 3000);
@@ -1534,6 +1538,88 @@ describe('initRules', function() {
                         jasmine.clock().tick(2000);
                       }, 0);
                     });
+                  });
+                },
+                { timeout: 2000 }
+              )
+            ],
+            actions: [generateAction('Action1')]
+          }
+        ]);
+
+        var lastPromiseInQueue = runInitRules(rules, true);
+
+        lastPromiseInQueue.then(function() {
+          var conditionExport = moduleProvider.getModuleExports(
+            moduleHelper.getPath('Condition1')
+          );
+          var actionExport = moduleProvider.getModuleExports(
+            moduleHelper.getPath('Action1')
+          );
+
+          expect(conditionExport.calls.count()).toBe(1);
+          expect(actionExport.calls.count()).toBe(0);
+
+          done();
+        });
+      });
+
+      it(
+        'does not execute actions when a condition exceeds the timeout' +
+          ' even if negate flag is true',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                generateNegatedCondition(
+                  'Condition1',
+                  function(module) {
+                    module.exports = jasmine
+                      .createSpy()
+                      .and.callFake(function() {
+                        return new Promise(function(resolve) {
+                          setTimeout(resolve, 3000);
+                          windowSetTimeout(function() {
+                            jasmine.clock().tick(2000);
+                          }, 0);
+                        });
+                      });
+                  },
+                  { timeout: 2000 }
+                )
+              ],
+              actions: [generateAction('Action1')]
+            }
+          ]);
+
+          var lastPromiseInQueue = runInitRules(rules, true);
+
+          lastPromiseInQueue.then(function() {
+            var conditionExport = moduleProvider.getModuleExports(
+              moduleHelper.getPath('Condition1')
+            );
+            var actionExport = moduleProvider.getModuleExports(
+              moduleHelper.getPath('Action1')
+            );
+
+            expect(conditionExport.calls.count()).toBe(1);
+            expect(actionExport.calls.count()).toBe(0);
+
+            done();
+          });
+        }
+      );
+
+      it(
+        'does not execute actions when a condition throws an error ' +
+          'even if negate flag is true',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                generateNegatedCondition('Condition1', function(module) {
+                  module.exports = jasmine.createSpy().and.callFake(function() {
+                    throw new Error('noob tried to divide by zero.');
                   });
                 })
               ],
@@ -1592,14 +1678,13 @@ describe('initRules', function() {
         });
       });
 
-      it(
-        'ceases to execute remaining actions if any action takes' +
-          ' longer than 2 seconds to complete',
-        function(done) {
-          var rules = setupRules([
-            {
-              actions: [
-                generateAction('Action1', function(module) {
+      it('ceases to execute remaining actions if any action exceeds the timeout', function(done) {
+        var rules = setupRules([
+          {
+            actions: [
+              generateAction(
+                'Action1',
+                function(module) {
                   module.exports = jasmine.createSpy().and.callFake(function() {
                     return new Promise(function(resolve) {
                       setTimeout(function() {
@@ -1611,31 +1696,32 @@ describe('initRules', function() {
                       }, 0);
                     });
                   });
-                }),
-                generateAction('Action2', function(module) {
-                  module.exports = jasmine.createSpy();
-                })
-              ]
-            }
-          ]);
+                },
+                { timeout: 2000 }
+              ),
+              generateAction('Action2', function(module) {
+                module.exports = jasmine.createSpy();
+              })
+            ]
+          }
+        ]);
 
-          var lastPromiseInQueue = runInitRules(rules, true);
+        var lastPromiseInQueue = runInitRules(rules, true);
 
-          lastPromiseInQueue.then(function() {
-            var action1Export = moduleProvider.getModuleExports(
-              moduleHelper.getPath('Action1')
-            );
-            var action2Export = moduleProvider.getModuleExports(
-              moduleHelper.getPath('Action2')
-            );
+        lastPromiseInQueue.then(function() {
+          var action1Export = moduleProvider.getModuleExports(
+            moduleHelper.getPath('Action1')
+          );
+          var action2Export = moduleProvider.getModuleExports(
+            moduleHelper.getPath('Action2')
+          );
 
-            expect(action1Export.calls.count()).toBe(1);
-            expect(action2Export.calls.count()).toBe(0);
+          expect(action1Export.calls.count()).toBe(1);
+          expect(action2Export.calls.count()).toBe(0);
 
-            done();
-          });
-        }
-      );
+          done();
+        });
+      });
 
       it('executes the events then the conditions then the actions', function(done) {
         var callOrder = [];
@@ -1721,6 +1807,59 @@ describe('initRules', function() {
         }
       );
 
+      it(
+        'executes the next action immediatelly when the previous action' +
+          ' does not have a timeout',
+        function(done) {
+          var callOrder = [];
+          var rules = setupRules([
+            {
+              actions: [
+                generateAction(
+                  'Action1',
+                  function(module) {
+                    module.exports = function() {
+                      return new Promise(function(resolve) {
+                        setTimeout(function() {
+                          callOrder.push('Action1');
+                          resolve('some value');
+                        }, 200);
+
+                        windowSetTimeout(function() {
+                          jasmine.clock().tick(200);
+                        }, 0);
+                      });
+                    };
+                  },
+                  {}
+                ),
+                generateAction(
+                  'Action2',
+                  function(module) {
+                    module.exports = function() {
+                      return new Promise(function(resolve) {
+                        callOrder.push('Action2');
+                        resolve('some value');
+                      });
+                    };
+                  },
+                  { timeout: 100 }
+                )
+              ]
+            }
+          ]);
+
+          var lastPromiseInQueue = runInitRules(rules, true);
+
+          lastPromiseInQueue.then(function() {
+            windowSetTimeout(function() {
+              expect(callOrder).toEqual(['Action2', 'Action1']);
+              done();
+            }, 0);
+          });
+        }
+      );
+
       it('does not throw error when there are no events for a rule', function() {
         var rules = setupRules([{}]);
         delete rules[0].events;
@@ -1752,28 +1891,6 @@ describe('initRules', function() {
     });
 
     describe('error handling and logging', function() {
-      it('logs a warning message a single time about queuing being only ' +
-        'for testing purposes', function() {
-
-        var rules = setupRules([
-          {
-            actions: [generateAction('Action1')]
-          }
-        ]);
-
-        runInitRules(rules, true);
-
-        var warningMessage = logger.warn.calls.mostRecent().args[0];
-        expect(warningMessage).toBe(
-          'Rule queueing is only intended for testing purposes. Queueing behavior may be ' +
-          'changed or removed at any time.'
-        );
-
-        runInitRules(rules, true);
-
-        expect(logger.warn.calls.count()).toBe(1);
-      });
-
       it('logs a message when a rule completes', function(done) {
         var rules = setupRules([
           {
@@ -1785,8 +1902,7 @@ describe('initRules', function() {
 
         lastPromiseInQueue.then(function() {
           var errorMessage = logger.log.calls.mostRecent().args[0];
-          var expectedErrorMessage =
-            'Rule "Test Rule 1" fired.';
+          var expectedErrorMessage = 'Rule "Test Rule 1" fired.';
           expect(errorMessage).toBe(expectedErrorMessage);
           expect(notifyMonitors).toHaveBeenCalledWith('ruleCompleted', {
             rule: rules[0]
@@ -1988,6 +2104,134 @@ describe('initRules', function() {
           done();
         });
       });
+
+      it('logs an error when condition module does not have a timeout defined', function(done) {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateCondition(
+                'Condition1',
+                function(module) {
+                  module.exports = function() {
+                    return true;
+                  };
+                },
+                {}
+              )
+            ]
+          }
+        ]);
+
+        var lastPromiseInQueue = initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          true
+        );
+
+        lastPromiseInQueue.then(function() {
+          var errorMessage = logger.error.calls.mostRecent().args[0];
+          var expectedErrorMessage =
+            'Failed to execute Condition1 for Test Rule 1 rule. Condition timeout ' +
+            'is not correctly defined.';
+          expect(errorMessage).toStartWith(expectedErrorMessage);
+          expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+            rule: rules[0],
+            condition: rules[0].conditions[0]
+          });
+
+          done();
+        });
+      });
+
+      it(
+        'logs an error when condition module does not have an integer timeout' +
+          ' defined',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                generateCondition(
+                  'Condition1',
+                  function(module) {
+                    module.exports = function() {
+                      return true;
+                    };
+                  },
+                  { timeout: {} }
+                )
+              ]
+            }
+          ]);
+
+          var lastPromiseInQueue = initRules(
+            _satellite,
+            rules,
+            moduleProvider,
+            replaceTokens,
+            true
+          );
+
+          lastPromiseInQueue.then(function() {
+            var errorMessage = logger.error.calls.mostRecent().args[0];
+            var expectedErrorMessage =
+              'Failed to execute Condition1 for Test Rule 1 rule. Condition timeout ' +
+              'is not correctly defined.';
+            expect(errorMessage).toStartWith(expectedErrorMessage);
+            expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+              rule: rules[0],
+              condition: rules[0].conditions[0]
+            });
+
+            done();
+          });
+        }
+      );
+
+      it(
+        'logs an error when condition module does have a negative integer' +
+          ' timeout defined',
+        function(done) {
+          var rules = setupRules([
+            {
+              conditions: [
+                generateCondition(
+                  'Condition1',
+                  function(module) {
+                    module.exports = function() {
+                      return true;
+                    };
+                  },
+                  { timeout: -100 }
+                )
+              ]
+            }
+          ]);
+
+          var lastPromiseInQueue = initRules(
+            _satellite,
+            rules,
+            moduleProvider,
+            replaceTokens,
+            true
+          );
+
+          lastPromiseInQueue.then(function() {
+            var errorMessage = logger.error.calls.mostRecent().args[0];
+            var expectedErrorMessage =
+              'Failed to execute Condition1 for Test Rule 1 rule. Condition timeout ' +
+              'is not correctly defined.';
+            expect(errorMessage).toStartWith(expectedErrorMessage);
+            expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+              rule: rules[0],
+              condition: rules[0].conditions[0]
+            });
+
+            done();
+          });
+        }
+      );
 
       it("logs a message when the negated condition doesn't pass", function(done) {
         var rules = setupRules([
@@ -2345,67 +2589,19 @@ describe('initRules', function() {
       );
 
       it(
-        'logs an error when a condition module take longer than 2 seconds' +
-          ' to complete',
-        function(done) {
-          var rules = setupRules([
-            {
-              conditions: [
-                generateCondition('Condition1', function(module) {
-                  module.exports = function() {
-                    return new Promise(function(resolve) {
-                      setTimeout(resolve, 3000);
-                      windowSetTimeout(function() {
-                        jasmine.clock().tick(2000);
-                      }, 0);
-                    });
-                  };
-                })
-              ]
-            }
-          ]);
-
-          var lastPromiseInQueue = initRules(
-            _satellite,
-            rules,
-            moduleProvider,
-            replaceTokens,
-            true
-          );
-
-          lastPromiseInQueue.then(function() {
-            var errorMessage = logger.error.calls.mostRecent().args[0];
-            var expectedErrorMessage =
-              'Failed to execute Condition1 for Test Rule 1 rule. A timeout occurred because the ' +
-              'condition took longer than 2 seconds to complete.';
-            expect(errorMessage).toStartWith(expectedErrorMessage);
-            expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
-              rule: rules[0],
-              condition: rules[0].conditions[0]
-            });
-
-            done();
-          });
-        }
-      );
-
-      it(
-        'logs an error when an action module take longer than 2 seconds' +
-          ' to complete',
+        'logs an error when action module does not have an integer timeout' +
+          ' defined',
         function(done) {
           var rules = setupRules([
             {
               actions: [
-                generateAction('Action1', function(module) {
-                  module.exports = function() {
-                    return new Promise(function(resolve) {
-                      setTimeout(resolve, 3000);
-                      windowSetTimeout(function() {
-                        jasmine.clock().tick(2000);
-                      }, 0);
-                    });
-                  };
-                })
+                generateAction(
+                  'Action1',
+                  function(module) {
+                    module.exports = function() {};
+                  },
+                  { timeout: {} }
+                )
               ]
             }
           ]);
@@ -2421,8 +2617,8 @@ describe('initRules', function() {
           lastPromiseInQueue.then(function() {
             var errorMessage = logger.error.calls.mostRecent().args[0];
             var expectedErrorMessage =
-              'Failed to execute Action1 for Test Rule 1 rule. A timeout occurred because the ' +
-              'action took longer than 2 seconds to complete.';
+              'Failed to execute Action1 for Test Rule 1 rule. Action timeout ' +
+              'is not correctly defined.';
             expect(errorMessage).toStartWith(expectedErrorMessage);
             expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
               rule: rules[0],
@@ -2433,6 +2629,138 @@ describe('initRules', function() {
           });
         }
       );
+
+      it(
+        'logs an error when action module does have a negative integer' +
+          ' timeout defined',
+        function(done) {
+          var rules = setupRules([
+            {
+              actions: [
+                generateAction(
+                  'Action1',
+                  function(module) {
+                    module.exports = function() {};
+                  },
+                  { timeout: -100 }
+                )
+              ]
+            }
+          ]);
+
+          var lastPromiseInQueue = initRules(
+            _satellite,
+            rules,
+            moduleProvider,
+            replaceTokens,
+            true
+          );
+
+          lastPromiseInQueue.then(function() {
+            var errorMessage = logger.error.calls.mostRecent().args[0];
+            var expectedErrorMessage =
+              'Failed to execute Action1 for Test Rule 1 rule. Action timeout ' +
+              'is not correctly defined.';
+            expect(errorMessage).toStartWith(expectedErrorMessage);
+            expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+              rule: rules[0],
+              action: rules[0].actions[0]
+            });
+
+            done();
+          });
+        }
+      );
+
+      it('logs an error when a condition module exceeds the timeout', function(done) {
+        var rules = setupRules([
+          {
+            conditions: [
+              generateCondition(
+                'Condition1',
+                function(module) {
+                  module.exports = function() {
+                    return new Promise(function(resolve) {
+                      setTimeout(resolve, 3000);
+                      windowSetTimeout(function() {
+                        jasmine.clock().tick(2000);
+                      }, 0);
+                    });
+                  };
+                },
+                { timeout: 2000 }
+              )
+            ]
+          }
+        ]);
+
+        var lastPromiseInQueue = initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          true
+        );
+
+        lastPromiseInQueue.then(function() {
+          var errorMessage = logger.error.calls.mostRecent().args[0];
+          var expectedErrorMessage =
+            'Failed to execute Condition1 for Test Rule 1 rule. A timeout occurred because the ' +
+            'condition took longer than 2 seconds to complete.';
+          expect(errorMessage).toStartWith(expectedErrorMessage);
+          expect(notifyMonitors).toHaveBeenCalledWith('ruleConditionFailed', {
+            rule: rules[0],
+            condition: rules[0].conditions[0]
+          });
+
+          done();
+        });
+      });
+
+      it('logs an error when an action module exceeds the timeout', function(done) {
+        var rules = setupRules([
+          {
+            actions: [
+              generateAction(
+                'Action1',
+                function(module) {
+                  module.exports = function() {
+                    return new Promise(function(resolve) {
+                      setTimeout(resolve, 3000);
+                      windowSetTimeout(function() {
+                        jasmine.clock().tick(2000);
+                      }, 0);
+                    });
+                  };
+                },
+                { timeout: 2000 }
+              )
+            ]
+          }
+        ]);
+
+        var lastPromiseInQueue = initRules(
+          _satellite,
+          rules,
+          moduleProvider,
+          replaceTokens,
+          true
+        );
+
+        lastPromiseInQueue.then(function() {
+          var errorMessage = logger.error.calls.mostRecent().args[0];
+          var expectedErrorMessage =
+            'Failed to execute Action1 for Test Rule 1 rule. A timeout occurred because the ' +
+            'action took longer than 2 seconds to complete.';
+          expect(errorMessage).toStartWith(expectedErrorMessage);
+          expect(notifyMonitors).toHaveBeenCalledWith('ruleActionFailed', {
+            rule: rules[0],
+            action: rules[0].actions[0]
+          });
+
+          done();
+        });
+      });
     });
   });
 });

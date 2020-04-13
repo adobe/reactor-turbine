@@ -21,7 +21,7 @@ describe('index', function() {
         property: {
           settings: {
             undefinedVarsReturnEmpty: true,
-            ruleComponentSequencing: false
+            ruleComponentSequencingEnabled: false
           }
         }
       }

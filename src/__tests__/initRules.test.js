@@ -101,9 +101,9 @@ var setupRules = function(rulesDefinition) {
   return rules;
 };
 
-var runInitRules = function(rules, ruleComponentSequencing) {
-  if (!ruleComponentSequencing) {
-    ruleComponentSequencing = false;
+var runInitRules = function(rules, ruleComponentSequencingEnabled) {
+  if (!ruleComponentSequencingEnabled) {
+    ruleComponentSequencingEnabled = false;
   }
 
   return initRules(
@@ -111,7 +111,7 @@ var runInitRules = function(rules, ruleComponentSequencing) {
     rules,
     moduleProvider,
     replaceTokens,
-    ruleComponentSequencing
+    ruleComponentSequencingEnabled
   );
 };
 

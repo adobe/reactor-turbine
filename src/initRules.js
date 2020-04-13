@@ -22,7 +22,7 @@ module.exports = function(
   rules,
   moduleProvider,
   replaceTokens,
-  ruleComponentSequencing
+  ruleComponentSequencingEnabled
 ) {
   var lastPromiseInQueue = Promise.resolve();
   var notifyMonitors = createNotifyMonitors(_satellite);
@@ -316,7 +316,7 @@ module.exports = function(
           syntheticEvent
         );
 
-        if (ruleComponentSequencing) {
+        if (ruleComponentSequencingEnabled) {
           addRuleToQueue(rule, normalizedSyntheticEvent);
         } else {
           checkConditions(rule, normalizedSyntheticEvent);

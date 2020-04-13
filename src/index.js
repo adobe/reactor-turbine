@@ -37,7 +37,7 @@ if (_satellite && !window.__satelliteLoaded) {
   delete _satellite.container;
 
   var undefinedVarsReturnEmpty = container.property.settings.undefinedVarsReturnEmpty;
-  var ruleComponentSequencing = container.property.settings.ruleComponentSequencing;
+  var ruleComponentSequencingEnabled = container.property.settings.ruleComponentSequencingEnabled;
 
   var dataElements = container.dataElements || {};
 
@@ -130,7 +130,7 @@ if (_satellite && !window.__satelliteLoaded) {
     container.rules || [],
     moduleProvider,
     replaceTokens,
-    ruleComponentSequencing
+    ruleComponentSequencingEnabled
   );
 }
 

@@ -128,10 +128,6 @@ module.exports = function(
           return new Promise(function(resolve, reject) {
             var promiseTimeout = condition.settings.timeout;
 
-            if (isNaN(promiseTimeout) || promiseTimeout < 0) {
-              reject(new Error('Condition timeout is not correctly defined.'));
-            }
-
             timeoutId = setTimeout(function() {
               // Reject instead of resolve to prevent subsequent
               // conditions and actions from executing.
@@ -172,13 +168,6 @@ module.exports = function(
 
           return new Promise(function(resolve, reject) {
             var promiseTimeout = action.settings.timeout;
-
-            if (
-              promiseTimeout &&
-              (isNaN(promiseTimeout) || promiseTimeout < 0)
-            ) {
-              reject(new Error('Action timeout is not correctly defined.'));
-            }
 
             var moduleResult = executeDelegateModule(action, syntheticEvent, [
               syntheticEvent

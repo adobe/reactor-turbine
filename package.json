@@ -7,7 +7,7 @@
     "build": "rollup -c --intro \"if (!window.atob) { console.warn('Adobe Launch is unsupported in IE 9 and below.'); return; }\" && uglifyjs dist/engine.js -c -m -o dist/engine.min.js",
     "build:watch": "rollup --watch -c --intro \"if (!window.atob) { console.warn('Adobe Launch is unsupported in IE 9 and below.'); return; }\" && uglifyjs dist/engine.js -c -m -o dist/engine.min.js",
     "prepublishOnly": "npm run build",
-    "test": "karma start",
+    "test": "karma start && npm run lint",
     "test:watch": "npm test -- --no-single-run --no-coverage",
     "lint": "eslint 'src/**/*.js'"
   },

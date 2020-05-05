@@ -20,8 +20,9 @@ describe('getRuleComponentErrorMessage', function () {
     expect(
       getRuleComponentErrorMessage('rule component name', 'rule name', error)
     ).toEqual(
-      'Failed to execute rule component name for rule name rule. some error\n' +
-        error.stack
+      'Failed to execute rule component name for rule name rule. some error' +
+        // IE doesn't support error stacks. This test in IE will behave like the test from below.
+        (error.stack ? '\n' + error.stack : '')
     );
   });
 

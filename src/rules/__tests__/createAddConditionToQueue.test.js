@@ -12,6 +12,7 @@ governing permissions and limitations under the License.
 
 'use strict';
 
+var Promise = require('@adobe/reactor-promise');
 var createAddConditionToQueue = require('../createAddConditionToQueue');
 var emptyFn = function () {};
 

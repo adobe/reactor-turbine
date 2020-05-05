@@ -5,9 +5,9 @@ export default {
   input: 'src/index.js',
   output: {
     file: 'dist/engine.js',
-    format: 'iife'
+    format: 'iife',
+    name: '_satellite'
   },
-  name: '_satellite',
   plugins: [
     resolve({
       preferBuiltins: false

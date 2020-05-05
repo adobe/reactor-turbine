@@ -9,19 +9,47 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  ****************************************************************************************/
+
+var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
+
+var createDebugController = require('./createDebugController');
+var createExecuteDelegateModule = require('./createExecuteDelegateModule');
+var createGetDataElementValue = require('./createGetDataElementValue');
+var createGetVar = require('./createGetVar');
+var createIsVar = require('./createIsVar');
+var createModuleProvider = require('./createModuleProvider');
+var createNotifyMonitors = require('./createNotifyMonitors');
 var createReplaceTokens = require('./createReplaceTokens');
 var createSetCustomVar = require('./createSetCustomVar');
-var createGetDataElementValue = require('./createGetDataElementValue');
-var createModuleProvider = require('./createModuleProvider');
-var createIsVar = require('./createIsVar');
-var createGetVar = require('./createGetVar');
-var hydrateModuleProvider = require('./hydrateModuleProvider');
-var hydrateSatelliteObject = require('./hydrateSatelliteObject');
-var logger = require('./logger');
-var initRules = require('./initRules');
+
+var createAddActionToQueue = require('./rules/createAddActionToQueue');
+var createAddConditionToQueue = require('./rules/createAddConditionToQueue');
+var createAddRuleToQueue = require('./rules/createAddRuleToQueue');
+var createConditionsAreChecked = require('./rules/createConditionsAreChecked');
+var createExecuteRule = require('./rules/createExecuteRule');
+var createGetModuleDisplayNameByRuleComponent = require('./rules/createGetModuleDisplayNameByRuleComponent');
+var createGetSyntheticEventMeta = require('./rules/createGetSyntheticEventMeta');
+var createInitEventModule = require('./rules/createInitEventModule');
+var createLogActionError = require('./rules/createLogActionError');
+var createLogConditionError = require('./rules/createLogConditionError');
+var createLogConditionNotMet = require('./rules/createLogConditionNotMet');
+var createLogRuleCompleted = require('./rules/createLogRuleCompleted');
+var createRunActions = require('./rules/createRunActions');
+var createTriggerRule = require('./rules/createTriggerRule');
+
+var getRuleComponentErrorMessage = require('./rules/getRuleComponentErrorMessage');
+var isConditionMet = require('./rules/isConditionMet');
+var initRules = require('./rules/initRules');
+var normalizeRuleComponentError = require('./rules/normalizeRuleComponentError');
+var normalizeSyntheticEvent = require('./rules/normalizeSyntheticEvent');
+
 var dataElementSafe = require('./dataElementSafe');
 var getNamespacedStorage = require('./getNamespacedStorage');
-var createDebugController = require("./createDebugController");
+
+var hydrateModuleProvider = require('./hydrateModuleProvider');
+var hydrateSatelliteObject = require('./hydrateSatelliteObject');
+
+var logger = require('./logger');
 
 var _satellite = window._satellite;
 
@@ -34,15 +62,17 @@ if (_satellite && !window.__satelliteLoaded) {
   // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
   delete _satellite.container;
 
-  var undefinedVarsReturnEmpty = container.property.settings.undefinedVarsReturnEmpty;
-  var ruleComponentSequencingEnabled = container.property.settings.ruleComponentSequencingEnabled;
+  var undefinedVarsReturnEmpty =
+    container.property.settings.undefinedVarsReturnEmpty;
+  var ruleComponentSequencingEnabled =
+    container.property.settings.ruleComponentSequencingEnabled;
 
   var dataElements = container.dataElements || {};
 
   // Remove when migration period has ended.
   dataElementSafe.migrateCookieData(dataElements);
 
-  var getDataElementDefinition = function(name) {
+  var getDataElementDefinition = function (name) {
     return dataElements[name];
   };
 
@@ -59,7 +89,7 @@ if (_satellite && !window.__satelliteLoaded) {
   // getDataElementValue that will stand in place of the real replaceTokens function until it
   // can be created. This also means that createDataElementValue should not call the proxy
   // replaceTokens function until after the real replaceTokens has been created.
-  var proxyReplaceTokens = function() {
+  var proxyReplaceTokens = function () {
     return replaceTokens.apply(null, arguments);
   };
 
@@ -71,14 +101,9 @@ if (_satellite && !window.__satelliteLoaded) {
   );
 
   var customVars = {};
-  var setCustomVar = createSetCustomVar(
-    customVars
-  );
+  var setCustomVar = createSetCustomVar(customVars);
 
-  var isVar = createIsVar(
-    customVars,
-    getDataElementDefinition
-  );
+  var isVar = createIsVar(customVars, getDataElementDefinition);
 
   var getVar = createGetVar(
     customVars,
@@ -86,11 +111,7 @@ if (_satellite && !window.__satelliteLoaded) {
     getDataElementValue
   );
 
-  replaceTokens = createReplaceTokens(
-    isVar,
-    getVar,
-    undefinedVarsReturnEmpty
-  );
+  replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
 
   var localStorage = getNamespacedStorage('localStorage');
   var debugController = createDebugController(localStorage, logger);
@@ -114,13 +135,84 @@ if (_satellite && !window.__satelliteLoaded) {
     getDataElementValue
   );
 
-  initRules(
-    _satellite,
-    container.rules || [],
+  var notifyMonitors = createNotifyMonitors(_satellite);
+  var executeDelegateModule = createExecuteDelegateModule(
     moduleProvider,
-    replaceTokens,
-    ruleComponentSequencingEnabled
+    replaceTokens
   );
+
+  var getModuleDisplayNameByRuleComponent = createGetModuleDisplayNameByRuleComponent(
+    moduleProvider
+  );
+  var logConditionNotMet = createLogConditionNotMet(
+    getModuleDisplayNameByRuleComponent,
+    logger,
+    notifyMonitors
+  );
+  var logConditionError = createLogConditionError(
+    getRuleComponentErrorMessage,
+    getModuleDisplayNameByRuleComponent,
+    logger,
+    notifyMonitors
+  );
+  var logActionError = createLogActionError(
+    getRuleComponentErrorMessage,
+    getModuleDisplayNameByRuleComponent,
+    logger,
+    notifyMonitors
+  );
+  var logRuleCompleted = createLogRuleCompleted(logger, notifyMonitors);
+
+  var conditionsAreChecked = createConditionsAreChecked(
+    executeDelegateModule,
+    isConditionMet,
+    logConditionNotMet,
+    logConditionError
+  );
+  var runActions = createRunActions(
+    executeDelegateModule,
+    logActionError,
+    logRuleCompleted
+  );
+  var executeRule = createExecuteRule(conditionsAreChecked, runActions);
+
+  var addConditionToQueue = createAddConditionToQueue(
+    executeDelegateModule,
+    normalizeRuleComponentError,
+    isConditionMet,
+    logConditionError,
+    logConditionNotMet
+  );
+  var addActionToQueue = createAddActionToQueue(
+    executeDelegateModule,
+    normalizeRuleComponentError,
+    logActionError
+  );
+  var addRuleToQueue = createAddRuleToQueue(
+    addConditionToQueue,
+    addActionToQueue,
+    logRuleCompleted
+  );
+
+  var triggerRule = createTriggerRule(
+    ruleComponentSequencingEnabled,
+    executeRule,
+    addRuleToQueue,
+    notifyMonitors
+  );
+
+  var getSyntheticEventMeta = createGetSyntheticEventMeta(moduleProvider);
+
+  var initEventModule = createInitEventModule(
+    triggerRule,
+    executeDelegateModule,
+    normalizeSyntheticEvent,
+    getRuleComponentErrorMessage,
+    getSyntheticEventMeta,
+    logger
+  );
+
+  initRules(buildRuleExecutionOrder, container.rules || [], initEventModule);
 }
 
 // Rollup's iife option always sets a global with whatever is exported, so we'll set the

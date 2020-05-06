@@ -25,13 +25,15 @@ describe('createAddActionToQueue returns a function that when called', function 
     var executeDelegateModuleSpy = jasmine
       .createSpy('executeDelegateModule')
       .and.returnValue(Promise.resolve());
+    var normalizeRuleComponentError = emptyFn;
+    var logActionError = emptyFn;
+    var lastPromiseInQueue = Promise.resolve();
 
-    return createAddActionToQueue(executeDelegateModuleSpy, emptyFn, emptyFn)(
-      action,
-      rule,
-      event,
-      Promise.resolve()
-    ).then(function () {
+    return createAddActionToQueue(
+      executeDelegateModuleSpy,
+      normalizeRuleComponentError,
+      logActionError
+    )(action, rule, event, lastPromiseInQueue).then(function () {
       expect(executeDelegateModuleSpy).toHaveBeenCalledWith(action, event, [
         event
       ]);
@@ -39,19 +41,21 @@ describe('createAddActionToQueue returns a function that when called', function 
   });
 
   it('returns a promise that is rejected when the action module throws an error', function () {
+    var e = new Error('some error');
+    var executeDelegateModule = function () {
+      throw e;
+    };
     var normalizeRuleComponentErrorSpy = jasmine
       .createSpy('normalizeRuleComponentError')
       .and.returnValue('normalized error');
-
-    var e = new Error('some error');
+    var logActionError = emptyFn;
+    var lastPromiseInQueue = Promise.resolve();
 
     return createAddActionToQueue(
-      function () {
-        throw e;
-      },
+      executeDelegateModule,
       normalizeRuleComponentErrorSpy,
-      emptyFn
-    )(action, rule, event, Promise.resolve()).then(
+      logActionError
+    )(action, rule, event, lastPromiseInQueue).then(
       fail.bind('You should never get in the resolved state for this test'),
       function (error) {
         expect(normalizeRuleComponentErrorSpy).toHaveBeenCalledWith(e);
@@ -65,17 +69,20 @@ describe('createAddActionToQueue returns a function that when called', function 
       'the action module throws an error',
     function () {
       var e = new Error('some error');
+      var executeDelegateModule = function () {
+        throw e;
+      };
+      var normalizeRuleComponentError = function (e) {
+        return e;
+      };
       var logActionErrorSpy = jasmine.createSpy('logActionError');
+      var lastPromiseInQueue = Promise.resolve();
 
       return createAddActionToQueue(
-        function () {
-          throw e;
-        },
-        function (e) {
-          return e;
-        },
+        executeDelegateModule,
+        normalizeRuleComponentError,
         logActionErrorSpy
-      )(action, rule, event, Promise.resolve()).then(
+      )(action, rule, event, lastPromiseInQueue).then(
         fail.bind('You should never get in the resolved state for this test'),
         function () {
           expect(logActionErrorSpy).toHaveBeenCalledWith(action, rule, e);
@@ -85,21 +92,26 @@ describe('createAddActionToQueue returns a function that when called', function 
   );
 
   it('returns a promise that is rejected if the action timeout is surpassed', function () {
+    var executeDelegateModule = function () {
+      return new Promise(function (resolve) {
+        setTimeout(resolve, 100);
+      });
+    };
+    var normalizeRuleComponentError = function (e) {
+      return e;
+    };
+    var logActionError = emptyFn;
+    var lastPromiseInQueue = Promise.resolve();
+
     return createAddActionToQueue(
-      function () {
-        return new Promise(function (resolve) {
-          setTimeout(resolve, 100);
-        });
-      },
-      function (e) {
-        return e;
-      },
-      emptyFn
+      executeDelegateModule,
+      normalizeRuleComponentError,
+      logActionError
     )(
       { modulePath: 'action1', settings: { timeout: 10 } },
       rule,
       event,
-      Promise.resolve()
+      lastPromiseInQueue
     ).then(
       fail.bind('You should never get in the resolved state for this test'),
       function (e) {
@@ -116,21 +128,26 @@ describe('createAddActionToQueue returns a function that when called', function 
     'returns a promise that is resolved immediately if the action timeout is ' +
       'not defined',
     function () {
+      var executeDelegateModule = function () {
+        return new Promise(function (resolve) {
+          setTimeout(resolve, 100);
+        });
+      };
+      var normalizeRuleComponentError = function (e) {
+        return e;
+      };
+      var logActionError = emptyFn;
+      var lastPromiseInQueue = Promise.resolve();
+
       return createAddActionToQueue(
-        function () {
-          return new Promise(function (resolve) {
-            setTimeout(resolve, 100);
-          });
-        },
-        function (e) {
-          return e;
-        },
-        emptyFn
+        executeDelegateModule,
+        normalizeRuleComponentError,
+        logActionError
       )(
         { modulePath: 'action1', settings: {} },
         rule,
         event,
-        Promise.resolve()
+        lastPromiseInQueue
       ).then(function (result) {
         expect(result).toBeUndefined();
       });

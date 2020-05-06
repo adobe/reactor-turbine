@@ -24,11 +24,16 @@ describe('createRunActions returns a function that when called', function () {
       { modulePath: 'path2', settings: {} }
     ];
 
+    var rule = { actions: actions };
+
+    var logActionError = emptyFn;
+    var logRuleCompleted = emptyFn;
+
     createRunActions(
       executeDelegateModuleSpy,
-      emptyFn,
-      emptyFn
-    )({ actions: actions }, syntheticEvent);
+      logActionError,
+      logRuleCompleted
+    )(rule, syntheticEvent);
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       actions[0],
@@ -46,11 +51,17 @@ describe('createRunActions returns a function that when called', function () {
   it('logs message when rule is completed', function () {
     var logRuleCompletedSpy = jasmine.createSpy('logRuleCompleted');
 
+    var executeDelegateModule = emptyFn;
+    var logActionError = emptyFn;
+
+    var rule = { actions: [] };
+    var syntheticEvent = {};
+
     createRunActions(
-      emptyFn,
-      emptyFn,
+      executeDelegateModule,
+      logActionError,
       logRuleCompletedSpy
-    )({ actions: [] }, {});
+    )(rule, syntheticEvent);
 
     expect(logRuleCompletedSpy).toHaveBeenCalledWith({ actions: [] });
   });
@@ -60,19 +71,34 @@ describe('createRunActions returns a function that when called', function () {
     var e = new Error('some error');
     var actions = [{ modulePath: 'path1', settings: {} }];
     var rule = { actions: actions };
+    var syntheticEvent = {};
+
+    var executeDelegateModule = function () {
+      throw e;
+    };
+    var logRuleCompleted = emptyFn;
 
     createRunActions(
-      function () {
-        throw e;
-      },
+      executeDelegateModule,
       logActionErrorSpy,
-      emptyFn
-    )(rule, {});
+      logRuleCompleted
+    )(rule, syntheticEvent);
 
     expect(logActionErrorSpy).toHaveBeenCalledWith(actions[0], rule, e);
   });
 
   it('does not throw an error when no actions exist', function () {
-    createRunActions(emptyFn, emptyFn, emptyFn)({}, {});
+    var executeDelegateModule = emptyFn;
+    var logActionError = emptyFn;
+    var logRuleCompleted = emptyFn;
+
+    var rule = {};
+    var syntheticEvent = {};
+
+    createRunActions(
+      executeDelegateModule,
+      logActionError,
+      logRuleCompleted
+    )(rule, syntheticEvent);
   });
 });

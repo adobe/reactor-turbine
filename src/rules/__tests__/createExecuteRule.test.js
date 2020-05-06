@@ -13,6 +13,8 @@ governing permissions and limitations under the License.
 'use strict';
 
 var createExecuteRule = require('../createExecuteRule');
+var rule = { id: 'rule id' };
+var normalizedSyntheticEvent = { $type: 'some type' };
 
 describe('createExecuteRule returns a function that when called', function () {
   it('executes runActions if conditions are returning true', function () {
@@ -22,8 +24,8 @@ describe('createExecuteRule returns a function that when called', function () {
     var runActionsSpy = jasmine.createSpy('runActions');
 
     createExecuteRule(evaluateConditionsSpy, runActionsSpy)(
-      { id: 'rule id' },
-      { $type: 'some type' }
+      rule,
+      normalizedSyntheticEvent
     );
 
     expect(evaluateConditionsSpy).toHaveBeenCalledWith(
@@ -44,8 +46,8 @@ describe('createExecuteRule returns a function that when called', function () {
     var runActionsSpy = jasmine.createSpy('runActions');
 
     createExecuteRule(evaluateConditions, runActionsSpy)(
-      { id: 'rule id' },
-      { $type: 'some type' }
+      rule,
+      normalizedSyntheticEvent
     );
 
     expect(runActionsSpy).not.toHaveBeenCalled();

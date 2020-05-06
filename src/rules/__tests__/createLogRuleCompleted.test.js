@@ -14,24 +14,22 @@ governing permissions and limitations under the License.
 
 var createLogRuleCompleted = require('../createLogRuleCompleted');
 var emptyFn = function () {};
+var rule = { name: 'rule1' };
 
 describe('createLogRuleCompleted returns a function that when called', function () {
   it('logs a complete message using the logger', function () {
     var loggerSpy = jasmine.createSpyObj('logger', ['log']);
+    var notifyMonitors = emptyFn;
 
-    createLogRuleCompleted(loggerSpy, emptyFn)({ name: 'rule1' });
-
+    createLogRuleCompleted(loggerSpy, notifyMonitors)(rule);
     expect(loggerSpy.log).toHaveBeenCalledWith('Rule "rule1" fired.');
   });
 
   it('notifies monitors about the rule being completed', function () {
     var notifyMonitorsSpy = jasmine.createSpy('notifyMonitors');
+    var logger = { log: emptyFn };
 
-    createLogRuleCompleted(
-      { log: emptyFn },
-      notifyMonitorsSpy
-    )({ name: 'rule1' });
-
+    createLogRuleCompleted(logger, notifyMonitorsSpy)(rule);
     expect(notifyMonitorsSpy).toHaveBeenCalledWith('ruleCompleted', {
       rule: {
         name: 'rule1'

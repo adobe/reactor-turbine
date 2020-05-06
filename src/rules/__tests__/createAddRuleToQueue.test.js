@@ -35,10 +35,13 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       .createSpy('addConditionToQueueSpy')
       .and.returnValue(Promise.resolve());
 
+    var addActionToQueue = emptyFn;
+    var logRuleCompleted = emptyFn;
+
     return createAddRuleToQueue(
       addConditionToQueueSpy,
-      emptyFn,
-      emptyFn
+      addActionToQueue,
+      logRuleCompleted
     )(rule, event).then(function () {
       expect(addConditionToQueueSpy).toHaveBeenCalledWith(
         rule.conditions[0],
@@ -60,14 +63,16 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       actions: [{ modulePath: 'action1' }, { modulePath: 'action2' }]
     };
     var event = { $type: 'type' };
+    var addConditionToQueue = emptyFn;
     var addActionToQueueSpy = jasmine
       .createSpy('addActionToQueue')
       .and.returnValue(Promise.resolve());
+    var logRuleCompleted = emptyFn;
 
     return createAddRuleToQueue(
-      emptyFn,
+      addConditionToQueue,
       addActionToQueueSpy,
-      emptyFn
+      logRuleCompleted
     )(rule, event).then(function () {
       expect(addActionToQueueSpy).toHaveBeenCalledWith(
         rule.actions[0],
@@ -94,11 +99,13 @@ describe('createAddRuleToQueue returns a function that when called', function ()
   it('calls logRuleCompleted once the rule is completed', function () {
     var rule = { name: 'rule1' };
     var event = { $type: 'type' };
+    var addConditionToQueue = emptyFn;
+    var addActionToQueue = emptyFn;
     var logRuleCompletedSpy = jasmine.createSpy('logRuleCompleted');
 
     return createAddRuleToQueue(
-      emptyFn,
-      emptyFn,
+      addConditionToQueue,
+      addActionToQueue,
       logRuleCompletedSpy
     )(rule, event).then(function () {
       expect(logRuleCompletedSpy).toHaveBeenCalledWith(rule);
@@ -109,14 +116,18 @@ describe('createAddRuleToQueue returns a function that when called', function ()
     var rule = { name: 'rule1', actions: [{ modulePath: 'path1' }] };
     var event = { $type: 'type' };
 
+    var addConditionToQueue = emptyFn;
+    var addActionToQueue = function () {
+      return new Promise(function (_, reject) {
+        reject(new Error('some error'));
+      });
+    };
+    var logRuleCompleted = emptyFn;
+
     return createAddRuleToQueue(
-      emptyFn,
-      function () {
-        return new Promise(function (_, reject) {
-          reject(new Error('some error'));
-        });
-      },
-      emptyFn
+      addConditionToQueue,
+      addActionToQueue,
+      logRuleCompleted
     )(rule, event);
   });
 });

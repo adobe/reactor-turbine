@@ -20,7 +20,17 @@ describe('createTriggerRule returns a function that when called', function () {
     var notifyMonitorsSpy = jasmine.createSpy('notifyMonitors');
     var rule = { ruleId: '123' };
 
-    createTriggerRule(true, emptyFn, emptyFn, notifyMonitorsSpy)({}, rule);
+    var ruleComponentSequencingEnabled = true;
+    var executeRule = emptyFn;
+    var addRuleToQueue = emptyFn;
+    var normalizedSyntheticEvent = {};
+
+    createTriggerRule(
+      ruleComponentSequencingEnabled,
+      executeRule,
+      addRuleToQueue,
+      notifyMonitorsSpy
+    )(normalizedSyntheticEvent, rule);
     expect(notifyMonitorsSpy).toHaveBeenCalledWith('ruleTriggered', {
       rule: rule
     });
@@ -31,11 +41,15 @@ describe('createTriggerRule returns a function that when called', function () {
     var rule = { ruleId: '123' };
     var normalizedSyntheticEvent = { a: 'a' };
 
+    var ruleComponentSequencingEnabled = true;
+    var executeRule = emptyFn;
+    var notifyMonitors = emptyFn;
+
     createTriggerRule(
-      true,
-      emptyFn,
+      ruleComponentSequencingEnabled,
+      executeRule,
       addRuleToQueueSpy,
-      emptyFn
+      notifyMonitors
     )(normalizedSyntheticEvent, rule);
 
     expect(addRuleToQueueSpy).toHaveBeenCalledWith(
@@ -49,11 +63,15 @@ describe('createTriggerRule returns a function that when called', function () {
     var rule = { ruleId: '123' };
     var normalizedSyntheticEvent = { a: 'a' };
 
+    var ruleComponentSequencingEnabled = false;
+    var addRuleToQueue = emptyFn;
+    var notifyMonitors = emptyFn;
+
     createTriggerRule(
-      false,
+      ruleComponentSequencingEnabled,
       executeRuleSpy,
-      emptyFn,
-      emptyFn
+      addRuleToQueue,
+      notifyMonitors
     )(normalizedSyntheticEvent, rule);
 
     expect(executeRuleSpy).toHaveBeenCalledWith(rule, normalizedSyntheticEvent);

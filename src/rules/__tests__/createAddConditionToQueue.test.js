@@ -26,15 +26,21 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       .createSpy('executeDelegateModule')
       .and.returnValue(Promise.resolve());
 
+    var normalizeRuleComponentError = emptyFn;
+    var isConditionMet = function () {
+      return true;
+    };
+    var logConditionError = emptyFn;
+    var logConditionNotMet = emptyFn;
+    var lastPromiseInQueue = Promise.resolve();
+
     return createAddConditionToQueue(
       executeDelegateModuleSpy,
-      emptyFn,
-      function () {
-        return true;
-      },
-      emptyFn,
-      emptyFn
-    )(condition, rule, event, Promise.resolve()).then(function () {
+      normalizeRuleComponentError,
+      isConditionMet,
+      logConditionError,
+      logConditionNotMet
+    )(condition, rule, event, lastPromiseInQueue).then(function () {
       expect(executeDelegateModuleSpy).toHaveBeenCalledWith(condition, event, [
         event
       ]);
@@ -42,19 +48,26 @@ describe('createAddRuleToQueue returns a function that when called', function ()
   });
 
   it('returns a promise that is rejected when the condition module is not met', function () {
+    var executeDelegateModule = function () {
+      return false;
+    };
+
+    var normalizeRuleComponentError = emptyFn;
     var isConditionMetSpy = jasmine
       .createSpy('isConditionMet')
       .and.returnValue(false);
 
+    var logConditionError = emptyFn;
+    var logConditionNotMet = emptyFn;
+    var lastPromiseInQueue = Promise.resolve();
+
     return createAddConditionToQueue(
-      function () {
-        return false;
-      },
-      emptyFn,
+      executeDelegateModule,
+      normalizeRuleComponentError,
       isConditionMetSpy,
-      emptyFn,
-      emptyFn
-    )(condition, rule, event, Promise.resolve()).then(
+      logConditionError,
+      logConditionNotMet
+    )(condition, rule, event, lastPromiseInQueue).then(
       fail.bind('You should never get in the resolved state for this test'),
       function () {
         expect(isConditionMetSpy).toHaveBeenCalledWith(condition, false);
@@ -63,17 +76,22 @@ describe('createAddRuleToQueue returns a function that when called', function ()
   });
 
   it('returns a promise that calls logConditionNotMet when the condition is not met', function () {
+    var executeDelegateModule = emptyFn;
+    var normalizeRuleComponentError = emptyFn;
+    var isConditionMet = function () {
+      return false;
+    };
+    var logConditionError = emptyFn;
     var logConditionNotMetSpy = jasmine.createSpy('logConditionNotMet');
+    var lastPromiseInQueue = Promise.resolve();
 
     return createAddConditionToQueue(
-      emptyFn,
-      emptyFn,
-      function () {
-        return false;
-      },
-      emptyFn,
+      executeDelegateModule,
+      normalizeRuleComponentError,
+      isConditionMet,
+      logConditionError,
       logConditionNotMetSpy
-    )(condition, rule, event, Promise.resolve()).then(
+    )(condition, rule, event, lastPromiseInQueue).then(
       fail.bind('You should never get in the resolved state for this test'),
       function () {
         expect(logConditionNotMetSpy).toHaveBeenCalledWith(condition, rule);
@@ -82,21 +100,26 @@ describe('createAddRuleToQueue returns a function that when called', function ()
   });
 
   it('returns a promise that is rejected when the condition module throws an error', function () {
+    var e = new Error('some error');
+    var executeDelegateModule = function () {
+      throw e;
+    };
     var normalizeRuleComponentErrorSpy = jasmine
       .createSpy('normalizeRuleComponentError')
       .and.returnValue('normalized error');
 
-    var e = new Error('some error');
+    var isConditionMet = emptyFn;
+    var logConditionError = emptyFn;
+    var logConditionNotMet = emptyFn;
+    var lastPromiseInQueue = Promise.resolve();
 
     return createAddConditionToQueue(
-      function () {
-        throw e;
-      },
+      executeDelegateModule,
       normalizeRuleComponentErrorSpy,
-      emptyFn,
-      emptyFn,
-      emptyFn
-    )(condition, rule, event, Promise.resolve()).then(
+      isConditionMet,
+      logConditionError,
+      logConditionNotMet
+    )(condition, rule, event, lastPromiseInQueue).then(
       fail.bind('You should never get in the resolved state for this test'),
       function (error) {
         expect(normalizeRuleComponentErrorSpy).toHaveBeenCalledWith(e);
@@ -110,19 +133,24 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       'the condition module throws an error',
     function () {
       var e = new Error('some error');
+      var executeDelegateModule = function () {
+        throw e;
+      };
+      var normalizeRuleComponentError = function (e) {
+        return e;
+      };
+      var isConditionMet = emptyFn;
       var logConditionErrorSpy = jasmine.createSpy('logConditionError');
+      var logConditionNotMet = emptyFn;
+      var lastPromiseInQueue = Promise.resolve();
 
       return createAddConditionToQueue(
-        function () {
-          throw e;
-        },
-        function (e) {
-          return e;
-        },
-        emptyFn,
+        executeDelegateModule,
+        normalizeRuleComponentError,
+        isConditionMet,
         logConditionErrorSpy,
-        emptyFn
-      )(condition, rule, event, Promise.resolve()).then(
+        logConditionNotMet
+      )(condition, rule, event, lastPromiseInQueue).then(
         fail.bind('You should never get in the resolved state for this test'),
         function () {
           expect(logConditionErrorSpy).toHaveBeenCalledWith(condition, rule, e);
@@ -132,24 +160,27 @@ describe('createAddRuleToQueue returns a function that when called', function ()
   );
 
   it('returns a promise that is rejected if the condition timeout is surpassed', function () {
+    var executeDelegateModule = function () {
+      return new Promise(function (resolve) {
+        setTimeout(resolve, 100);
+      });
+    };
+    var normalizeRuleComponentError = function (e) {
+      return e;
+    };
+    var isConditionMet = emptyFn;
+    var logConditionError = emptyFn;
+    var logConditionNotMet = emptyFn;
+    var lastPromiseInQueue = Promise.resolve();
+    var condition = { modulePath: 'condition1', settings: { timeout: 10 } };
+
     return createAddConditionToQueue(
-      function () {
-        return new Promise(function (resolve) {
-          setTimeout(resolve, 100);
-        });
-      },
-      function (e) {
-        return e;
-      },
-      emptyFn,
-      emptyFn,
-      emptyFn
-    )(
-      { modulePath: 'condition1', settings: { timeout: 10 } },
-      rule,
-      event,
-      Promise.resolve()
-    ).then(
+      executeDelegateModule,
+      normalizeRuleComponentError,
+      isConditionMet,
+      logConditionError,
+      logConditionNotMet
+    )(condition, rule, event, lastPromiseInQueue).then(
       fail.bind('You should never get in the resolved state for this test'),
       function (e) {
         expect(e).toEqual(
@@ -165,24 +196,27 @@ describe('createAddRuleToQueue returns a function that when called', function ()
     'returns a promise that is rejected if the condition timeout is ' +
       'not defined and also surpassed',
     function () {
+      var executeDelegateModule = function () {
+        return new Promise(function (resolve) {
+          setTimeout(resolve, 100);
+        });
+      };
+      var normalizeRuleComponentError = function (e) {
+        return e;
+      };
+      var isConditionMet = emptyFn;
+      var logConditionError = emptyFn;
+      var logConditionNotMet = emptyFn;
+      var lastPromiseInQueue = Promise.resolve();
+      var condition = { modulePath: 'condition1', settings: {} };
+
       return createAddConditionToQueue(
-        function () {
-          return new Promise(function (resolve) {
-            setTimeout(resolve, 100);
-          });
-        },
-        function (e) {
-          return e;
-        },
-        emptyFn,
-        emptyFn,
-        emptyFn
-      )(
-        { modulePath: 'condition1', settings: {} },
-        rule,
-        event,
-        Promise.resolve()
-      ).then(
+        executeDelegateModule,
+        normalizeRuleComponentError,
+        isConditionMet,
+        logConditionError,
+        logConditionNotMet
+      )(condition, rule, event, lastPromiseInQueue).then(
         fail.bind('You should never get in the resolved state for this test'),
         function (e) {
           expect(e).toEqual(

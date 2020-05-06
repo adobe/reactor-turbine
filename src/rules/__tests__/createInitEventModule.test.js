@@ -17,18 +17,26 @@ var emptyFn = function () {};
 
 describe('createInitEventModule returns a function that when called', function () {
   it('executes the module of the provided event', function () {
+    var triggerRule = emptyFn;
     var executeDelegateModuleSpy = jasmine.createSpy('executeDelegateModule');
-    createInitEventModule(
-      emptyFn,
-      executeDelegateModuleSpy,
-      emptyFn,
-      emptyFn,
-      emptyFn,
-      {}
-    )(emptyFn, {
+    var normalizeSyntheticEvent = emptyFn;
+    var getErrorMessage = emptyFn;
+    var getSyntheticEventMeta = emptyFn;
+    var logger = {};
+    var guardUntilAllInitialized = emptyFn;
+    var ruleEventPair = {
       rule: { modulePath: 'rule1 path' },
       event: { modulePath: 'event1 path', settings: { key: 'value' } }
-    });
+    };
+
+    createInitEventModule(
+      triggerRule,
+      executeDelegateModuleSpy,
+      normalizeSyntheticEvent,
+      getErrorMessage,
+      getSyntheticEventMeta,
+      logger
+    )(guardUntilAllInitialized, ruleEventPair);
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       { modulePath: 'event1 path', settings: { key: 'value' } },
@@ -38,18 +46,26 @@ describe('createInitEventModule returns a function that when called', function (
   });
 
   it('executes the module of the provided event using default settings', function () {
+    var triggerRule = emptyFn;
     var executeDelegateModuleSpy = jasmine.createSpy('executeDelegateModule');
-    createInitEventModule(
-      emptyFn,
-      executeDelegateModuleSpy,
-      emptyFn,
-      emptyFn,
-      emptyFn,
-      {}
-    )(emptyFn, {
+    var normalizeSyntheticEvent = emptyFn;
+    var getErrorMessage = emptyFn;
+    var getSyntheticEventMeta = emptyFn;
+    var logger = {};
+    var guardUntilAllInitialized = emptyFn;
+    var ruleEventPair = {
       rule: { modulePath: 'rule1 path' },
       event: { modulePath: 'event1 path' }
-    });
+    };
+
+    createInitEventModule(
+      triggerRule,
+      executeDelegateModuleSpy,
+      normalizeSyntheticEvent,
+      getErrorMessage,
+      getSyntheticEventMeta,
+      logger
+    )(guardUntilAllInitialized, ruleEventPair);
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       { modulePath: 'event1 path', settings: {} },
@@ -59,26 +75,31 @@ describe('createInitEventModule returns a function that when called', function (
   });
 
   it('logs an error when the event module throws an error', function () {
+    var triggerRule = emptyFn;
     var e = new Error('some error');
-    var executeDelegateModuleSpy = function () {
+    var executeDelegateModule = function () {
       throw e;
     };
-    var loggerSpy = jasmine.createSpyObj('logger', ['error']);
+    var normalizeSyntheticEvent = emptyFn;
     var getErrorMessageSpy = jasmine
       .createSpy('getErrorMessage')
       .and.returnValue('error message');
-
-    createInitEventModule(
-      emptyFn,
-      executeDelegateModuleSpy,
-      emptyFn,
-      getErrorMessageSpy,
-      emptyFn,
-      loggerSpy
-    )(emptyFn, {
+    var getSyntheticEventMeta = emptyFn;
+    var loggerSpy = jasmine.createSpyObj('logger', ['error']);
+    var guardUntilAllInitialized = emptyFn;
+    var ruleEventPair = {
       rule: { modulePath: 'rule1 path' },
       event: { modulePath: 'event1 path' }
-    });
+    };
+
+    createInitEventModule(
+      triggerRule,
+      executeDelegateModule,
+      normalizeSyntheticEvent,
+      getErrorMessageSpy,
+      getSyntheticEventMeta,
+      loggerSpy
+    )(guardUntilAllInitialized, ruleEventPair);
 
     expect(getErrorMessageSpy).toHaveBeenCalledWith(
       { modulePath: 'event1 path', settings: {} },
@@ -93,13 +114,24 @@ describe('createInitEventModule returns a function that when called', function (
       'executeDelegateModule that once called',
     function () {
       it('sends the real trigger function to guardUntilAllInitialized', function () {
+        var customTrigger;
+
         var triggerRuleSpy = jasmine.createSpy('triggerRule');
+        var executeDelegateModule = function (e, _, args) {
+          customTrigger = args[0];
+        };
         var normalizeSyntheticEventSpy = jasmine
           .createSpy('normalizeSyntheticEvent')
           .and.returnValue({ $type: 'some type' });
+        var getErrorMessage = emptyFn;
         var getSyntheticEventMetaSpy = jasmine
           .createSpy('getSyntheticEventMeta')
           .and.returnValue({ $type: 'some type' });
+        var logger = {};
+        var guardUntilAllInitialized = function (cbk) {
+          cbk();
+        };
+
         var ruleEventPair = {
           rule: { modulePath: 'rule1 path' },
           event: { modulePath: 'event1 path', settings: { key: 1 } }
@@ -107,20 +139,15 @@ describe('createInitEventModule returns a function that when called', function (
         var syntheticEvent = {
           target: 'some target'
         };
-        var customTrigger;
 
         createInitEventModule(
           triggerRuleSpy,
-          function (e, _, args) {
-            customTrigger = args[0];
-          },
+          executeDelegateModule,
           normalizeSyntheticEventSpy,
-          emptyFn,
+          getErrorMessage,
           getSyntheticEventMetaSpy,
-          {}
-        )(function (cbk) {
-          cbk();
-        }, ruleEventPair);
+          logger
+        )(guardUntilAllInitialized, ruleEventPair);
 
         customTrigger(syntheticEvent);
 

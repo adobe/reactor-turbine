@@ -27,11 +27,15 @@ describe('createExecuteDelegateModule returns a function that when called', func
       .createSpy('getModuleExports')
       .and.returnValue(moduleExportsSpy);
 
+    var moduleProvider = { getModuleExports: getModuleExportsSpy };
+    var replaceTokens = emptyFn;
+
     expect(
-      createExecuteDelegateModule(
-        { getModuleExports: getModuleExportsSpy },
-        emptyFn
-      )(moduleDescriptor, event, moduleCallParameters)
+      createExecuteDelegateModule(moduleProvider, replaceTokens)(
+        moduleDescriptor,
+        event,
+        moduleCallParameters
+      )
     ).toBe('module result');
     expect(getModuleExportsSpy).toHaveBeenCalledWith('path');
     expect(moduleExportsSpy).toHaveBeenCalledWith(undefined, 'a', 'b');
@@ -43,29 +47,36 @@ describe('createExecuteDelegateModule returns a function that when called', func
     function () {
       var moduleExportsSpy = jasmine.createSpy('moduleExports');
 
-      createExecuteDelegateModule(
-        {
-          getModuleExports: function () {
-            return moduleExportsSpy;
-          }
-        },
-        emptyFn
-      )(moduleDescriptor, event);
+      var moduleProvider = {
+        getModuleExports: function () {
+          return moduleExportsSpy;
+        }
+      };
+      var replaceTokens = emptyFn;
+
+      createExecuteDelegateModule(moduleProvider, replaceTokens)(
+        moduleDescriptor,
+        event
+      );
 
       expect(moduleExportsSpy).toHaveBeenCalledWith(undefined);
     }
   );
 
   it('throws an error if the module export is not a function', function () {
+    var moduleProvider = {
+      getModuleExports: function () {
+        return 5;
+      }
+    };
+    var replaceTokens = emptyFn;
+
     expect(function () {
-      createExecuteDelegateModule(
-        {
-          getModuleExports: function () {
-            return 5;
-          }
-        },
-        emptyFn
-      )(moduleDescriptor, event, moduleCallParameters);
+      createExecuteDelegateModule(moduleProvider, replaceTokens)(
+        moduleDescriptor,
+        event,
+        moduleCallParameters
+      );
     }).toThrow(new Error('Module did not export a function.'));
   });
 
@@ -77,16 +88,20 @@ describe('createExecuteDelegateModule returns a function that when called', func
         settings = s;
       });
 
-    createExecuteDelegateModule(
-      {
-        getModuleExports: function () {
-          return moduleExportsSpy;
-        }
-      },
-      function () {
-        return { key: 'replaced tokens value' };
+    var moduleProvider = {
+      getModuleExports: function () {
+        return moduleExportsSpy;
       }
-    )(moduleDescriptor, event, moduleCallParameters);
+    };
+    var replaceTokens = function () {
+      return { key: 'replaced tokens value' };
+    };
+
+    createExecuteDelegateModule(moduleProvider, replaceTokens)(
+      moduleDescriptor,
+      event,
+      moduleCallParameters
+    );
 
     expect(settings).toEqual({
       key: 'replaced tokens value'
@@ -98,15 +113,18 @@ describe('createExecuteDelegateModule returns a function that when called', func
       ' present on the moduleDescriptor',
     function () {
       var replaceTokensSpy = jasmine.createSpy('replaceTokens');
+      var moduleDescriptor = { modulePath: 'path' };
+      var moduleProvider = {
+        getModuleExports: function () {
+          return emptyFn;
+        }
+      };
 
-      createExecuteDelegateModule(
-        {
-          getModuleExports: function () {
-            return emptyFn;
-          }
-        },
-        replaceTokensSpy
-      )({ modulePath: 'path' }, event, moduleCallParameters);
+      createExecuteDelegateModule(moduleProvider, replaceTokensSpy)(
+        moduleDescriptor,
+        event,
+        moduleCallParameters
+      );
 
       expect(replaceTokensSpy).toHaveBeenCalledWith({}, event);
     }

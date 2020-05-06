@@ -26,12 +26,13 @@ describe(
       var moduleProvider = {
         getModuleDefinition: getModuleDefinitionSpy
       };
+      var ruleComponent = {
+        modulePath: 'event module path'
+      };
 
       var displayName = createGetModuleDisplayNameByRuleComponent(
         moduleProvider
-      )({
-        modulePath: 'event module path'
-      });
+      )(ruleComponent);
 
       expect(getModuleDefinitionSpy).toHaveBeenCalledWith('event module path');
       expect(displayName).toBe('display name');
@@ -41,12 +42,13 @@ describe(
       var moduleProvider = {
         getModuleDefinition: jasmine.createSpy('getModuleDefinition')
       };
+      var ruleComponent = {
+        modulePath: 'event module path'
+      };
 
       var displayName = createGetModuleDisplayNameByRuleComponent(
         moduleProvider
-      )({
-        modulePath: 'event module path'
-      });
+      )(ruleComponent);
 
       expect(displayName).toBe('event module path');
     });

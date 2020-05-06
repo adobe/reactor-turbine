@@ -16,18 +16,26 @@ var isConditionMet = require('../isConditionMet');
 
 describe('isConditionMet', function () {
   it('returns true when result is truthy and condition negate is false', function () {
-    expect(isConditionMet({ negate: false }, true)).toBeTrue();
+    var condition = { negate: false };
+    var result = true;
+    expect(isConditionMet(condition, result)).toBeTrue();
   });
 
   it('returns false when result is not truthy and condition negate is false', function () {
-    expect(isConditionMet({ negate: false }, false)).toBeFalse();
+    var condition = { negate: false };
+    var result = false;
+    expect(isConditionMet(condition, result)).toBeFalse();
   });
 
   it('returns true when result is not truthy and condition negate is true', function () {
-    expect(isConditionMet({ negate: true }, false)).toBeTrue();
+    var condition = { negate: true };
+    var result = false;
+    expect(isConditionMet(condition, result)).toBeTrue();
   });
 
   it('returns false when result is truthy and condition negate is true', function () {
-    expect(isConditionMet({ negate: true }, true)).toBeFalse();
+    var condition = { negate: true };
+    var result = true;
+    expect(isConditionMet(condition, result)).toBeFalse();
   });
 });

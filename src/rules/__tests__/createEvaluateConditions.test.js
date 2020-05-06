@@ -14,54 +14,72 @@ governing permissions and limitations under the License.
 
 var createEvaluateConditions = require('../createEvaluateConditions');
 var emptyFn = function () {};
+var rule = {
+  conditions: [
+    {
+      modulePath: 'condition1'
+    }
+  ]
+};
 
 describe('createEvaluateConditions returns a function that when called', function () {
   it('returns true when rule does not have conditons', function () {
-    expect(createEvaluateConditions()({ id: 'rule id' })).toBeTrue();
+    var rule = { id: 'rule id' };
+    expect(createEvaluateConditions()(rule)).toBeTrue();
   });
 
   it('returns true when conditions are met', function () {
+    var executeDelegateModule = function (condition) {
+      return condition.modulePath === 'condition1';
+    };
+
+    var isConditionMet = function (_, result) {
+      return result;
+    };
+
+    var logConditionNotMet = emptyFn;
+    var logConditionError = emptyFn;
+
     expect(
       createEvaluateConditions(
-        function (condition) {
-          return condition.modulePath === 'condition1';
-        },
-        function (_, result) {
-          return result;
-        },
-        emptyFn
-      )({
-        conditions: [
-          {
-            modulePath: 'condition1'
-          }
-        ]
-      })
+        executeDelegateModule,
+        isConditionMet,
+        logConditionNotMet,
+        logConditionError
+      )(rule)
     ).toBeTrue();
   });
 
   it('returns false when conditions are not met', function () {
+    var executeDelegateModule = function (condition) {
+      return condition.modulePath === 'condition1';
+    };
+    var isConditionMet = function () {
+      return false;
+    };
+
+    var logConditionNotMet = emptyFn;
+    var logConditionError = emptyFn;
+
     expect(
       createEvaluateConditions(
-        function (condition) {
-          return condition.modulePath === 'condition1';
-        },
-        function () {
-          return false;
-        },
-        emptyFn
-      )({
-        conditions: [
-          {
-            modulePath: 'condition1'
-          }
-        ]
-      })
+        executeDelegateModule,
+        isConditionMet,
+        logConditionNotMet,
+        logConditionError
+      )(rule)
     ).toBeFalse();
   });
 
   it('calls logConditionNotMet when conditions are not met', function () {
+    var executeDelegateModule = function (condition) {
+      return condition.modulePath === 'condition1';
+    };
+    var isConditionMet = function () {
+      return false;
+    };
     var logConditionNotMetSpy = jasmine.createSpy('logConditionNotMet');
+    var logConditionError = emptyFn;
     var condition = {
       modulePath: 'condition1'
     };
@@ -70,27 +88,29 @@ describe('createEvaluateConditions returns a function that when called', functio
     };
 
     createEvaluateConditions(
-      function (condition) {
-        return condition.modulePath === 'condition1';
-      },
-      function () {
-        return false;
-      },
-      logConditionNotMetSpy
+      executeDelegateModule,
+      isConditionMet,
+      logConditionNotMetSpy,
+      logConditionError
     )(rule);
 
     expect(logConditionNotMetSpy).toHaveBeenCalledWith(condition, rule);
   });
 
   it('returns false when a condition throws an error', function () {
+    var executeDelegateModule = function () {
+      throw new Error('some error');
+    };
+    var isConditionMet = emptyFn;
+    var logConditionNotMet = emptyFn;
+    var logConditionError = emptyFn;
+
     expect(
       createEvaluateConditions(
-        function () {
-          throw new Error('some error');
-        },
-        emptyFn,
-        emptyFn,
-        emptyFn
+        executeDelegateModule,
+        isConditionMet,
+        logConditionNotMet,
+        logConditionError
       )({
         conditions: [
           {
@@ -102,6 +122,11 @@ describe('createEvaluateConditions returns a function that when called', functio
   });
 
   it('calls logConditionError when a condition throws an error', function () {
+    var executeDelegateModule = function () {
+      throw e;
+    };
+    var isConditionMet = emptyFn;
+    var logConditionNotMet = emptyFn;
     var logConditionErrorSpy = jasmine.createSpy('logConditionError');
     var e = new Error('some error');
 
@@ -113,11 +138,9 @@ describe('createEvaluateConditions returns a function that when called', functio
     };
 
     createEvaluateConditions(
-      function () {
-        throw e;
-      },
-      emptyFn,
-      emptyFn,
+      executeDelegateModule,
+      isConditionMet,
+      logConditionNotMet,
       logConditionErrorSpy
     )(rule);
 
@@ -126,7 +149,12 @@ describe('createEvaluateConditions returns a function that when called', functio
 
   it('calls executeDelegateModule for each condition', function () {
     var executeDelegateModuleSpy = jasmine.createSpy('executeDelegateModule');
-    var event = { $type: 'some type' };
+    var isConditionMet = function () {
+      return true;
+    };
+    var logConditionNotMet = emptyFn;
+    var logConditionError = emptyFn;
+
     var conditions = [
       {
         modulePath: 'condition1'
@@ -135,19 +163,17 @@ describe('createEvaluateConditions returns a function that when called', functio
         modulePath: 'condition2'
       }
     ];
+    var rule = {
+      conditions: conditions
+    };
+    var event = { $type: 'some type' };
 
     createEvaluateConditions(
       executeDelegateModuleSpy,
-      function () {
-        return true;
-      },
-      emptyFn
-    )(
-      {
-        conditions: conditions
-      },
-      event
-    );
+      isConditionMet,
+      logConditionNotMet,
+      logConditionError
+    )(rule, event);
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       conditions[0],
@@ -164,6 +190,11 @@ describe('createEvaluateConditions returns a function that when called', functio
 
   it('does not evaluate other conditions once a condition fails', function () {
     var executeDelegateModuleSpy = jasmine.createSpy('executeDelegateModule');
+    var isConditionMet = function () {
+      return false;
+    };
+    var logConditionNotMet = emptyFn;
+    var logConditionError = emptyFn;
     var event = { $type: 'some type' };
     var conditions = [
       {
@@ -173,19 +204,16 @@ describe('createEvaluateConditions returns a function that when called', functio
         modulePath: 'condition2'
       }
     ];
+    var rule = {
+      conditions: conditions
+    };
 
     createEvaluateConditions(
       executeDelegateModuleSpy,
-      function () {
-        return false;
-      },
-      emptyFn
-    )(
-      {
-        conditions: conditions
-      },
-      event
-    );
+      isConditionMet,
+      logConditionNotMet,
+      logConditionError
+    )(rule, event);
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       conditions[0],

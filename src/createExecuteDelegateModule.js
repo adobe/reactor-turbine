@@ -12,8 +12,8 @@
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 
-module.exports = function(moduleProvider, replaceTokens) {
-  return function(moduleDescriptor, syntheticEvent, moduleCallParameters) {
+module.exports = function (moduleProvider, replaceTokens) {
+  return function (moduleDescriptor, syntheticEvent, moduleCallParameters) {
     moduleCallParameters = moduleCallParameters || [];
     var moduleExports = moduleProvider.getModuleExports(
       moduleDescriptor.modulePath

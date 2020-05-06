@@ -21,11 +21,12 @@ var getModuleDisplayNameByRuleComponent = function () {
 describe('createLogConditionNotMet returns a function that when called', function () {
   it('logs a message about condition not being met using the logger', function () {
     var loggerSpy = jasmine.createSpyObj('logger', ['log']);
+    var notifyMonitors = emptyFn;
 
     createLogConditionNotMet(
       getModuleDisplayNameByRuleComponent,
       loggerSpy,
-      emptyFn
+      notifyMonitors
     )({ name: 'condition1' }, { name: 'rule1' });
 
     expect(loggerSpy.log).toHaveBeenCalledWith(
@@ -35,10 +36,11 @@ describe('createLogConditionNotMet returns a function that when called', functio
 
   it('notifies monitors about the rule being completed', function () {
     var notifyMonitorsSpy = jasmine.createSpy('notifyMonitors');
+    var logger = { log: emptyFn };
 
     createLogConditionNotMet(
       getModuleDisplayNameByRuleComponent,
-      { log: emptyFn },
+      logger,
       notifyMonitorsSpy
     )({ name: 'condition1' }, { name: 'rule1' });
 

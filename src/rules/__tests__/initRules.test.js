@@ -13,6 +13,7 @@ governing permissions and limitations under the License.
 'use strict';
 
 var initRules = require('../initRules');
+var emptyFn = function () {};
 var buildRuleExecutionOrder = function (r) {
   return r;
 };
@@ -22,14 +23,19 @@ describe('initRules', function () {
     'lets buildRuleExecutionOrder module to determine the ' +
       'way the rules are executed',
     function () {
-      var buildRuleExecutionOrder = jasmine
+      var buildRuleExecutionOrderSpy = jasmine
         .createSpy()
         .and.callFake(function (rules) {
           return rules;
         });
 
-      initRules(buildRuleExecutionOrder, [{ ruleId: 123 }], function () {});
-      expect(buildRuleExecutionOrder).toHaveBeenCalledWith([{ ruleId: 123 }]);
+      var rules = [{ ruleId: 123 }];
+      var initEventModule = emptyFn;
+
+      initRules(buildRuleExecutionOrderSpy, rules, initEventModule);
+      expect(buildRuleExecutionOrderSpy).toHaveBeenCalledWith([
+        { ruleId: 123 }
+      ]);
     }
   );
 
@@ -59,11 +65,7 @@ describe('initRules', function () {
     var triggerForRule123 = jasmine.createSpy('rule123');
     var triggerForRule124 = jasmine.createSpy('rule124');
     var triggers = [triggerForRule123, triggerForRule124];
-
-    initRules(buildRuleExecutionOrder, rules, function (
-      guardUntilAllInitialized,
-      rule
-    ) {
+    var initEventModule = function (guardUntilAllInitialized) {
       guardUntilAllInitialized(triggers[index]);
 
       if (index === 1) {
@@ -72,7 +74,9 @@ describe('initRules', function () {
       }
 
       index += 1;
-    });
+    };
+
+    initRules(buildRuleExecutionOrder, rules, initEventModule);
 
     expect(triggerForRule123).toHaveBeenCalled();
     expect(triggerForRule124).toHaveBeenCalled();
@@ -88,10 +92,11 @@ describe('initRules', function () {
     var rules = [{ ruleId: 123 }];
 
     var triggerForRule123 = jasmine.createSpy('rule123');
-
-    initRules(buildRuleExecutionOrder, rules, function (g) {
+    var initEventModule = function (g) {
       guardUntilAllInitialized = g;
-    });
+    };
+
+    initRules(buildRuleExecutionOrder, rules, initEventModule);
 
     expect(triggerForRule123).not.toHaveBeenCalled();
     guardUntilAllInitialized(triggerForRule123);

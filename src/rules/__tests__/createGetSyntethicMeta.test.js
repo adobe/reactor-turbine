@@ -28,10 +28,14 @@ describe('createGetSyntheticEventMeta returns a function that when called', func
       getModuleExtensionName: getModuleExtensionNameSpy
     };
 
-    var syntheticEventMeta = createGetSyntheticEventMeta(moduleProvider)({
+    var ruleEventPair = {
       rule: { name: 'rule name', id: 'rule id' },
       event: { modulePath: 'event module path' }
-    });
+    };
+
+    var syntheticEventMeta = createGetSyntheticEventMeta(moduleProvider)(
+      ruleEventPair
+    );
 
     expect(getModuleDefinitionSpy).toHaveBeenCalledWith('event module path');
     expect(getModuleExtensionNameSpy).toHaveBeenCalledWith('event module path');

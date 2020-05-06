@@ -22,12 +22,12 @@
  * @param {Array} rules
  * @returns {Array} An ordered array of rule-event pair objects.
  */
-module.exports = function(rules) {
+module.exports = function (rules) {
   var ruleEventPairs = [];
 
-  rules.forEach(function(rule) {
+  rules.forEach(function (rule) {
     if (rule.events) {
-      rule.events.forEach(function(event) {
+      rule.events.forEach(function (event) {
         ruleEventPairs.push({
           rule: rule,
           event: event
@@ -36,7 +36,7 @@ module.exports = function(rules) {
     }
   });
 
-  return ruleEventPairs.sort(function(ruleEventPairA, ruleEventPairB) {
+  return ruleEventPairs.sort(function (ruleEventPairA, ruleEventPairB) {
     return ruleEventPairA.event.ruleOrder - ruleEventPairB.event.ruleOrder;
   });
 };

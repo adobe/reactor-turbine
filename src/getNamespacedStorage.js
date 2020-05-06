@@ -13,7 +13,7 @@
 var window = require('@adobe/reactor-window');
 var NAMESPACE = 'com.adobe.reactor.';
 
-module.exports = function(storageType, additionalNamespace) {
+module.exports = function (storageType, additionalNamespace) {
   var finalNamespace = NAMESPACE + (additionalNamespace || '');
 
   // When storage is disabled on Safari, the mere act of referencing window.localStorage
@@ -24,7 +24,7 @@ module.exports = function(storageType, additionalNamespace) {
      * @param {string} name The name of the item to be read.
      * @returns {string}
      */
-    getItem: function(name) {
+    getItem: function (name) {
       try {
         return window[storageType].getItem(finalNamespace + name);
       } catch (e) {
@@ -37,7 +37,7 @@ module.exports = function(storageType, additionalNamespace) {
      * @param {string} value The value of the item to be saved.
      * @returns {boolean} Whether the item was successfully saved to storage.
      */
-    setItem: function(name, value) {
+    setItem: function (name, value) {
       try {
         window[storageType].setItem(finalNamespace + name, value);
         return true;
@@ -47,4 +47,3 @@ module.exports = function(storageType, additionalNamespace) {
     }
   };
 };
-

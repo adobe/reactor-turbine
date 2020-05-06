@@ -15,6 +15,6 @@
  * @param {string} str The string to clean.
  * @returns {string}
  */
-module.exports = function(str) {
+module.exports = function (str) {
   return typeof str === 'string' ? str.replace(/\s+/g, ' ').trim() : str;
 };

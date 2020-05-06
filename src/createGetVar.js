@@ -13,10 +13,10 @@
 var cleanText = require('./cleanText');
 
 var specialPropertyAccessors = {
-  text: function(obj) {
+  text: function (obj) {
     return obj.textContent;
   },
-  cleanText: function(obj) {
+  cleanText: function (obj) {
     return cleanText(obj.textContent);
   }
 };
@@ -37,7 +37,7 @@ var specialPropertyAccessors = {
  * @param supportSpecial
  * @returns {*}
  */
-var getObjectProperty = function(host, propChain, supportSpecial) {
+var getObjectProperty = function (host, propChain, supportSpecial) {
   var value = host;
   var attrMatch;
   for (var i = 0, len = propChain.length; i < len; i++) {
@@ -50,8 +50,10 @@ var getObjectProperty = function(host, propChain, supportSpecial) {
       value = specialPropertyAccessors[specialProp](value);
       continue;
     }
-    if (value.getAttribute &&
-      (attrMatch = prop.match(/^getAttribute\((.+)\)$/))) {
+    if (
+      value.getAttribute &&
+      (attrMatch = prop.match(/^getAttribute\((.+)\)$/))
+    ) {
       var attr = attrMatch[1];
       value = value.getAttribute(attr);
       continue;
@@ -68,8 +70,12 @@ var getObjectProperty = function(host, propChain, supportSpecial) {
  * or %target...
  * @returns {*}
  */
-module.exports = function(customVars, getDataElementDefinition, getDataElementValue) {
-  return function(variable, syntheticEvent) {
+module.exports = function (
+  customVars,
+  getDataElementDefinition,
+  getDataElementValue
+) {
+  return function (variable, syntheticEvent) {
     var value;
 
     if (getDataElementDefinition(variable)) {

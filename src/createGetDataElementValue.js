@@ -14,22 +14,34 @@ var cleanText = require('./cleanText');
 var logger = require('./logger');
 var dataElementSafe = require('./dataElementSafe');
 
-var getErrorMessage = function(dataDef, dataElementName, errorMessage, errorStack) {
-  return 'Failed to execute data element module ' + dataDef.modulePath + ' for data element ' +
-    dataElementName + '. ' + errorMessage + (errorStack ? '\n' + errorStack : '');
+var getErrorMessage = function (
+  dataDef,
+  dataElementName,
+  errorMessage,
+  errorStack
+) {
+  return (
+    'Failed to execute data element module ' +
+    dataDef.modulePath +
+    ' for data element ' +
+    dataElementName +
+    '. ' +
+    errorMessage +
+    (errorStack ? '\n' + errorStack : '')
+  );
 };
 
-var isDataElementValuePresent = function(value) {
+var isDataElementValuePresent = function (value) {
   return value !== undefined && value !== null;
 };
 
-module.exports = function(
+module.exports = function (
   moduleProvider,
   getDataElementDefinition,
   replaceTokens,
   undefinedVarsReturnEmpty
 ) {
-  return function(name, syntheticEvent) {
+  return function (name, syntheticEvent) {
     var dataDef = getDataElementDefinition(name);
 
     if (!dataDef) {
@@ -47,14 +59,19 @@ module.exports = function(
     }
 
     if (typeof moduleExports !== 'function') {
-      logger.error(getErrorMessage(dataDef, name, 'Module did not export a function.'));
+      logger.error(
+        getErrorMessage(dataDef, name, 'Module did not export a function.')
+      );
       return;
     }
 
     var value;
 
     try {
-      value = moduleExports(replaceTokens(dataDef.settings, syntheticEvent), syntheticEvent);
+      value = moduleExports(
+        replaceTokens(dataDef.settings, syntheticEvent),
+        syntheticEvent
+      );
     } catch (e) {
       logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
       return;

@@ -12,8 +12,8 @@
 
 var buildRuleExecutionOrder = require('../buildRuleExecutionOrder');
 
-describe('buildRuleExecutionOrder', function() {
-  it('orders rules whose order is swapped in different events', function() {
+describe('buildRuleExecutionOrder', function () {
+  it('orders rules whose order is swapped in different events', function () {
     var ruleA = {
       events: [
         {
@@ -40,10 +40,7 @@ describe('buildRuleExecutionOrder', function() {
       ]
     };
 
-    var executionOrder = buildRuleExecutionOrder([
-      ruleA,
-      ruleB
-    ]);
+    var executionOrder = buildRuleExecutionOrder([ruleA, ruleB]);
 
     expect(executionOrder).toEqual([
       {
@@ -65,7 +62,7 @@ describe('buildRuleExecutionOrder', function() {
     ]);
   });
 
-  it('maintains the natural order to no ruleOrder provided', function() {
+  it('maintains the natural order to no ruleOrder provided', function () {
     // Note that we don't provide a default ruleOrder value. This is because ruleOrder will
     // be required in the container schema. However, when users are testing things out in the
     // sandbox, it's nice to be able to leave off ruleOrder and have the rules still execute
@@ -94,11 +91,7 @@ describe('buildRuleExecutionOrder', function() {
       ]
     };
 
-    var exectionOrder = buildRuleExecutionOrder([
-      ruleA,
-      ruleB,
-      ruleC
-    ]);
+    var exectionOrder = buildRuleExecutionOrder([ruleA, ruleB, ruleC]);
 
     expect(exectionOrder).toEqual([
       {
@@ -116,14 +109,12 @@ describe('buildRuleExecutionOrder', function() {
     ]);
   });
 
-  it('handles rules with no events', function() {
+  it('handles rules with no events', function () {
     var ruleA = {
       events: []
     };
 
-    var executionOrder = buildRuleExecutionOrder([
-      ruleA
-    ]);
+    var executionOrder = buildRuleExecutionOrder([ruleA]);
 
     expect(executionOrder).toEqual([]);
   });

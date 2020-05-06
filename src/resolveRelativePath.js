@@ -24,7 +24,7 @@ var JS_EXTENSION = '.js';
  * @param {string} path
  * @returns {string}
  */
-var dirname = function(path) {
+var dirname = function (path) {
   return path.substr(0, path.lastIndexOf('/'));
 };
 
@@ -34,7 +34,7 @@ var dirname = function(path) {
  * @param {string} suffix The suffix to look for at the end of str.
  * @returns {boolean} Whether str ends in suffix.
  */
-var endsWith = function(str, suffix) {
+var endsWith = function (str, suffix) {
   return str.indexOf(suffix, str.length - suffix.length) !== -1;
 };
 
@@ -52,7 +52,7 @@ var endsWith = function(str, suffix) {
  * @param {string} relativePath
  * @returns {string}
  */
-module.exports = function(fromPath, relativePath) {
+module.exports = function (fromPath, relativePath) {
   // Handle the case where the relative path does not end in the .js extension. We auto-append it.
   if (!endsWith(relativePath, JS_EXTENSION)) {
     relativePath = relativePath + JS_EXTENSION;
@@ -61,7 +61,7 @@ module.exports = function(fromPath, relativePath) {
   var relativePathSegments = relativePath.split('/');
   var resolvedPathSegments = dirname(fromPath).split('/');
 
-  relativePathSegments.forEach(function(relativePathSegment) {
+  relativePathSegments.forEach(function (relativePathSegment) {
     if (!relativePathSegment || relativePathSegment === '.') {
       return;
     } else if (relativePathSegment === '..') {

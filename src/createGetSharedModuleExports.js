@@ -18,8 +18,8 @@
  * @param {Object} moduleProvider
  * @returns {Function}
  */
-module.exports = function(extensions, moduleProvider) {
-  return function(extensionName, moduleName) {
+module.exports = function (extensions, moduleProvider) {
+  return function (extensionName, moduleName) {
     var extension = extensions[extensionName];
 
     if (extension) {

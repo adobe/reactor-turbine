@@ -14,20 +14,20 @@
 
 var injectHydrateModuleProvider = require('inject-loader!../hydrateModuleProvider');
 
-describe('hydrateModuleProvider', function() {
+describe('hydrateModuleProvider', function () {
   var container;
   var moduleProvider;
   var replaceTokens;
   var getDataElementValue;
   var debugController;
 
-  beforeEach(function() {
+  beforeEach(function () {
     container = {
       extensions: {
         'ext-a': {
           displayName: 'Extension A',
           modules: {
-            'ext-a/a1.js': function() {},
+            'ext-a/a1.js': function () {}
           },
           settings: {},
           hostedLibFilesBaseUrl: 'somebaseurl'
@@ -47,20 +47,20 @@ describe('hydrateModuleProvider', function() {
       'getModuleExports'
     ]);
 
-    replaceTokens = function() {};
-    getDataElementValue = function() {};
+    replaceTokens = function () {};
+    getDataElementValue = function () {};
     debugController = jasmine.createSpyObj('debugController', {
       onDebugChanged: undefined,
       getDebugEnabled: true
     });
   });
 
-  it('registers all modules', function() {
+  it('registers all modules', function () {
     var hydrateModuleProvider = injectHydrateModuleProvider();
-    var a1Module = function() {};
-    var a2Module = function() {};
-    var b1Module = function() {};
-    var b2Module = function() {};
+    var a1Module = function () {};
+    var a2Module = function () {};
+    var b1Module = function () {};
+    var b2Module = function () {};
 
     container.extensions = {
       'ext-a': {
@@ -112,7 +112,7 @@ describe('hydrateModuleProvider', function() {
     );
   });
 
-  it('hydrates module cache', function() {
+  it('hydrates module cache', function () {
     var hydrateModuleProvider = injectHydrateModuleProvider();
 
     hydrateModuleProvider(container, moduleProvider, debugController);
@@ -120,19 +120,19 @@ describe('hydrateModuleProvider', function() {
     expect(moduleProvider.hydrateCache).toHaveBeenCalled();
   });
 
-  describe('public require provided to modules', function() {
+  describe('public require provided to modules', function () {
     var publicRequire;
     var createPublicRequire;
     var getModuleExportsByRelativePath;
 
-    beforeEach(function() {
-      publicRequire = function() {};
-      createPublicRequire = jasmine.createSpy().and.callFake(
-        function(_getModuleExportsByRelativePath) {
+    beforeEach(function () {
+      publicRequire = function () {};
+      createPublicRequire = jasmine
+        .createSpy()
+        .and.callFake(function (_getModuleExportsByRelativePath) {
           getModuleExportsByRelativePath = _getModuleExportsByRelativePath;
           return publicRequire;
-        }
-      );
+        });
 
       var hydrateModuleProvider = injectHydrateModuleProvider({
         './createPublicRequire': createPublicRequire
@@ -141,19 +141,23 @@ describe('hydrateModuleProvider', function() {
       hydrateModuleProvider(container, moduleProvider, debugController);
     });
 
-    it('is the publicRequire returned from createPublicRequire', function() {
-      expect(moduleProvider.registerModule.calls.mostRecent().args[3]).toEqual(publicRequire);
+    it('is the publicRequire returned from createPublicRequire', function () {
+      expect(moduleProvider.registerModule.calls.mostRecent().args[3]).toEqual(
+        publicRequire
+      );
     });
 
-    it('was created by supplying a functional getModuleExportsByRelativePath', function() {
+    it('was created by supplying a functional getModuleExportsByRelativePath', function () {
       expect(getModuleExportsByRelativePath).toEqual(jasmine.any(Function));
 
       getModuleExportsByRelativePath('./a2.js');
-      expect(moduleProvider.getModuleExports).toHaveBeenCalledWith('ext-a/a2.js');
+      expect(moduleProvider.getModuleExports).toHaveBeenCalledWith(
+        'ext-a/a2.js'
+      );
     });
   });
 
-  describe('turbine object provided to modules', function() {
+  describe('turbine object provided to modules', function () {
     var turbine;
     var createGetExtensionSettings;
     var getExtensionSettings;
@@ -164,22 +168,26 @@ describe('hydrateModuleProvider', function() {
     var prefixedLogger;
     var logger;
 
-    beforeEach(function() {
-      getExtensionSettings = function() {};
-      createGetExtensionSettings = jasmine.createSpy().and.callFake(function() {
-        return getExtensionSettings;
-      });
-      getHostedLibFileUrl = function() {};
-      createGetHostedLibFileUrl = jasmine.createSpy().and.callFake(function() {
+    beforeEach(function () {
+      getExtensionSettings = function () {};
+      createGetExtensionSettings = jasmine
+        .createSpy()
+        .and.callFake(function () {
+          return getExtensionSettings;
+        });
+      getHostedLibFileUrl = function () {};
+      createGetHostedLibFileUrl = jasmine.createSpy().and.callFake(function () {
         return getHostedLibFileUrl;
       });
-      getSharedModuleExports = function() {};
-      createGetSharedModuleExports = jasmine.createSpy().and.callFake(function() {
-        return getSharedModuleExports;
-      });
+      getSharedModuleExports = function () {};
+      createGetSharedModuleExports = jasmine
+        .createSpy()
+        .and.callFake(function () {
+          return getSharedModuleExports;
+        });
       prefixedLogger = {};
       logger = {
-        createPrefixedLogger: jasmine.createSpy().and.callFake(function() {
+        createPrefixedLogger: jasmine.createSpy().and.callFake(function () {
           return prefixedLogger;
         })
       };
@@ -201,15 +209,15 @@ describe('hydrateModuleProvider', function() {
       turbine = moduleProvider.registerModule.calls.mostRecent().args[4];
     });
 
-    it('contains buildInfo', function() {
+    it('contains buildInfo', function () {
       expect(turbine.buildInfo).toBe(container.buildInfo);
     });
 
-    it('contains getDataElementValue', function() {
+    it('contains getDataElementValue', function () {
       expect(turbine.getDataElementValue).toBe(getDataElementValue);
     });
 
-    it('contains getExtensionSettings', function() {
+    it('contains getExtensionSettings', function () {
       expect(createGetExtensionSettings).toHaveBeenCalledWith(
         replaceTokens,
         container.extensions['ext-a'].settings
@@ -217,7 +225,7 @@ describe('hydrateModuleProvider', function() {
       expect(turbine.getExtensionSettings).toEqual(getExtensionSettings);
     });
 
-    it('contains getHostedLibFileUrl', function() {
+    it('contains getHostedLibFileUrl', function () {
       expect(createGetHostedLibFileUrl).toHaveBeenCalledWith(
         'somebaseurl',
         true
@@ -225,7 +233,7 @@ describe('hydrateModuleProvider', function() {
       expect(turbine.getHostedLibFileUrl).toEqual(getHostedLibFileUrl);
     });
 
-    it('contains getSharedModule', function() {
+    it('contains getSharedModule', function () {
       expect(createGetSharedModuleExports).toHaveBeenCalledWith(
         container.extensions,
         moduleProvider
@@ -233,24 +241,24 @@ describe('hydrateModuleProvider', function() {
       expect(turbine.getSharedModule).toBe(getSharedModuleExports);
     });
 
-    it('contains logger', function() {
+    it('contains logger', function () {
       expect(logger.createPrefixedLogger).toHaveBeenCalledWith('Extension A');
       expect(turbine.logger).toBe(prefixedLogger);
     });
 
-    it('contains propertySettings', function() {
+    it('contains propertySettings', function () {
       expect(turbine.propertySettings).toBe(container.property.settings);
     });
 
-    it('contains replaceTokens', function() {
+    it('contains replaceTokens', function () {
       expect(turbine.replaceTokens).toBe(replaceTokens);
     });
 
-    it('contains onDebugChanged', function() {
+    it('contains onDebugChanged', function () {
       expect(turbine.onDebugChanged).toBe(debugController.onDebugChanged);
     });
 
-    it('contains debugEnabled', function() {
+    it('contains debugEnabled', function () {
       expect(turbine.debugEnabled).toBe(true);
       expect(debugController.getDebugEnabled.and.returnValue(false));
       expect(turbine.debugEnabled).toBe(false);

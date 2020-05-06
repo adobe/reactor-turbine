@@ -11,17 +11,17 @@ governing permissions and limitations under the License.
 */
 var DEBUG_LOCAL_STORAGE_NAME = 'debug';
 
-module.exports = function(localStorage, logger) {
-  var getPersistedDebugEnabled = function() {
+module.exports = function (localStorage, logger) {
+  var getPersistedDebugEnabled = function () {
     return localStorage.getItem(DEBUG_LOCAL_STORAGE_NAME) === 'true';
   };
 
-  var setPersistedDebugEnabled = function(enabled) {
+  var setPersistedDebugEnabled = function (enabled) {
     localStorage.setItem(DEBUG_LOCAL_STORAGE_NAME, enabled);
   };
 
   var debugChangedCallbacks = [];
-  var onDebugChanged = function(callback) {
+  var onDebugChanged = function (callback) {
     debugChangedCallbacks.push(callback);
   };
 
@@ -30,11 +30,11 @@ module.exports = function(localStorage, logger) {
   return {
     onDebugChanged: onDebugChanged,
     getDebugEnabled: getPersistedDebugEnabled,
-    setDebugEnabled: function(enabled) {
+    setDebugEnabled: function (enabled) {
       if (getPersistedDebugEnabled() !== enabled) {
         setPersistedDebugEnabled(enabled);
         logger.outputEnabled = enabled;
-        debugChangedCallbacks.forEach(function(callback) {
+        debugChangedCallbacks.forEach(function (callback) {
           callback(enabled);
         });
       }

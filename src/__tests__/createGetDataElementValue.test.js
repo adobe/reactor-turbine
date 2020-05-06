@@ -14,32 +14,32 @@
 
 var injectCreateGetDataElementValue = require('inject-loader!../createGetDataElementValue');
 
-describe('function returned by createGetDataElementValue', function() {
+describe('function returned by createGetDataElementValue', function () {
   var logger;
   var replaceTokens;
-  var getInjectedCreateGetDataElementValue = function(mocks) {
+  var getInjectedCreateGetDataElementValue = function (mocks) {
     mocks = mocks || {};
     mocks['./logger'] = logger;
     return injectCreateGetDataElementValue(mocks);
   };
 
-  beforeEach(function() {
+  beforeEach(function () {
     logger = jasmine.createSpyObj('logger', ['log', 'error']);
-    replaceTokens = jasmine.createSpy().and.callFake(function(settings) {
+    replaceTokens = jasmine.createSpy().and.callFake(function (settings) {
       return settings;
     });
   });
 
-  it('returns a data element value using data from settings', function() {
+  it('returns a data element value using data from settings', function () {
     var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
-      getModuleExports: function() {
-        return function(settings) {
+      getModuleExports: function () {
+        return function (settings) {
           return settings.foo;
         };
       }
     };
-    var getDataElementDefinition = function() {
+    var getDataElementDefinition = function () {
       return {
         settings: {
           foo: 'bar'
@@ -60,16 +60,16 @@ describe('function returned by createGetDataElementValue', function() {
 
   // DTM-12602 Allows data elements to reference event
   // data when retrieved within the context of a rule execution
-  it('returns a data element value using data from event', function() {
+  it('returns a data element value using data from event', function () {
     var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
-      getModuleExports: function() {
-        return function(settings, event) {
+      getModuleExports: function () {
+        return function (settings, event) {
           return event.foo;
         };
       }
     };
-    var getDataElementDefinition = function() {
+    var getDataElementDefinition = function () {
       return {
         settings: {}
       };
@@ -89,7 +89,7 @@ describe('function returned by createGetDataElementValue', function() {
     expect(value).toBe('bar');
   });
 
-  it('stores the data element value if value exists and storageDuration provided', function() {
+  it('stores the data element value if value exists and storageDuration provided', function () {
     var dataElementSafe = {
       setValue: jasmine.createSpy()
     };
@@ -97,13 +97,13 @@ describe('function returned by createGetDataElementValue', function() {
       './dataElementSafe': dataElementSafe
     });
     var moduleProvider = {
-      getModuleExports: function() {
-        return function(settings) {
+      getModuleExports: function () {
+        return function (settings) {
           return settings.foo;
         };
       }
     };
-    var getDataElementDefinition = function() {
+    var getDataElementDefinition = function () {
       return {
         storageDuration: 'visitor',
         settings: {
@@ -120,23 +120,27 @@ describe('function returned by createGetDataElementValue', function() {
     );
     getDataElementValue('testDataElement');
 
-    expect(dataElementSafe.setValue).toHaveBeenCalledWith('testDataElement', 'visitor', 'bar');
+    expect(dataElementSafe.setValue).toHaveBeenCalledWith(
+      'testDataElement',
+      'visitor',
+      'bar'
+    );
   });
 
-  it('cleans the value when cleanText = true', function() {
-    var createGetDataElementValue =  getInjectedCreateGetDataElementValue({
-      './cleanText': function(value) {
+  it('cleans the value when cleanText = true', function () {
+    var createGetDataElementValue = getInjectedCreateGetDataElementValue({
+      './cleanText': function (value) {
         return 'cleaned:' + value;
       }
     });
     var moduleProvider = {
-      getModuleExports: function() {
-        return function() {
+      getModuleExports: function () {
+        return function () {
           return 'bar';
         };
       }
     };
-    var getDataElementDefinition = function() {
+    var getDataElementDefinition = function () {
       return {
         cleanText: true,
         settings: {}
@@ -154,18 +158,18 @@ describe('function returned by createGetDataElementValue', function() {
     expect(value).toBe('cleaned:bar');
   });
 
-  it('cleans the default value when cleanText = true', function() {
-    var createGetDataElementValue =  getInjectedCreateGetDataElementValue({
-      './cleanText': function(value) {
+  it('cleans the default value when cleanText = true', function () {
+    var createGetDataElementValue = getInjectedCreateGetDataElementValue({
+      './cleanText': function (value) {
         return 'cleaned:' + value;
       }
     });
     var moduleProvider = {
-      getModuleExports: function() {
-        return function() {};
+      getModuleExports: function () {
+        return function () {};
       }
     };
-    var getDataElementDefinition = function() {
+    var getDataElementDefinition = function () {
       return {
         cleanText: true,
         defaultValue: 'bar',
@@ -184,66 +188,72 @@ describe('function returned by createGetDataElementValue', function() {
     expect(value).toBe('cleaned:bar');
   });
 
-  it('returns an empty string when undefinedVarsReturnEmpty = true and data element value' +
-    'is undefined', function() {
-    var createGetDataElementValue =  getInjectedCreateGetDataElementValue({
-      './cleanText': function(value) {
-        return 'cleaned:' + value;
-      }
-    });
-    var moduleProvider = {
-      getModuleExports: function() {
-        return function() {};
-      }
-    };
-    var getDataElementDefinition = function() {
-      return {
-        settings: {}
+  it(
+    'returns an empty string when undefinedVarsReturnEmpty = true and data element value' +
+      'is undefined',
+    function () {
+      var createGetDataElementValue = getInjectedCreateGetDataElementValue({
+        './cleanText': function (value) {
+          return 'cleaned:' + value;
+        }
+      });
+      var moduleProvider = {
+        getModuleExports: function () {
+          return function () {};
+        }
       };
-    };
-    var undefinedVarsReturnEmpty = true;
-    var getDataElementValue = createGetDataElementValue(
-      moduleProvider,
-      getDataElementDefinition,
-      replaceTokens,
-      undefinedVarsReturnEmpty
-    );
-    var value = getDataElementValue('testDataElement');
+      var getDataElementDefinition = function () {
+        return {
+          settings: {}
+        };
+      };
+      var undefinedVarsReturnEmpty = true;
+      var getDataElementValue = createGetDataElementValue(
+        moduleProvider,
+        getDataElementDefinition,
+        replaceTokens,
+        undefinedVarsReturnEmpty
+      );
+      var value = getDataElementValue('testDataElement');
 
-    expect(value).toBe('');
-  });
+      expect(value).toBe('');
+    }
+  );
 
-  it('returns null when undefinedVarsReturnEmpty = false and data element ' +
-    'does not exist', function() {
-    var createGetDataElementValue =  getInjectedCreateGetDataElementValue();
-    var moduleProvider = {};
-    var getDataElementDefinition = function() {};
-    var undefinedVarsReturnEmpty = false;
-    var getDataElementValue = createGetDataElementValue(
-      moduleProvider,
-      getDataElementDefinition,
-      replaceTokens,
-      undefinedVarsReturnEmpty
-    );
-    var value = getDataElementValue('testDataElement');
+  it(
+    'returns null when undefinedVarsReturnEmpty = false and data element ' +
+      'does not exist',
+    function () {
+      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
+      var moduleProvider = {};
+      var getDataElementDefinition = function () {};
+      var undefinedVarsReturnEmpty = false;
+      var getDataElementValue = createGetDataElementValue(
+        moduleProvider,
+        getDataElementDefinition,
+        replaceTokens,
+        undefinedVarsReturnEmpty
+      );
+      var value = getDataElementValue('testDataElement');
 
-    expect(value).toBe(null);
-  });
+      expect(value).toBe(null);
+    }
+  );
 
-  it('does not return default value if cached value is present', function() {
-    var createGetDataElementValue =  getInjectedCreateGetDataElementValue({
+  it('does not return default value if cached value is present', function () {
+    var createGetDataElementValue = getInjectedCreateGetDataElementValue({
       './dataElementSafe': {
-        getValue: function() {
+        getValue: function () {
           return 'cachedValue';
         }
       }
     });
     var moduleProvider = {
-      getModuleExports: function() {
-        return function() {};
+      getModuleExports: function () {
+        return function () {};
       }
     };
-    var getDataElementDefinition = function() {
+    var getDataElementDefinition = function () {
       return {
         defaultValue: 'defaultValue',
         storageDuration: 'pageview',
@@ -262,50 +272,53 @@ describe('function returned by createGetDataElementValue', function() {
     expect(value).toBe('cachedValue');
   });
 
-  [undefined, null].forEach(function(dataElementValue) {
-    it('returns a cached value if current value is ' + dataElementValue, function() {
-      var createGetDataElementValue =  getInjectedCreateGetDataElementValue({
-        './dataElementSafe': {
-          getValue: function() {
-            return 'cachedValue';
+  [undefined, null].forEach(function (dataElementValue) {
+    it(
+      'returns a cached value if current value is ' + dataElementValue,
+      function () {
+        var createGetDataElementValue = getInjectedCreateGetDataElementValue({
+          './dataElementSafe': {
+            getValue: function () {
+              return 'cachedValue';
+            }
           }
-        }
-      });
-      var moduleProvider = {
-        getModuleExports: function() {
-          return function() {
-            return dataElementValue;
-          };
-        }
-      };
-      var getDataElementDefinition = function() {
-        return {
-          storageDuration: 'session',
-          settings: {}
+        });
+        var moduleProvider = {
+          getModuleExports: function () {
+            return function () {
+              return dataElementValue;
+            };
+          }
         };
-      };
-      var undefinedVarsReturnEmpty = false;
-      var getDataElementValue = createGetDataElementValue(
-        moduleProvider,
-        getDataElementDefinition,
-        replaceTokens,
-        undefinedVarsReturnEmpty
-      );
-      var value = getDataElementValue('testDataElement');
+        var getDataElementDefinition = function () {
+          return {
+            storageDuration: 'session',
+            settings: {}
+          };
+        };
+        var undefinedVarsReturnEmpty = false;
+        var getDataElementValue = createGetDataElementValue(
+          moduleProvider,
+          getDataElementDefinition,
+          replaceTokens,
+          undefinedVarsReturnEmpty
+        );
+        var value = getDataElementValue('testDataElement');
 
-      expect(value).toBe('cachedValue');
-    });
+        expect(value).toBe('cachedValue');
+      }
+    );
 
-    it('returns a default value if value is ' + dataElementValue, function() {
-      var createGetDataElementValue =  getInjectedCreateGetDataElementValue();
+    it('returns a default value if value is ' + dataElementValue, function () {
+      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
-        getModuleExports: function() {
-          return function() {
+        getModuleExports: function () {
+          return function () {
             return dataElementValue;
           };
         }
       };
-      var getDataElementDefinition = function() {
+      var getDataElementDefinition = function () {
         return {
           defaultValue: 'defaultValue',
           settings: {}
@@ -323,73 +336,80 @@ describe('function returned by createGetDataElementValue', function() {
       expect(value).toBe('defaultValue');
     });
 
-    it('returns an empty string if value is ' + dataElementValue +
-      ' and default is undefined', function() {
-      var createGetDataElementValue =  getInjectedCreateGetDataElementValue();
-      var moduleProvider = {
-        getModuleExports: function() {
-          return function() {
-            return dataElementValue;
-          };
-        }
-      };
-      var getDataElementDefinition = function() {
-        return {
-          settings: {}
+    it(
+      'returns an empty string if value is ' +
+        dataElementValue +
+        ' and default is undefined',
+      function () {
+        var createGetDataElementValue = getInjectedCreateGetDataElementValue();
+        var moduleProvider = {
+          getModuleExports: function () {
+            return function () {
+              return dataElementValue;
+            };
+          }
         };
-      };
-      var undefinedVarsReturnEmpty = false;
-      var getDataElementValue = createGetDataElementValue(
-        moduleProvider,
-        getDataElementDefinition,
-        replaceTokens,
-        undefinedVarsReturnEmpty
-      );
-      var value = getDataElementValue('testDataElement');
+        var getDataElementDefinition = function () {
+          return {
+            settings: {}
+          };
+        };
+        var undefinedVarsReturnEmpty = false;
+        var getDataElementValue = createGetDataElementValue(
+          moduleProvider,
+          getDataElementDefinition,
+          replaceTokens,
+          undefinedVarsReturnEmpty
+        );
+        var value = getDataElementValue('testDataElement');
 
-      expect(value).toBe('');
-    });
+        expect(value).toBe('');
+      }
+    );
   });
 
-  ['', 0, false, NaN].forEach(function(dataElementValue) {
-    it('does not return a default value if value is ' + dataElementValue, function() {
-      var createGetDataElementValue =  getInjectedCreateGetDataElementValue();
-      var moduleProvider = {
-        getModuleExports: function() {
-          return function() {
-            return dataElementValue;
-          };
-        }
-      };
-      var getDataElementDefinition = function() {
-        return {
-          defaultValue: 'defaultValue',
-          settings: {}
+  ['', 0, false, NaN].forEach(function (dataElementValue) {
+    it(
+      'does not return a default value if value is ' + dataElementValue,
+      function () {
+        var createGetDataElementValue = getInjectedCreateGetDataElementValue();
+        var moduleProvider = {
+          getModuleExports: function () {
+            return function () {
+              return dataElementValue;
+            };
+          }
         };
-      };
-      var undefinedVarsReturnEmpty = false;
-      var getDataElementValue = createGetDataElementValue(
-        moduleProvider,
-        getDataElementDefinition,
-        replaceTokens,
-        undefinedVarsReturnEmpty
-      );
-      var value = getDataElementValue('testDataElement');
+        var getDataElementDefinition = function () {
+          return {
+            defaultValue: 'defaultValue',
+            settings: {}
+          };
+        };
+        var undefinedVarsReturnEmpty = false;
+        var getDataElementValue = createGetDataElementValue(
+          moduleProvider,
+          getDataElementDefinition,
+          replaceTokens,
+          undefinedVarsReturnEmpty
+        );
+        var value = getDataElementValue('testDataElement');
 
-      expect(value).toEqual(dataElementValue);
-    });
+        expect(value).toEqual(dataElementValue);
+      }
+    );
   });
 
-  it('lowercases the value if forceLowerCase = true', function() {
-    var createGetDataElementValue =  getInjectedCreateGetDataElementValue();
+  it('lowercases the value if forceLowerCase = true', function () {
+    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
-      getModuleExports: function() {
-        return function(settings) {
+      getModuleExports: function () {
+        return function (settings) {
           return settings.foo;
         };
       }
     };
-    var getDataElementDefinition = function() {
+    var getDataElementDefinition = function () {
       return {
         forceLowerCase: true,
         settings: {
@@ -409,16 +429,16 @@ describe('function returned by createGetDataElementValue', function() {
     expect(value).toBe('bar');
   });
 
-  it('lowercases the default value if forceLowerCase = true', function() {
-    var createGetDataElementValue =  getInjectedCreateGetDataElementValue();
+  it('lowercases the default value if forceLowerCase = true', function () {
+    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
-      getModuleExports: function() {
-        return function() {
+      getModuleExports: function () {
+        return function () {
           return;
         };
       }
     };
-    var getDataElementDefinition = function() {
+    var getDataElementDefinition = function () {
       return {
         forceLowerCase: true,
         defaultValue: 'bAr',
@@ -437,16 +457,16 @@ describe('function returned by createGetDataElementValue', function() {
     expect(value).toBe('bar');
   });
 
-  it('replaces tokens in settings object', function() {
+  it('replaces tokens in settings object', function () {
     var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
-      getModuleExports: function() {
-        return function(settings) {
+      getModuleExports: function () {
+        return function (settings) {
           return settings.foo;
         };
       }
     };
-    var getDataElementDefinition = function() {
+    var getDataElementDefinition = function () {
       return {
         settings: {
           foo: '%bar%'
@@ -454,7 +474,7 @@ describe('function returned by createGetDataElementValue', function() {
       };
     };
 
-    var replaceTokens = function() {
+    var replaceTokens = function () {
       return {
         foo: 'valueOfBar'
       };
@@ -472,15 +492,15 @@ describe('function returned by createGetDataElementValue', function() {
     expect(value).toBe('valueOfBar');
   });
 
-  describe('error handling', function() {
-    it('logs an error when retrieving data element module exports fails', function() {
-      var createGetDataElementValue =  getInjectedCreateGetDataElementValue();
+  describe('error handling', function () {
+    it('logs an error when retrieving data element module exports fails', function () {
+      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
-        getModuleExports: function() {
+        getModuleExports: function () {
           throw new Error('noob tried to divide by zero');
         }
       };
-      var getDataElementDefinition = function() {
+      var getDataElementDefinition = function () {
         return {
           modulePath: 'hello-world/foo.js',
           settings: {}
@@ -498,20 +518,22 @@ describe('function returned by createGetDataElementValue', function() {
       expect(value).toBeUndefined();
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
-      expect(errorMessage).toStartWith('Failed to execute data element module hello-world/foo.js ' +
-        'for data element testDataElement. noob tried to divide by zero');
+      expect(errorMessage).toStartWith(
+        'Failed to execute data element module hello-world/foo.js ' +
+          'for data element testDataElement. noob tried to divide by zero'
+      );
     });
 
-    it('logs an error when executing data element module exports fails', function() {
-      var createGetDataElementValue =  getInjectedCreateGetDataElementValue();
+    it('logs an error when executing data element module exports fails', function () {
+      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
-        getModuleExports: function() {
-          return function() {
+        getModuleExports: function () {
+          return function () {
             throw new Error('noob tried to divide by zero');
           };
         }
       };
-      var getDataElementDefinition = function() {
+      var getDataElementDefinition = function () {
         return {
           modulePath: 'hello-world/foo.js',
           settings: {}
@@ -529,18 +551,20 @@ describe('function returned by createGetDataElementValue', function() {
       expect(value).toBeUndefined();
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
-      expect(errorMessage).toStartWith('Failed to execute data element module hello-world/foo.js ' +
-        'for data element testDataElement. noob tried to divide by zero');
+      expect(errorMessage).toStartWith(
+        'Failed to execute data element module hello-world/foo.js ' +
+          'for data element testDataElement. noob tried to divide by zero'
+      );
     });
 
-    it('logs an error when the data element module does not export a function', function() {
-      var createGetDataElementValue =  getInjectedCreateGetDataElementValue();
+    it('logs an error when the data element module does not export a function', function () {
+      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
-        getModuleExports: function() {
+        getModuleExports: function () {
           return {};
         }
       };
-      var getDataElementDefinition = function() {
+      var getDataElementDefinition = function () {
         return {
           modulePath: 'hello-world/foo.js',
           settings: {}
@@ -558,8 +582,10 @@ describe('function returned by createGetDataElementValue', function() {
       expect(value).toBeUndefined();
 
       var errorMessage = logger.error.calls.mostRecent().args[0];
-      expect(errorMessage).toBe('Failed to execute data element module hello-world/foo.js for ' +
-        'data element testDataElement. Module did not export a function.');
+      expect(errorMessage).toBe(
+        'Failed to execute data element module hello-world/foo.js for ' +
+          'data element testDataElement. Module did not export a function.'
+      );
     });
   });
 });

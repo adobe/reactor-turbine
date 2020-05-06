@@ -3,7 +3,7 @@ var kebabCase = require('kebab-case');
 
 module.exports = {
   extensionName: 'test-extension',
-  createModule: function(name, scriptFn) {
+  createModule: function (name, scriptFn) {
     var cName = camelCase(name);
     var kName = kebabCase(name);
 
@@ -18,7 +18,7 @@ module.exports = {
     ];
   },
 
-  getPath: function(name) {
+  getPath: function (name) {
     return this.extensionName + '/' + camelCase(name) + '.js';
   }
 };

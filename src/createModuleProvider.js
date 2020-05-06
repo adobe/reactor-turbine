@@ -13,10 +13,10 @@
 var extractModuleExports = require('./extractModuleExports');
 var logger = require('./logger');
 
-module.exports = function() {
+module.exports = function () {
   var moduleByReferencePath = {};
 
-  var getModule = function(referencePath) {
+  var getModule = function (referencePath) {
     var module = moduleByReferencePath[referencePath];
 
     if (!module) {
@@ -26,7 +26,13 @@ module.exports = function() {
     return module;
   };
 
-  var registerModule = function(referencePath, moduleDefinition, extensionName, require, turbine) {
+  var registerModule = function (
+    referencePath,
+    moduleDefinition,
+    extensionName,
+    require,
+    turbine
+  ) {
     var module = {
       definition: moduleDefinition,
       extensionName: extensionName,
@@ -37,36 +43,43 @@ module.exports = function() {
     moduleByReferencePath[referencePath] = module;
   };
 
-  var hydrateCache = function() {
-    Object.keys(moduleByReferencePath).forEach(function(referencePath) {
+  var hydrateCache = function () {
+    Object.keys(moduleByReferencePath).forEach(function (referencePath) {
       try {
         getModuleExports(referencePath);
       } catch (e) {
-        var errorMessage = 'Error initializing module ' + referencePath + '. ' +
-          e.message + (e.stack ? '\n' + e.stack : '');
+        var errorMessage =
+          'Error initializing module ' +
+          referencePath +
+          '. ' +
+          e.message +
+          (e.stack ? '\n' + e.stack : '');
         logger.error(errorMessage);
       }
     });
   };
 
-  var getModuleExports = function(referencePath) {
+  var getModuleExports = function (referencePath) {
     var module = getModule(referencePath);
 
     // Using hasOwnProperty instead of a falsey check because the module could export undefined
     // in which case we don't want to execute the module each time the exports is requested.
     if (!module.hasOwnProperty('exports')) {
-      module.exports = extractModuleExports(module.definition.script, module.require,
-        module.turbine);
+      module.exports = extractModuleExports(
+        module.definition.script,
+        module.require,
+        module.turbine
+      );
     }
 
     return module.exports;
   };
 
-  var getModuleDefinition = function(referencePath) {
+  var getModuleDefinition = function (referencePath) {
     return getModule(referencePath).definition;
   };
 
-  var getModuleExtensionName = function(referencePath) {
+  var getModuleExtensionName = function (referencePath) {
     return getModule(referencePath).extensionName;
   };
 
@@ -78,5 +91,3 @@ module.exports = function() {
     getModuleExtensionName: getModuleExtensionName
   };
 };
-
-

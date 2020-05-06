@@ -13,18 +13,20 @@ var logger = require('./logger');
 
 var warningLogged = false;
 
-module.exports = function(_satellite) {
-  return function(type, event) {
+module.exports = function (_satellite) {
+  return function (type, event) {
     var monitors = _satellite._monitors;
 
     if (monitors) {
       if (!warningLogged) {
-        logger.warn('The _satellite._monitors API may change at any time and should only ' +
-          'be used for debugging.');
+        logger.warn(
+          'The _satellite._monitors API may change at any time and should only ' +
+            'be used for debugging.'
+        );
         warningLogged = true;
       }
 
-      monitors.forEach(function(monitor) {
+      monitors.forEach(function (monitor) {
         if (monitor[type]) {
           monitor[type](event);
         }

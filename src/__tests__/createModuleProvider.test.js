@@ -14,7 +14,7 @@
 
 var injectCreateModuleProvider = require('inject-loader!../createModuleProvider');
 
-describe('function returned by createModuleProvider', function() {
+describe('function returned by createModuleProvider', function () {
   var logger;
   var referencePath = 'hello-world/src/foo.js';
   var extensionName = 'test-extension';
@@ -25,9 +25,10 @@ describe('function returned by createModuleProvider', function() {
   var extractModuleExportsSpy;
   var moduleProvider;
 
-  beforeEach(function() {
+  beforeEach(function () {
     logger = jasmine.createSpyObj('logger', ['log', 'error']);
-    extractModuleExportsSpy = jasmine.createSpy('extractModuleExports')
+    extractModuleExportsSpy = jasmine
+      .createSpy('extractModuleExports')
       .and.callFake(extractModuleExports);
 
     var createModuleProvider = injectCreateModuleProvider({
@@ -40,50 +41,57 @@ describe('function returned by createModuleProvider', function() {
     var module = {
       name: name,
       displayName: displayName,
-      script: function(module) {
+      script: function (module) {
         module.exports = moduleExports;
       }
     };
 
-    var require = function(path) { return path; };
+    var require = function (path) {
+      return path;
+    };
 
-    moduleProvider.registerModule(referencePath, module, extensionName, require);
+    moduleProvider.registerModule(
+      referencePath,
+      module,
+      extensionName,
+      require
+    );
   });
 
-  it('does not attempt to extract the module export when only registering a module', function() {
+  it('does not attempt to extract the module export when only registering a module', function () {
     expect(extractModuleExportsSpy.calls.count()).toBe(0);
   });
 
-  it('hydrates cache', function() {
+  it('hydrates cache', function () {
     moduleProvider.hydrateCache();
     expect(extractModuleExportsSpy.calls.count()).toBe(1);
     moduleProvider.getModuleExports(referencePath);
     expect(extractModuleExportsSpy.calls.count()).toBe(1);
   });
 
-  it('logs an error if error is thrown while hydrating cache', function() {
-    moduleProvider.registerModule(
-      referencePath,
-      {
-        displayName: 'Foo',
-        script: function() {
-          throw new Error('noob tried to divide by zero.');
-        }
+  it('logs an error if error is thrown while hydrating cache', function () {
+    moduleProvider.registerModule(referencePath, {
+      displayName: 'Foo',
+      script: function () {
+        throw new Error('noob tried to divide by zero.');
       }
-    );
+    });
 
     moduleProvider.hydrateCache();
 
     var errorMessage = logger.error.calls.mostRecent().args[0];
-    expect(errorMessage).toStartWith('Error initializing module ' + referencePath +
-      '. noob tried to divide by zero.');
+    expect(errorMessage).toStartWith(
+      'Error initializing module ' +
+        referencePath +
+        '. noob tried to divide by zero.'
+    );
   });
 
-  it('returns module exports', function() {
+  it('returns module exports', function () {
     expect(moduleProvider.getModuleExports(referencePath)).toBe(moduleExports);
   });
 
-  it('returns definition', function() {
+  it('returns definition', function () {
     expect(moduleProvider.getModuleDefinition(referencePath)).toEqual({
       name: name,
       displayName: displayName,
@@ -91,12 +99,14 @@ describe('function returned by createModuleProvider', function() {
     });
   });
 
-  it('returns extension name', function() {
-    expect(moduleProvider.getModuleExtensionName(referencePath)).toBe(extensionName);
+  it('returns extension name', function () {
+    expect(moduleProvider.getModuleExtensionName(referencePath)).toBe(
+      extensionName
+    );
   });
 
-  it('throws an error when a module is not found', function() {
-    expect(function() {
+  it('throws an error when a module is not found', function () {
+    expect(function () {
       moduleProvider.getModuleExports('hello-world/src/invalid.js');
     }).toThrowError('Module hello-world/src/invalid.js not found.');
   });

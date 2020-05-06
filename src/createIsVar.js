@@ -16,16 +16,16 @@
  * @param variableName
  * @returns {boolean}
  */
-module.exports = function(customVars, getDataElementDefinition) {
-  return function(variableName) {
+module.exports = function (customVars, getDataElementDefinition) {
+  return function (variableName) {
     var nameBeforeDot = variableName.split('.')[0];
 
     return Boolean(
       getDataElementDefinition(variableName) ||
-      nameBeforeDot === 'this' ||
-      nameBeforeDot === 'event' ||
-      nameBeforeDot === 'target' ||
-      customVars.hasOwnProperty(nameBeforeDot)
+        nameBeforeDot === 'this' ||
+        nameBeforeDot === 'event' ||
+        nameBeforeDot === 'target' ||
+        customVars.hasOwnProperty(nameBeforeDot)
     );
   };
 };

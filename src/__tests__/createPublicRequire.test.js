@@ -14,9 +14,8 @@
 
 var injectCreatePublicRequire = require('inject-loader!../createPublicRequire');
 
-describe('function returned by createPublicRequire', function() {
-
-  it('should return the static core modules', function() {
+describe('function returned by createPublicRequire', function () {
+  it('should return the static core modules', function () {
     var cookieMock = {};
     var documentMock = {};
     var loadScriptMock = {};
@@ -40,20 +39,24 @@ describe('function returned by createPublicRequire', function() {
     expect(publicRequire('@adobe/reactor-cookie')).toBe(cookieMock);
     expect(publicRequire('@adobe/reactor-document')).toBe(documentMock);
     expect(publicRequire('@adobe/reactor-load-script')).toBe(loadScriptMock);
-    expect(publicRequire('@adobe/reactor-object-assign')).toBe(objectAssignMock);
+    expect(publicRequire('@adobe/reactor-object-assign')).toBe(
+      objectAssignMock
+    );
     expect(publicRequire('@adobe/reactor-promise')).toBe(promiseMock);
     expect(publicRequire('@adobe/reactor-query-string')).toBe(queryStringMock);
     expect(publicRequire('@adobe/reactor-window')).toBe(windowMock);
   });
 
-  it('should call for relative module when relative path is used', function() {
+  it('should call for relative module when relative path is used', function () {
     var relativeModuleMock = {};
 
     var createPublicRequire = injectCreatePublicRequire({});
 
-    var getModuleExportsByRelativePath = jasmine.createSpy().and.callFake(function() {
-      return relativeModuleMock;
-    });
+    var getModuleExportsByRelativePath = jasmine
+      .createSpy()
+      .and.callFake(function () {
+        return relativeModuleMock;
+      });
 
     var publicRequire = createPublicRequire(getModuleExportsByRelativePath);
 
@@ -61,13 +64,15 @@ describe('function returned by createPublicRequire', function() {
     expect(getModuleExportsByRelativePath).toHaveBeenCalledWith('./foo/bar.js');
 
     expect(publicRequire('../../foo/bar.js')).toBe(relativeModuleMock);
-    expect(getModuleExportsByRelativePath).toHaveBeenCalledWith('../../foo/bar.js');
+    expect(getModuleExportsByRelativePath).toHaveBeenCalledWith(
+      '../../foo/bar.js'
+    );
   });
 
-  it('should throw error when a module that is neither core nor relative is required', function() {
+  it('should throw error when a module that is neither core nor relative is required', function () {
     var createPublicRequire = injectCreatePublicRequire({});
     var publicRequire = createPublicRequire();
-    expect(function() {
+    expect(function () {
       publicRequire('@adobe/reactor-invalidmodulename');
     }).toThrowError(Error);
   });

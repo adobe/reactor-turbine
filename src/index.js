@@ -25,7 +25,7 @@ var createSetCustomVar = require('./createSetCustomVar');
 var createAddActionToQueue = require('./rules/createAddActionToQueue');
 var createAddConditionToQueue = require('./rules/createAddConditionToQueue');
 var createAddRuleToQueue = require('./rules/createAddRuleToQueue');
-var createConditionsAreChecked = require('./rules/createConditionsAreChecked');
+var createEvaluateConditions = require('./rules/createEvaluateConditions');
 var createExecuteRule = require('./rules/createExecuteRule');
 var createGetModuleDisplayNameByRuleComponent = require('./rules/createGetModuleDisplayNameByRuleComponent');
 var createGetSyntheticEventMeta = require('./rules/createGetSyntheticEventMeta');
@@ -163,7 +163,7 @@ if (_satellite && !window.__satelliteLoaded) {
   );
   var logRuleCompleted = createLogRuleCompleted(logger, notifyMonitors);
 
-  var conditionsAreChecked = createConditionsAreChecked(
+  var evaluateConditions = createEvaluateConditions(
     executeDelegateModule,
     isConditionMet,
     logConditionNotMet,
@@ -174,7 +174,7 @@ if (_satellite && !window.__satelliteLoaded) {
     logActionError,
     logRuleCompleted
   );
-  var executeRule = createExecuteRule(conditionsAreChecked, runActions);
+  var executeRule = createExecuteRule(evaluateConditions, runActions);
 
   var addConditionToQueue = createAddConditionToQueue(
     executeDelegateModule,

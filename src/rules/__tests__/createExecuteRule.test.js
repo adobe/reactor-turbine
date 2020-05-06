@@ -16,17 +16,17 @@ var createExecuteRule = require('../createExecuteRule');
 
 describe('createExecuteRule returns a function that when called', function () {
   it('executes runActions if conditions are returning true', function () {
-    var conditionsAreCheckedSpy = jasmine
-      .createSpy('conditionsAreChecked')
+    var evaluateConditionsSpy = jasmine
+      .createSpy('evaluateConditions')
       .and.returnValue(true);
     var runActionsSpy = jasmine.createSpy('runActions');
 
-    createExecuteRule(conditionsAreCheckedSpy, runActionsSpy)(
+    createExecuteRule(evaluateConditionsSpy, runActionsSpy)(
       { id: 'rule id' },
       { $type: 'some type' }
     );
 
-    expect(conditionsAreCheckedSpy).toHaveBeenCalledWith(
+    expect(evaluateConditionsSpy).toHaveBeenCalledWith(
       { id: 'rule id' },
       { $type: 'some type' }
     );
@@ -38,12 +38,12 @@ describe('createExecuteRule returns a function that when called', function () {
   });
 
   it('does not execute runActions if conditions are returning false', function () {
-    var conditionsAreCheckedSpy = function () {
+    var evaluateConditions = function () {
       return false;
     };
     var runActionsSpy = jasmine.createSpy('runActions');
 
-    createExecuteRule(conditionsAreCheckedSpy, runActionsSpy)(
+    createExecuteRule(evaluateConditions, runActionsSpy)(
       { id: 'rule id' },
       { $type: 'some type' }
     );

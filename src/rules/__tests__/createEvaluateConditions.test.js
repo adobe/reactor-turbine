@@ -12,17 +12,17 @@ governing permissions and limitations under the License.
 
 'use strict';
 
-var createConditionsAreChecked = require('../createConditionsAreChecked');
+var createEvaluateConditions = require('../createEvaluateConditions');
 var emptyFn = function () {};
 
-describe('createConditionsAreChecked returns a function that when called', function () {
+describe('createEvaluateConditions returns a function that when called', function () {
   it('returns true when rule does not have conditons', function () {
-    expect(createConditionsAreChecked()({ id: 'rule id' })).toBeTrue();
+    expect(createEvaluateConditions()({ id: 'rule id' })).toBeTrue();
   });
 
   it('returns true when conditions are met', function () {
     expect(
-      createConditionsAreChecked(
+      createEvaluateConditions(
         function (condition) {
           return condition.modulePath === 'condition1';
         },
@@ -42,7 +42,7 @@ describe('createConditionsAreChecked returns a function that when called', funct
 
   it('returns false when conditions are not met', function () {
     expect(
-      createConditionsAreChecked(
+      createEvaluateConditions(
         function (condition) {
           return condition.modulePath === 'condition1';
         },
@@ -69,7 +69,7 @@ describe('createConditionsAreChecked returns a function that when called', funct
       conditions: [condition]
     };
 
-    createConditionsAreChecked(
+    createEvaluateConditions(
       function (condition) {
         return condition.modulePath === 'condition1';
       },
@@ -84,7 +84,7 @@ describe('createConditionsAreChecked returns a function that when called', funct
 
   it('returns false when a condition throws an error', function () {
     expect(
-      createConditionsAreChecked(
+      createEvaluateConditions(
         function () {
           throw new Error('some error');
         },
@@ -112,7 +112,7 @@ describe('createConditionsAreChecked returns a function that when called', funct
       conditions: [condition]
     };
 
-    createConditionsAreChecked(
+    createEvaluateConditions(
       function () {
         throw e;
       },
@@ -136,7 +136,7 @@ describe('createConditionsAreChecked returns a function that when called', funct
       }
     ];
 
-    createConditionsAreChecked(
+    createEvaluateConditions(
       executeDelegateModuleSpy,
       function () {
         return true;
@@ -174,7 +174,7 @@ describe('createConditionsAreChecked returns a function that when called', funct
       }
     ];
 
-    createConditionsAreChecked(
+    createEvaluateConditions(
       executeDelegateModuleSpy,
       function () {
         return false;

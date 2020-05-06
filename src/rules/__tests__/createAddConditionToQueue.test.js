@@ -55,11 +55,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       emptyFn,
       emptyFn
     )(condition, rule, event, Promise.resolve()).then(
-      function () {
-        throw new Error(
-          'You should never get in the resolved state for this test'
-        );
-      },
+      fail.bind('You should never get in the resolved state for this test'),
       function () {
         expect(isConditionMetSpy).toHaveBeenCalledWith(condition, false);
       }
@@ -78,11 +74,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       emptyFn,
       logConditionNotMetSpy
     )(condition, rule, event, Promise.resolve()).then(
-      function () {
-        throw new Error(
-          'You should never get in the resolved state for this test'
-        );
-      },
+      fail.bind('You should never get in the resolved state for this test'),
       function () {
         expect(logConditionNotMetSpy).toHaveBeenCalledWith(condition, rule);
       }
@@ -105,11 +97,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       emptyFn,
       emptyFn
     )(condition, rule, event, Promise.resolve()).then(
-      function () {
-        throw new Error(
-          'You should never get in the resolved state for this test'
-        );
-      },
+      fail.bind('You should never get in the resolved state for this test'),
       function (error) {
         expect(normalizeRuleComponentErrorSpy).toHaveBeenCalledWith(e);
         expect(error).toBe('normalized error');
@@ -135,11 +123,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
         logConditionErrorSpy,
         emptyFn
       )(condition, rule, event, Promise.resolve()).then(
-        function () {
-          throw new Error(
-            'You should never get in the resolved state for this test'
-          );
-        },
+        fail.bind('You should never get in the resolved state for this test'),
         function () {
           expect(logConditionErrorSpy).toHaveBeenCalledWith(condition, rule, e);
         }
@@ -166,11 +150,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       event,
       Promise.resolve()
     ).then(
-      function () {
-        throw new Error(
-          'You should never get in the resolved state for this test'
-        );
-      },
+      fail.bind('You should never get in the resolved state for this test'),
       function (e) {
         expect(e).toEqual(
           new Error(
@@ -203,11 +183,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
         event,
         Promise.resolve()
       ).then(
-        function () {
-          throw new Error(
-            'You should never get in the resolved state for this test'
-          );
-        },
+        fail.bind('You should never get in the resolved state for this test'),
         function (e) {
           expect(e).toEqual(
             new Error(

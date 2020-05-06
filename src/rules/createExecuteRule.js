@@ -10,9 +10,9 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-module.exports = function (conditionsAreChecked, runActions) {
+module.exports = function (evaluateConditions, runActions) {
   return function (rule, normalizedSyntheticEvent) {
-    if (conditionsAreChecked(rule, normalizedSyntheticEvent)) {
+    if (evaluateConditions(rule, normalizedSyntheticEvent)) {
       runActions(rule, normalizedSyntheticEvent);
     }
   };

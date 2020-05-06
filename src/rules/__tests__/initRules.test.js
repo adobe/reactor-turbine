@@ -38,19 +38,13 @@ describe('initRules', function () {
     var rules = [{ ruleId: 123 }, { ruleId: 124 }];
     initRules(buildRuleExecutionOrder, rules, initEventModule);
 
-    expect(initEventModule).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      { ruleId: 123 },
-      0,
-      rules
-    );
+    expect(initEventModule).toHaveBeenCalledWith(jasmine.any(Function), {
+      ruleId: 123
+    });
 
-    expect(initEventModule).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      { ruleId: 124 },
-      1,
-      rules
-    );
+    expect(initEventModule).toHaveBeenCalledWith(jasmine.any(Function), {
+      ruleId: 124
+    });
   });
 
   it('delays the actual rule triggering until all event modules are initialized', function () {
@@ -58,6 +52,7 @@ describe('initRules', function () {
     // the module with eventModulesInitialized=false.
     delete require.cache[require.resolve('../initRules')];
     var initRules = require('../initRules');
+    var index = 0;
 
     var rules = [{ ruleId: 123 }, { ruleId: 124 }];
 
@@ -67,22 +62,23 @@ describe('initRules', function () {
 
     initRules(buildRuleExecutionOrder, rules, function (
       guardUntilAllInitialized,
-      rule,
-      index
+      rule
     ) {
       guardUntilAllInitialized(triggers[index]);
 
-      if (index === 2) {
+      if (index === 1) {
         expect(triggerForRule123).not.toHaveBeenCalled();
         expect(triggerForRule124).not.toHaveBeenCalled();
       }
+
+      index += 1;
     });
 
     expect(triggerForRule123).toHaveBeenCalled();
     expect(triggerForRule124).toHaveBeenCalled();
   });
 
-  it('after all modules are intialized it executes triggers imediatelly', function () {
+  it('after all modules are intialized it executes triggers immediately', function () {
     // Force reloading the initRules module in this test in order to initialize
     // the module with eventModulesInitialized=false.
     delete require.cache[require.resolve('../initRules')];

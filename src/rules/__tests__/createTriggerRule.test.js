@@ -44,7 +44,7 @@ describe('createTriggerRule returns a function that when called', function () {
     );
   });
 
-  it('executes rule imediatelly when ruleComponentSequencingEnabled is false', function () {
+  it('executes rule immediately when ruleComponentSequencingEnabled is false', function () {
     var executeRuleSpy = jasmine.createSpy('executeRule');
     var rule = { ruleId: '123' };
     var normalizedSyntheticEvent = { a: 'a' };

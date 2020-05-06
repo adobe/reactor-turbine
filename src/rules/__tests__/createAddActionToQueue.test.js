@@ -52,11 +52,7 @@ describe('createAddActionToQueue returns a function that when called', function 
       normalizeRuleComponentErrorSpy,
       emptyFn
     )(action, rule, event, Promise.resolve()).then(
-      function () {
-        throw new Error(
-          'You should never get in the resolved state for this test'
-        );
-      },
+      fail.bind('You should never get in the resolved state for this test'),
       function (error) {
         expect(normalizeRuleComponentErrorSpy).toHaveBeenCalledWith(e);
         expect(error).toBe('normalized error');
@@ -80,11 +76,7 @@ describe('createAddActionToQueue returns a function that when called', function 
         },
         logActionErrorSpy
       )(action, rule, event, Promise.resolve()).then(
-        function () {
-          throw new Error(
-            'You should never get in the resolved state for this test'
-          );
-        },
+        fail.bind('You should never get in the resolved state for this test'),
         function () {
           expect(logActionErrorSpy).toHaveBeenCalledWith(action, rule, e);
         }
@@ -109,11 +101,7 @@ describe('createAddActionToQueue returns a function that when called', function 
       event,
       Promise.resolve()
     ).then(
-      function () {
-        throw new Error(
-          'You should never get in the resolved state for this test'
-        );
-      },
+      fail.bind('You should never get in the resolved state for this test'),
       function (e) {
         expect(e).toEqual(
           new Error(
@@ -125,7 +113,7 @@ describe('createAddActionToQueue returns a function that when called', function 
   });
 
   it(
-    'returns a promise that is resolved imediatelly if the action timeout is ' +
+    'returns a promise that is resolved immediately if the action timeout is ' +
       'not defined',
     function () {
       return createAddActionToQueue(

@@ -22,9 +22,9 @@ var guardUntilAllInitialized = function (callback) {
 };
 
 module.exports = function (buildRuleExecutionOrder, rules, initEventModule) {
-  buildRuleExecutionOrder(rules).forEach(
-    initEventModule.bind(null, guardUntilAllInitialized)
-  );
+  buildRuleExecutionOrder(rules).forEach(function (ruleEventPair) {
+    initEventModule(guardUntilAllInitialized, ruleEventPair);
+  });
 
   eventModulesInitialized = true;
   triggerCallQueue.forEach(function (triggerCall) {

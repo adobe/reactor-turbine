@@ -24,14 +24,14 @@ var logger = require('./logger');
  * %target.something%)
  * @returns {*} A processed value.
  */
-module.exports = function(isVar, getVar, undefinedVarsReturnEmpty) {
+module.exports = function (isVar, getVar, undefinedVarsReturnEmpty) {
   var replaceTokensInString;
   var replaceTokensInObject;
   var replaceTokensInArray;
   var replaceTokens;
   var variablesBeingRetrieved = [];
 
-  var getVarValue = function(token, variableName, syntheticEvent) {
+  var getVarValue = function (token, variableName, syntheticEvent) {
     if (!isVar(variableName)) {
       return token;
     }
@@ -52,20 +52,20 @@ module.exports = function(isVar, getVar, undefinedVarsReturnEmpty) {
    * @param event {Object} The event object to use for tokens in the form of %target.property%.
    * @returns {*}
    */
-  replaceTokensInString = function(str, syntheticEvent) {
+  replaceTokensInString = function (str, syntheticEvent) {
     // Is the string a single data element token and nothing else?
     var result = /^%([^%]+)%$/.exec(str);
 
     if (result) {
       return getVarValue(str, result[1], syntheticEvent);
     } else {
-      return str.replace(/%(.+?)%/g, function(token, variableName) {
+      return str.replace(/%(.+?)%/g, function (token, variableName) {
         return getVarValue(token, variableName, syntheticEvent);
       });
     }
   };
 
-  replaceTokensInObject = function(obj, syntheticEvent) {
+  replaceTokensInObject = function (obj, syntheticEvent) {
     var ret = {};
     var keys = Object.keys(obj);
     for (var i = 0; i < keys.length; i++) {
@@ -76,7 +76,7 @@ module.exports = function(isVar, getVar, undefinedVarsReturnEmpty) {
     return ret;
   };
 
-  replaceTokensInArray = function(arr, syntheticEvent) {
+  replaceTokensInArray = function (arr, syntheticEvent) {
     var ret = [];
     for (var i = 0, len = arr.length; i < len; i++) {
       ret.push(replaceTokens(arr[i], syntheticEvent));
@@ -84,7 +84,7 @@ module.exports = function(isVar, getVar, undefinedVarsReturnEmpty) {
     return ret;
   };
 
-  replaceTokens = function(thing, syntheticEvent) {
+  replaceTokens = function (thing, syntheticEvent) {
     if (typeof thing === 'string') {
       return replaceTokensInString(thing, syntheticEvent);
     } else if (Array.isArray(thing)) {
@@ -96,12 +96,14 @@ module.exports = function(isVar, getVar, undefinedVarsReturnEmpty) {
     return thing;
   };
 
-  return function(thing, syntheticEvent) {
+  return function (thing, syntheticEvent) {
     // It's possible for a data element to reference another data element. Because of this,
     // we need to prevent circular dependencies from causing an infinite loop.
     if (variablesBeingRetrieved.length > 10) {
-      logger.error('Data element circular reference detected: ' +
-        variablesBeingRetrieved.join(' -> '));
+      logger.error(
+        'Data element circular reference detected: ' +
+          variablesBeingRetrieved.join(' -> ')
+      );
       return thing;
     }
 

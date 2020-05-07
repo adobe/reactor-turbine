@@ -1,14 +1,14 @@
 {
   "name": "@adobe/reactor-turbine",
-  "version": "25.8.0",
+  "version": "26.0.0",
   "description": "Launch rule engine which processes rules on client websites and delegates logic to extensions.",
   "license": "Apache-2.0",
   "scripts": {
     "build": "rollup -c --intro \"if (!window.atob) { console.warn('Adobe Launch is unsupported in IE 9 and below.'); return; }\" && uglifyjs dist/engine.js -c -m -o dist/engine.min.js",
     "build:watch": "rollup --watch -c --intro \"if (!window.atob) { console.warn('Adobe Launch is unsupported in IE 9 and below.'); return; }\" && uglifyjs dist/engine.js -c -m -o dist/engine.min.js",
     "prepublishOnly": "npm run build",
-    "test": "karma start",
-    "test:watch": "npm test -- --no-single-run --no-coverage",
+    "test": "karma start && npm run lint",
+    "test:watch": "karma start --no-single-run --no-coverage",
     "lint": "eslint 'src/**/*.js'"
   },
   "author": {
@@ -32,23 +32,26 @@
   "devDependencies": {
     "camelize": "1.0.0",
     "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
     "inject-loader": "^4.0.1",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-core": "^3.5.0",
-    "karma": "^4.4.1",
+    "karma": "^5.0.3",
     "karma-chrome-launcher": "^3.1.0",
-    "karma-coverage": "^2.0.1",
+    "karma-coverage": "^2.0.2",
     "karma-firefox-launcher": "^1.3.0",
-    "karma-jasmine": "^3.1.0",
+    "karma-jasmine": "^3.1.1",
     "karma-jasmine-matchers": "^4.0.2",
     "karma-safari-launcher": "^1.0.0",
-    "karma-sauce-launcher": "^2.0.2",
+    "karma-sauce-launcher": "^4.1.4",
     "karma-webpack": "^4.0.2",
     "kebab-case": "1.0.0",
-    "rollup": "^0.50.0",
-    "rollup-plugin-commonjs": "^8.2.4",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "webpack": "^4.41.5",
-    "yargs": "^15.1.0"
+    "prettier": "^2.0.5",
+    "rollup": "^2.7.5",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "webpack": "^4.43.0",
+    "yargs": "^15.3.1"
   }
 }

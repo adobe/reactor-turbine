@@ -13,26 +13,36 @@
 'use strict';
 var injectCreateReplaceTokens = require('inject-loader!../createReplaceTokens');
 
-describe('function returned by replaceTokens', function() {
+describe('function returned by replaceTokens', function () {
   var isVar;
   var getVar;
   var undefinedVarsReturnEmpty;
   var logger;
   var createReplaceTokens;
 
-  beforeEach(function() {
+  beforeEach(function () {
     logger = jasmine.createSpyObj('logger', ['error']);
-    isVar = function() { return true; };
-    getVar = function() { return null; };
+    isVar = function () {
+      return true;
+    };
+    getVar = function () {
+      return null;
+    };
     undefinedVarsReturnEmpty = false;
     createReplaceTokens = injectCreateReplaceTokens({
       './logger': logger
     });
   });
 
-  it('replaces nested tokens', function() {
-    getVar = function(variableName) { return 'replaced:' + variableName; };
-    var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
+  it('replaces nested tokens', function () {
+    getVar = function (variableName) {
+      return 'replaced:' + variableName;
+    };
+    var replaceTokens = createReplaceTokens(
+      isVar,
+      getVar,
+      undefinedVarsReturnEmpty
+    );
     var result = replaceTokens({
       foo: [
         {},
@@ -41,10 +51,7 @@ describe('function returned by replaceTokens', function() {
           zoo: '%unicorn% and %dinosaur%'
         }
       ],
-      fruits: [
-        '%apple%',
-        'banana'
-      ]
+      fruits: ['%apple%', 'banana']
     });
 
     expect(result).toEqual({
@@ -55,60 +62,96 @@ describe('function returned by replaceTokens', function() {
           zoo: 'replaced:unicorn and replaced:dinosaur'
         }
       ],
-      fruits: [
-        'replaced:apple',
-        'banana'
-      ]
+      fruits: ['replaced:apple', 'banana']
     });
   });
 
-  it('replaces token with empty string if value is null and ' +
-    'undefinedVarsReturnEmpty = true', function() {
-    var undefinedVarsReturnEmpty = true;
-    var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
+  it(
+    'replaces token with empty string if value is null and ' +
+      'undefinedVarsReturnEmpty = true',
+    function () {
+      var undefinedVarsReturnEmpty = true;
+      var replaceTokens = createReplaceTokens(
+        isVar,
+        getVar,
+        undefinedVarsReturnEmpty
+      );
 
-    expect(replaceTokens('foo %bar%')).toBe('foo ');
-  });
+      expect(replaceTokens('foo %bar%')).toBe('foo ');
+    }
+  );
 
-  it('replace token if var value is null and undefinedVarsReturnEmpty = false', function() {
-    var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
+  it('replace token if var value is null and undefinedVarsReturnEmpty = false', function () {
+    var replaceTokens = createReplaceTokens(
+      isVar,
+      getVar,
+      undefinedVarsReturnEmpty
+    );
 
     expect(replaceTokens('foo %bar%')).toBe('foo null');
   });
 
-  it('does not replace token if var definition is not found', function() {
-    isVar = function() { return false; };
-    var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
+  it('does not replace token if var definition is not found', function () {
+    isVar = function () {
+      return false;
+    };
+    var replaceTokens = createReplaceTokens(
+      isVar,
+      getVar,
+      undefinedVarsReturnEmpty
+    );
 
     expect(replaceTokens('foo %bar%')).toBe('foo %bar%');
   });
 
-  it('returns the data element\'s raw value if only a ' +
-    'single data element token is given', function() {
-    var objValue = {};
-    getVar = function() { return objValue; };
-    var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
+  it(
+    "returns the data element's raw value if only a " +
+      'single data element token is given',
+    function () {
+      var objValue = {};
+      getVar = function () {
+        return objValue;
+      };
+      var replaceTokens = createReplaceTokens(
+        isVar,
+        getVar,
+        undefinedVarsReturnEmpty
+      );
 
-    expect(replaceTokens('%foo%')).toBe(objValue);
-  });
+      expect(replaceTokens('%foo%')).toBe(objValue);
+    }
+  );
 
-  it('does not return the data element\'s raw value if string starts and ends with different ' +
-    'data element tokens', function() {
-    getVar = function() { return 'quux'; };
-    var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
+  it(
+    "does not return the data element's raw value if string starts and ends with different " +
+      'data element tokens',
+    function () {
+      getVar = function () {
+        return 'quux';
+      };
+      var replaceTokens = createReplaceTokens(
+        isVar,
+        getVar,
+        undefinedVarsReturnEmpty
+      );
 
-    // tests regex robustness
-    expect(replaceTokens('%foo% and %bar%')).toBe('quux and quux');
-  });
+      // tests regex robustness
+      expect(replaceTokens('%foo% and %bar%')).toBe('quux and quux');
+    }
+  );
 
-  it('returns the argument unmodified if it is an unsupported type', function() {
-    var replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
+  it('returns the argument unmodified if it is an unsupported type', function () {
+    var replaceTokens = createReplaceTokens(
+      isVar,
+      getVar,
+      undefinedVarsReturnEmpty
+    );
 
-    var fn = function() {};
+    var fn = function () {};
     expect(replaceTokens(fn)).toBe(fn);
   });
 
-  it('handles recursive data element references', function() {
+  it('handles recursive data element references', function () {
     var replaceTokens;
 
     var de1Settings = {
@@ -119,17 +162,25 @@ describe('function returned by replaceTokens', function() {
       foo: '%de1%'
     };
 
-    getVar = function(variableName) {
-      var result = replaceTokens(variableName === 'de1' ? de1Settings : de2Settings);
+    getVar = function (variableName) {
+      var result = replaceTokens(
+        variableName === 'de1' ? de1Settings : de2Settings
+      );
       return result.foo;
     };
 
-    replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
+    replaceTokens = createReplaceTokens(
+      isVar,
+      getVar,
+      undefinedVarsReturnEmpty
+    );
 
     expect(replaceTokens(de1Settings)).toEqual({
       foo: '%de1%'
     });
-    expect(logger.error).toHaveBeenCalledWith('Data element circular reference detected: ' +
-      'de2 -> de1 -> de2 -> de1 -> de2 -> de1 -> de2 -> de1 -> de2 -> de1 -> de2');
+    expect(logger.error).toHaveBeenCalledWith(
+      'Data element circular reference detected: ' +
+        'de2 -> de1 -> de2 -> de1 -> de2 -> de1 -> de2 -> de1 -> de2 -> de1 -> de2'
+    );
   });
 });

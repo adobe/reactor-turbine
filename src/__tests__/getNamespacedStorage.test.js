@@ -14,8 +14,8 @@
 
 var injectGetNamespacedStorage = require('inject-loader!../getNamespacedStorage');
 
-describe('getNamespacedStorage', function() {
-  var createMockWindowUnavailableStorage = function() {
+describe('getNamespacedStorage', function () {
+  var createMockWindowUnavailableStorage = function () {
     return {
       get sessionStorage() {
         throw new Error('Storage unavailable.');
@@ -26,13 +26,13 @@ describe('getNamespacedStorage', function() {
     };
   };
 
-  afterEach(function() {
+  afterEach(function () {
     window.localStorage.removeItem('com.adobe.reactor.foo');
   });
 
-  ['sessionStorage', 'localStorage'].forEach(function(storageType) {
-    describe('getItem', function() {
-      it('returns item', function() {
+  ['sessionStorage', 'localStorage'].forEach(function (storageType) {
+    describe('getItem', function () {
+      it('returns item', function () {
         var getNamespacedStorage = injectGetNamespacedStorage();
         var storage = getNamespacedStorage(storageType);
 
@@ -40,7 +40,7 @@ describe('getNamespacedStorage', function() {
         expect(storage.getItem('foo')).toEqual('something');
       });
 
-      it('proper error handling if storage is disabled', function() {
+      it('proper error handling if storage is disabled', function () {
         var mockWindow = createMockWindowUnavailableStorage();
 
         var getNamespacedStorage = injectGetNamespacedStorage({
@@ -53,16 +53,18 @@ describe('getNamespacedStorage', function() {
       });
     });
 
-    describe('setItem', function() {
-      it('sets item', function() {
+    describe('setItem', function () {
+      it('sets item', function () {
         var getNamespacedStorage = injectGetNamespacedStorage();
         var storage = getNamespacedStorage(storageType);
 
         storage.setItem('foo', 'something');
-        expect(window[storageType].getItem('com.adobe.reactor.foo')).toEqual('something');
+        expect(window[storageType].getItem('com.adobe.reactor.foo')).toEqual(
+          'something'
+        );
       });
 
-      it('proper error handling if storage is disabled', function() {
+      it('proper error handling if storage is disabled', function () {
         var mockWindow = createMockWindowUnavailableStorage();
 
         var getNamespacedStorage = injectGetNamespacedStorage({

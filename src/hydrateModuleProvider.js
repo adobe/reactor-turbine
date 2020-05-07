@@ -17,7 +17,7 @@ var logger = require('./logger');
 var resolveRelativePath = require('./resolveRelativePath');
 var createPublicRequire = require('./createPublicRequire');
 
-module.exports = function(
+module.exports = function (
   container,
   moduleProvider,
   debugController,
@@ -29,11 +29,17 @@ module.exports = function(
   var propertySettings = container.property.settings;
 
   if (extensions) {
-    var getSharedModuleExports = createGetSharedModuleExports(extensions, moduleProvider);
+    var getSharedModuleExports = createGetSharedModuleExports(
+      extensions,
+      moduleProvider
+    );
 
-    Object.keys(extensions).forEach(function(extensionName) {
+    Object.keys(extensions).forEach(function (extensionName) {
       var extension = extensions[extensionName];
-      var getExtensionSettings = createGetExtensionSettings(replaceTokens, extension.settings);
+      var getExtensionSettings = createGetExtensionSettings(
+        replaceTokens,
+        extension.settings
+      );
 
       if (extension.modules) {
         var prefixedLogger = logger.createPrefixedLogger(extension.displayName);
@@ -56,13 +62,18 @@ module.exports = function(
           }
         };
 
-        Object.keys(extension.modules).forEach(function(referencePath) {
+        Object.keys(extension.modules).forEach(function (referencePath) {
           var module = extension.modules[referencePath];
-          var getModuleExportsByRelativePath = function(relativePath) {
-            var resolvedReferencePath = resolveRelativePath(referencePath, relativePath);
+          var getModuleExportsByRelativePath = function (relativePath) {
+            var resolvedReferencePath = resolveRelativePath(
+              referencePath,
+              relativePath
+            );
             return moduleProvider.getModuleExports(resolvedReferencePath);
           };
-          var publicRequire = createPublicRequire(getModuleExportsByRelativePath);
+          var publicRequire = createPublicRequire(
+            getModuleExportsByRelativePath
+          );
 
           moduleProvider.registerModule(
             referencePath,

@@ -13,16 +13,16 @@
 'use strict';
 var createGetExtensionSettings = require('../createGetExtensionSettings');
 
-describe('function returned by createGetExtensionConfiguration', function() {
+describe('function returned by createGetExtensionConfiguration', function () {
   var settingsWithReplacements = {
     name: 'shoes'
   };
 
-  var replaceTokens = function() {
+  var replaceTokens = function () {
     return settingsWithReplacements;
   };
 
-  it('returns settings with data element tokens replaced', function() {
+  it('returns settings with data element tokens replaced', function () {
     var getExtensionSettings = createGetExtensionSettings(replaceTokens, {
       name: '%foo%'
     });
@@ -30,7 +30,7 @@ describe('function returned by createGetExtensionConfiguration', function() {
     expect(getExtensionSettings()).toEqual(settingsWithReplacements);
   });
 
-  it('gracefully handles undefined settings', function() {
+  it('gracefully handles undefined settings', function () {
     var getExtensionSettings = createGetExtensionSettings(replaceTokens);
 
     expect(getExtensionSettings()).toEqual({});

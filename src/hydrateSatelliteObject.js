@@ -13,21 +13,31 @@
 var cookie = require('@adobe/reactor-cookie');
 var logger = require('./logger');
 
-module.exports = function(_satellite, container, setDebugEnabled, getVar, setCustomVar) {
+module.exports = function (
+  _satellite,
+  container,
+  setDebugEnabled,
+  getVar,
+  setCustomVar
+) {
   var customScriptPrefixedLogger = logger.createPrefixedLogger('Custom Script');
 
   // Will get replaced by the directCall event delegate from the Core extension. Exists here in
   // case there are no direct call rules (and therefore the directCall event delegate won't get
   // included) and our customers are still calling the method. In this case, we don't want an error
   // to be thrown. This method existed before Reactor.
-  _satellite.track = function(identifier) {
-    logger.log('"' + identifier + '" does not match any direct call identifiers.');
+  _satellite.track = function (identifier) {
+    logger.log(
+      '"' + identifier + '" does not match any direct call identifiers.'
+    );
   };
 
   // Will get replaced by the Marketing Cloud ID extension if installed. Exists here in case
   // the extension is not installed and our customers are still calling the method. In this case,
   // we don't want an error to be thrown. This method existed before Reactor.
-  _satellite.getVisitorId = function() { return null; };
+  _satellite.getVisitorId = function () {
+    return null;
+  };
 
   // container.property also has property settings, but it shouldn't concern the user.
   // By limiting our API exposure to necessities, we provide more flexibility in the future.
@@ -47,8 +57,10 @@ module.exports = function(_satellite, container, setDebugEnabled, getVar, setCus
    * @param {number} [level] A number that represents the level of logging.
    * 3=info, 4=warn, 5=error, anything else=log
    */
-  _satellite.notify = function(message, level) {
-    logger.warn('_satellite.notify is deprecated. Please use the `_satellite.logger` API.');
+  _satellite.notify = function (message, level) {
+    logger.warn(
+      '_satellite.notify is deprecated. Please use the `_satellite.logger` API.'
+    );
 
     switch (level) {
       case 3:
@@ -75,7 +87,7 @@ module.exports = function(_satellite, container, setDebugEnabled, getVar, setCus
    * @param {number} [days] The number of days to store the cookie. If not specified, the cookie
    * will be stored for the session only.
    */
-  _satellite.setCookie = function(name, value, days) {
+  _satellite.setCookie = function (name, value, days) {
     var optionsStr = '';
     var options = {};
 
@@ -84,8 +96,15 @@ module.exports = function(_satellite, container, setDebugEnabled, getVar, setCus
       options.expires = days;
     }
 
-    var msg = '_satellite.setCookie is deprecated. Please use ' +
-      '_satellite.cookie.set("' + name + '", "' + value + '"' + optionsStr + ').';
+    var msg =
+      '_satellite.setCookie is deprecated. Please use ' +
+      '_satellite.cookie.set("' +
+      name +
+      '", "' +
+      value +
+      '"' +
+      optionsStr +
+      ').';
 
     logger.warn(msg);
     cookie.set(name, value, options);
@@ -96,9 +115,13 @@ module.exports = function(_satellite, container, setDebugEnabled, getVar, setCus
    * @param {string} name The name of the cookie to read.
    * @returns {string}
    */
-  _satellite.readCookie = function(name) {
-    logger.warn('_satellite.readCookie is deprecated. ' +
-      'Please use _satellite.cookie.get("' + name + '").');
+  _satellite.readCookie = function (name) {
+    logger.warn(
+      '_satellite.readCookie is deprecated. ' +
+        'Please use _satellite.cookie.get("' +
+        name +
+        '").'
+    );
     return cookie.get(name);
   };
 
@@ -106,9 +129,13 @@ module.exports = function(_satellite, container, setDebugEnabled, getVar, setCus
    * Removes a cookie value.
    * @param name
    */
-  _satellite.removeCookie = function(name) {
-    logger.warn('_satellite.removeCookie is deprecated. ' +
-      'Please use _satellite.cookie.remove("' + name + '").');
+  _satellite.removeCookie = function (name) {
+    logger.warn(
+      '_satellite.removeCookie is deprecated. ' +
+        'Please use _satellite.cookie.remove("' +
+        name +
+        '").'
+    );
     cookie.remove(name);
   };
 
@@ -118,17 +145,19 @@ module.exports = function(_satellite, container, setDebugEnabled, getVar, setCus
   // case the customers are not using core (and therefore the pageBottom event delegate won't get
   // included) and they are still calling the method. In this case, we don't want an error
   // to be thrown. This method existed before Reactor.
-  _satellite.pageBottom = function() {};
+  _satellite.pageBottom = function () {};
 
   _satellite.setDebug = setDebugEnabled;
 
   var warningLogged = false;
 
   Object.defineProperty(_satellite, '_container', {
-    get: function() {
+    get: function () {
       if (!warningLogged) {
-        logger.warn('_satellite._container may change at any time and should only ' +
-          'be used for debugging.');
+        logger.warn(
+          '_satellite._container may change at any time and should only ' +
+            'be used for debugging.'
+        );
         warningLogged = true;
       }
 

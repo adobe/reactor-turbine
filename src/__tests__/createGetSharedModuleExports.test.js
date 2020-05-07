@@ -12,11 +12,11 @@
 
 'use strict';
 
-describe('function returned by createGetSharedModuleExports', function() {
+describe('function returned by createGetSharedModuleExports', function () {
   var createGetSharedModuleExports = require('../createGetSharedModuleExports');
   var getSharedModuleExports;
 
-  beforeEach(function() {
+  beforeEach(function () {
     var extensions = {
       'hello-world': {
         modules: {
@@ -24,32 +24,34 @@ describe('function returned by createGetSharedModuleExports', function() {
             name: 'foo',
             shared: true
           },
-          'hello-world/src/baz.js': {
-          }
+          'hello-world/src/baz.js': {}
         }
       }
     };
 
     var moduleProvider = {
-      getModuleExports: function(referencePath) {
+      getModuleExports: function (referencePath) {
         return 'exports from ' + referencePath;
       }
     };
 
-    getSharedModuleExports = createGetSharedModuleExports(extensions, moduleProvider);
+    getSharedModuleExports = createGetSharedModuleExports(
+      extensions,
+      moduleProvider
+    );
   });
 
-  it('returns a shared module\'s exports', function() {
+  it("returns a shared module's exports", function () {
     var exports = getSharedModuleExports('hello-world', 'foo');
     expect(exports).toBe('exports from hello-world/src/foo.js');
   });
 
-  it('returns undefined if no matching extension is found', function() {
+  it('returns undefined if no matching extension is found', function () {
     var exports = getSharedModuleExports('goodbye-moon', 'foo');
     expect(exports).toBeUndefined();
   });
 
-  it('returns undefined if no matching shared module is found', function() {
+  it('returns undefined if no matching shared module is found', function () {
     var exports = getSharedModuleExports('hello-world', 'baz');
     expect(exports).toBeUndefined();
   });

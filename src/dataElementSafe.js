@@ -19,8 +19,14 @@ var DATA_ELEMENTS_NAMESPACE = 'dataElements.';
 var MIGRATED_KEY = 'dataElementCookiesMigrated';
 
 var reactorLocalStorage = getNamespacedStorage('localStorage');
-var dataElementSessionStorage = getNamespacedStorage('sessionStorage', DATA_ELEMENTS_NAMESPACE);
-var dataElementLocalStorage = getNamespacedStorage('localStorage', DATA_ELEMENTS_NAMESPACE);
+var dataElementSessionStorage = getNamespacedStorage(
+  'sessionStorage',
+  DATA_ELEMENTS_NAMESPACE
+);
+var dataElementLocalStorage = getNamespacedStorage(
+  'localStorage',
+  DATA_ELEMENTS_NAMESPACE
+);
 
 var storageDurations = {
   PAGEVIEW: 'pageview',
@@ -30,7 +36,7 @@ var storageDurations = {
 
 var pageviewCache = {};
 
-var serialize = function(value) {
+var serialize = function (value) {
   var serialized;
 
   try {
@@ -43,7 +49,7 @@ var serialize = function(value) {
   return serialized;
 };
 
-var setValue = function(key, storageDuration, value) {
+var setValue = function (key, storageDuration, value) {
   var serializedValue;
 
   switch (storageDuration) {
@@ -65,7 +71,7 @@ var setValue = function(key, storageDuration, value) {
   }
 };
 
-var getValue = function(key, storageDuration) {
+var getValue = function (key, storageDuration) {
   var value;
 
   // It should consistently return the same value if no stored item was found. We chose null,
@@ -86,7 +92,7 @@ var getValue = function(key, storageDuration) {
 // DTM is running on the same domain it can still use the persisted values. Our migration strategy
 // is essentially copying data from cookies and then diverging the storage mechanism between
 // DTM and Launch (DTM uses cookies and Launch uses session and local storage).
-var migrateDataElement = function(dataElementName, storageDuration) {
+var migrateDataElement = function (dataElementName, storageDuration) {
   var storedValue = cookie.get(COOKIE_PREFIX + dataElementName);
 
   if (storedValue !== undefined) {
@@ -94,10 +100,13 @@ var migrateDataElement = function(dataElementName, storageDuration) {
   }
 };
 
-var migrateCookieData = function(dataElements) {
+var migrateCookieData = function (dataElements) {
   if (!reactorLocalStorage.getItem(MIGRATED_KEY)) {
-    Object.keys(dataElements).forEach(function(dataElementName) {
-      migrateDataElement(dataElementName, dataElements[dataElementName].storageDuration);
+    Object.keys(dataElements).forEach(function (dataElementName) {
+      migrateDataElement(
+        dataElementName,
+        dataElements[dataElementName].storageDuration
+      );
     });
 
     reactorLocalStorage.setItem(MIGRATED_KEY, true);

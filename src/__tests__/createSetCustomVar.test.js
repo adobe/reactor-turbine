@@ -11,22 +11,22 @@
  ****************************************************************************************/
 var createSetCustomVar = require('../createSetCustomVar');
 
-describe('function returned by setCustomVar', function() {
+describe('function returned by setCustomVar', function () {
   var customVars;
   var setCustomVar;
 
-  beforeEach(function() {
+  beforeEach(function () {
     customVars = {};
     setCustomVar = createSetCustomVar(customVars);
   });
 
-  it('sets a single custom var', function() {
+  it('sets a single custom var', function () {
     setCustomVar('foo', 'bar');
 
     expect(customVars['foo']).toBe('bar');
   });
 
-  it('sets multiple custom vars', function() {
+  it('sets multiple custom vars', function () {
     setCustomVar({
       foo: 'bar',
       animal: 'unicorn'

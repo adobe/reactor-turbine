@@ -17,8 +17,8 @@
  * @returns {Function}
  */
 
-module.exports = function(hostedLibFilesBaseUrl, minified) {
-  return function(file) {
+module.exports = function (hostedLibFilesBaseUrl, minified) {
+  return function (file) {
     if (minified) {
       var fileParts = file.split('.');
       fileParts.splice(fileParts.length - 1 || 1, 0, 'min');

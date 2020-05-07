@@ -17,8 +17,8 @@
  * @param {Object} settings
  * @returns {Function}
  */
-module.exports = function(replaceTokens, settings) {
-  return function() {
+module.exports = function (replaceTokens, settings) {
+  return function () {
     return settings ? replaceTokens(settings) : {};
   };
 };

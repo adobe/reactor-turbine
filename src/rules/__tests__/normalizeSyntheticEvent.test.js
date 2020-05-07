@@ -21,21 +21,21 @@ var mockMeta = {
   }
 };
 
-describe('normalizeSyntheticEvent', function() {
+describe('normalizeSyntheticEvent', function () {
   var logger;
   var normalizeSyntheticEvent;
 
-  beforeEach(function() {
+  beforeEach(function () {
     logger = {
       warn: jasmine.createSpy()
     };
 
     normalizeSyntheticEvent = injectNormalizeSyntheticEvent({
-      './logger': logger
+      '../logger': logger
     });
   });
 
-  it('creates a synthetic event with meta if synthetic event is undefined', function() {
+  it('creates a synthetic event with meta if synthetic event is undefined', function () {
     var syntheticEvent = normalizeSyntheticEvent(mockMeta);
     expect(syntheticEvent).toEqual({
       $type: 'extension-name.event-name',
@@ -58,10 +58,13 @@ describe('normalizeSyntheticEvent', function() {
   // suddenly start returning only the meta keys ($rule, $type), since Object.keys would
   // not return properties from the prototype.
   // See DTM-14142
-  it('modifies the original syntheticEvent rather than creating a new object', function() {
+  it('modifies the original syntheticEvent rather than creating a new object', function () {
     var syntheticEvent = document.createEvent('CustomEvent');
     syntheticEvent.initCustomEvent('test', true, true, { foo: 'bar' });
-    var normalizedSyntheticEvent = normalizeSyntheticEvent(mockMeta, syntheticEvent);
+    var normalizedSyntheticEvent = normalizeSyntheticEvent(
+      mockMeta,
+      syntheticEvent
+    );
 
     expect(normalizedSyntheticEvent).toBe(syntheticEvent);
     expect(normalizedSyntheticEvent.detail.foo).toBe('bar');
@@ -69,7 +72,7 @@ describe('normalizeSyntheticEvent', function() {
     expect(normalizedSyntheticEvent.$rule.name).toBe('rule name');
   });
 
-  it('overwrites meta even if same properties are provided by extension', function() {
+  it('overwrites meta even if same properties are provided by extension', function () {
     var syntheticEvent = normalizeSyntheticEvent(mockMeta, {
       $type: 'oh nos',
       $rule: 'oh nos'
@@ -83,23 +86,25 @@ describe('normalizeSyntheticEvent', function() {
     });
   });
 
-  it('sets a deprecated type property for backward compatibility', function() {
+  it('sets a deprecated type property for backward compatibility', function () {
     var syntheticEvent = normalizeSyntheticEvent(mockMeta);
 
     // Note that the type property is non-enumerable, which is why the other tests pass without
     // accounting for the type property.
     expect(syntheticEvent.type).toBe('extension-name.event-name');
-    expect(logger.warn).toHaveBeenCalledWith('Accessing event.type in Adobe Launch has been ' +
-      'deprecated and will be removed soon. Please use event.$type instead.');
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Accessing event.type in Adobe Launch has been ' +
+        'deprecated and will be removed soon. Please use event.$type instead.'
+    );
   });
 
-  it('does not overwrite existing type property with deprecated type property', function() {
+  it('does not overwrite existing type property with deprecated type property', function () {
     var syntheticEvent = normalizeSyntheticEvent(mockMeta, {
-      type: 'don\'t overwrite me'
+      type: "don't overwrite me"
     });
 
     expect(syntheticEvent).toEqual({
-      type: 'don\'t overwrite me',
+      type: "don't overwrite me",
       $type: 'extension-name.event-name',
       $rule: {
         name: 'rule name'

@@ -13,13 +13,13 @@
 var CORE_MODULE_PREFIX = '@adobe/reactor-';
 
 var modules = {
-  'cookie': require('@adobe/reactor-cookie'),
-  'document': require('@adobe/reactor-document'),
+  cookie: require('@adobe/reactor-cookie'),
+  document: require('@adobe/reactor-document'),
   'load-script': require('@adobe/reactor-load-script'),
   'object-assign': require('@adobe/reactor-object-assign'),
-  'promise': require('@adobe/reactor-promise'),
+  promise: require('@adobe/reactor-promise'),
   'query-string': require('@adobe/reactor-query-string'),
-  'window': require('@adobe/reactor-window')
+  window: require('@adobe/reactor-window')
 };
 
 /**
@@ -28,8 +28,8 @@ var modules = {
  * @param {Function} getModuleExportsByRelativePath
  * @returns {Function}
  */
-module.exports = function(getModuleExportsByRelativePath) {
-  return function(key) {
+module.exports = function (getModuleExportsByRelativePath) {
+  return function (key) {
     if (key.indexOf(CORE_MODULE_PREFIX) === 0) {
       var keyWithoutScope = key.substr(CORE_MODULE_PREFIX.length);
       var module = modules[keyWithoutScope];

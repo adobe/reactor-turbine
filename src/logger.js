@@ -35,7 +35,9 @@ var ROCKET = '\uD83D\uDE80';
  * be NaN.
  * @type {Number}
  */
-var ieVersion = parseInt((/msie (\d+)/.exec(navigator.userAgent.toLowerCase()) || [])[1]);
+var ieVersion = parseInt(
+  (/msie (\d+)/.exec(navigator.userAgent.toLowerCase()) || [])[1]
+);
 
 /**
  * Prefix to use on all messages. The rocket unicode doesn't work on IE 10.
@@ -55,7 +57,7 @@ var outputEnabled = false;
  * @param {...*} arg Any argument to be logged.
  * @private
  */
-var process = function(level) {
+var process = function (level) {
   if (outputEnabled && window.console) {
     var logArguments = Array.prototype.slice.call(arguments, 1);
     logArguments.unshift(launchPrefix);
@@ -119,7 +121,7 @@ module.exports = {
    * Creates a logging utility that only exposes logging functionality and prefixes all messages
    * with an identifier.
    */
-  createPrefixedLogger: function(identifier) {
+  createPrefixedLogger: function (identifier) {
     var loggerSpecificPrefix = '[' + identifier + ']';
 
     return {

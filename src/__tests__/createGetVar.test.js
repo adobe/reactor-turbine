@@ -12,25 +12,29 @@
 
 var createGetVar = require('../createGetVar');
 
-describe('function returned by createGetVar', function() {
+describe('function returned by createGetVar', function () {
   var customVars;
   var getDataElementDefinition;
   var getDataElementValue;
 
-  beforeEach(function() {
+  beforeEach(function () {
     customVars = {};
-    getDataElementDefinition = function() {};
-    getDataElementValue = function() {};
+    getDataElementDefinition = function () {};
+    getDataElementValue = function () {};
   });
 
-  it('returns data element value', function() {
-    getDataElementDefinition = function() {
+  it('returns data element value', function () {
+    getDataElementDefinition = function () {
       return {};
     };
-    getDataElementValue = jasmine.createSpy().and.callFake(function() {
+    getDataElementValue = jasmine.createSpy().and.callFake(function () {
       return 'baz';
     });
-    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+    var getVar = createGetVar(
+      customVars,
+      getDataElementDefinition,
+      getDataElementValue
+    );
     var event = {};
 
     var value = getVar('unicorn.foo.bar', event);
@@ -40,28 +44,36 @@ describe('function returned by createGetVar', function() {
 
   // Accessing nested properties of a data element using dot-notation is unsupported because users
   // can currently create data elements with periods in the name.
-  it('does not return nested property of a data element value', function() {
-    getDataElementDefinition = function() {
+  it('does not return nested property of a data element value', function () {
+    getDataElementDefinition = function () {
       return {};
     };
-    getDataElementValue = function() {
+    getDataElementValue = function () {
       return {
         foo: {
           bar: 'baz'
         }
       };
     };
-    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+    var getVar = createGetVar(
+      customVars,
+      getDataElementDefinition,
+      getDataElementValue
+    );
 
     var value = getVar('unicorn.foo.bar');
     expect(value).not.toBe('baz');
   });
 
-  it('returns nested property on element using "this." prefix', function() {
-    getDataElementValue = function() {
+  it('returns nested property on element using "this." prefix', function () {
+    getDataElementValue = function () {
       return 'baz';
     };
-    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+    var getVar = createGetVar(
+      customVars,
+      getDataElementDefinition,
+      getDataElementValue
+    );
     var value = getVar('this.foo.bar', {
       element: {
         foo: {
@@ -74,8 +86,12 @@ describe('function returned by createGetVar', function() {
   });
 
   // This probably sufficiently covers the same use case for the other token prefixes
-  it('returns undefined if part of prop chain doesn\'t exist', function() {
-    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+  it("returns undefined if part of prop chain doesn't exist", function () {
+    var getVar = createGetVar(
+      customVars,
+      getDataElementDefinition,
+      getDataElementValue
+    );
     var value = getVar('this.goo.bar', {
       element: {
         foo: {
@@ -87,8 +103,12 @@ describe('function returned by createGetVar', function() {
     expect(value).toBeUndefined();
   });
 
-  it('returns textContent of element when using this.@text', function() {
-    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+  it('returns textContent of element when using this.@text', function () {
+    var getVar = createGetVar(
+      customVars,
+      getDataElementDefinition,
+      getDataElementValue
+    );
     var value = getVar('this.@text', {
       element: {
         textContent: 'bar'
@@ -98,11 +118,15 @@ describe('function returned by createGetVar', function() {
     expect(value).toBe('bar');
   });
 
-  it('returns attribute of element when using this.getAttribute()', function() {
-    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+  it('returns attribute of element when using this.getAttribute()', function () {
+    var getVar = createGetVar(
+      customVars,
+      getDataElementDefinition,
+      getDataElementValue
+    );
     var value = getVar('this.getAttribute(foo)', {
       element: {
-        getAttribute: function(name) {
+        getAttribute: function (name) {
           return name + 'Value';
         }
       }
@@ -111,8 +135,12 @@ describe('function returned by createGetVar', function() {
     expect(value).toBe('fooValue');
   });
 
-  it('returns textContent of element when using this.@cleanText', function() {
-    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+  it('returns textContent of element when using this.@cleanText', function () {
+    var getVar = createGetVar(
+      customVars,
+      getDataElementDefinition,
+      getDataElementValue
+    );
 
     var value = getVar('this.@cleanText', {
       element: {
@@ -123,8 +151,12 @@ describe('function returned by createGetVar', function() {
     expect(value).toBe('bar');
   });
 
-  it('returns nested property on event using "event." prefix', function() {
-    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+  it('returns nested property on event using "event." prefix', function () {
+    var getVar = createGetVar(
+      customVars,
+      getDataElementDefinition,
+      getDataElementValue
+    );
 
     var value = getVar('event.foo.bar', {
       foo: {
@@ -135,8 +167,12 @@ describe('function returned by createGetVar', function() {
     expect(value).toBe('baz');
   });
 
-  it('returns nested property on event.target using "target." prefix', function() {
-    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+  it('returns nested property on event.target using "target." prefix', function () {
+    var getVar = createGetVar(
+      customVars,
+      getDataElementDefinition,
+      getDataElementValue
+    );
 
     var value = getVar('target.foo.bar', {
       target: {
@@ -149,7 +185,7 @@ describe('function returned by createGetVar', function() {
     expect(value).toBe('baz');
   });
 
-  it('returns nested property on a custom var', function() {
+  it('returns nested property on a custom var', function () {
     var customVars = {
       foo: {
         bar: {
@@ -157,7 +193,11 @@ describe('function returned by createGetVar', function() {
         }
       }
     };
-    var getVar = createGetVar(customVars, getDataElementDefinition, getDataElementValue);
+    var getVar = createGetVar(
+      customVars,
+      getDataElementDefinition,
+      getDataElementValue
+    );
 
     expect(getVar('foo.bar.baz')).toBe('unicorn');
   });

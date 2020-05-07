@@ -14,26 +14,41 @@
 
 var createGetHostedLibFileUrl = require('../createGetHostedLibFileUrl');
 
-describe('function returned by createGetHostedLibFileUrl', function() {
-  it('returns full hosted lib path url', function() {
-    var getHostedLibFileUrl = createGetHostedLibFileUrl('//example.com/', false);
+describe('function returned by createGetHostedLibFileUrl', function () {
+  it('returns full hosted lib path url', function () {
+    var getHostedLibFileUrl = createGetHostedLibFileUrl(
+      '//example.com/',
+      false
+    );
     expect(getHostedLibFileUrl('file.js')).toEqual('//example.com/file.js');
   });
 
-  describe('for a minified build', function() {
-
-    it('returns full hosted lib path url for a file', function() {
-      var getHostedLibFileUrl = createGetHostedLibFileUrl('//example.com/', true);
-      expect(getHostedLibFileUrl('file.js')).toEqual('//example.com/file.min.js');
+  describe('for a minified build', function () {
+    it('returns full hosted lib path url for a file', function () {
+      var getHostedLibFileUrl = createGetHostedLibFileUrl(
+        '//example.com/',
+        true
+      );
+      expect(getHostedLibFileUrl('file.js')).toEqual(
+        '//example.com/file.min.js'
+      );
     });
 
-    it('returns full hosted lib path url for a file with multiple dots', function() {
-      var getHostedLibFileUrl = createGetHostedLibFileUrl('//example.com/', true);
-      expect(getHostedLibFileUrl('file.some.js')).toEqual('//example.com/file.some.min.js');
+    it('returns full hosted lib path url for a file with multiple dots', function () {
+      var getHostedLibFileUrl = createGetHostedLibFileUrl(
+        '//example.com/',
+        true
+      );
+      expect(getHostedLibFileUrl('file.some.js')).toEqual(
+        '//example.com/file.some.min.js'
+      );
     });
 
-    it('returns full hosted lib path url for a file without extension', function() {
-      var getHostedLibFileUrl = createGetHostedLibFileUrl('//example.com/', true);
+    it('returns full hosted lib path url for a file without extension', function () {
+      var getHostedLibFileUrl = createGetHostedLibFileUrl(
+        '//example.com/',
+        true
+      );
       expect(getHostedLibFileUrl('file')).toEqual('//example.com/file.min');
     });
   });

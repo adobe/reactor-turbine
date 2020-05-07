@@ -11,17 +11,17 @@
  ****************************************************************************************/
 var createIsVar = require('../createIsVar');
 
-describe('function returned by createIsVar', function() {
+describe('function returned by createIsVar', function () {
   var customVars;
   var getDataElementDefinition;
 
-  beforeEach(function() {
+  beforeEach(function () {
     customVars = {};
-    getDataElementDefinition = function() {};
+    getDataElementDefinition = function () {};
   });
 
-  it('returns true for an existing data element value', function() {
-    getDataElementDefinition = function() {
+  it('returns true for an existing data element value', function () {
+    getDataElementDefinition = function () {
       return {};
     };
     var isVar = createIsVar(customVars, getDataElementDefinition);
@@ -29,25 +29,25 @@ describe('function returned by createIsVar', function() {
     expect(isVar('foo.bar.baz')).toBe(true);
   });
 
-  it('returns true for name using "this." prefix', function() {
+  it('returns true for name using "this." prefix', function () {
     var isVar = createIsVar(customVars, getDataElementDefinition);
 
     expect(isVar('this.foo')).toBe(true);
   });
 
-  it('returns true for name using "event." prefix', function() {
+  it('returns true for name using "event." prefix', function () {
     var isVar = createIsVar(customVars, getDataElementDefinition);
 
     expect(isVar('event.foo')).toBe(true);
   });
 
-  it('returns true for name using "target." prefix', function() {
+  it('returns true for name using "target." prefix', function () {
     var isVar = createIsVar(customVars, getDataElementDefinition);
 
     expect(isVar('target.foo')).toBe(true);
   });
 
-  it('returns true for an existing custom var', function() {
+  it('returns true for an existing custom var', function () {
     customVars = {
       foo: {
         bar: 'unicorn'

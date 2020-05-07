@@ -12,11 +12,11 @@ governing permissions and limitations under the License.
 
 var createDebugController = require('../createDebugController');
 
-describe('function returned by createDebugController', function() {
+describe('function returned by createDebugController', function () {
   var localStorage;
   var logger;
 
-  beforeEach(function() {
+  beforeEach(function () {
     localStorage = jasmine.createSpyObj('localStorage', ['getItem', 'setItem']);
     logger = {
       outputEnabled: false
@@ -24,46 +24,46 @@ describe('function returned by createDebugController', function() {
     debugController = createDebugController(localStorage, logger);
   });
 
-  it('returns whether debug is enabled', function() {
-    localStorage.getItem.and.returnValue("true");
+  it('returns whether debug is enabled', function () {
+    localStorage.getItem.and.returnValue('true');
     var debugController = createDebugController(localStorage, logger);
     expect(debugController.getDebugEnabled()).toBe(true);
-    localStorage.getItem.and.returnValue("false");
+    localStorage.getItem.and.returnValue('false');
     expect(debugController.getDebugEnabled()).toBe(false);
   });
 
-  it('persists debug changes', function() {
+  it('persists debug changes', function () {
     var debugController = createDebugController(localStorage, logger);
-    localStorage.getItem.and.returnValue("false");
+    localStorage.getItem.and.returnValue('false');
     debugController.setDebugEnabled(true);
     expect(localStorage.setItem).toHaveBeenCalledWith('debug', true);
-    localStorage.getItem.and.returnValue("true");
+    localStorage.getItem.and.returnValue('true');
     debugController.setDebugEnabled(false);
     expect(localStorage.setItem).toHaveBeenCalledWith('debug', false);
   });
 
-  it('calls onDebugChanged callbacks when debugging is toggled', function() {
+  it('calls onDebugChanged callbacks when debugging is toggled', function () {
     var debugController = createDebugController(localStorage, logger);
     var callback1 = jasmine.createSpy('callback1');
 
     debugController.onDebugChanged(callback1);
     debugController.setDebugEnabled(true);
-    localStorage.getItem.and.returnValue("true");
+    localStorage.getItem.and.returnValue('true');
     expect(callback1).toHaveBeenCalledWith(true);
 
     var callback2 = jasmine.createSpy('callback2');
     debugController.onDebugChanged(callback2);
     debugController.setDebugEnabled(false);
-    localStorage.getItem.and.returnValue("false");
+    localStorage.getItem.and.returnValue('false');
     expect(callback1).toHaveBeenCalledWith(false);
     expect(callback2).toHaveBeenCalledWith(false);
-    expect (callback1).toHaveBeenCalledTimes(2);
-    expect (callback2).toHaveBeenCalledTimes(1);
+    expect(callback1).toHaveBeenCalledTimes(2);
+    expect(callback2).toHaveBeenCalledTimes(1);
 
     // Shouldn't call the callbacks again since debug
     // hasn't actually changed.
     debugController.setDebugEnabled(false);
-    expect (callback1).toHaveBeenCalledTimes(2);
-    expect (callback2).toHaveBeenCalledTimes(1);
+    expect(callback1).toHaveBeenCalledTimes(2);
+    expect(callback2).toHaveBeenCalledTimes(1);
   });
 });

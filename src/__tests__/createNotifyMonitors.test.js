@@ -12,11 +12,11 @@
 
 var injectCreateNotifyMonitors = require('inject-loader!../createNotifyMonitors');
 
-describe('function returned by createNotifyMonitors', function() {
+describe('function returned by createNotifyMonitors', function () {
   var logger;
   var createNotifyMonitors;
 
-  beforeEach(function() {
+  beforeEach(function () {
     logger = {
       warn: jasmine.createSpy()
     };
@@ -26,23 +26,21 @@ describe('function returned by createNotifyMonitors', function() {
     });
   });
 
-  it('doesn\'t throw errors if monitors aren\'t defined', function() {
+  it("doesn't throw errors if monitors aren't defined", function () {
     var notifyMonitors = createNotifyMonitors({});
 
-    expect(function() {
+    expect(function () {
       notifyMonitors('testtype', {});
     }).not.toThrow();
   });
 
-  it('calls method on monitor if method exists', function() {
+  it('calls method on monitor if method exists', function () {
     var monitor = {
       ruleTriggered: jasmine.createSpy()
     };
 
     var notifyMonitors = createNotifyMonitors({
-      _monitors: [
-        monitor
-      ]
+      _monitors: [monitor]
     });
 
     var event = {};
@@ -50,24 +48,24 @@ describe('function returned by createNotifyMonitors', function() {
     notifyMonitors('ruleTriggered', event);
 
     expect(monitor.ruleTriggered).toHaveBeenCalledWith(event);
-    expect(logger.warn).toHaveBeenCalledWith('The _satellite._monitors API may change at ' +
-      'any time and should only be used for debugging.');
+    expect(logger.warn).toHaveBeenCalledWith(
+      'The _satellite._monitors API may change at ' +
+        'any time and should only be used for debugging.'
+    );
 
     // It shouldn't warn again.
     notifyMonitors('ruleTriggered', event);
     expect(logger.warn.calls.count()).toBe(1);
   });
 
-  it('doesn\'t throw an error if method on monitor doesn\'t exist', function() {
+  it("doesn't throw an error if method on monitor doesn't exist", function () {
     var notifyMonitors = createNotifyMonitors({
-      _monitors: [
-        {}
-      ]
+      _monitors: [{}]
     });
 
     var event = {};
 
-    expect(function() {
+    expect(function () {
       notifyMonitors('ruleTriggered', event);
     }).not.toThrow();
   });

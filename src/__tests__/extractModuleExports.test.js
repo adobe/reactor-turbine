@@ -12,12 +12,12 @@
 
 'use strict';
 
-describe('extract module exports', function() {
+describe('extract module exports', function () {
   var extractModuleExports = require('../extractModuleExports');
 
-  it('runs the module code', function() {
+  it('runs the module code', function () {
     var moduleScript = jasmine.createSpy('module');
-    var require = function() {};
+    var require = function () {};
     var turbine = {};
     extractModuleExports(moduleScript, require, turbine);
 
@@ -29,10 +29,10 @@ describe('extract module exports', function() {
     );
   });
 
-  it('returns the extracted exports', function() {
+  it('returns the extracted exports', function () {
     var moduleExports = 'exportedvalue';
 
-    var moduleScript = function(module) {
+    var moduleScript = function (module) {
       module.exports = moduleExports;
     };
 

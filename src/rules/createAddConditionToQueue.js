@@ -24,7 +24,7 @@ module.exports = function (
       var timeoutId;
 
       return new Promise(function (resolve, reject) {
-        var promiseTimeout = condition.settings.timeout;
+        var promiseTimeout = condition.timeout;
 
         timeoutId = setTimeout(function () {
           // Reject instead of resolve to prevent subsequent

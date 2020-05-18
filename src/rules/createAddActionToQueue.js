@@ -22,7 +22,7 @@ module.exports = function (
       var timeoutId;
 
       return new Promise(function (resolve, reject) {
-        var promiseTimeout = action.settings.timeout;
+        var promiseTimeout = action.timeout;
 
         var moduleResult = executeDelegateModule(action, syntheticEvent, [
           syntheticEvent

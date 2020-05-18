@@ -172,7 +172,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
     var logConditionError = emptyFn;
     var logConditionNotMet = emptyFn;
     var lastPromiseInQueue = Promise.resolve();
-    var condition = { modulePath: 'condition1', settings: { timeout: 10 } };
+    var condition = { modulePath: 'condition1', timeout: 10, settings: {} };
 
     return createAddConditionToQueue(
       executeDelegateModule,

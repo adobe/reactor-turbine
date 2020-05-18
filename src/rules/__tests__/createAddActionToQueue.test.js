@@ -108,7 +108,7 @@ describe('createAddActionToQueue returns a function that when called', function 
       normalizeRuleComponentError,
       logActionError
     )(
-      { modulePath: 'action1', settings: { timeout: 10 } },
+      { modulePath: 'action1', timeout: 10, settings: {} },
       rule,
       event,
       lastPromiseInQueue

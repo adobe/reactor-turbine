@@ -10,28 +10,15 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-module.exports = function (
-  executeDelegateModule,
-  logActionError,
-  logRuleCompleted
-) {
-  return function (rule, syntheticEvent) {
-    var action;
+module.exports = function (ruleEventPair) {
+  var rule = ruleEventPair.rule;
+  var event = ruleEventPair.event;
 
-    if (rule.actions) {
-      for (var i = 0; i < rule.actions.length; i++) {
-        action = rule.actions[i];
-        try {
-          executeDelegateModule(action, 'actions', syntheticEvent, [
-            syntheticEvent
-          ]);
-        } catch (e) {
-          logActionError(action, rule, e);
-          return;
-        }
-      }
+  return {
+    $type: event.extensionName + '.' + event.delegateName,
+    $rule: {
+      id: rule.id,
+      name: rule.name
     }
-
-    logRuleCompleted(rule);
   };
 };

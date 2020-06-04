@@ -15,15 +15,22 @@
 var injectIndex = require('inject-loader!../index');
 
 describe('index', function () {
+  var container;
+  var modules;
+
   beforeEach(function () {
-    window._satellite = {
-      container: {
-        property: {
-          settings: {
-            undefinedVarsReturnEmpty: true,
-            ruleComponentSequencingEnabled: false
-          }
+    container = {
+      property: {
+        settings: {
+          undefinedVarsReturnEmpty: true,
+          ruleComponentSequencingEnabled: false
         }
+      }
+    };
+
+    modules = {
+      'core::events::click': {
+        getExports: function () {}
       }
     };
   });
@@ -31,29 +38,31 @@ describe('index', function () {
   afterEach(function () {
     delete window._satellite;
     delete window.__satelliteLoaded;
-    window.localStorage.removeItem('com.adobe.reactor.debug');
-    window.localStorage.removeItem('com.adobe.reactor.hideActivity');
-  });
-
-  it('exports the window._satellite object', function () {
-    var index = injectIndex();
-    expect(index).toBe(window._satellite);
+    window.localStorage.clear();
   });
 
   it('prevents turbine from executing multiple times', function () {
-    var createModuleProvider = jasmine.createSpy();
+    var moduleProvider = jasmine.createSpyObj('moduleProvider', [
+      'registerModules'
+    ]);
 
-    injectIndex();
+    injectIndex().initialize(container, modules);
     injectIndex({
-      './createModuleProvider': createModuleProvider
-    });
+      './moduleProvider': moduleProvider
+    }).initialize(container, modules);
 
-    expect(createModuleProvider).not.toHaveBeenCalled();
+    expect(moduleProvider.registerModules).not.toHaveBeenCalled();
   });
 
-  it('deletes the container', function () {
-    injectIndex();
-    expect(window._satellite.container).toBe(undefined);
+  it('registers modules with module provider', function () {
+    var moduleProvider = jasmine.createSpyObj('moduleProvider', [
+      'registerModules'
+    ]);
+    injectIndex({
+      './moduleProvider': moduleProvider
+    }).initialize(container, modules);
+
+    expect(moduleProvider.registerModules).toHaveBeenCalledWith(modules);
   });
 
   it('migrates cookie data', function () {
@@ -66,41 +75,31 @@ describe('index', function () {
       }
     };
 
-    window._satellite.container.dataElements = dataElements;
+    container.dataElements = dataElements;
 
     injectIndex({
       './dataElementSafe': {
         migrateCookieData: migrateCookieDataSpy
       }
-    });
+    }).initialize(container, modules);
 
     expect(migrateCookieDataSpy).toHaveBeenCalledWith(dataElements);
   });
 
-  it('creates moduleProvider', function () {
-    var createModuleProvider = jasmine.createSpy();
-    injectIndex({
-      './createModuleProvider': createModuleProvider
-    });
-
-    expect(createModuleProvider).toHaveBeenCalled();
-  });
-
   it('creates getDataElementValue', function () {
     var createGetDataElementValue = jasmine.createSpy();
-    var moduleProvider = function () {};
+    var moduleProvider = { registerModules: function () {} };
+
     injectIndex({
       './createGetDataElementValue': createGetDataElementValue,
-      './createModuleProvider': function () {
-        return moduleProvider;
-      }
-    });
+      './moduleProvider': moduleProvider
+    }).initialize(container, modules);
 
     expect(createGetDataElementValue).toHaveBeenCalledWith(
       moduleProvider,
       jasmine.any(Function),
       jasmine.any(Function),
-      true
+      container.property.settings.undefinedVarsReturnEmpty
     );
   });
 
@@ -108,7 +107,7 @@ describe('index', function () {
     var createSetCustomVar = jasmine.createSpy();
     injectIndex({
       './createSetCustomVar': createSetCustomVar
-    });
+    }).initialize(container, modules);
 
     expect(createSetCustomVar).toHaveBeenCalledWith(jasmine.any(Object));
   });
@@ -117,7 +116,7 @@ describe('index', function () {
     var createIsVar = jasmine.createSpy();
     injectIndex({
       './createIsVar': createIsVar
-    });
+    }).initialize(container, modules);
 
     expect(createIsVar).toHaveBeenCalledWith(
       jasmine.any(Object),
@@ -133,7 +132,7 @@ describe('index', function () {
       './createGetDataElementValue': function () {
         return getDataElementValue;
       }
-    });
+    }).initialize(container, modules);
 
     expect(createGetVar).toHaveBeenCalledWith(
       jasmine.any(Object),
@@ -154,9 +153,13 @@ describe('index', function () {
       './createGetVar': function () {
         return getVar;
       }
-    });
+    }).initialize(container, modules);
 
-    expect(createReplaceTokens).toHaveBeenCalledWith(isVar, getVar, true);
+    expect(createReplaceTokens).toHaveBeenCalledWith(
+      isVar,
+      getVar,
+      container.property.settings.undefinedVarsReturnEmpty
+    );
   });
 
   it('creates namespaced storage', function () {
@@ -165,50 +168,29 @@ describe('index', function () {
     });
     injectIndex({
       './getNamespacedStorage': getNamespacedStorage
-    });
+    }).initialize(container, modules);
 
     expect(getNamespacedStorage).toHaveBeenCalledWith('localStorage');
   });
 
-  it('creates namespaced storage', function () {
-    var getNamespacedStorage = jasmine.createSpy().and.returnValue({
-      getItem: function () {}
-    });
-    injectIndex({
-      './getNamespacedStorage': getNamespacedStorage
+  it('creates debug controller', function () {
+    var logger = { type: 'logger' };
+    var createDebugController = jasmine.createSpy().and.returnValue({
+      setDebugEnabled: function () {}
     });
 
-    expect(getNamespacedStorage).toHaveBeenCalledWith('localStorage');
-  });
-
-  it("sets logger output enabled when local storage item is 'true'", function () {
-    var logger = {};
-    window.localStorage.setItem('com.adobe.reactor.debug', true);
-
     injectIndex({
+      './createDebugController': createDebugController,
       './logger': logger
-    });
+    }).initialize(container, modules);
 
-    expect(logger.outputEnabled).toBe(true);
+    expect(createDebugController).toHaveBeenCalledWith(
+      jasmine.any(Object),
+      logger
+    );
   });
-
-  it(
-    'sets logger output disabled when local storage item is anything ' +
-      "other than 'true'",
-    function () {
-      var logger = {};
-      window.localStorage.setItem('com.adobe.reactor.debug', false);
-
-      injectIndex({
-        './logger': logger
-      });
-
-      expect(logger.outputEnabled).toBe(false);
-    }
-  );
 
   it('hydrates satellite object', function () {
-    var container = window._satellite.container;
     var hydrateSatelliteObject = jasmine.createSpy();
     var getVar = function () {};
     var setCustomVar = function () {};
@@ -220,7 +202,7 @@ describe('index', function () {
       './createSetCustomVar': function () {
         return setCustomVar;
       }
-    });
+    }).initialize(container, modules);
 
     expect(hydrateSatelliteObject).toHaveBeenCalledWith(
       window._satellite,
@@ -231,36 +213,46 @@ describe('index', function () {
     );
   });
 
-  it('hydrates module provider', function () {
-    var container = window._satellite.container;
-    var hydrateModuleProvider = jasmine.createSpy();
-    var moduleProvider = { type: 'moduleProvider' };
-    var debugController = { type: 'debugController' };
-    var replaceTokens = function () {};
-    var getDataElementValue = function () {};
+  it('builds scoped utilities for extensions', function () {
+    var logger = { createPrefixedLogger: function () {} };
+    var createGetExtensionSettings = function () {};
+    var createGetHostedLibFileUrl = function () {};
+    var buildScopedUtilitiesForExtension = jasmine.createSpy();
+    var createBuildScopedUtilitiesForExtension = jasmine
+      .createSpy()
+      .and.returnValue(buildScopedUtilitiesForExtension);
+    var buildScopedUtilitiesForExtensions = jasmine.createSpy();
     injectIndex({
-      './hydrateModuleProvider': hydrateModuleProvider,
-      './createModuleProvider': function () {
-        return moduleProvider;
-      },
-      './createDebugController': function () {
-        return debugController;
-      },
-      './createReplaceTokens': function () {
-        return replaceTokens;
-      },
-      './createGetDataElementValue': function () {
-        return getDataElementValue;
-      }
-    });
+      './logger': logger,
+      './createGetExtensionSettings': createGetExtensionSettings,
+      './createGetHostedLibFileUrl': createGetHostedLibFileUrl,
+      './createBuildScopedUtilitiesForExtension': createBuildScopedUtilitiesForExtension,
+      './buildScopedUtilitiesForExtensions': buildScopedUtilitiesForExtensions
+    }).initialize(container, modules);
 
-    expect(hydrateModuleProvider).toHaveBeenCalledWith(
+    expect(createBuildScopedUtilitiesForExtension).toHaveBeenCalledWith(
       container,
-      moduleProvider,
-      debugController,
-      replaceTokens,
-      getDataElementValue
+      logger.createPrefixedLogger,
+      createGetExtensionSettings,
+      createGetHostedLibFileUrl,
+      jasmine.any(Function),
+      jasmine.any(Function)
     );
+    expect(buildScopedUtilitiesForExtensions).toHaveBeenCalledWith(
+      container,
+      buildScopedUtilitiesForExtension
+    );
+  });
+
+  it('registers modules with module provider', function () {
+    var moduleProvider = jasmine.createSpyObj('moduleProvider', [
+      'registerModules'
+    ]);
+    injectIndex({
+      './moduleProvider': moduleProvider
+    }).initialize(container, modules);
+
+    expect(moduleProvider.registerModules).toHaveBeenCalledWith(modules);
   });
 
   it('initializes rules', function () {
@@ -274,7 +266,7 @@ describe('index', function () {
       './rules/createInitEventModule': function () {
         return createInitEventModule;
       }
-    });
+    }).initialize(container, modules);;
 
     expect(initRules).toHaveBeenCalledWith(
       buildRuleExecutionOrder,
@@ -284,13 +276,12 @@ describe('index', function () {
   });
 
   it("provides an empty array for rules when container doesn't have rules", function () {
-    delete window._satellite.container.rules;
     var rules;
     injectIndex({
       './rules/initRules': function (_satellite, _rules) {
         rules = _rules;
       }
-    });
+    }).initialize(container, modules);
 
     expect(rules).toEqual([]);
   });
@@ -298,7 +289,7 @@ describe('index', function () {
   describe('getDataElementDefinition', function () {
     it('returns data elements from container', function () {
       var dataElementDefinition = {};
-      window._satellite.container.dataElements = {
+      container.dataElements = {
         foo: dataElementDefinition
       };
       var getDataElementDefinition;
@@ -307,20 +298,19 @@ describe('index', function () {
           getDataElementDefinition = _getDataElementDefinition;
           return function () {};
         }
-      });
+      }).initialize(container, modules);
 
       expect(getDataElementDefinition('foo')).toBe(dataElementDefinition);
     });
 
     it("doesn't throw an error when container doesn't have data elements", function () {
-      delete window._satellite.container.dataElements;
       var getDataElementDefinition;
       injectIndex({
         './createIsVar': function (customVars, _getDataElementDefinition) {
           getDataElementDefinition = _getDataElementDefinition;
           return function () {};
         }
-      });
+      }).initialize(container, modules);
 
       expect(getDataElementDefinition('foo')).toBe(undefined);
     });
@@ -337,7 +327,7 @@ describe('index', function () {
         ) {
           setOutputDebugEnabled = _setOutputDebugEnabled;
         }
-      });
+      }).initialize(container, modules);
 
       setOutputDebugEnabled(true);
 

@@ -37,12 +37,14 @@ describe('createRunActions returns a function that when called', function () {
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       actions[0],
+      'actions',
       syntheticEvent,
       [syntheticEvent]
     );
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       actions[1],
+      'actions',
       syntheticEvent,
       [syntheticEvent]
     );

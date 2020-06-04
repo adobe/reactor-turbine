@@ -13,10 +13,17 @@
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 
 module.exports = function (moduleProvider, replaceTokens) {
-  return function (moduleDescriptor, syntheticEvent, moduleCallParameters) {
-    moduleCallParameters = moduleCallParameters || [];
+  return function (
+    moduleDescriptor,
+    moduleType,
+    syntheticEvent,
+    moduleCallArgs
+  ) {
+    moduleCallArgs = moduleCallArgs || [];
     var moduleExports = moduleProvider.getModuleExports(
-      moduleDescriptor.modulePath
+      moduleDescriptor.extensionName,
+      moduleType,
+      moduleDescriptor.delegateName
     );
 
     if (typeof moduleExports !== 'function') {
@@ -27,6 +34,6 @@ module.exports = function (moduleProvider, replaceTokens) {
       moduleDescriptor.settings || {},
       syntheticEvent
     );
-    return moduleExports.bind(null, settings).apply(null, moduleCallParameters);
+    return moduleExports.bind(null, settings).apply(null, moduleCallArgs);
   };
 };

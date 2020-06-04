@@ -24,9 +24,12 @@ module.exports = function (
       return new Promise(function (resolve, reject) {
         var promiseTimeout = action.timeout;
 
-        var moduleResult = executeDelegateModule(action, syntheticEvent, [
-          syntheticEvent
-        ]);
+        var moduleResult = executeDelegateModule(
+          action,
+          'actions',
+          syntheticEvent,
+          [syntheticEvent]
+        );
 
         if (promiseTimeout) {
           timeoutId = setTimeout(function () {

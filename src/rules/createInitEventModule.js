@@ -26,32 +26,32 @@ module.exports = function (
     try {
       var syntheticEventMeta = getSyntheticEventMeta(ruleEventPair);
 
-      executeDelegateModule(event, null, [
-        /**
-         * This is the callback that executes a particular rule when an event has occurred.
-         * @param {Object} [syntheticEvent] An object that contains detail regarding the event
-         * that occurred.
-         */
-        function (syntheticEvent) {
-          // DTM-11871
-          // If we're still in the process of initializing event modules,
-          // we need to queue up any calls to trigger, otherwise if the triggered
-          // rule does something that triggers a different rule whose event module
-          // has not been initialized, that secondary rule will never get executed.
-          // This can be removed if we decide to always use the rule queue, since
-          // conditions and actions will be processed asynchronously, which
-          // would give time for all event modules to be initialized.
+      /**
+       * This is the callback that executes a particular rule when an event has occurred.
+       * @param {Object} [syntheticEvent] An object that contains detail regarding the event
+       * that occurred.
+       */
+      var wrappedTriggerRule = function (syntheticEvent) {
+        // DTM-11871
+        // If we're still in the process of initializing event modules,
+        // we need to queue up any calls to trigger, otherwise if the triggered
+        // rule does something that triggers a different rule whose event module
+        // has not been initialized, that secondary rule will never get executed.
+        // This can be removed if we decide to always use the rule queue, since
+        // conditions and actions will be processed asynchronously, which
+        // would give time for all event modules to be initialized.
 
-          var normalizedSyntheticEvent = normalizeSyntheticEvent(
-            syntheticEventMeta,
-            syntheticEvent
-          );
+        var normalizedSyntheticEvent = normalizeSyntheticEvent(
+          syntheticEventMeta,
+          syntheticEvent
+        );
 
-          guardUntilAllInitialized(function () {
-            triggerRule(normalizedSyntheticEvent, rule);
-          });
-        }
-      ]);
+        guardUntilAllInitialized(function () {
+          triggerRule(normalizedSyntheticEvent, rule);
+        });
+      };
+
+      executeDelegateModule(event, 'events', null, [wrappedTriggerRule]);
     } catch (e) {
       logger.error(getErrorMessage(event, rule, e));
     }

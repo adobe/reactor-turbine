@@ -30,6 +30,37 @@ describe('function returned by createGetDataElementValue', function () {
     });
   });
 
+  it('calls moduleProvider.getModuleExports with correct information', function () {
+    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
+    var moduleProvider = jasmine.createSpyObj('moduleProvider', {
+      getModuleExports: function (settings) {
+        return settings.foo;
+      }
+    });
+    var getDataElementDefinition = function () {
+      return {
+        extensionName: 'core',
+        delegateName: 'cookie',
+        settings: {
+          foo: 'bar'
+        }
+      };
+    };
+    var undefinedVarsReturnEmpty = false;
+    var getDataElementValue = createGetDataElementValue(
+      moduleProvider,
+      getDataElementDefinition,
+      replaceTokens,
+      undefinedVarsReturnEmpty
+    );
+    getDataElementValue('testDataElement');
+    expect(moduleProvider.getModuleExports).toHaveBeenCalledWith(
+      'core',
+      'dataElements',
+      'cookie'
+    );
+  });
+
   it('returns a data element value using data from settings', function () {
     var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
@@ -41,6 +72,8 @@ describe('function returned by createGetDataElementValue', function () {
     };
     var getDataElementDefinition = function () {
       return {
+        extensionName: 'core',
+        delegateName: 'cookie',
         settings: {
           foo: 'bar'
         }
@@ -54,7 +87,6 @@ describe('function returned by createGetDataElementValue', function () {
       undefinedVarsReturnEmpty
     );
     var value = getDataElementValue('testDataElement');
-
     expect(value).toBe('bar');
   });
 

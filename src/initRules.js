@@ -10,20 +10,26 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-module.exports = function (moduleProvider) {
-  return function (ruleEventPair) {
-    var rule = ruleEventPair.rule;
-    var event = ruleEventPair.event;
+var triggerCallQueue = [];
+var eventModulesInitialized = false;
 
-    var moduleName = moduleProvider.getModuleDefinition(event.modulePath).name;
-    var extensionName = moduleProvider.getModuleExtensionName(event.modulePath);
+var guardUntilAllInitialized = function (callback) {
+  if (!eventModulesInitialized) {
+    triggerCallQueue.push(callback);
+  } else {
+    callback();
+  }
+};
 
-    return {
-      $type: extensionName + '.' + moduleName,
-      $rule: {
-        id: rule.id,
-        name: rule.name
-      }
-    };
-  };
+module.exports = function (buildRuleExecutionOrder, rules, initEventModule) {
+  buildRuleExecutionOrder(rules).forEach(function (ruleEventPair) {
+    initEventModule(guardUntilAllInitialized, ruleEventPair);
+  });
+
+  eventModulesInitialized = true;
+  triggerCallQueue.forEach(function (triggerCall) {
+    triggerCall();
+  });
+
+  triggerCallQueue = [];
 };

@@ -24,9 +24,12 @@ module.exports = function (
         condition = rule.conditions[i];
 
         try {
-          var result = executeDelegateModule(condition, syntheticEvent, [
-            syntheticEvent
-          ]);
+          var result = executeDelegateModule(
+            condition,
+            'conditions',
+            syntheticEvent,
+            [syntheticEvent]
+          );
 
           if (!isConditionMet(condition, result)) {
             logConditionNotMet(condition, rule);

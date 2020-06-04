@@ -177,12 +177,14 @@ describe('createEvaluateConditions returns a function that when called', functio
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       conditions[0],
+      'conditions',
       event,
       [event]
     );
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       conditions[1],
+      'conditions',
       event,
       [event]
     );
@@ -217,6 +219,7 @@ describe('createEvaluateConditions returns a function that when called', functio
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       conditions[0],
+      'conditions',
       event,
       [event]
     );

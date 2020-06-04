@@ -40,6 +40,7 @@ describe('createInitEventModule returns a function that when called', function (
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       { modulePath: 'event1 path', settings: { key: 'value' } },
+      'events',
       null,
       [jasmine.any(Function)]
     );
@@ -69,6 +70,7 @@ describe('createInitEventModule returns a function that when called', function (
 
     expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
       { modulePath: 'event1 path', settings: {} },
+      'events',
       null,
       [jasmine.any(Function)]
     );
@@ -117,8 +119,13 @@ describe('createInitEventModule returns a function that when called', function (
         var customTrigger;
 
         var triggerRuleSpy = jasmine.createSpy('triggerRule');
-        var executeDelegateModule = function (e, _, args) {
-          customTrigger = args[0];
+        var executeDelegateModule = function (
+          moduleDescriptor,
+          moduleType,
+          syntheticEvent,
+          moduleCallArgs
+        ) {
+          customTrigger = moduleCallArgs[0];
         };
         var normalizeSyntheticEventSpy = jasmine
           .createSpy('normalizeSyntheticEvent')
@@ -127,7 +134,7 @@ describe('createInitEventModule returns a function that when called', function (
         var getSyntheticEventMetaSpy = jasmine
           .createSpy('getSyntheticEventMeta')
           .and.returnValue({ $type: 'some type' });
-        var logger = {};
+        var logger = jasmine.createSpyObj('logger', ['error']);
         var guardUntilAllInitialized = function (cbk) {
           cbk();
         };

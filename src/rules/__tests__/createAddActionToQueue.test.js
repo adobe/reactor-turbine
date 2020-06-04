@@ -34,9 +34,12 @@ describe('createAddActionToQueue returns a function that when called', function 
       normalizeRuleComponentError,
       logActionError
     )(action, rule, event, lastPromiseInQueue).then(function () {
-      expect(executeDelegateModuleSpy).toHaveBeenCalledWith(action, event, [
-        event
-      ]);
+      expect(executeDelegateModuleSpy).toHaveBeenCalledWith(
+        action,
+        'actions',
+        event,
+        [event]
+      );
     });
   });
 

@@ -41,7 +41,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       logConditionError,
       logConditionNotMet
     )(condition, rule, event, lastPromiseInQueue).then(function () {
-      expect(executeDelegateModuleSpy).toHaveBeenCalledWith(condition, event, [
+      expect(executeDelegateModuleSpy).toHaveBeenCalledWith(condition, 'conditions', event, [
         event
       ]);
     });

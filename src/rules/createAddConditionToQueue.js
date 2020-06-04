@@ -39,7 +39,9 @@ module.exports = function (
         }, promiseTimeout);
 
         Promise.resolve(
-          executeDelegateModule(condition, syntheticEvent, [syntheticEvent])
+          executeDelegateModule(condition, 'conditions', syntheticEvent, [
+            syntheticEvent
+          ])
         ).then(resolve, reject);
       })
         .catch(function (e) {

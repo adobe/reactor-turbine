@@ -15,8 +15,12 @@ governing permissions and limitations under the License.
 var createExecuteDelegateModule = require('../createExecuteDelegateModule');
 var emptyFn = function () {};
 var event = { $type: 'type' };
-var moduleDescriptor = { modulePath: 'path', settings: { key: 'value' } };
-var moduleCallParameters = ['a', 'b'];
+var moduleDescriptor = {
+  extensionName: 'core',
+  delegateName: 'send-beacon',
+  settings: { key: 'value' }
+};
+var moduleCallArgs = ['a', 'b'];
 
 describe('createExecuteDelegateModule returns a function that when called', function () {
   it('returns the module export function result', function () {
@@ -33,11 +37,16 @@ describe('createExecuteDelegateModule returns a function that when called', func
     expect(
       createExecuteDelegateModule(moduleProvider, replaceTokens)(
         moduleDescriptor,
+        'actions',
         event,
-        moduleCallParameters
+        moduleCallArgs
       )
     ).toBe('module result');
-    expect(getModuleExportsSpy).toHaveBeenCalledWith('path');
+    expect(getModuleExportsSpy).toHaveBeenCalledWith(
+      'core',
+      'actions',
+      'send-beacon'
+    );
     expect(moduleExportsSpy).toHaveBeenCalledWith(undefined, 'a', 'b');
   });
 
@@ -56,6 +65,7 @@ describe('createExecuteDelegateModule returns a function that when called', func
 
       createExecuteDelegateModule(moduleProvider, replaceTokens)(
         moduleDescriptor,
+        'actions',
         event
       );
 
@@ -74,8 +84,9 @@ describe('createExecuteDelegateModule returns a function that when called', func
     expect(function () {
       createExecuteDelegateModule(moduleProvider, replaceTokens)(
         moduleDescriptor,
+        'actions',
         event,
-        moduleCallParameters
+        moduleCallArgs
       );
     }).toThrow(new Error('Module did not export a function.'));
   });
@@ -99,8 +110,9 @@ describe('createExecuteDelegateModule returns a function that when called', func
 
     createExecuteDelegateModule(moduleProvider, replaceTokens)(
       moduleDescriptor,
+      'actions',
       event,
-      moduleCallParameters
+      moduleCallArgs
     );
 
     expect(settings).toEqual({
@@ -122,8 +134,9 @@ describe('createExecuteDelegateModule returns a function that when called', func
 
       createExecuteDelegateModule(moduleProvider, replaceTokensSpy)(
         moduleDescriptor,
+        'actions',
         event,
-        moduleCallParameters
+        moduleCallArgs
       );
 
       expect(replaceTokensSpy).toHaveBeenCalledWith({}, event);

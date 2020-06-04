@@ -10,28 +10,25 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-module.exports = function (
-  executeDelegateModule,
-  logActionError,
-  logRuleCompleted
-) {
-  return function (rule, syntheticEvent) {
-    var action;
+'use strict';
 
-    if (rule.actions) {
-      for (var i = 0; i < rule.actions.length; i++) {
-        action = rule.actions[i];
-        try {
-          executeDelegateModule(action, 'actions', syntheticEvent, [
-            syntheticEvent
-          ]);
-        } catch (e) {
-          logActionError(action, rule, e);
-          return;
-        }
+var getSyntheticEventMeta = require('../getSyntheticEventMeta');
+
+describe('getSyntheticEventMeta', function () {
+  it('returns the synthetic event meta', function () {
+    var ruleEventPair = {
+      rule: { name: 'rule name', id: 'rule id' },
+      event: { extensionName: 'core', delegateName: 'click' }
+    };
+
+    var syntheticEventMeta = getSyntheticEventMeta(ruleEventPair);
+
+    expect(syntheticEventMeta).toEqual({
+      $type: 'core.click',
+      $rule: {
+        id: 'rule id',
+        name: 'rule name'
       }
-    }
-
-    logRuleCompleted(rule);
-  };
-};
+    });
+  });
+});

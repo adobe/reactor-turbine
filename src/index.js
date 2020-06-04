@@ -11,13 +11,12 @@
  ****************************************************************************************/
 
 var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
-
 var createDebugController = require('./createDebugController');
 var createExecuteDelegateModule = require('./createExecuteDelegateModule');
 var createGetDataElementValue = require('./createGetDataElementValue');
 var createGetVar = require('./createGetVar');
 var createIsVar = require('./createIsVar');
-var createModuleProvider = require('./createModuleProvider');
+var moduleProvider = require('./moduleProvider');
 var createNotifyMonitors = require('./createNotifyMonitors');
 var createReplaceTokens = require('./createReplaceTokens');
 var createSetCustomVar = require('./createSetCustomVar');
@@ -28,7 +27,6 @@ var createAddRuleToQueue = require('./rules/createAddRuleToQueue');
 var createEvaluateConditions = require('./rules/createEvaluateConditions');
 var createExecuteRule = require('./rules/createExecuteRule');
 var createGetModuleDisplayNameByRuleComponent = require('./rules/createGetModuleDisplayNameByRuleComponent');
-var createGetSyntheticEventMeta = require('./rules/createGetSyntheticEventMeta');
 var createInitEventModule = require('./rules/createInitEventModule');
 var createLogActionError = require('./rules/createLogActionError');
 var createLogConditionError = require('./rules/createLogConditionError');
@@ -37,6 +35,7 @@ var createLogRuleCompleted = require('./rules/createLogRuleCompleted');
 var createRunActions = require('./rules/createRunActions');
 var createTriggerRule = require('./rules/createTriggerRule');
 
+var getSyntheticEventMeta = require('./rules/getSyntheticEventMeta');
 var getRuleComponentErrorMessage = require('./rules/getRuleComponentErrorMessage');
 var isConditionMet = require('./rules/isConditionMet');
 var initRules = require('./rules/initRules');
@@ -46,21 +45,24 @@ var normalizeSyntheticEvent = require('./rules/normalizeSyntheticEvent');
 var dataElementSafe = require('./dataElementSafe');
 var getNamespacedStorage = require('./getNamespacedStorage');
 
-var hydrateModuleProvider = require('./hydrateModuleProvider');
+var createGetExtensionSettings = require('./createGetExtensionSettings');
+var createGetHostedLibFileUrl = require('./createGetHostedLibFileUrl');
+var createBuildScopedUtilitiesForExtension = require('./createBuildScopedUtilitiesForExtension');
+var buildScopedUtilitiesForExtensions = require('./buildScopedUtilitiesForExtensions');
 var hydrateSatelliteObject = require('./hydrateSatelliteObject');
-
 var logger = require('./logger');
 
-var _satellite = window._satellite;
+var scopedExtensionUtilities = {};
 
-if (_satellite && !window.__satelliteLoaded) {
+var initialize = function (container, modules) {
+  if (window.__satelliteLoaded) {
+    return;
+  }
+
   // If a consumer loads the library multiple times, make sure only the first time is effective.
   window.__satelliteLoaded = true;
-
-  var container = _satellite.container;
-
-  // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
-  delete _satellite.container;
+  window._satellite = window._satellite || {};
+  var _satellite = window._satellite;
 
   var undefinedVarsReturnEmpty =
     container.property.settings.undefinedVarsReturnEmpty;
@@ -75,8 +77,6 @@ if (_satellite && !window.__satelliteLoaded) {
   var getDataElementDefinition = function (name) {
     return dataElements[name];
   };
-
-  var moduleProvider = createModuleProvider();
 
   var replaceTokens;
 
@@ -127,13 +127,21 @@ if (_satellite && !window.__satelliteLoaded) {
     setCustomVar
   );
 
-  hydrateModuleProvider(
+  var buildScopedUtilitiesForExtension = createBuildScopedUtilitiesForExtension(
     container,
-    moduleProvider,
-    debugController,
+    logger.createPrefixedLogger,
+    createGetExtensionSettings,
+    createGetHostedLibFileUrl,
     replaceTokens,
     getDataElementValue
   );
+  scopedExtensionUtilities = buildScopedUtilitiesForExtensions(
+    container,
+    buildScopedUtilitiesForExtension
+  );
+
+  // Must come after scopedExtensionUtilities is set.
+  moduleProvider.registerModules(modules);
 
   var notifyMonitors = createNotifyMonitors(_satellite);
   var executeDelegateModule = createExecuteDelegateModule(
@@ -201,8 +209,6 @@ if (_satellite && !window.__satelliteLoaded) {
     notifyMonitors
   );
 
-  var getSyntheticEventMeta = createGetSyntheticEventMeta(moduleProvider);
-
   var initEventModule = createInitEventModule(
     triggerRule,
     executeDelegateModule,
@@ -213,8 +219,13 @@ if (_satellite && !window.__satelliteLoaded) {
   );
 
   initRules(buildRuleExecutionOrder, container.rules || [], initEventModule);
-}
+};
 
-// Rollup's iife option always sets a global with whatever is exported, so we'll set the
-// _satellite global with the same object it already is (we've only modified it).
-module.exports = _satellite;
+module.exports = {
+  initialize: initialize,
+  getScopedExtensionUtilities: function getScopedExtensionUtilities(
+    extensionName
+  ) {
+    return scopedExtensionUtilities[extensionName];
+  }
+};

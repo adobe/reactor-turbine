@@ -10,32 +10,18 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-'use strict';
+module.exports = function (container, buildScopedUtilitiesForExtension) {
+  var extensions = container.extensions;
 
-describe('extract module exports', function () {
-  var extractModuleExports = require('../extractModuleExports');
+  var utilitiesScopedByExtensionName = {};
 
-  it('runs the module code', function () {
-    var moduleScript = jasmine.createSpy('module');
-    var require = function () {};
-    var turbine = {};
-    extractModuleExports(moduleScript, require, turbine);
+  if (extensions) {
+    Object.keys(extensions).forEach(function (extensionName) {
+      utilitiesScopedByExtensionName[
+        extensionName
+      ] = buildScopedUtilitiesForExtension(extensionName);
+    });
+  }
 
-    expect(moduleScript).toHaveBeenCalledWith(
-      jasmine.any(Object),
-      jasmine.any(Object),
-      require,
-      turbine
-    );
-  });
-
-  it('returns the extracted exports', function () {
-    var moduleExports = 'exportedvalue';
-
-    var moduleScript = function (module) {
-      module.exports = moduleExports;
-    };
-
-    expect(extractModuleExports(moduleScript)).toEqual(moduleExports);
-  });
-});
+  return utilitiesScopedByExtensionName;
+};

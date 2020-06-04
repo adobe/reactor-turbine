@@ -52,7 +52,11 @@ module.exports = function (
     var moduleExports;
 
     try {
-      moduleExports = moduleProvider.getModuleExports(dataDef.modulePath);
+      moduleExports = moduleProvider.getModuleExports(
+        dataDef.extensionName,
+        'dataElements',
+        dataDef.delegateName
+      );
     } catch (e) {
       logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
       return;

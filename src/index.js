@@ -47,6 +47,7 @@ var getNamespacedStorage = require('./getNamespacedStorage');
 
 var createGetExtensionSettings = require('./createGetExtensionSettings');
 var createGetHostedLibFileUrl = require('./createGetHostedLibFileUrl');
+var createGetSharedModule = require('./createGetSharedModule');
 var createBuildScopedUtilitiesForExtension = require('./createBuildScopedUtilitiesForExtension');
 var buildScopedUtilitiesForExtensions = require('./buildScopedUtilitiesForExtensions');
 var hydrateSatelliteObject = require('./hydrateSatelliteObject');
@@ -127,11 +128,14 @@ var initialize = function (container, modules) {
     setCustomVar
   );
 
+  var getSharedModule = createGetSharedModule(moduleProvider);
+
   var buildScopedUtilitiesForExtension = createBuildScopedUtilitiesForExtension(
     container,
     logger.createPrefixedLogger,
     createGetExtensionSettings,
     createGetHostedLibFileUrl,
+    getSharedModule,
     replaceTokens,
     getDataElementValue
   );

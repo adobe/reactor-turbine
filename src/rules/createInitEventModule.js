@@ -9,6 +9,7 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
+var delegateType = require('../enum/delegateType');
 
 module.exports = function (
   triggerRule,
@@ -51,7 +52,9 @@ module.exports = function (
         });
       };
 
-      executeDelegateModule(event, 'events', null, [wrappedTriggerRule]);
+      executeDelegateModule(event, delegateType.EVENTS, null, [
+        wrappedTriggerRule
+      ]);
     } catch (e) {
       logger.error(getErrorMessage(event, rule, e));
     }

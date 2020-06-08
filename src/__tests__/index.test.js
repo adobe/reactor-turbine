@@ -213,6 +213,19 @@ describe('index', function () {
     );
   });
 
+  it('creates getSharedModule', function () {
+    var moduleProvider = {
+      registerModules: function () {}
+    };
+    var createGetSharedModule = jasmine.createSpy();
+    injectIndex({
+      './moduleProvider': moduleProvider,
+      './createGetSharedModule': createGetSharedModule
+    }).initialize(container, modules);
+
+    expect(createGetSharedModule).toHaveBeenCalledWith(moduleProvider);
+  });
+
   it('builds scoped utilities for extensions', function () {
     var logger = { createPrefixedLogger: function () {} };
     var createGetExtensionSettings = function () {};
@@ -235,6 +248,7 @@ describe('index', function () {
       logger.createPrefixedLogger,
       createGetExtensionSettings,
       createGetHostedLibFileUrl,
+      jasmine.any(Function),
       jasmine.any(Function),
       jasmine.any(Function)
     );
@@ -266,7 +280,7 @@ describe('index', function () {
       './rules/createInitEventModule': function () {
         return createInitEventModule;
       }
-    }).initialize(container, modules);;
+    }).initialize(container, modules);
 
     expect(initRules).toHaveBeenCalledWith(
       buildRuleExecutionOrder,

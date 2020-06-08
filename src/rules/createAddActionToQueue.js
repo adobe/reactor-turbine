@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 */
 
 var Promise = require('@adobe/reactor-promise');
+var delegateType = require('../enum/delegateType');
 
 module.exports = function (
   executeDelegateModule,
@@ -26,7 +27,7 @@ module.exports = function (
 
         var moduleResult = executeDelegateModule(
           action,
-          'actions',
+          delegateType.ACTIONS,
           syntheticEvent,
           [syntheticEvent]
         );

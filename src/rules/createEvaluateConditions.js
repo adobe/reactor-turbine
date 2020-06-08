@@ -9,6 +9,7 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
+var delegateType = require('../enum/delegateType');
 
 module.exports = function (
   executeDelegateModule,
@@ -26,7 +27,7 @@ module.exports = function (
         try {
           var result = executeDelegateModule(
             condition,
-            'conditions',
+            delegateType.CONDITIONS,
             syntheticEvent,
             [syntheticEvent]
           );

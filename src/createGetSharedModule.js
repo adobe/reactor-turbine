@@ -9,30 +9,25 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
-var delegateType = require('../enum/delegateType');
 
-module.exports = function (
-  executeDelegateModule,
-  logActionError,
-  logRuleCompleted
-) {
-  return function (rule, syntheticEvent) {
-    var action;
+var delegateType = require('./enum/delegateType');
 
-    if (rule.actions) {
-      for (var i = 0; i < rule.actions.length; i++) {
-        action = rule.actions[i];
-        try {
-          executeDelegateModule(action, delegateType.ACTIONS, syntheticEvent, [
-            syntheticEvent
-          ]);
-        } catch (e) {
-          logActionError(action, rule, e);
-          return;
-        }
-      }
+module.exports = function (moduleProvider) {
+  return function (extensionName, sharedModuleName) {
+    // The turbine.getSharedModule contract states that undefined
+    // will be returned if the shared module doesn't exist.
+    if (
+      moduleProvider.getModuleDefinition(
+        extensionName,
+        delegateType.SHARED,
+        sharedModuleName
+      )
+    ) {
+      return moduleProvider.getModuleExports(
+        extensionName,
+        delegateType.SHARED,
+        sharedModuleName
+      );
     }
-
-    logRuleCompleted(rule);
   };
 };

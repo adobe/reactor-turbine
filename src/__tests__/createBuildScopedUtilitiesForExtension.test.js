@@ -55,11 +55,14 @@ describe('createBuildScopedUtilitiesForExtension returns a function that when ca
       .createSpy()
       .and.returnValue(getHostedLibFileUrl);
 
+    var getSharedModule = function () {};
+
     var buildScopedUtilitiesForExtension = createBuildScopedUtilitiesForExtensionTest(
       container,
       createPrefixedLogger,
       createGetExtensionSettings,
       createGetHostedLibFileUrl,
+      getSharedModule,
       replaceTokens,
       getDataElementValue
     );
@@ -81,6 +84,7 @@ describe('createBuildScopedUtilitiesForExtension returns a function that when ca
       getDataElementValue: getDataElementValue,
       getExtensionSettings: getExtensionSettings,
       getHostedLibFileUrl: getHostedLibFileUrl,
+      getSharedModule: getSharedModule,
       logger: prefixedLogger,
       propertySettings: container.property.settings,
       replaceTokens: replaceTokens

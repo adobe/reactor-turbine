@@ -15,6 +15,7 @@ module.exports = function (
   createPrefixedLogger,
   createGetExtensionSettings,
   createGetHostedLibFileUrl,
+  getSharedModule,
   replaceTokens,
   getDataElementValue
 ) {
@@ -40,6 +41,7 @@ module.exports = function (
       getDataElementValue: getDataElementValue,
       getExtensionSettings: getExtensionSettings,
       getHostedLibFileUrl: getHostedLibFileUrl,
+      getSharedModule: getSharedModule,
       logger: prefixedLogger,
       propertySettings: propertySettings,
       replaceTokens: replaceTokens

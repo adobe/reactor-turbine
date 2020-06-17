@@ -12,11 +12,11 @@ governing permissions and limitations under the License.
 
 module.exports = function (ruleComponentName, ruleName, error) {
   return (
-    'Failed to execute ' +
+    'Failed to execute "' +
     ruleComponentName +
-    ' for ' +
+    '" for "' +
     ruleName +
-    ' rule. ' +
+    '" rule. ' +
     error.message +
     (error.stack ? '\n' + error.stack : '')
   );

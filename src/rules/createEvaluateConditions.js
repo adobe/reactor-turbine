@@ -28,6 +28,17 @@ module.exports = function (
             syntheticEvent
           ]);
 
+          // If the result is promise-like, the extension needs to do something asynchronously,
+          // but the customer does not have rule component sequencing enabled on the property.
+          // If we didn't do this, the condition would always pass because the promise is
+          // considered "truthy".
+          if (typeof result === 'object' && typeof result.then === 'function') {
+            throw new Error(
+              'Rule component sequencing must be enabled on the property ' +
+                'for this condition to function properly.'
+            );
+          }
+
           if (!isConditionMet(condition, result)) {
             logConditionNotMet(condition, rule);
             return false;

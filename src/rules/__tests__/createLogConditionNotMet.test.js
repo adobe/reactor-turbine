@@ -30,7 +30,7 @@ describe('createLogConditionNotMet returns a function that when called', functio
     )({ name: 'condition1' }, { name: 'rule1' });
 
     expect(loggerSpy.log).toHaveBeenCalledWith(
-      'Condition value comparison for rule rule1 not met.'
+      'Condition "value comparison" for rule "rule1" was not met.'
     );
   });
 

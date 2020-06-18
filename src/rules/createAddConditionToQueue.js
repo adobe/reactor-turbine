@@ -27,6 +27,7 @@ module.exports = function (
         var promiseTimeout = condition.timeout;
 
         timeoutId = setTimeout(function () {
+          console.log("promise rejected");
           // Reject instead of resolve to prevent subsequent
           // conditions and actions from executing.
           reject(
@@ -40,7 +41,10 @@ module.exports = function (
 
         Promise.resolve(
           executeDelegateModule(condition, syntheticEvent, [syntheticEvent])
-        ).then(resolve, reject);
+        ).then(function(value) {
+          console.log("promise resolved");
+          resolve(value);
+        }, reject);
       })
         .catch(function (e) {
           clearTimeout(timeoutId);

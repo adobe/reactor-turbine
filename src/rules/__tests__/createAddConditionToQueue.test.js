@@ -20,7 +20,7 @@ var condition = { modulePath: 'condition1', settings: {} };
 var event = { $type: 'type' };
 var rule = { id: 'rule id' };
 
-describe('createAddRuleToQueue returns a function that when called', function () {
+describe('createAddConditionToQueue returns a function that when called', function () {
   it('returns a promise that is resolved when the condition module is met', function () {
     var executeDelegateModuleSpy = jasmine
       .createSpy('executeDelegateModule')
@@ -33,7 +33,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
     var logConditionError = emptyFn;
     var logConditionNotMet = emptyFn;
     var lastPromiseInQueue = Promise.resolve();
-
+    console.log('this is the start of the test');
     return createAddConditionToQueue(
       executeDelegateModuleSpy,
       normalizeRuleComponentError,
@@ -44,6 +44,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       expect(executeDelegateModuleSpy).toHaveBeenCalledWith(condition, event, [
         event
       ]);
+      console.log('this is the end of the test');
     });
   });
 

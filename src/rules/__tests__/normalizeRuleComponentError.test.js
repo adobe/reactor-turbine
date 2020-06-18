@@ -28,13 +28,13 @@ describe('normalizeRuleComponentError', function () {
     );
   });
 
-  it('returns an error when a string is received', function () {
+  it('returns an error whose message is the string that is received', function () {
     expect(normalizeRuleComponentError('some other error')).toEqual(
       new Error('some other error')
     );
   });
 
-  it('returns an error when an object that is not an error is received', function () {
+  it('returns an error whose message is serialized from a non-error object', function () {
     expect(normalizeRuleComponentError({ foo: 'some other error' })).toEqual(
       new Error('{"foo":"some other error"}')
     );

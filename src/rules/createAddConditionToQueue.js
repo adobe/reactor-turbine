@@ -21,35 +21,40 @@ module.exports = function (
 ) {
   return function (condition, rule, syntheticEvent, lastPromiseInQueue) {
     return lastPromiseInQueue.then(function () {
-      var timeoutId;
+      // This module is used when ruleComponentSequencing is enabled.
+      // condition.timeout is always supplied to this module as >= 0.
+      // Conditions always assume delayNext = true because we have to know the
+      // condition result before moving on.
+      var conditionTimeoutId;
 
       return new Promise(function (resolve, reject) {
-        var promiseTimeout = condition.timeout;
+        var moduleResult = executeDelegateModule(condition, syntheticEvent, [
+          syntheticEvent
+        ]);
 
-        timeoutId = setTimeout(function () {
-          // Reject instead of resolve to prevent subsequent
-          // conditions and actions from executing.
-          reject(
-            new Error(
-              'A timeout occurred because the condition took longer than ' +
-                (promiseTimeout || 0) / 1000 +
-                ' seconds to complete. '
-            )
-          );
-        }, promiseTimeout);
+        var promiseTimeoutMs = condition.timeout;
+        var timeoutPromise = new Promise(function (resolve, reject) {
+          conditionTimeoutId = setTimeout(function () {
+            reject(
+              new Error(
+                'A timeout occurred because the condition took longer than ' +
+                  promiseTimeoutMs / 1000 +
+                  ' seconds to complete. '
+              )
+            );
+          }, promiseTimeoutMs);
+        });
 
-        Promise.resolve(
-          executeDelegateModule(condition, syntheticEvent, [syntheticEvent])
-        ).then(resolve, reject);
+        Promise.race([moduleResult, timeoutPromise]).then(resolve, reject);
       })
         .catch(function (e) {
-          clearTimeout(timeoutId);
+          clearTimeout(conditionTimeoutId);
           e = normalizeRuleComponentError(e);
           logConditionError(condition, rule, e);
           return Promise.reject(e);
         })
         .then(function (result) {
-          clearTimeout(timeoutId);
+          clearTimeout(conditionTimeoutId);
           if (!isConditionMet(condition, result)) {
             logConditionNotMet(condition, rule);
             return Promise.reject();

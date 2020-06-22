@@ -19,39 +19,44 @@ module.exports = function (
 ) {
   return function (action, rule, syntheticEvent, lastPromiseInQueue) {
     return lastPromiseInQueue.then(function () {
-      var timeoutId;
+      // This module is used when ruleComponentSequencing is enabled.
+      // action.timeout is always supplied to this module as >= 0 when delayNext is true.
+
+      var delayNextAction = action.delayNext;
+      var actionTimeoutId;
 
       return new Promise(function (resolve, reject) {
-        var promiseTimeout = action.timeout;
-
         var moduleResult = executeDelegateModule(action, syntheticEvent, [
           syntheticEvent
         ]);
 
-        if (promiseTimeout) {
-          timeoutId = setTimeout(function () {
+        if (!delayNextAction) {
+          return resolve();
+        }
+
+        var promiseTimeoutMs = action.timeout;
+        var timeoutPromise = new Promise(function (resolve, reject) {
+          actionTimeoutId = setTimeout(function () {
             reject(
               new Error(
                 'A timeout occurred because the action took longer than ' +
-                  promiseTimeout / 1000 +
+                  promiseTimeoutMs / 1000 +
                   ' seconds to complete. '
               )
             );
-          }, promiseTimeout);
-        } else {
-          moduleResult = null;
-        }
+          }, promiseTimeoutMs);
+        });
 
-        Promise.resolve(moduleResult).then(resolve, reject);
+        Promise.race([moduleResult, timeoutPromise]).then(resolve, reject);
       })
         .catch(function (e) {
-          clearTimeout(timeoutId);
+          clearTimeout(actionTimeoutId);
           e = normalizeRuleComponentError(e);
           logActionError(action, rule, e);
           return Promise.reject(e);
         })
         .then(function () {
-          clearTimeout(timeoutId);
+          clearTimeout(actionTimeoutId);
         });
     });
   };

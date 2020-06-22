@@ -10,6 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+var isPromiseLike = require('../isPromiseLike');
+
 module.exports = function (
   executeDelegateModule,
   isConditionMet,
@@ -32,7 +34,7 @@ module.exports = function (
           // but the customer does not have rule component sequencing enabled on the property.
           // If we didn't do this, the condition would always pass because the promise is
           // considered "truthy".
-          if (typeof result === 'object' && typeof result.then === 'function') {
+          if (isPromiseLike(result)) {
             throw new Error(
               'Rule component sequencing must be enabled on the property ' +
                 'for this condition to function properly.'

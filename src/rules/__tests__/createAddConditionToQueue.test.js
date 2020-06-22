@@ -16,11 +16,15 @@ var Promise = require('@adobe/reactor-promise');
 var createAddConditionToQueue = require('../createAddConditionToQueue');
 var emptyFn = function () {};
 
-var condition = { modulePath: 'condition1', settings: {} };
+var condition;
 var event = { $type: 'type' };
 var rule = { id: 'rule id' };
 
 describe('createAddRuleToQueue returns a function that when called', function () {
+  beforeEach(function () {
+    condition = { modulePath: 'condition1', settings: {}, timeout: 0 };
+  });
+
   it('returns a promise that is resolved when the condition module is met', function () {
     var executeDelegateModuleSpy = jasmine
       .createSpy('executeDelegateModule')
@@ -68,7 +72,10 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       logConditionError,
       logConditionNotMet
     )(condition, rule, event, lastPromiseInQueue).then(
-      fail.bind('You should never get in the resolved state for this test'),
+      fail.bind(
+        null,
+        'You should never get in the resolved state for this test'
+      ),
       function () {
         expect(isConditionMetSpy).toHaveBeenCalledWith(condition, false);
       }
@@ -92,7 +99,10 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       logConditionError,
       logConditionNotMetSpy
     )(condition, rule, event, lastPromiseInQueue).then(
-      fail.bind('You should never get in the resolved state for this test'),
+      fail.bind(
+        null,
+        'You should never get in the resolved state for this test'
+      ),
       function () {
         expect(logConditionNotMetSpy).toHaveBeenCalledWith(condition, rule);
       }
@@ -120,7 +130,10 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       logConditionError,
       logConditionNotMet
     )(condition, rule, event, lastPromiseInQueue).then(
-      fail.bind('You should never get in the resolved state for this test'),
+      fail.bind(
+        null,
+        'You should never get in the resolved state for this test'
+      ),
       function (error) {
         expect(normalizeRuleComponentErrorSpy).toHaveBeenCalledWith(e);
         expect(error).toBe('normalized error');
@@ -151,7 +164,10 @@ describe('createAddRuleToQueue returns a function that when called', function ()
         logConditionErrorSpy,
         logConditionNotMet
       )(condition, rule, event, lastPromiseInQueue).then(
-        fail.bind('You should never get in the resolved state for this test'),
+        fail.bind(
+          null,
+          'You should never get in the resolved state for this test'
+        ),
         function () {
           expect(logConditionErrorSpy).toHaveBeenCalledWith(condition, rule, e);
         }
@@ -159,7 +175,7 @@ describe('createAddRuleToQueue returns a function that when called', function ()
     }
   );
 
-  it('returns a promise that is rejected if the condition timeout is surpassed', function () {
+  it('returns a promise that is rejected if the condition timeout zero', function () {
     var executeDelegateModule = function () {
       return new Promise(function (resolve) {
         setTimeout(resolve, 100);
@@ -172,7 +188,8 @@ describe('createAddRuleToQueue returns a function that when called', function ()
     var logConditionError = emptyFn;
     var logConditionNotMet = emptyFn;
     var lastPromiseInQueue = Promise.resolve();
-    var condition = { modulePath: 'condition1', timeout: 10, settings: {} };
+
+    condition.timeout = 0;
 
     return createAddConditionToQueue(
       executeDelegateModule,
@@ -181,11 +198,14 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       logConditionError,
       logConditionNotMet
     )(condition, rule, event, lastPromiseInQueue).then(
-      fail.bind('You should never get in the resolved state for this test'),
+      fail.bind(
+        null,
+        'You should never get in the resolved state for this test'
+      ),
       function (e) {
         expect(e).toEqual(
           new Error(
-            'A timeout occurred because the condition took longer than 0.01 seconds to complete. '
+            'A timeout occurred because the condition took longer than 0 seconds to complete. '
           )
         );
       }
@@ -193,8 +213,8 @@ describe('createAddRuleToQueue returns a function that when called', function ()
   });
 
   it(
-    'returns a promise that is rejected if the condition timeout is ' +
-      'not defined and also surpassed',
+    'returns a promise that is rejected if the condition timeout is surpassed ' +
+      'with the correct timeout calculation reported',
     function () {
       var executeDelegateModule = function () {
         return new Promise(function (resolve) {
@@ -208,7 +228,8 @@ describe('createAddRuleToQueue returns a function that when called', function ()
       var logConditionError = emptyFn;
       var logConditionNotMet = emptyFn;
       var lastPromiseInQueue = Promise.resolve();
-      var condition = { modulePath: 'condition1', settings: {} };
+
+      condition.timeout = 10;
 
       return createAddConditionToQueue(
         executeDelegateModule,
@@ -217,11 +238,14 @@ describe('createAddRuleToQueue returns a function that when called', function ()
         logConditionError,
         logConditionNotMet
       )(condition, rule, event, lastPromiseInQueue).then(
-        fail.bind('You should never get in the resolved state for this test'),
+        fail.bind(
+          null,
+          'You should never get in the resolved state for this test'
+        ),
         function (e) {
           expect(e).toEqual(
             new Error(
-              'A timeout occurred because the condition took longer than 0 seconds to complete. '
+              'A timeout occurred because the condition took longer than 0.01 seconds to complete. '
             )
           );
         }

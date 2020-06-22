@@ -32,7 +32,7 @@ module.exports = function (
          * @param {Object} [syntheticEvent] An object that contains detail regarding the event
          * that occurred.
          */
-        function (syntheticEvent) {
+        function trigger(syntheticEvent) {
           // DTM-11871
           // If we're still in the process of initializing event modules,
           // we need to queue up any calls to trigger, otherwise if the triggered

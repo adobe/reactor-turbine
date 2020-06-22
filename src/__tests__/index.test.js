@@ -267,19 +267,19 @@ describe('index', function () {
     var rules = [];
     var initRules = jasmine.createSpy();
     var buildRuleExecutionOrder = function () {};
-    var createInitEventModule = function () {};
+    var initEventModule = function () {};
     injectIndex({
       './rules/initRules': initRules,
       './buildRuleExecutionOrder': buildRuleExecutionOrder,
       './rules/createInitEventModule': function () {
-        return createInitEventModule;
+        return initEventModule;
       }
     });
 
     expect(initRules).toHaveBeenCalledWith(
       buildRuleExecutionOrder,
       rules,
-      createInitEventModule
+      initEventModule
     );
   });
 

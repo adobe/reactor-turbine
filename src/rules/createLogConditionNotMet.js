@@ -19,11 +19,11 @@ module.exports = function (
     var conditionDisplayName = getModuleDisplayNameByRuleComponent(condition);
 
     logger.log(
-      'Condition ' +
+      'Condition "' +
         conditionDisplayName +
-        ' for rule ' +
+        '" for rule "' +
         rule.name +
-        ' not met.'
+        '" was not met.'
     );
 
     notifyMonitors('ruleConditionFailed', {

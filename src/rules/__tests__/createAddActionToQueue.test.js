@@ -16,12 +16,16 @@ var Promise = require('@adobe/reactor-promise');
 var createAddActionToQueue = require('../createAddActionToQueue');
 var emptyFn = function () {};
 
-var action = { modulePath: 'action1', settings: {} };
+var action;
 var event = { $type: 'type' };
 var rule = { id: 'rule id' };
 
 describe('createAddActionToQueue returns a function that when called', function () {
-  it('returns a promise that is resolved when the action module is met', function () {
+  beforeEach(function () {
+    action = { modulePath: 'action1', settings: {} };
+  });
+
+  it('returns a promise and calls the action module with the correct arguments', function () {
     var executeDelegateModuleSpy = jasmine
       .createSpy('executeDelegateModule')
       .and.returnValue(Promise.resolve());
@@ -56,7 +60,10 @@ describe('createAddActionToQueue returns a function that when called', function 
       normalizeRuleComponentErrorSpy,
       logActionError
     )(action, rule, event, lastPromiseInQueue).then(
-      fail.bind('You should never get in the resolved state for this test'),
+      fail.bind(
+        null,
+        'You should never get in the resolved state for this test'
+      ),
       function (error) {
         expect(normalizeRuleComponentErrorSpy).toHaveBeenCalledWith(e);
         expect(error).toBe('normalized error');
@@ -83,7 +90,10 @@ describe('createAddActionToQueue returns a function that when called', function 
         normalizeRuleComponentError,
         logActionErrorSpy
       )(action, rule, event, lastPromiseInQueue).then(
-        fail.bind('You should never get in the resolved state for this test'),
+        fail.bind(
+          null,
+          'You should never get in the resolved state for this test'
+        ),
         function () {
           expect(logActionErrorSpy).toHaveBeenCalledWith(action, rule, e);
         }
@@ -91,42 +101,9 @@ describe('createAddActionToQueue returns a function that when called', function 
     }
   );
 
-  it('returns a promise that is rejected if the action timeout is surpassed', function () {
-    var executeDelegateModule = function () {
-      return new Promise(function (resolve) {
-        setTimeout(resolve, 100);
-      });
-    };
-    var normalizeRuleComponentError = function (e) {
-      return e;
-    };
-    var logActionError = emptyFn;
-    var lastPromiseInQueue = Promise.resolve();
-
-    return createAddActionToQueue(
-      executeDelegateModule,
-      normalizeRuleComponentError,
-      logActionError
-    )(
-      { modulePath: 'action1', timeout: 10, settings: {} },
-      rule,
-      event,
-      lastPromiseInQueue
-    ).then(
-      fail.bind('You should never get in the resolved state for this test'),
-      function (e) {
-        expect(e).toEqual(
-          new Error(
-            'A timeout occurred because the action took longer than 0.01 seconds to complete. '
-          )
-        );
-      }
-    );
-  });
-
   it(
-    'returns a promise that is resolved immediately if the action timeout is ' +
-      'not defined',
+    'returns a promise that is rejected with a properly formatted message when a ' +
+      'zero timeout is surpassed',
     function () {
       var executeDelegateModule = function () {
         return new Promise(function (resolve) {
@@ -139,16 +116,172 @@ describe('createAddActionToQueue returns a function that when called', function 
       var logActionError = emptyFn;
       var lastPromiseInQueue = Promise.resolve();
 
+      action.timeout = 0;
+      action.delayNext = true;
+
       return createAddActionToQueue(
         executeDelegateModule,
         normalizeRuleComponentError,
         logActionError
-      )(
-        { modulePath: 'action1', settings: {} },
-        rule,
-        event,
-        lastPromiseInQueue
-      ).then(function (result) {
+      )(action, rule, event, lastPromiseInQueue).then(
+        fail.bind(
+          null,
+          'You should never get in the resolved state for this test'
+        ),
+        function (e) {
+          expect(e).toEqual(
+            new Error(
+              'A timeout occurred because the action took longer than 0 seconds to complete. '
+            )
+          );
+        }
+      );
+    }
+  );
+
+  it(
+    'returns a promise that is rejected with a properly formatted message when a ' +
+      'non-zero timeout is surpassed',
+    function () {
+      var executeDelegateModule = function () {
+        return new Promise(function (resolve) {
+          setTimeout(resolve, 100);
+        });
+      };
+      var normalizeRuleComponentError = function (e) {
+        return e;
+      };
+      var logActionError = emptyFn;
+      var lastPromiseInQueue = Promise.resolve();
+
+      action.timeout = 10;
+      action.delayNext = true;
+
+      return createAddActionToQueue(
+        executeDelegateModule,
+        normalizeRuleComponentError,
+        logActionError
+      )(action, rule, event, lastPromiseInQueue).then(
+        fail.bind(
+          null,
+          'You should never get in the resolved state for this test'
+        ),
+        function (e) {
+          expect(e).toEqual(
+            new Error(
+              'A timeout occurred because the action took longer than 0.01 seconds to complete. '
+            )
+          );
+        }
+      );
+    }
+  );
+
+  it(
+    'returns a promise that is resolved immediately if the action delayNext is ' +
+      'not defined and the action result returns a promise',
+    function () {
+      var timeoutCompleteSpy = jasmine.createSpy();
+      var executeDelegateModule = function () {
+        return new Promise(function (resolve) {
+          setTimeout(function () {
+            resolve();
+            timeoutCompleteSpy();
+          }, 10000); // 10s
+        });
+      };
+      var normalizeRuleComponentError = function (e) {
+        return e;
+      };
+      var logActionError = emptyFn;
+      var lastPromiseInQueue = Promise.resolve();
+
+      action.delayNext = undefined;
+
+      return createAddActionToQueue(
+        executeDelegateModule,
+        normalizeRuleComponentError,
+        logActionError
+      )(action, rule, event, lastPromiseInQueue).then(function () {
+        expect(timeoutCompleteSpy).not.toHaveBeenCalled();
+      });
+    }
+  );
+
+  it(
+    'returns a promise that is resolved immediately if the action delayNext ' +
+      'is false and the action result returns a promise',
+    function () {
+      var timeoutCompleteSpy = jasmine.createSpy();
+      var executeDelegateModule = function () {
+        return new Promise(function (resolve) {
+          setTimeout(function () {
+            resolve();
+            timeoutCompleteSpy();
+          }, 10000); // 10s
+        });
+      };
+      var normalizeRuleComponentError = function (e) {
+        return e;
+      };
+      var logActionError = emptyFn;
+      var lastPromiseInQueue = Promise.resolve();
+
+      action.delayNext = false;
+
+      return createAddActionToQueue(
+        executeDelegateModule,
+        normalizeRuleComponentError,
+        logActionError
+      )(action, rule, event, lastPromiseInQueue).then(function () {
+        expect(timeoutCompleteSpy).not.toHaveBeenCalled();
+      });
+    }
+  );
+
+  it(
+    'returns a promise that resolves properly when delayNext is true and the ' +
+      'action returns a promise',
+    function () {
+      var executeDelegateModule = function () {
+        return Promise.resolve();
+      };
+      var normalizeRuleComponentError = emptyFn;
+      var logActionError = emptyFn;
+      var lastPromiseInQueue = Promise.resolve();
+
+      action.timeout = 10;
+      action.delayNext = true;
+
+      return createAddActionToQueue(
+        executeDelegateModule,
+        normalizeRuleComponentError,
+        logActionError
+      )(action, rule, event, lastPromiseInQueue).then(function (result) {
+        expect(result).toBeUndefined();
+      });
+    }
+  );
+
+  it(
+    'returns a promise that resolves properly when delayNext is true and the ' +
+      'action does not return a promise',
+    function () {
+      var executeDelegateModule = function () {
+        return 'synchronous result';
+      };
+      var normalizeRuleComponentError = emptyFn;
+      var logActionError = emptyFn;
+      var lastPromiseInQueue = Promise.resolve();
+
+      action.timeout = 10;
+      action.delayNext = true;
+
+      return createAddActionToQueue(
+        executeDelegateModule,
+        normalizeRuleComponentError,
+        logActionError
+      )(action, rule, event, lastPromiseInQueue).then(function (result) {
         expect(result).toBeUndefined();
       });
     }

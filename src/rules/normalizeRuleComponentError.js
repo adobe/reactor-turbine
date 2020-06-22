@@ -18,7 +18,9 @@ module.exports = function (e) {
   }
 
   if (!(e instanceof Error)) {
-    e = new Error(String(e));
+    var stringifiedError =
+      typeof e === 'object' ? JSON.stringify(e) : String(e);
+    e = new Error(stringifiedError);
   }
 
   return e;

@@ -51,6 +51,7 @@
     "rollup": "^2.7.5",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
+    "uglify-js": "^3.9.4",
     "webpack": "^4.43.0",
     "yargs": "^15.3.1"
   }

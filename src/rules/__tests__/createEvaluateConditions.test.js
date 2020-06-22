@@ -28,7 +28,7 @@ describe('createEvaluateConditions returns a function that when called', functio
     expect(createEvaluateConditions()(rule)).toBeTrue();
   });
 
-  it('returns true when conditions are met', function () {
+  it('handles condition returning true', function () {
     var executeDelegateModule = function (condition) {
       return condition.modulePath === 'condition1';
     };
@@ -37,114 +37,99 @@ describe('createEvaluateConditions returns a function that when called', functio
       return result;
     };
 
-    var logConditionNotMet = emptyFn;
-    var logConditionError = emptyFn;
-
-    expect(
-      createEvaluateConditions(
-        executeDelegateModule,
-        isConditionMet,
-        logConditionNotMet,
-        logConditionError
-      )(rule)
-    ).toBeTrue();
-  });
-
-  it('returns false when conditions are not met', function () {
-    var executeDelegateModule = function (condition) {
-      return condition.modulePath === 'condition1';
-    };
-    var isConditionMet = function () {
-      return false;
-    };
-
-    var logConditionNotMet = emptyFn;
-    var logConditionError = emptyFn;
-
-    expect(
-      createEvaluateConditions(
-        executeDelegateModule,
-        isConditionMet,
-        logConditionNotMet,
-        logConditionError
-      )(rule)
-    ).toBeFalse();
-  });
-
-  it('calls logConditionNotMet when conditions are not met', function () {
-    var executeDelegateModule = function (condition) {
-      return condition.modulePath === 'condition1';
-    };
-    var isConditionMet = function () {
-      return false;
-    };
-    var logConditionNotMetSpy = jasmine.createSpy('logConditionNotMet');
-    var logConditionError = emptyFn;
-    var condition = {
-      modulePath: 'condition1'
-    };
-    var rule = {
-      conditions: [condition]
-    };
-
-    createEvaluateConditions(
+    var logConditionNotMetSpy = jasmine.createSpy();
+    var logConditionErrorSpy = jasmine.createSpy();
+    var result = createEvaluateConditions(
       executeDelegateModule,
       isConditionMet,
       logConditionNotMetSpy,
-      logConditionError
-    )(rule);
-
-    expect(logConditionNotMetSpy).toHaveBeenCalledWith(condition, rule);
-  });
-
-  it('returns false when a condition throws an error', function () {
-    var executeDelegateModule = function () {
-      throw new Error('some error');
-    };
-    var isConditionMet = emptyFn;
-    var logConditionNotMet = emptyFn;
-    var logConditionError = emptyFn;
-
-    expect(
-      createEvaluateConditions(
-        executeDelegateModule,
-        isConditionMet,
-        logConditionNotMet,
-        logConditionError
-      )({
-        conditions: [
-          {
-            modulePath: 'condition1'
-          }
-        ]
-      })
-    ).toBeFalse();
-  });
-
-  it('calls logConditionError when a condition throws an error', function () {
-    var executeDelegateModule = function () {
-      throw e;
-    };
-    var isConditionMet = emptyFn;
-    var logConditionNotMet = emptyFn;
-    var logConditionErrorSpy = jasmine.createSpy('logConditionError');
-    var e = new Error('some error');
-
-    var condition = {
-      modulePath: 'condition1'
-    };
-    var rule = {
-      conditions: [condition]
-    };
-
-    createEvaluateConditions(
-      executeDelegateModule,
-      isConditionMet,
-      logConditionNotMet,
       logConditionErrorSpy
     )(rule);
 
-    expect(logConditionErrorSpy).toHaveBeenCalledWith(condition, rule, e);
+    expect(result).toBeTrue();
+    expect(logConditionNotMetSpy).not.toHaveBeenCalled();
+    expect(logConditionErrorSpy).not.toHaveBeenCalled();
+  });
+
+  it('handles a condition returning a promise', function () {
+    var executeDelegateModule = function () {
+      // Not using a real promise to ensure that the logic detects
+      // objects that are promise-like.
+      return {
+        then: function () {}
+      };
+    };
+    var isConditionMet = jasmine.createSpy();
+    var logConditionNotMetSpy = jasmine.createSpy();
+    var logConditionErrorSpy = jasmine.createSpy();
+    var result = createEvaluateConditions(
+      executeDelegateModule,
+      isConditionMet,
+      logConditionNotMetSpy,
+      logConditionErrorSpy
+    )(rule);
+
+    expect(result).toBeFalse();
+    expect(isConditionMet).not.toHaveBeenCalled();
+    expect(logConditionNotMetSpy).not.toHaveBeenCalled();
+    expect(logConditionErrorSpy).toHaveBeenCalledWith(
+      rule.conditions[0],
+      rule,
+      new Error(
+        'Rule component sequencing must be enabled on the property ' +
+          'for this condition to function properly.'
+      )
+    );
+  });
+
+  it('handles a condition not being met', function () {
+    var executeDelegateModule = function (condition) {
+      return condition.modulePath === 'condition1';
+    };
+    var isConditionMet = function () {
+      return false;
+    };
+
+    var logConditionNotMetSpy = jasmine.createSpy();
+    var logConditionErrorSpy = jasmine.createSpy();
+    var result = createEvaluateConditions(
+      executeDelegateModule,
+      isConditionMet,
+      logConditionNotMetSpy,
+      logConditionErrorSpy
+    )(rule);
+
+    expect(result).toBeFalse();
+    expect(logConditionNotMetSpy).toHaveBeenCalledWith(
+      rule.conditions[0],
+      rule
+    );
+    expect(logConditionErrorSpy).not.toHaveBeenCalled();
+  });
+
+  it('handles a condition throwing an error', function () {
+    var e = new Error('some error');
+    var executeDelegateModule = function () {
+      throw e;
+    };
+    var isConditionMetSpy = jasmine.createSpy();
+    var logConditionNotMetSpy = jasmine.createSpy();
+    var logConditionErrorSpy = jasmine.createSpy();
+    var result = createEvaluateConditions(
+      executeDelegateModule,
+      isConditionMetSpy,
+      logConditionNotMetSpy,
+      logConditionErrorSpy
+    )(rule);
+
+    expect(result).toBeFalse();
+    expect(isConditionMetSpy).not.toHaveBeenCalled();
+    expect(logConditionNotMetSpy).not.toHaveBeenCalled();
+    expect(logConditionErrorSpy).toHaveBeenCalledWith(
+      rule.conditions[0],
+      rule,
+      e
+    );
   });
 
   it('calls executeDelegateModule for each condition', function () {

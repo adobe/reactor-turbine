@@ -189,38 +189,6 @@ describe('function returned by createGetDataElementValue', function () {
   });
 
   it(
-    'returns an empty string when undefinedVarsReturnEmpty = true and data element value' +
-      'is undefined',
-    function () {
-      var createGetDataElementValue = getInjectedCreateGetDataElementValue({
-        './cleanText': function (value) {
-          return 'cleaned:' + value;
-        }
-      });
-      var moduleProvider = {
-        getModuleExports: function () {
-          return function () {};
-        }
-      };
-      var getDataElementDefinition = function () {
-        return {
-          settings: {}
-        };
-      };
-      var undefinedVarsReturnEmpty = true;
-      var getDataElementValue = createGetDataElementValue(
-        moduleProvider,
-        getDataElementDefinition,
-        replaceTokens,
-        undefinedVarsReturnEmpty
-      );
-      var value = getDataElementValue('testDataElement');
-
-      expect(value).toBe('');
-    }
-  );
-
-  it(
     'returns null when undefinedVarsReturnEmpty = false and data element ' +
       'does not exist',
     function () {
@@ -236,7 +204,7 @@ describe('function returned by createGetDataElementValue', function () {
       );
       var value = getDataElementValue('testDataElement');
 
-      expect(value).toBe(null);
+      expect(value).toBe(undefined);
     }
   );
 
@@ -337,7 +305,46 @@ describe('function returned by createGetDataElementValue', function () {
     });
 
     it(
-      'returns an empty string if value is ' +
+      'returns ' +
+        dataElementValue +
+        ' when undefinedVarsReturnEmpty = true and data element value' +
+        'is ' +
+        dataElementValue,
+      function () {
+        var createGetDataElementValue = getInjectedCreateGetDataElementValue({
+          './cleanText': function (value) {
+            return 'cleaned:' + value;
+          }
+        });
+        var moduleProvider = {
+          getModuleExports: function () {
+            return function () {
+              return dataElementValue;
+            };
+          }
+        };
+        var getDataElementDefinition = function () {
+          return {
+            settings: {}
+          };
+        };
+        var undefinedVarsReturnEmpty = true;
+        var getDataElementValue = createGetDataElementValue(
+          moduleProvider,
+          getDataElementDefinition,
+          replaceTokens,
+          undefinedVarsReturnEmpty
+        );
+        var value = getDataElementValue('testDataElement');
+
+        expect(value).toBe(dataElementValue);
+      }
+    );
+
+    it(
+      'returns ' +
+        dataElementValue +
+        ' if value is ' +
         dataElementValue +
         ' and default is undefined',
       function () {
@@ -363,7 +370,40 @@ describe('function returned by createGetDataElementValue', function () {
         );
         var value = getDataElementValue('testDataElement');
 
-        expect(value).toBe('');
+        expect(value).toBe(dataElementValue);
+      }
+    );
+
+    it(
+      'returns the defaultValue ' +
+        ' if value is ' +
+        dataElementValue +
+        ' and default is defined',
+      function () {
+        var createGetDataElementValue = getInjectedCreateGetDataElementValue();
+        var moduleProvider = {
+          getModuleExports: function () {
+            return function () {
+              return dataElementValue;
+            };
+          }
+        };
+        var getDataElementDefinition = function () {
+          return {
+            settings: {},
+            defaultValue: 'defaultValue'
+          };
+        };
+        var undefinedVarsReturnEmpty = false;
+        var getDataElementValue = createGetDataElementValue(
+          moduleProvider,
+          getDataElementDefinition,
+          replaceTokens,
+          undefinedVarsReturnEmpty
+        );
+        var value = getDataElementValue('testDataElement');
+
+        expect(value).toBe('defaultValue');
       }
     );
   });
@@ -433,9 +473,7 @@ describe('function returned by createGetDataElementValue', function () {
     var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
       getModuleExports: function () {
-        return function () {
-          return;
-        };
+        return function () {};
       }
     };
     var getDataElementDefinition = function () {

@@ -189,7 +189,7 @@ describe('function returned by createGetDataElementValue', function () {
   });
 
   it(
-    'returns null when undefinedVarsReturnEmpty = false and data element ' +
+    'returns undefined when undefinedVarsReturnEmpty = false and data element ' +
       'does not exist',
     function () {
       var createGetDataElementValue = getInjectedCreateGetDataElementValue();

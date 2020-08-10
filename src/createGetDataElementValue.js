@@ -31,10 +31,6 @@ var getErrorMessage = function (
   );
 };
 
-var isDataElementValuePresent = function (value) {
-  return value !== undefined && value !== null;
-};
-
 module.exports = function (
   moduleProvider,
   getDataElementDefinition,
@@ -45,7 +41,7 @@ module.exports = function (
     var dataDef = getDataElementDefinition(name);
 
     if (!dataDef) {
-      return undefinedVarsReturnEmpty ? '' : null;
+      return undefinedVarsReturnEmpty ? '' : undefined;
     }
 
     var storageDuration = dataDef.storageDuration;
@@ -78,15 +74,15 @@ module.exports = function (
     }
 
     if (storageDuration) {
-      if (isDataElementValuePresent(value)) {
+      if (value != null) {
         dataElementSafe.setValue(name, storageDuration, value);
       } else {
         value = dataElementSafe.getValue(name, storageDuration);
       }
     }
 
-    if (!isDataElementValuePresent(value)) {
-      value = dataDef.defaultValue || '';
+    if (value == null && dataDef.defaultValue != null) {
+      value = dataDef.defaultValue;
     }
 
     if (typeof value === 'string') {

@@ -373,39 +373,6 @@ describe('function returned by createGetDataElementValue', function () {
         expect(value).toBe(dataElementValue);
       }
     );
-
-    it(
-      'returns the defaultValue ' +
-        ' if value is ' +
-        dataElementValue +
-        ' and default is defined',
-      function () {
-        var createGetDataElementValue = getInjectedCreateGetDataElementValue();
-        var moduleProvider = {
-          getModuleExports: function () {
-            return function () {
-              return dataElementValue;
-            };
-          }
-        };
-        var getDataElementDefinition = function () {
-          return {
-            settings: {},
-            defaultValue: 'defaultValue'
-          };
-        };
-        var undefinedVarsReturnEmpty = false;
-        var getDataElementValue = createGetDataElementValue(
-          moduleProvider,
-          getDataElementDefinition,
-          replaceTokens,
-          undefinedVarsReturnEmpty
-        );
-        var value = getDataElementValue('testDataElement');
-
-        expect(value).toBe('defaultValue');
-      }
-    );
   });
 
   ['', 0, false, NaN].forEach(function (dataElementValue) {

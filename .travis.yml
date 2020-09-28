@@ -2,13 +2,8 @@ language: node_js
 node_js:
   - "node"
 addons:
-  code_climate:
-    repo_token: f2b3d8098cb4578112ed889d0f0f1d548b0d7832ac2aeedd91a5656873cca5ff
   sauce_connect:
     no_ssl_bump_domains: "all"
 after_script:
   - "npm install -g coveralls"
   - "cat coverage/lcov.dat | coveralls"
-after_success:
-  - "npm install -g codeclimate-test-reporter"
-  - "codeclimate-test-reporter < coverage/lcov.dat"

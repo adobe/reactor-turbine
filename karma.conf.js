@@ -5,6 +5,7 @@ var path = require('path');
 var defaultBrowsers = ['Chrome'];
 var reporters = ['dots'];
 var startConnect = false;
+var buildId;
 
 if (process.env.CI) {
   buildId =

@@ -57,7 +57,7 @@ if (argv.coverage) {
   reporters.push('coverage');
 }
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     hostname: '0.0.0.0',
 
@@ -191,10 +191,7 @@ module.exports = function(config) {
     concurrency: Infinity,
 
     coverageReporter: {
-      reporters: [
-        { type: 'html' },
-        { type: 'lcovonly', subdir: '.', file: 'lcov.dat' }
-      ]
+      reporters: [{ type: 'html' }, { type: 'lcovonly', file: 'lcov.info' }]
     },
 
     captureTimeout: 180000,

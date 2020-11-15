@@ -5,14 +5,16 @@ var path = require('path');
 var defaultBrowsers = ['Chrome'];
 var reporters = ['dots'];
 var startConnect = false;
+var buildId;
 
-if (process.env.TRAVIS) {
-  var buildId =
-    'TRAVIS #' +
-    process.env.TRAVIS_BUILD_NUMBER +
+if (process.env.CI) {
+  buildId =
+    'CI #' +
+    process.env.GITHUB_RUN_NUMBER +
     ' (' +
-    process.env.TRAVIS_BUILD_ID +
+    process.env.GITHUB_RUN_ID +
     ')';
+
   defaultBrowsers = [
     'SL_IE10',
     'SL_IE11',
@@ -169,7 +171,7 @@ module.exports = function(config) {
     sauceLabs: {
       buildId: buildId,
       testName: 'reactor-turbine Unit Test',
-      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+      tunnelIdentifier: 'github-action-tunnel',
       startConnect: startConnect,
       retryLimit: 3,
       recordVideo: false,
@@ -191,7 +193,7 @@ module.exports = function(config) {
     coverageReporter: {
       reporters: [
         { type: 'html' },
-        { type: 'lcovonly', subdir: '.', file: 'lcov.dat' }
+        { type: 'lcovonly', subdir: '.', file: 'lcov.info' }
       ]
     },
 

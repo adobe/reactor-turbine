@@ -1,7 +1,7 @@
 # Launch Turbine
 
 [![Build Status](https://img.shields.io/github/workflow/status/adobe/reactor-turbine/ci?style=flat)](https://github.com/adobe/reactor-turbine/actions)
-[![Coverage Status](https://coveralls.io/repos/github/Adobe-Marketing-Cloud/reactor-turbine/badge.svg)](https://coveralls.io/github/Adobe-Marketing-Cloud/reactor-turbine)
+[![Coverage Status](https://coveralls.io/repos/github/adobe/reactor-turbine/badge.svg)](https://coveralls.io/github/adobe/reactor-turbine)
 [![npm (scoped with tag)](https://img.shields.io/npm/v/@adobe/reactor-turbine.svg?style=flat)](https://www.npmjs.com/package/@adobe/reactor-turbine)
 
 Launch, by Adobe, is a next-generation tag management solution enabling simplified deployment of marketing technologies. For more information regarding Launch, please visit our [product website](http://www.adobe.com/enterprise/cloud-platform/launch.html).

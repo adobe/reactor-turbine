@@ -30,6 +30,8 @@
     "@adobe/reactor-window": "*"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
     "camelize": "1.0.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.11.0",
@@ -37,10 +39,10 @@
     "inject-loader": "^4.0.1",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-core": "^3.5.0",
-    "karma": "^5.0.3",
+    "karma": "^5.2.3",
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage": "^2.0.2",
-    "karma-firefox-launcher": "^1.3.0",
+    "karma-firefox-launcher": "^2.1.0",
     "karma-jasmine": "^3.1.1",
     "karma-jasmine-matchers": "^4.0.2",
     "karma-safari-launcher": "^1.0.0",
@@ -48,11 +50,9 @@
     "karma-webpack": "^4.0.2",
     "kebab-case": "1.0.0",
     "prettier": "^2.0.5",
-    "rollup": "^2.7.5",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup": "^2.36.1",
     "uglify-js": "^3.9.4",
-    "webpack": "^4.43.0",
+    "webpack": "^4.46.0",
     "yargs": "^15.3.1"
   }
 }

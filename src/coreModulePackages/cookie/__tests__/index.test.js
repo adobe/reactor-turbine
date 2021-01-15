@@ -11,27 +11,16 @@
  ****************************************************************************************/
 'use strict';
 
-var loadScript = require('./index');
+var cookie = require('../index');
 
-describe('loadScript', function() {
-  it('returns a promise', function() {
-    var promise = loadScript('/base/coreModulePackages/loadScript/empty.js');
-    expect(promise.then).toBeDefined();
-    expect(promise.catch).toBeDefined();
+describe('cookie', function () {
+  it('exposes get, set, and remove', function () {
+    expect(cookie.get).toEqual(jasmine.any(Function));
+    expect(cookie.set).toEqual(jasmine.any(Function));
+    expect(cookie.remove).toEqual(jasmine.any(Function));
   });
 
-  it('should fulfill with script element when the script is loaded', function(done) {
-    loadScript('/base/coreModulePackages/loadScript/empty.js').then(function(script) {
-      expect(script).toEqual(jasmine.any(HTMLScriptElement));
-      done();
-    });
-  });
-
-  it('should reject with error when script fails to load', function(done) {
-    loadScript('nonexistent.js').catch(function(error) {
-      expect(error).toEqual(jasmine.any(Error));
-      expect(error.message).toBe('Failed to load script nonexistent.js');
-      done();
-    });
+  it('does not expose other methods supported by the underlying implementation', function () {
+    expect(Object.keys(cookie).length).toBe(3);
   });
 });

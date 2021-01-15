@@ -6,6 +6,7 @@ var defaultBrowsers = ['Chrome'];
 var reporters = ['dots'];
 var startConnect = false;
 var buildId;
+var rollupConfig = require('./rollup.test.config');
 
 if (process.env.CI) {
   buildId =
@@ -57,7 +58,7 @@ if (argv.coverage) {
   reporters.push('coverage');
 }
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     hostname: '0.0.0.0',
 
@@ -71,14 +72,12 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       {
-        pattern: 'testIndex.js',
-        watched: false,
-        included: true,
-        served: true
+        pattern: './src/**/*.test.js',
+        watched: false
       },
       // Used in load-script core module test.
       {
-        pattern: 'coreModulePackages/loadScript/empty.js',
+        pattern: 'src/coreModulePackages/loadScript/empty.js',
         watched: false,
         included: false,
         served: true
@@ -86,13 +85,15 @@ module.exports = function(config) {
     ],
 
     // list of files to exclude
-    exclude: ['**/*.test.js'],
+    exclude: [],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'testIndex.js': ['webpack']
+      './src/**/*.test.js': ['rollup']
     },
+
+    rollupPreprocessor: rollupConfig,
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -201,25 +202,5 @@ module.exports = function(config) {
     browserDisconnectTimeout: 180000,
     browserDisconnectTolerance: 3,
     browserNoActivityTimeout: 300000,
-
-    webpack: {
-      mode: 'development',
-      externals: {
-        window: 'window',
-        document: 'document'
-      },
-      resolve: {
-        extensions: ['.js']
-      },
-      module: {
-        rules: rules
-      }
-    },
-
-    webpackServer: {
-      debug: false,
-      progress: true,
-      quiet: false
-    }
   });
 };

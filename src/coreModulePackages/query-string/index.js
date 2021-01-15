@@ -11,16 +11,23 @@
  ****************************************************************************************/
 'use strict';
 
-var cookie = require('./index');
+var querystring = require('querystring');
 
-describe('cookie', function() {
-  it('exposes get, set, and remove', function() {
-    expect(cookie.get).toEqual(jasmine.any(Function));
-    expect(cookie.set).toEqual(jasmine.any(Function));
-    expect(cookie.remove).toEqual(jasmine.any(Function));
-  });
-
-  it('does not expose other methods supported by the underlying implementation', function() {
-    expect(Object.keys(cookie).length).toBe(3);
-  });
-});
+// We proxy the underlying querystring module so we can limit the API we expose.
+// This allows us to more easily make changes to the underlying implementation later without
+// having to worry about breaking extensions. If extensions demand additional functionality, we
+// can make adjustments as needed.
+module.exports = {
+  parse: function (string) {
+    //
+    if (typeof string === 'string') {
+      // Remove leading ?, #, & for some leniency so you can pass in location.search or
+      // location.hash directly.
+      string = string.trim().replace(/^[?#&]/, '');
+    }
+    return querystring.parse(string);
+  },
+  stringify: function (object) {
+    return querystring.stringify(object);
+  }
+};

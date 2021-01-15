@@ -13,4 +13,15 @@ governing permissions and limitations under the License.
  * Patterns of source files (files within the src directory) that should be
  * ignored for test coverage checks and reporting.
  */
-module.exports = ["**/.*", "**/constants/**", "**/index.js", "**/*.test.js"];
+/* eslint-disable-next-line */
+// ignore [hidden files, test files within the src folder, [...coreModules...] (some core modules don't have tests)]
+module.exports = [
+  '**/.*', // hidden folders
+  '**/*.json',
+  '**/*.test.js', // find src files to then find test files. ignore test files.
+  '**/*empty.js',
+  '**/coreModulePackages/document/index.js', // core module isn't tested
+  '**/coreModulePackages/objectAssign/index.js', // core module isn't tested
+  '**/coreModulePackages/promise/index.js', // core module isn't tested
+  '**/coreModulePackages/window/index.js' // core module isn't tested
+];

@@ -11,23 +11,27 @@
  ****************************************************************************************/
 'use strict';
 
-var querystring = require('querystring');
+var Promise = require('@adobe/reactor-promise');
 
-// We proxy the underlying querystring module so we can limit the API we expose.
-// This allows us to more easily make changes to the underlying implementation later without
-// having to worry about breaking extensions. If extensions demand additional functionality, we
-// can make adjustments as needed.
-module.exports = {
-  parse: function(string) {
-    //
-    if (typeof string === 'string') {
-      // Remove leading ?, #, & for some leniency so you can pass in location.search or
-      // location.hash directly.
-      string = string.trim().replace(/^[?#&]/, '');
-    }
-    return querystring.parse(string);
-  },
-  stringify: function(object) {
-    return querystring.stringify(object);
-  }
+var getPromise = function (url, script) {
+  return new Promise(function (resolve, reject) {
+    script.onload = function () {
+      resolve(script);
+    };
+
+    script.onerror = function () {
+      reject(new Error('Failed to load script ' + url));
+    };
+  });
+};
+
+module.exports = function (url) {
+  var script = document.createElement('script');
+  script.src = url;
+  script.async = true;
+
+  var promise = getPromise(url, script);
+
+  document.getElementsByTagName('head')[0].appendChild(script);
+  return promise;
 };

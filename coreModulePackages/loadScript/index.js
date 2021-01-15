@@ -13,19 +13,19 @@
 
 var Promise = require('@adobe/reactor-promise');
 
-var getPromise = function(url, script) {
-  return new Promise(function(resolve, reject) {
-    script.onload = function() {
+var getPromise = function (url, script) {
+  return new Promise(function (resolve, reject) {
+    script.onload = function () {
       resolve(script);
     };
 
-    script.onerror = function() {
+    script.onerror = function () {
       reject(new Error('Failed to load script ' + url));
     };
   });
 };
 
-module.exports = function(url) {
+module.exports = function (url) {
   var script = document.createElement('script');
   script.src = url;
   script.async = true;
@@ -35,4 +35,3 @@ module.exports = function(url) {
   document.getElementsByTagName('head')[0].appendChild(script);
   return promise;
 };
-

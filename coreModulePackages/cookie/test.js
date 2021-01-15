@@ -13,14 +13,14 @@
 
 var cookie = require('./index');
 
-describe('cookie', function() {
-  it('exposes get, set, and remove', function() {
+describe('cookie', function () {
+  it('exposes get, set, and remove', function () {
     expect(cookie.get).toEqual(jasmine.any(Function));
     expect(cookie.set).toEqual(jasmine.any(Function));
     expect(cookie.remove).toEqual(jasmine.any(Function));
   });
 
-  it('does not expose other methods supported by the underlying implementation', function() {
+  it('does not expose other methods supported by the underlying implementation', function () {
     expect(Object.keys(cookie).length).toBe(3);
   });
 });

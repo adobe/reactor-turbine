@@ -13,22 +13,24 @@
 
 var loadScript = require('./index');
 
-describe('loadScript', function() {
-  it('returns a promise', function() {
+describe('loadScript', function () {
+  it('returns a promise', function () {
     var promise = loadScript('/base/coreModulePackages/loadScript/empty.js');
     expect(promise.then).toBeDefined();
     expect(promise.catch).toBeDefined();
   });
 
-  it('should fulfill with script element when the script is loaded', function(done) {
-    loadScript('/base/coreModulePackages/loadScript/empty.js').then(function(script) {
+  it('should fulfill with script element when the script is loaded', function (done) {
+    loadScript('/base/coreModulePackages/loadScript/empty.js').then(function (
+      script
+    ) {
       expect(script).toEqual(jasmine.any(HTMLScriptElement));
       done();
     });
   });
 
-  it('should reject with error when script fails to load', function(done) {
-    loadScript('nonexistent.js').catch(function(error) {
+  it('should reject with error when script fails to load', function (done) {
+    loadScript('nonexistent.js').catch(function (error) {
       expect(error).toEqual(jasmine.any(Error));
       expect(error.message).toBe('Failed to load script nonexistent.js');
       done();

@@ -18,7 +18,7 @@ var querystring = require('querystring');
 // having to worry about breaking extensions. If extensions demand additional functionality, we
 // can make adjustments as needed.
 module.exports = {
-  parse: function(string) {
+  parse: function (string) {
     //
     if (typeof string === 'string') {
       // Remove leading ?, #, & for some leniency so you can pass in location.search or
@@ -27,7 +27,7 @@ module.exports = {
     }
     return querystring.parse(string);
   },
-  stringify: function(object) {
+  stringify: function (object) {
     return querystring.stringify(object);
   }
 };

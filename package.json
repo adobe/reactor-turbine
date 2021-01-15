@@ -7,6 +7,7 @@
     "build": "npm run clean && rollup -c && npm run minify",
     "build:watch": "npm run clean && rollup --watch -c",
     "clean": "rm -rf dist",
+    "format": "pretty-quick",
     "minify": "uglifyjs dist/engine.js -c -m -o dist/engine.min.js",
     "prepublishOnly": "npm run build",
     "test": "karma start",
@@ -52,7 +53,9 @@
     "karma-sauce-launcher": "^4.1.4",
     "karma-webpack": "^4.0.2",
     "kebab-case": "1.0.0",
+    "lint-staged": "^10.5.3",
     "prettier": "^2.0.5",
+    "pretty-quick": "^3.1.0",
     "rollup": "^2.36.1",
     "uglify-js": "^3.9.4",
     "webpack": "^4.46.0",
@@ -60,8 +63,14 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint && npm test"
+      "pre-commit": "pretty-quick --staged && lint-staged",
+      "pre-push": "npm test"
     }
+  },
+  "lint-staged": {
+    "(src/**/*.js|coreModulePackages/**/*.js)": [
+      "npm run lint -- --fix"
+    ]
   },
   "engines": {
     "node": ">=10.0.0"

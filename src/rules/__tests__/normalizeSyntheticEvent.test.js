@@ -27,7 +27,7 @@ describe('normalizeSyntheticEvent', function () {
 
   beforeEach(function () {
     logger = {
-      warn: jasmine.createSpy()
+      deprecation: jasmine.createSpy()
     };
 
     normalizeSyntheticEvent = injectNormalizeSyntheticEvent({
@@ -92,7 +92,7 @@ describe('normalizeSyntheticEvent', function () {
     // Note that the type property is non-enumerable, which is why the other tests pass without
     // accounting for the type property.
     expect(syntheticEvent.type).toBe('extension-name.event-name');
-    expect(logger.warn).toHaveBeenCalledWith(
+    expect(logger.deprecation).toHaveBeenCalledWith(
       'Accessing event.type in Adobe Launch has been ' +
         'deprecated and will be removed soon. Please use event.$type instead.'
     );

@@ -58,7 +58,7 @@ module.exports = function (
    * 3=info, 4=warn, 5=error, anything else=log
    */
   _satellite.notify = function (message, level) {
-    logger.warn(
+    logger.deprecation(
       '_satellite.notify is deprecated. Please use the `_satellite.logger` API.'
     );
 
@@ -106,7 +106,7 @@ module.exports = function (
       optionsStr +
       ').';
 
-    logger.warn(msg);
+    logger.deprecation(msg);
     cookie.set(name, value, options);
   };
 
@@ -116,7 +116,7 @@ module.exports = function (
    * @returns {string}
    */
   _satellite.readCookie = function (name) {
-    logger.warn(
+    logger.deprecation(
       '_satellite.readCookie is deprecated. ' +
         'Please use _satellite.cookie.get("' +
         name +
@@ -130,7 +130,7 @@ module.exports = function (
    * @param name
    */
   _satellite.removeCookie = function (name) {
-    logger.warn(
+    logger.deprecation(
       '_satellite.removeCookie is deprecated. ' +
         'Please use _satellite.cookie.remove("' +
         name +

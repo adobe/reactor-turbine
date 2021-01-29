@@ -95,7 +95,7 @@ describe('hydrateSatelliteObject', function () {
 
   it('successfully allows setting, reading, and removing a cookie', function () {
     var logger = {
-      warn: jasmine.createSpy(),
+      deprecation: jasmine.createSpy(),
       createPrefixedLogger: function () {}
     };
     var hydrateSatelliteObject = injectHydrateSatelliteObject({
@@ -108,7 +108,7 @@ describe('hydrateSatelliteObject', function () {
 
     _satellite.setCookie(cookieName, cookieValue, 91);
 
-    expect(logger.warn).toHaveBeenCalledWith(
+    expect(logger.deprecation).toHaveBeenCalledWith(
       '_satellite.setCookie is deprecated. Please use ' +
         '_satellite.cookie.set("cookiename", "cookievalue", { expires: 91 }).'
     );
@@ -119,13 +119,13 @@ describe('hydrateSatelliteObject', function () {
 
     expect(_satellite.readCookie(cookieName)).toEqual('cookievalue');
 
-    expect(logger.warn).toHaveBeenCalledWith(
+    expect(logger.deprecation).toHaveBeenCalledWith(
       '_satellite.readCookie is deprecated. Please use _satellite.cookie.get("cookiename").'
     );
 
     _satellite.removeCookie(cookieName);
 
-    expect(logger.warn).toHaveBeenCalledWith(
+    expect(logger.deprecation).toHaveBeenCalledWith(
       '_satellite.removeCookie is deprecated. Please use _satellite.cookie.remove("cookiename").'
     );
 
@@ -167,7 +167,8 @@ describe('hydrateSatelliteObject', function () {
         error: function () {},
         createPrefixedLogger: function () {
           return loggerMock;
-        }
+        },
+        deprecation: function () {}
       }
     });
     hydrateSatelliteObject(_satellite, container);
@@ -187,6 +188,45 @@ describe('hydrateSatelliteObject', function () {
     _satellite.notify('error test', 5);
     expect(loggerMock.error).toHaveBeenCalledWith('error test');
   });
+
+  it(
+    'logger.deprecation is called for all deprecated methods on the ' +
+      '_satellite object',
+    function () {
+      var logger = require('../logger');
+      var deprecationSpy = spyOn(logger, 'deprecation');
+      require('../hydrateSatelliteObject')(
+        _satellite,
+        container,
+        jasmine.createSpy('setDebugEnabled'),
+        jasmine.createSpy('getVar'),
+        jasmine.createSpy('setCustomVar')
+      );
+
+      _satellite.notify('using deprecated function', 1);
+      expect(deprecationSpy).toHaveBeenCalledWith(
+        '_satellite.notify is deprecated. Please use the `_satellite.logger` API.'
+      );
+
+      _satellite.setCookie('cookie name', 'cookie value', 1);
+      expect(deprecationSpy).toHaveBeenCalledWith(
+        '_satellite.setCookie is deprecated. Please use _satellite.cookie.set(' +
+          '"cookie name", "cookie value", { expires: 1 }).'
+      );
+
+      _satellite.readCookie('cookie name');
+      expect(deprecationSpy).toHaveBeenCalledWith(
+        '_satellite.readCookie is deprecated. Please use ' +
+          '_satellite.cookie.get("cookie name").'
+      );
+
+      _satellite.removeCookie('cookie name');
+      expect(deprecationSpy).toHaveBeenCalledWith(
+        '_satellite.removeCookie is deprecated. Please use ' +
+          '_satellite.cookie.remove("cookie name").'
+      );
+    }
+  );
 
   it('exposes a pageBottom method', function () {
     var hydrateSatelliteObject = injectHydrateSatelliteObject();

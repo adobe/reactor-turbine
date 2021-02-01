@@ -156,21 +156,18 @@ describe('hydrateSatelliteObject', function () {
       'log',
       'info',
       'warn',
-      'error'
+      'error',
+      'deprecation'
     ]);
-
+    loggerMock.createPrefixedLogger = jasmine
+      .createSpy('createPrefixedLogger')
+      .and.callFake(function () {
+        return loggerMock;
+      });
     var hydrateSatelliteObject = injectHydrateSatelliteObject({
-      './logger': {
-        warn: function () {},
-        log: function () {},
-        info: function () {},
-        error: function () {},
-        createPrefixedLogger: function () {
-          return loggerMock;
-        },
-        deprecation: function () {}
-      }
+      './logger': loggerMock
     });
+
     hydrateSatelliteObject(_satellite, container);
 
     _satellite.notify('log test');
@@ -187,41 +184,52 @@ describe('hydrateSatelliteObject', function () {
 
     _satellite.notify('error test', 5);
     expect(loggerMock.error).toHaveBeenCalledWith('error test');
+
+    expect(loggerMock.deprecation.calls.count()).toBe(5);
+    loggerMock.deprecation.calls.all().forEach(function (call) {
+      var logMessage = call.args[0];
+      expect(logMessage).toBe(
+        '_satellite.notify is deprecated. Please use the `_satellite.logger` API.'
+      );
+    });
   });
 
   it(
     'logger.deprecation is called for all deprecated methods on the ' +
       '_satellite object',
     function () {
-      var logger = require('../logger');
-      var deprecationSpy = spyOn(logger, 'deprecation');
-      require('../hydrateSatelliteObject')(
-        _satellite,
-        container,
-        jasmine.createSpy('setDebugEnabled'),
-        jasmine.createSpy('getVar'),
-        jasmine.createSpy('setCustomVar')
-      );
+      var loggerMock = jasmine.createSpyObj('logger', [
+        'log',
+        'info',
+        'warn',
+        'error',
+        'deprecation'
+      ]);
+      loggerMock.createPrefixedLogger = jasmine
+        .createSpy('createPrefixedLogger')
+        .and.callFake(function () {
+          return loggerMock;
+        });
+      var hydrateSatelliteObject = injectHydrateSatelliteObject({
+        './logger': loggerMock
+      });
 
-      _satellite.notify('using deprecated function', 1);
-      expect(deprecationSpy).toHaveBeenCalledWith(
-        '_satellite.notify is deprecated. Please use the `_satellite.logger` API.'
-      );
+      hydrateSatelliteObject(_satellite, container);
 
       _satellite.setCookie('cookie name', 'cookie value', 1);
-      expect(deprecationSpy).toHaveBeenCalledWith(
+      expect(loggerMock.deprecation).toHaveBeenCalledWith(
         '_satellite.setCookie is deprecated. Please use _satellite.cookie.set(' +
           '"cookie name", "cookie value", { expires: 1 }).'
       );
 
       _satellite.readCookie('cookie name');
-      expect(deprecationSpy).toHaveBeenCalledWith(
+      expect(loggerMock.deprecation).toHaveBeenCalledWith(
         '_satellite.readCookie is deprecated. Please use ' +
           '_satellite.cookie.get("cookie name").'
       );
 
       _satellite.removeCookie('cookie name');
-      expect(deprecationSpy).toHaveBeenCalledWith(
+      expect(loggerMock.deprecation).toHaveBeenCalledWith(
         '_satellite.removeCookie is deprecated. Please use ' +
           '_satellite.cookie.remove("cookie name").'
       );

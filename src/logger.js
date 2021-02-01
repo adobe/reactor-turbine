@@ -101,12 +101,31 @@ var warn = process.bind(null, levels.WARN);
  */
 var error = process.bind(null, levels.ERROR);
 
+/**
+ * Outputs a warning message to the web console.
+ * @param {...*} arg Any argument to be logged.
+ */
+var logDeprecation = function () {
+  var wasEnabled = outputEnabled;
+  outputEnabled = true;
+
+  process.apply(
+    null,
+    Array.prototype.concat(levels.WARN, Array.prototype.slice.call(arguments))
+  );
+
+  if (!wasEnabled) {
+    outputEnabled = false;
+  }
+};
+
 module.exports = {
   log: log,
   info: info,
   debug: debug,
   warn: warn,
   error: error,
+  deprecation: logDeprecation,
   /**
    * Whether logged messages should be output to the console.
    * @type {boolean}

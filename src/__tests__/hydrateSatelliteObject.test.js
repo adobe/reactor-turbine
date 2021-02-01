@@ -95,7 +95,7 @@ describe('hydrateSatelliteObject', function () {
 
   it('successfully allows setting, reading, and removing a cookie', function () {
     var logger = {
-      warn: jasmine.createSpy(),
+      deprecation: jasmine.createSpy(),
       createPrefixedLogger: function () {}
     };
     var hydrateSatelliteObject = injectHydrateSatelliteObject({
@@ -108,7 +108,7 @@ describe('hydrateSatelliteObject', function () {
 
     _satellite.setCookie(cookieName, cookieValue, 91);
 
-    expect(logger.warn).toHaveBeenCalledWith(
+    expect(logger.deprecation).toHaveBeenCalledWith(
       '_satellite.setCookie is deprecated. Please use ' +
         '_satellite.cookie.set("cookiename", "cookievalue", { expires: 91 }).'
     );
@@ -119,13 +119,13 @@ describe('hydrateSatelliteObject', function () {
 
     expect(_satellite.readCookie(cookieName)).toEqual('cookievalue');
 
-    expect(logger.warn).toHaveBeenCalledWith(
+    expect(logger.deprecation).toHaveBeenCalledWith(
       '_satellite.readCookie is deprecated. Please use _satellite.cookie.get("cookiename").'
     );
 
     _satellite.removeCookie(cookieName);
 
-    expect(logger.warn).toHaveBeenCalledWith(
+    expect(logger.deprecation).toHaveBeenCalledWith(
       '_satellite.removeCookie is deprecated. Please use _satellite.cookie.remove("cookiename").'
     );
 
@@ -156,20 +156,18 @@ describe('hydrateSatelliteObject', function () {
       'log',
       'info',
       'warn',
-      'error'
+      'error',
+      'deprecation'
     ]);
-
+    loggerMock.createPrefixedLogger = jasmine
+      .createSpy('createPrefixedLogger')
+      .and.callFake(function () {
+        return loggerMock;
+      });
     var hydrateSatelliteObject = injectHydrateSatelliteObject({
-      './logger': {
-        warn: function () {},
-        log: function () {},
-        info: function () {},
-        error: function () {},
-        createPrefixedLogger: function () {
-          return loggerMock;
-        }
-      }
+      './logger': loggerMock
     });
+
     hydrateSatelliteObject(_satellite, container);
 
     _satellite.notify('log test');
@@ -186,7 +184,57 @@ describe('hydrateSatelliteObject', function () {
 
     _satellite.notify('error test', 5);
     expect(loggerMock.error).toHaveBeenCalledWith('error test');
+
+    expect(loggerMock.deprecation.calls.count()).toBe(5);
+    loggerMock.deprecation.calls.all().forEach(function (call) {
+      var logMessage = call.args[0];
+      expect(logMessage).toBe(
+        '_satellite.notify is deprecated. Please use the `_satellite.logger` API.'
+      );
+    });
   });
+
+  it(
+    'logger.deprecation is called for all deprecated methods on the ' +
+      '_satellite object',
+    function () {
+      var loggerMock = jasmine.createSpyObj('logger', [
+        'log',
+        'info',
+        'warn',
+        'error',
+        'deprecation'
+      ]);
+      loggerMock.createPrefixedLogger = jasmine
+        .createSpy('createPrefixedLogger')
+        .and.callFake(function () {
+          return loggerMock;
+        });
+      var hydrateSatelliteObject = injectHydrateSatelliteObject({
+        './logger': loggerMock
+      });
+
+      hydrateSatelliteObject(_satellite, container);
+
+      _satellite.setCookie('cookie name', 'cookie value', 1);
+      expect(loggerMock.deprecation).toHaveBeenCalledWith(
+        '_satellite.setCookie is deprecated. Please use _satellite.cookie.set(' +
+          '"cookie name", "cookie value", { expires: 1 }).'
+      );
+
+      _satellite.readCookie('cookie name');
+      expect(loggerMock.deprecation).toHaveBeenCalledWith(
+        '_satellite.readCookie is deprecated. Please use ' +
+          '_satellite.cookie.get("cookie name").'
+      );
+
+      _satellite.removeCookie('cookie name');
+      expect(loggerMock.deprecation).toHaveBeenCalledWith(
+        '_satellite.removeCookie is deprecated. Please use ' +
+          '_satellite.cookie.remove("cookie name").'
+      );
+    }
+  );
 
   it('exposes a pageBottom method', function () {
     var hydrateSatelliteObject = injectHydrateSatelliteObject();

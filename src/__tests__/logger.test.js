@@ -103,4 +103,22 @@ describe('logger', function () {
     logger.outputEnabled = false;
     expect(logger.outputEnabled).toBe(false);
   });
+
+  it('logs deprecations to the console when logger.outputEnabled=true', function () {
+    var message = '_satellite.deprecatedFeature is officially deprecated';
+    logger.outputEnabled = true;
+    logger.deprecation(message);
+
+    expect(window.console.warn).toHaveBeenCalledWith(launchPrefix, message);
+    expect(logger.outputEnabled).toBeTrue();
+  });
+
+  it('logs deprecations to the console when logger.outputEnabled=false', function () {
+    var message = '_satellite.deprecatedFeature is officially deprecated';
+    logger.outputEnabled = false;
+    logger.deprecation(message);
+
+    expect(window.console.warn).toHaveBeenCalledWith(launchPrefix, message);
+    expect(logger.outputEnabled).toBeFalse();
+  });
 });

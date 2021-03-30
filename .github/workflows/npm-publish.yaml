@@ -12,7 +12,7 @@ on:
         default: 'latest'
 
 jobs:
-  ci:
+  publish-npm:
     runs-on: ubuntu-latest
     steps:
       - name: Check Tag Name
@@ -41,17 +41,6 @@ jobs:
         env:
           SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
           SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
-      - run: npm run build --if-present
-
-  publish-npm:
-    needs: ci
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 14.x
-          registry-url: https://registry.npmjs.org/
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}

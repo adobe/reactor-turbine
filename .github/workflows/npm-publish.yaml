@@ -6,12 +6,8 @@ name: Node.js Package
 on:
   workflow_dispatch:
     inputs:
-      level:
-        description: 'major | minor | patch'
-        required: true
-        default: 'patch'
       tag:
-        description: 'The tag to publish to.'
+        description: 'The tag to publish to: latest | next'
         required: false
         default: 'latest'
 
@@ -19,6 +15,11 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
+      - name: Check Tag Name
+        if: ${{ github.event.inputs.tag != 'latest' && github.events.inputs.tag != 'next' }}
+        run: |
+          echo 'Only the tags "latest" or "next" are supported'
+          exit 1
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
@@ -51,11 +52,6 @@ jobs:
         with:
           node-version: 14.x
           registry-url: https://registry.npmjs.org/
-      - name: Version Up and Publish
-        if: ${{ github.event.inputs.level != '' }}
-        run: |
-          npm version ${{ github.event.inputs.level }}
-          git push
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}

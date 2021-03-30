@@ -4,18 +4,33 @@
 name: Node.js Package
 
 on:
-  release:
-    types: [created]
+  workflow_dispatch:
+    inputs:
+      level:
+        description: 'major | minor | patch'
+        required: true
+        default: 'patch'
+      tag:
+        description: 'The tag to publish to.'
+        required: false
+        default: 'latest'
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
           node-version: 14.x
-      - run: npm ci
+      - uses: actions/cache@v2
+        id: npm-cache
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
       - uses: saucelabs/sauce-connect-action@v1
         with:
           username: ${{ secrets.SAUCE_USERNAME }}
@@ -25,10 +40,10 @@ jobs:
         env:
           SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
           SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
-      - run: npm run build
+      - run: npm run build --if-present
 
   publish-npm:
-    needs: build
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +51,13 @@ jobs:
         with:
           node-version: 14.x
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.ADOBE_BOT_NPM_TOKEN}}
+      - name: Version Up and Publish
+        if: ${{ github.event.inputs.level != '' }}
+        run: |
+          npm version ${{ github.event.inputs.level }}
+          git push
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
+          tag: ${{ github.event.inputs.tag }}
+          access: 'public'

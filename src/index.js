@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+// DYNAMIC URL
+var createDynamicHostResolver = require('./createDynamicHostResolver');
 var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
 
 var createDebugController = require('./createDebugController');
@@ -57,10 +59,17 @@ if (_satellite && !window.__satelliteLoaded) {
   // If a consumer loads the library multiple times, make sure only the first time is effective.
   window.__satelliteLoaded = true;
 
+  // DYNAMIC URL
+  _satellite.container.dynamicEnforced = true;
   var container = _satellite.container;
 
   // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
   delete _satellite.container;
+
+  var dynamicHostResolver = createDynamicHostResolver(
+    document.currentScript.src,
+    container.dynamicEnforced
+  );
 
   var undefinedVarsReturnEmpty =
     container.property.settings.undefinedVarsReturnEmpty;

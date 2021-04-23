@@ -1,8 +1,14 @@
 module.exports = function (turbineEmbedCode, isDynamicEnforced) {
-  var turbineUrl = new URL(turbineEmbedCode);
+  var turbineUrl;
+
+  try {
+    turbineUrl = new URL(turbineEmbedCode);
+  } catch (e) {
+    // do nothing
+  }
 
   return function toTurbineHost(sourceUrl) {
-    if (!isDynamicEnforced) {
+    if (!isDynamicEnforced || !turbineUrl) {
       return sourceUrl;
     }
 

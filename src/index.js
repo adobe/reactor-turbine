@@ -11,6 +11,7 @@
  ****************************************************************************************/
 
 // DYNAMIC URL
+var document = require('@adobe/reactor-document');
 var createDynamicHostResolver = require('./createDynamicHostResolver');
 var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
 
@@ -66,8 +67,12 @@ if (_satellite && !window.__satelliteLoaded) {
   // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
   delete _satellite.container;
 
+  var currentScriptSource = '';
+  if (document.currentScript && document.currentScript.source) {
+    currentScriptSource = document.currentScript.source;
+  }
   var dynamicHostResolver = createDynamicHostResolver(
-    document.currentScript.src,
+    currentScriptSource,
     container.dynamicEnforced
   );
 

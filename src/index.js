@@ -76,6 +76,9 @@ if (_satellite && !window.__satelliteLoaded) {
     container.dynamicEnforced
   );
 
+  window.dynamicHostResolver = dynamicHostResolver;
+  console.log('added dynamic host resolver to the window');
+
   var undefinedVarsReturnEmpty =
     container.property.settings.undefinedVarsReturnEmpty;
   var ruleComponentSequencingEnabled =

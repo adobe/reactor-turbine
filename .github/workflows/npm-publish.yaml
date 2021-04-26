@@ -18,7 +18,7 @@ jobs:
       - name: Check Tag Name
         if: ${{ github.event.inputs.tag != 'latest' && github.events.inputs.tag != 'next' }}
         run: |
-          echo 'Only the tags "latest" or "next" are supported'
+          echo 'Only the tags "latest" or "next" are supported. You entered "${{ github.event.inputs.tag }}"'
           exit 1
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1

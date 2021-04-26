@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check Tag Name
-        if: ${{ github.event.inputs.tag != 'latest' && github.events.inputs.tag != 'next' }}
+        if: ${{ github.event.inputs.tag != 'latest' && github.event.inputs.tag != 'next' }}
         run: |
           echo 'Only the tags "latest" or "next" are supported. You entered "${{ github.event.inputs.tag }}"'
           exit 1

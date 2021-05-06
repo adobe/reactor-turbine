@@ -61,19 +61,23 @@ if (_satellite && !window.__satelliteLoaded) {
   window.__satelliteLoaded = true;
 
   // DYNAMIC URL
-  _satellite.container.dynamicEnforced = true;
+  var dynamicHostSettings = _satellite.container.dynamicHostSettings || {
+    dynamicEnforced: true
+  };
   var container = _satellite.container;
 
   // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
   delete _satellite.container;
 
+  // DYNAMIC URL
   var currentScriptSource = '';
-  if (document.currentScript && document.currentScript.source) {
-    currentScriptSource = document.currentScript.source;
+  if (document.currentScript && document.currentScript.src) {
+    currentScriptSource = document.currentScript.src;
   }
   var dynamicHostResolver = createDynamicHostResolver(
     currentScriptSource,
-    container.dynamicEnforced
+    dynamicHostSettings.dynamicEnforced,
+    logger
   );
 
   window.dynamicHostResolver = dynamicHostResolver;

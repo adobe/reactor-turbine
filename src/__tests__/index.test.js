@@ -14,6 +14,15 @@
 
 var injectIndex = require('inject-loader!../index');
 
+var logger = jasmine.createSpyObj('logger', [
+  'log',
+  'info',
+  'debug',
+  'warn',
+  'error',
+  'deprecation'
+]);
+
 describe('index', function () {
   beforeEach(function () {
     window._satellite = {
@@ -23,6 +32,9 @@ describe('index', function () {
             undefinedVarsReturnEmpty: true,
             ruleComponentSequencingEnabled: false
           }
+        },
+        dynamicHostSettings: {
+          dynamicEnforced: false
         }
       }
     };
@@ -182,7 +194,6 @@ describe('index', function () {
   });
 
   it("sets logger output enabled when local storage item is 'true'", function () {
-    var logger = {};
     window.localStorage.setItem('com.adobe.reactor.debug', true);
 
     injectIndex({
@@ -196,7 +207,6 @@ describe('index', function () {
     'sets logger output disabled when local storage item is anything ' +
       "other than 'true'",
     function () {
-      var logger = {};
       window.localStorage.setItem('com.adobe.reactor.debug', false);
 
       injectIndex({
@@ -212,6 +222,8 @@ describe('index', function () {
     var hydrateSatelliteObject = jasmine.createSpy();
     var getVar = function () {};
     var setCustomVar = function () {};
+    var registerScript = function () {};
+    var retrieveScript = function () {};
     injectIndex({
       './hydrateSatelliteObject': hydrateSatelliteObject,
       './createGetVar': function () {
@@ -219,6 +231,12 @@ describe('index', function () {
       },
       './createSetCustomVar': function () {
         return setCustomVar;
+      },
+      './createScriptStore': function () {
+        return {
+          registerScript: registerScript,
+          retrieveScript: retrieveScript
+        };
       }
     });
 
@@ -227,7 +245,9 @@ describe('index', function () {
       container,
       jasmine.any(Function),
       getVar,
-      setCustomVar
+      setCustomVar,
+      registerScript,
+      retrieveScript
     );
   });
 
@@ -238,6 +258,7 @@ describe('index', function () {
     var debugController = { type: 'debugController' };
     var replaceTokens = function () {};
     var getDataElementValue = function () {};
+    var decorateWithDynamicHost = function () {};
     injectIndex({
       './hydrateModuleProvider': hydrateModuleProvider,
       './createModuleProvider': function () {
@@ -251,6 +272,11 @@ describe('index', function () {
       },
       './createGetDataElementValue': function () {
         return getDataElementValue;
+      },
+      './createDynamicHostResolver': function () {
+        return {
+          decorateWithDynamicHost: decorateWithDynamicHost
+        };
       }
     });
 
@@ -259,7 +285,8 @@ describe('index', function () {
       moduleProvider,
       debugController,
       replaceTokens,
-      getDataElementValue
+      getDataElementValue,
+      decorateWithDynamicHost
     );
   });
 
@@ -346,4 +373,6 @@ describe('index', function () {
       );
     });
   });
+
+  // it('tests when dynamicEnforced=true')
 });

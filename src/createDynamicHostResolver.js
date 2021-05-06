@@ -6,7 +6,7 @@ module.exports = function (turbineEmbedCode, isDynamicEnforced, logger) {
     //  __satellite.container.dynamicEnforced turned on
     turbineUrl = new URL(turbineEmbedCode);
   } catch (e) {
-    if (isDynamicEnforced) {
+    if (isDynamicEnforced === true) {
       // TODO: this should not stay as "deprecation", but it allows us to
       //  force messages to the console
       logger.deprecation(

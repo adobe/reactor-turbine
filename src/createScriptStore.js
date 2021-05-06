@@ -14,30 +14,33 @@
 var loadScript = require('@adobe/reactor-load-script');
 var Promise = require('@adobe/reactor-promise');
 
-var scriptStore = {};
+var loadScriptPromiseStore = {};
 var codeBySourceUrl = {};
 
+// TODO: i don't think we need to decorate here, in case it might actually be a bug.
+//  at this point, the script should already be loading...?
 module.exports = function (decorateWithDynamicHost) {
   var loadScriptOnlyOnce = function (sourceUrl) {
-    if (!scriptStore[sourceUrl]) {
-      scriptStore[sourceUrl] = loadScript(decorateWithDynamicHost(sourceUrl));
+    if (!loadScriptPromiseStore[sourceUrl]) {
+      loadScriptPromiseStore[sourceUrl] = loadScript(sourceUrl);
     }
 
-    return scriptStore[sourceUrl];
+    return loadScriptPromiseStore[sourceUrl];
   };
 
   var registerScript = function (sourceUrl, code) {
-    scriptStore[sourceUrl] = code;
+    codeBySourceUrl[decorateWithDynamicHost(sourceUrl)] = code;
   };
 
-  var retrieveScript = function (sourceUrl) {
-    if (codeBySourceUrl[sourceUrl]) {
-      return Promise.resolve(codeBySourceUrl[sourceUrl]);
+  var retrieveScript = function (u) {
+    var decoratedUrl = decorateWithDynamicHost(u);
+    if (codeBySourceUrl[decoratedUrl]) {
+      return Promise.resolve(codeBySourceUrl[decoratedUrl]);
     } else {
       return new Promise(function (resolve) {
-        loadScriptOnlyOnce(sourceUrl).then(
+        loadScriptOnlyOnce(decoratedUrl).then(
           function () {
-            resolve(codeBySourceUrl[sourceUrl]);
+            resolve(codeBySourceUrl[decoratedUrl]);
           },
           function () {
             resolve();

@@ -157,7 +157,8 @@ if (_satellite && !window.__satelliteLoaded) {
     moduleProvider,
     debugController,
     replaceTokens,
-    getDataElementValue
+    getDataElementValue,
+    dynamicHostResolver.decorateWithDynamicHost
   );
 
   var notifyMonitors = createNotifyMonitors(_satellite);

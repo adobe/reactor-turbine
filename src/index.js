@@ -49,6 +49,7 @@ var normalizeSyntheticEvent = require('./rules/normalizeSyntheticEvent');
 var dataElementSafe = require('./dataElementSafe');
 var getNamespacedStorage = require('./getNamespacedStorage');
 
+var createScriptStore = require('./createScriptStore');
 var hydrateModuleProvider = require('./hydrateModuleProvider');
 var hydrateSatelliteObject = require('./hydrateSatelliteObject');
 
@@ -136,6 +137,7 @@ if (_satellite && !window.__satelliteLoaded) {
 
   var localStorage = getNamespacedStorage('localStorage');
   var debugController = createDebugController(localStorage, logger);
+  var scriptStore = createScriptStore(dynamicHostResolver);
 
   // Important to hydrate satellite object before we hydrate the module provider or init rules.
   // When we hydrate module provider, we also execute extension code which may be
@@ -145,7 +147,9 @@ if (_satellite && !window.__satelliteLoaded) {
     container,
     debugController.setDebugEnabled,
     getVar,
-    setCustomVar
+    setCustomVar,
+    scriptStore.registerScript,
+    scriptStore.retrieveScript
   );
 
   hydrateModuleProvider(

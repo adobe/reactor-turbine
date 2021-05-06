@@ -44,6 +44,7 @@ module.exports = function (
       if (extension.modules) {
         var prefixedLogger = logger.createPrefixedLogger(extension.displayName);
         var getHostedLibFileUrl = createGetHostedLibFileUrl(
+          dynamicHostResolver.decorateWithDynamicHost,
           extension.hostedLibFilesBaseUrl,
           buildInfo.minified
         );

@@ -17,15 +17,27 @@ module.exports = function (turbineEmbedCode, isDynamicEnforced, logger) {
 
   var shouldAugment = Boolean(isDynamicEnforced && turbineUrl);
 
+  /**
+   * Returns the host of the Turbine embed code, or an empty string if Dynamic Host
+   * is not enabled.
+   * @returns {string}
+   */
   var getTurbineHost = function () {
     if (shouldAugment) {
+      // be sure we always force https to Adobe managed domains
       return 'https://' + turbineUrl.host;
     }
 
     return '';
   };
 
-  var augmentUrl = function (sourceUrl) {
+  /**
+   * Returns a url decorated with the host of the Turbine embed code. If Dynamic host
+   * is disabled, the original sourceUrl is returned unmodified.
+   * @param sourceUrl
+   * @returns {string|*}
+   */
+  var decorateWithDynamicHost = function (sourceUrl) {
     if (shouldAugment) {
       return getTurbineHost() + '/' + sourceUrl;
     }
@@ -35,6 +47,6 @@ module.exports = function (turbineEmbedCode, isDynamicEnforced, logger) {
 
   return {
     getTurbineHost: getTurbineHost,
-    augmentUrl: augmentUrl
+    decorateWithDynamicHost: decorateWithDynamicHost
   };
 };

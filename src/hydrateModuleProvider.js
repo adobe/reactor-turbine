@@ -22,7 +22,8 @@ module.exports = function (
   moduleProvider,
   debugController,
   replaceTokens,
-  getDataElementValue
+  getDataElementValue,
+  decorateWithDynamicHost
 ) {
   var extensions = container.extensions;
   var buildInfo = container.buildInfo;
@@ -44,7 +45,7 @@ module.exports = function (
       if (extension.modules) {
         var prefixedLogger = logger.createPrefixedLogger(extension.displayName);
         var getHostedLibFileUrl = createGetHostedLibFileUrl(
-          dynamicHostResolver.decorateWithDynamicHost,
+          decorateWithDynamicHost,
           extension.hostedLibFilesBaseUrl,
           buildInfo.minified
         );

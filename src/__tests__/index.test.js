@@ -33,8 +33,8 @@ describe('index', function () {
             ruleComponentSequencingEnabled: false
           }
         },
-        dynamicHostSettings: {
-          dynamicEnforced: false
+        company: {
+          cdnAllowList: ['assets.adobedtm.com']
         }
       }
     };

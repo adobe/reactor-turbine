@@ -66,7 +66,7 @@ if (_satellite && !window.__satelliteLoaded) {
   var dynamicHostSettings = {
     dynamicEnforced:
       Boolean(
-        Array.isArray(container.company.cdnAllowList) &&
+        Array.isArray(container.company && container.company.cdnAllowList) &&
           container.company.cdnAllowList.length
       ) || true
   };

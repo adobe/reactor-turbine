@@ -61,11 +61,15 @@ if (_satellite && !window.__satelliteLoaded) {
   // If a consumer loads the library multiple times, make sure only the first time is effective.
   window.__satelliteLoaded = true;
 
-  // DYNAMIC URL
-  var dynamicHostSettings = _satellite.container.dynamicHostSettings || {
-    dynamicEnforced: true
-  };
   var container = _satellite.container;
+  // DYNAMIC URL
+  var dynamicHostSettings = {
+    dynamicEnforced:
+      Boolean(
+        Array.isArray(container.company.cdnAllowList) &&
+          container.company.cdnAllowList.length
+      ) || true
+  };
 
   // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
   delete _satellite.container;

@@ -39,6 +39,7 @@ module.exports = function (turbineEmbedCode, isDynamicEnforced, logger) {
    */
   var decorateWithDynamicHost = function (sourceUrl) {
     if (shouldAugment) {
+      // TODO don't make a double slash here
       return getTurbineHost() + '/' + sourceUrl;
     }
 

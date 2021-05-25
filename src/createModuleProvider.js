@@ -10,10 +10,15 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var objectAssign = require('@adobe/reactor-object-assign');
 var extractModuleExports = require('./extractModuleExports');
 var logger = require('./logger');
 
-module.exports = function () {
+module.exports = function (
+  traverseDelegateProperties,
+  isDynamicEnforced,
+  decorateWithDynamicHost
+) {
   var moduleByReferencePath = {};
 
   var getModule = function (referencePath) {
@@ -75,6 +80,67 @@ module.exports = function () {
     return module.exports;
   };
 
+  /*
+   * Stored by reference path, holds the modules settings that need to be transformed
+   * into a dynamic URL.
+   * {
+   *  'referencePath': {
+   *     'setting.nested[4].path': 'relative-url'
+   *   }
+   * }
+   */
+  var fileTransformsCacheByReferencePath = {};
+  var decorateSettingsWithDelegateFilePaths = function (
+    referencePath,
+    settings
+  ) {
+    // nothing to do
+    if (!isDynamicEnforced || !Object.keys(settings).length) {
+      return settings;
+    }
+
+    var settingsCopy = objectAssign({}, settings);
+
+    // store into the cache an object that is referenced by referencePath
+    if (!fileTransformsCacheByReferencePath.hasOwnProperty(referencePath)) {
+      fileTransformsCacheByReferencePath[referencePath] = {};
+    }
+    // pull the cache object
+    var cache = fileTransformsCacheByReferencePath[referencePath];
+
+    // see if the module has file paths
+    var module = getModule(referencePath);
+
+    if (module.hasOwnProperty('filePaths') && Array.isArray(module.filePaths)) {
+      // pull out the file paths by the module's reference path and loop over each urlPath
+      module.filePaths.forEach(function (urlSettingPath) {
+        if (!cache.hasOwnProperty(urlSettingPath)) {
+          // accumulate the settings over time that need to be URL transformed
+          var url = traverseDelegateProperties.pluckSettingsValue(
+            urlSettingPath,
+            settingsCopy
+          );
+          if (url) {
+            url = decorateWithDynamicHost(url);
+          }
+          cache[urlSettingPath] = url;
+        }
+      });
+    }
+
+    Object.keys(cache).forEach(function (urlSettingPath) {
+      var decoratedUrlValue = cache[urlSettingPath];
+      traverseDelegateProperties.pushValueIntoSettings(
+        urlSettingPath,
+        settingsCopy,
+        decoratedUrlValue
+      );
+    });
+
+    // return the decorated settings object
+    return settingsCopy;
+  };
+
   var getModuleDefinition = function (referencePath) {
     return getModule(referencePath).definition;
   };
@@ -88,6 +154,7 @@ module.exports = function () {
     hydrateCache: hydrateCache,
     getModuleExports: getModuleExports,
     getModuleDefinition: getModuleDefinition,
-    getModuleExtensionName: getModuleExtensionName
+    getModuleExtensionName: getModuleExtensionName,
+    decorateSettingsWithDelegateFilePaths: decorateSettingsWithDelegateFilePaths
   };
 };

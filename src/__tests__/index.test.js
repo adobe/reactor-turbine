@@ -38,6 +38,10 @@ describe('index', function () {
         }
       }
     };
+
+    spyOnProperty(document, 'currentScript', 'get').and.returnValue({
+      src: 'https://fake.adobeassets.com'
+    });
   });
 
   afterEach(function () {

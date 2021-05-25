@@ -53,6 +53,8 @@ var createScriptStore = require('./createScriptStore');
 var hydrateModuleProvider = require('./hydrateModuleProvider');
 var hydrateSatelliteObject = require('./hydrateSatelliteObject');
 
+var traverseDelegateProperties = require('./traverseDelegateProperties');
+
 var logger = require('./logger');
 
 var _satellite = window._satellite;
@@ -66,7 +68,8 @@ if (_satellite && !window.__satelliteLoaded) {
   var dynamicHostSettings = {
     dynamicEnforced:
       Boolean(
-        Array.isArray(container.company && container.company.cdnAllowList) &&
+        container.company &&
+          Array.isArray(container.company.cdnAllowList) &&
           container.company.cdnAllowList.length
       ) || true
   };
@@ -102,7 +105,11 @@ if (_satellite && !window.__satelliteLoaded) {
     return dataElements[name];
   };
 
-  var moduleProvider = createModuleProvider();
+  var moduleProvider = createModuleProvider(
+    traverseDelegateProperties,
+    dynamicHostSettings.dynamicEnforced,
+    dynamicHostResolver.decorateWithDynamicHost
+  );
 
   var replaceTokens;
 

@@ -1,3 +1,5 @@
+var objectAssign = require('@adobe/reactor-object-assign');
+
 function isArrayReference(str) {
   return isString(str) && str.indexOf('[') !== -1 && str.indexOf(']') !== -1;
 }
@@ -42,26 +44,67 @@ function traverseDelegateProperties(pathArray, settingsSlice) {
   }
 
   var nextPathKey = pathArray[0];
-  var nextObject;
+  var nextPropertyValue;
 
   if (isArrayReference(nextPathKey)) {
     var nextPathKeyParts = sanitizeArrayKeyAndSplit(nextPathKey);
-    nextObject =
+    nextPropertyValue =
       settingsSlice[nextPathKeyParts.arrName][nextPathKeyParts.arrIndex];
   } else {
     // objects
-    nextObject = settingsSlice[nextPathKey];
+    nextPropertyValue = settingsSlice[nextPathKey];
   }
+
   if (pathArray.length === 1) {
-    return nextObject;
+    return nextPropertyValue;
   }
-  return traverseDelegateProperties(pathArray.slice(1), nextObject);
+
+  return traverseDelegateProperties(pathArray.slice(1), nextPropertyValue);
 }
 
-module.exports = function (pathString, extensionSettings) {
-  if (!isString(pathString) || !isObject(extensionSettings)) {
+function pluckSettingsValue(pathString, settings) {
+  if (!isString(pathString) || !isObject(settings)) {
     return undefined;
   }
 
-  return traverseDelegateProperties(pathString.split('.'), extensionSettings);
+  return traverseDelegateProperties(pathString.split('.'), settings);
+}
+
+function pushValueIntoSettings(pathString, settings, value) {
+  if (!isString(pathString) || !isObject(settings)) {
+    return undefined;
+  }
+
+  var settingsCopy = objectAssign({}, settings);
+
+  var pathSegments = pathString.split('.');
+  var nextSettingsLevel = settingsCopy;
+
+  var finalSegment = pathSegments.pop();
+
+  pathSegments.forEach(function (pathSegment, index) {
+    if (isArrayReference(pathSegment)) {
+      var nextPathKeyParts = sanitizeArrayKeyAndSplit(pathSegment);
+      nextSettingsLevel =
+        nextSettingsLevel[nextPathKeyParts.arrName][nextPathKeyParts.arrIndex];
+    } else {
+      nextSettingsLevel = nextSettingsLevel[pathSegment];
+    }
+  });
+
+  if (isArrayReference(finalSegment)) {
+    var nextPathKeyParts = sanitizeArrayKeyAndSplit(finalSegment);
+    nextSettingsLevel[nextPathKeyParts.arrName][
+      nextPathKeyParts.arrIndex
+    ] = value;
+  } else {
+    nextSettingsLevel[finalSegment] = value;
+  }
+
+  return settingsCopy;
+}
+
+module.exports = {
+  pluckSettingsValue: pluckSettingsValue,
+  pushValueIntoSettings: pushValueIntoSettings
 };

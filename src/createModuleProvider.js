@@ -95,7 +95,7 @@ module.exports = function (
     settings
   ) {
     // nothing to do
-    if (!isDynamicEnforced || !Object.keys(settings).length) {
+    if (!isDynamicEnforced || !settings || !Object.keys(settings).length) {
       return settings;
     }
 
@@ -111,9 +111,13 @@ module.exports = function (
     // see if the module has file paths
     var module = getModule(referencePath);
 
-    if (module.hasOwnProperty('filePaths') && Array.isArray(module.filePaths)) {
+    if (
+      module &&
+      module.definition.hasOwnProperty('filePaths') &&
+      Array.isArray(module.definition.filePaths)
+    ) {
       // pull out the file paths by the module's reference path and loop over each urlPath
-      module.filePaths.forEach(function (urlSettingPath) {
+      module.definition.filePaths.forEach(function (urlSettingPath) {
         if (!cache.hasOwnProperty(urlSettingPath)) {
           // accumulate the settings over time that need to be URL transformed
           var url = traverseDelegateProperties.pluckSettingsValue(

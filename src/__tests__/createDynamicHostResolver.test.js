@@ -167,7 +167,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       );
     });
 
-    it('returns the host as a part of URL decoration', function () {
+    it('returns the protocol as a part of URL decoration', function () {
       turbineEmbedCode = 'https://assets.adobedtm.com:8080/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
@@ -180,7 +180,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       );
     });
 
-    it('returns the host as a part of querying the turbine host', function () {
+    it('returns the protocol as a part of querying the turbine host', function () {
       turbineEmbedCode = 'https://assets.adobedtm.com:8080/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,

@@ -64,15 +64,6 @@ if (_satellite && !window.__satelliteLoaded) {
   window.__satelliteLoaded = true;
 
   var container = _satellite.container;
-  // DYNAMIC URL
-  var dynamicHostSettings = {
-    dynamicEnforced:
-      Boolean(
-        container.company &&
-          Array.isArray(container.company.cdnAllowList) &&
-          container.company.cdnAllowList.length
-      ) || true
-  };
 
   // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
   delete _satellite.container;
@@ -82,11 +73,16 @@ if (_satellite && !window.__satelliteLoaded) {
   if (document.currentScript && document.currentScript.src) {
     currentScriptSource = document.currentScript.src;
   }
-  var dynamicHostResolver = createDynamicHostResolver(
-    currentScriptSource,
-    dynamicHostSettings.dynamicEnforced,
-    logger
-  );
+  var dynamicHostResolver;
+  try {
+    dynamicHostResolver = createDynamicHostResolver(
+      currentScriptSource,
+      container.company.cdnAllowList
+    );
+  } catch (e) {
+    logger.warn('Please review the following error:');
+    throw e; // We don't want to continue allowing Turbine to start up if we detect an error in here
+  }
 
   window.dynamicHostResolver = dynamicHostResolver;
   console.log('added dynamic host resolver to the window');
@@ -107,7 +103,7 @@ if (_satellite && !window.__satelliteLoaded) {
 
   var moduleProvider = createModuleProvider(
     traverseDelegateProperties,
-    dynamicHostSettings.dynamicEnforced,
+    dynamicHostResolver.isDynamicEnforced,
     dynamicHostResolver.decorateWithDynamicHost
   );
 

@@ -14,14 +14,7 @@
 
 var injectIndex = require('inject-loader!../index');
 
-var logger = jasmine.createSpyObj('logger', [
-  'log',
-  'info',
-  'debug',
-  'warn',
-  'error',
-  'deprecation'
-]);
+var logger;
 
 describe('index', function () {
   beforeEach(function () {
@@ -34,14 +27,19 @@ describe('index', function () {
           }
         },
         company: {
-          cdnAllowList: ['assets.adobedtm.com']
+          cdnAllowList: undefined
         }
       }
     };
 
-    spyOnProperty(document, 'currentScript', 'get').and.returnValue({
-      src: 'https://fake.adobeassets.com'
-    });
+    logger = jasmine.createSpyObj('logger', [
+      'log',
+      'info',
+      'debug',
+      'warn',
+      'error',
+      'deprecation'
+    ]);
   });
 
   afterEach(function () {
@@ -49,6 +47,18 @@ describe('index', function () {
     delete window.__satelliteLoaded;
     window.localStorage.removeItem('com.adobe.reactor.debug');
     window.localStorage.removeItem('com.adobe.reactor.hideActivity');
+  });
+
+  it('starts up just fine when container.company.cdnAllowList is undefined', function () {
+    expect(function () {
+      injectIndex({
+        './logger': logger
+      });
+    }).not.toThrow();
+
+    expect(logger.warn).not.toHaveBeenCalledWith(
+      'Please review the following error:'
+    );
   });
 
   it('exports the window._satellite object', function () {
@@ -378,5 +388,74 @@ describe('index', function () {
     });
   });
 
-  // it('tests when dynamicEnforced=true')
+  describe('dynamic host', function () {
+    describe('prompts the user to see the thrown error when', function () {
+      describe('there is not a proper turbineEmbedCode', function () {
+        beforeEach(function () {
+          spyOnProperty(document, 'currentScript', 'get').and.returnValue(null);
+        });
+
+        it('the approved hosts list is empty', function () {
+          window._satellite.container.company.cdnAllowList = [];
+
+          expect(function () {
+            injectIndex({
+              './logger': logger
+            });
+          }).toThrowError(
+            'Unable to find the Library Embed Code for Dynamic Host Resolution.'
+          );
+
+          expect(logger.warn).toHaveBeenCalledWith(
+            'Please review the following error:'
+          );
+        });
+      });
+
+      describe('there is a proper turbineEmbedCode', function () {
+        beforeEach(function () {
+          spyOnProperty(document, 'currentScript', 'get').and.returnValue({
+            src: 'https://fake.adobeassets.com:443'
+          });
+        });
+
+        it('the approved hosts list is empty', function () {
+          window._satellite.container.company.cdnAllowList = [];
+
+          expect(function () {
+            injectIndex({
+              './logger': logger
+            });
+          }).toThrowError(
+            'This library is not authorized for this domain. ' +
+              'Please contact your CSM for more information.'
+          );
+
+          expect(logger.warn).toHaveBeenCalledWith(
+            'Please review the following error:'
+          );
+        });
+
+        it('the turbine embed code is not in the list of approved hosts', function () {
+          window._satellite.container.company.cdnAllowList = [
+            'first.domain.com',
+            'second.domain.com'
+          ];
+
+          expect(function () {
+            injectIndex({
+              './logger': logger
+            });
+          }).toThrowError(
+            'This library is not authorized for this domain. ' +
+              'Please contact your CSM for more information.'
+          );
+
+          expect(logger.warn).toHaveBeenCalledWith(
+            'Please review the following error:'
+          );
+        });
+      });
+    });
+  });
 });

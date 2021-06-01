@@ -10,8 +10,11 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-module.exports = function (turbineEmbedCode, isDynamicEnforced, logger) {
+module.exports = function (turbineEmbedCode, cdnAllowList) {
   var turbineUrl;
+
+  // even an empty list is flagging to us that we're trying to enforce dynamic
+  var isDynamicEnforced = Array.isArray(cdnAllowList);
 
   try {
     // TODO: web only? I think embedded TVs wouldn't have
@@ -19,12 +22,21 @@ module.exports = function (turbineEmbedCode, isDynamicEnforced, logger) {
     turbineUrl = new URL(turbineEmbedCode);
   } catch (e) {
     if (isDynamicEnforced === true) {
-      // TODO: this should not stay as "deprecation", but it allows us to
-      //  force messages to the console
-      logger.deprecation(
+      var missingEmbedCodeError = new Error(
         'Unable to find the Library Embed Code for Dynamic Host Resolution.'
       );
+      missingEmbedCodeError.code = 'dynamic_host_resolver_constructor_error';
+      throw missingEmbedCodeError;
     }
+  }
+
+  if (isDynamicEnforced && cdnAllowList.indexOf(turbineUrl.hostname) === -1) {
+    var dynamicDeniedError = new Error(
+      'This library is not authorized for this domain. ' +
+        'Please contact your CSM for more information.'
+    );
+    dynamicDeniedError.code = 'dynamic_host_not_allowed';
+    throw dynamicDeniedError;
   }
 
   var shouldAugment = Boolean(isDynamicEnforced && turbineUrl);
@@ -63,6 +75,7 @@ module.exports = function (turbineEmbedCode, isDynamicEnforced, logger) {
   };
 
   return {
+    isDynamicEnforced: isDynamicEnforced,
     getTurbineHost: getTurbineHost,
     decorateWithDynamicHost: decorateWithDynamicHost
   };

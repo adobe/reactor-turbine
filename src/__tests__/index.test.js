@@ -236,8 +236,6 @@ describe('index', function () {
     var hydrateSatelliteObject = jasmine.createSpy();
     var getVar = function () {};
     var setCustomVar = function () {};
-    var registerScript = function () {};
-    var retrieveScript = function () {};
     injectIndex({
       './hydrateSatelliteObject': hydrateSatelliteObject,
       './createGetVar': function () {
@@ -245,12 +243,6 @@ describe('index', function () {
       },
       './createSetCustomVar': function () {
         return setCustomVar;
-      },
-      './createScriptStore': function () {
-        return {
-          registerScript: registerScript,
-          retrieveScript: retrieveScript
-        };
       }
     });
 
@@ -259,9 +251,7 @@ describe('index', function () {
       container,
       jasmine.any(Function),
       getVar,
-      setCustomVar,
-      registerScript,
-      retrieveScript
+      setCustomVar
     );
   });
 

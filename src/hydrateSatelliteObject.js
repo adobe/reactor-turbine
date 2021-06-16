@@ -18,9 +18,7 @@ module.exports = function (
   container,
   setDebugEnabled,
   getVar,
-  setCustomVar,
-  registerScript,
-  retrieveScript
+  setCustomVar
 ) {
   var customScriptPrefixedLogger = logger.createPrefixedLogger('Custom Script');
 
@@ -166,9 +164,4 @@ module.exports = function (
       return container;
     }
   });
-
-  // Core Custom code actions are the main users of this functionality. It has been introduced
-  // to Turbine so we can support Dynamic Host resolution.
-  _satellite.registerScript = registerScript;
-  _satellite.retrieveScript = retrieveScript;
 };

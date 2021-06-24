@@ -12,6 +12,7 @@
 
 var logger = require('../logger');
 var objectAssign = require('@adobe/reactor-object-assign');
+var isPlainObject = require('is-plain-object');
 
 /**
  * Normalizes a synthetic event so that it exists and has at least meta.
@@ -21,7 +22,16 @@ var objectAssign = require('@adobe/reactor-object-assign');
  */
 module.exports = function (syntheticEventMeta, syntheticEvent) {
   syntheticEvent = syntheticEvent || {};
-  objectAssign(syntheticEvent, syntheticEventMeta);
+
+  // This ensures that as the user hands us a synthetic event for multiple rules,
+  // we aren't overwriting a new meta into the same object reference.
+  if (isPlainObject(syntheticEvent)) {
+    syntheticEvent = objectAssign({}, syntheticEvent, syntheticEventMeta);
+  } else {
+    // When syntheticEvent is not an object, there's nothing we can guarantee
+    // about the ability to "copy". Leave it alone.
+    objectAssign(syntheticEvent, syntheticEventMeta);
+  }
 
   // Remove after some arbitrary time period when we think users have had sufficient chance
   // to move away from event.type

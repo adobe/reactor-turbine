@@ -30,7 +30,8 @@
     "@adobe/reactor-object-assign": "*",
     "@adobe/reactor-promise": "*",
     "@adobe/reactor-query-string": "*",
-    "@adobe/reactor-window": "*"
+    "@adobe/reactor-window": "*",
+    "is-plain-object": "^2.0.4"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",

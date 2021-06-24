@@ -13,6 +13,7 @@
 'use strict';
 
 var injectNormalizeSyntheticEvent = require('inject-loader!../normalizeSyntheticEvent');
+var CustomEventShim = require('./helpers/CustomEventShim');
 
 var mockMeta = {
   $type: 'extension-name.event-name',
@@ -110,5 +111,53 @@ describe('normalizeSyntheticEvent', function () {
         name: 'rule name'
       }
     });
+  });
+
+  it(
+    'does not override meta of first normalized event if synthetic event is ' +
+      'normalized multiple times',
+    function () {
+      var syntheticEvent = {};
+      var syntheticEventMeta1 = { $rule: { id: 'ABC123' } };
+      var syntheticEventMeta2 = { $rule: { id: 'ABC456' } };
+      var normalizedSyntheticEvent1 = normalizeSyntheticEvent(
+        syntheticEventMeta1,
+        syntheticEvent
+      );
+      var normalizedSyntheticEvent2 = normalizeSyntheticEvent(
+        syntheticEventMeta2,
+        syntheticEvent
+      );
+
+      expect(Object.keys(syntheticEvent).length).toBe(0); // synthetic event not modified
+      expect(normalizedSyntheticEvent1.$rule.id).toEqual('ABC123');
+      expect(normalizedSyntheticEvent2.$rule.id).toEqual('ABC456');
+    }
+  );
+
+  it('leaves syntheticEvent objects alone that are not plain objects', function () {
+    var syntheticEvent = CustomEventShim('swipe', { swipeAngle: 90 });
+    var oldSyntheticEventReference = syntheticEvent;
+
+    var syntheticEventMeta1 = { $rule: { id: 'ABC123' } };
+    var syntheticEventMeta2 = { $rule: { id: 'ABC456' } };
+    var normalizedSyntheticEvent1 = normalizeSyntheticEvent(
+      syntheticEventMeta1,
+      syntheticEvent
+    );
+    var normalizedSyntheticEvent2 = normalizeSyntheticEvent(
+      syntheticEventMeta2,
+      syntheticEvent
+    );
+
+    // There is a known bug that we are not solving for cases where users pass us a synthetic
+    // event that is not a plain object. In this instance, the original object is modified.
+    // These tests are here to ensure the event is left alone for current implementations.
+    expect(oldSyntheticEventReference === normalizedSyntheticEvent1).toBeTrue();
+    expect(oldSyntheticEventReference === normalizedSyntheticEvent2).toBeTrue();
+    expect(Object.keys(normalizedSyntheticEvent1).length).toBeGreaterThan(0);
+    expect(Object.keys(normalizedSyntheticEvent1).length).toBeGreaterThan(0);
+    expect(normalizedSyntheticEvent1.$rule.id).toEqual('ABC456');
+    expect(normalizedSyntheticEvent2.$rule.id).toEqual('ABC456');
   });
 });

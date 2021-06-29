@@ -48,8 +48,12 @@ module.exports = function (turbineEmbedCode, cdnAllowList) {
    */
   var getTurbineHost = function () {
     if (shouldAugment) {
-      // be sure we always force https to Adobe managed domains
-      return 'https://' + turbineUrl.host;
+      // be sure we always force https to Adobe managed domains.
+      // IE 10/11 returns the :443 protocol when modern browsers don't, so this replacement
+      // is bringing every browser in line with the same return value
+      return (
+        'https://' + turbineUrl.host.replace(':80/', '/').replace(':443/', '/')
+      );
     }
 
     return '';

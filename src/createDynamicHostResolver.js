@@ -11,23 +11,23 @@
  ****************************************************************************************/
 
 module.exports = function (turbineEmbedCode, cdnAllowList) {
-  var turbineUrl;
-
   // even an empty list is flagging to us that we're trying to enforce dynamic
   var isDynamicEnforced = Array.isArray(cdnAllowList);
+  var embedPattern = /^https?:\/\/.*/;
 
-  try {
-    // TODO: web only? I think embedded TVs wouldn't have
-    //  __satellite.container.dynamicEnforced turned on
-    turbineUrl = new URL(turbineEmbedCode);
-  } catch (e) {
-    if (isDynamicEnforced === true) {
-      var missingEmbedCodeError = new Error(
-        'Unable to find the Library Embed Code for Dynamic Host Resolution.'
-      );
-      missingEmbedCodeError.code = 'dynamic_host_resolver_constructor_error';
-      throw missingEmbedCodeError;
-    }
+  // TODO: web only? I think embedded TVs wouldn't have
+  //  __satellite.container.dynamicEnforced turned on
+  var turbineUrl = document.createElement('a');
+  turbineUrl.href = turbineEmbedCode;
+  if (
+    (!embedPattern.test(turbineEmbedCode) || !turbineUrl.host) &&
+    isDynamicEnforced === true
+  ) {
+    var missingEmbedCodeError = new Error(
+      'Unable to find the Library Embed Code for Dynamic Host Resolution.'
+    );
+    missingEmbedCodeError.code = 'dynamic_host_resolver_constructor_error';
+    throw missingEmbedCodeError;
   }
 
   if (isDynamicEnforced && cdnAllowList.indexOf(turbineUrl.hostname) === -1) {

@@ -17,6 +17,11 @@ var injectIndex = require('inject-loader!../index');
 var logger;
 
 describe('index', function () {
+  var turbineScriptId = 'turbine-script-id';
+  var currentScriptSpy;
+  var scriptSrc =
+    'https://fake.adobeassets.com:443/launch-ENabc123-development.min.js';
+
   beforeEach(function () {
     window._satellite = {
       container: {
@@ -40,6 +45,26 @@ describe('index', function () {
       'error',
       'deprecation'
     ]);
+
+    if (typeof document.currentScript !== 'undefined') {
+      // modern browsers
+      currentScriptSpy = spyOnProperty(
+        document,
+        'currentScript',
+        'get'
+      ).and.returnValue({
+        src: scriptSrc,
+        getAttribute: function () {
+          return scriptSrc;
+        }
+      });
+    } else {
+      // IE
+      var turbineScript = document.createElement('script');
+      turbineScript.id = turbineScriptId;
+      turbineScript.src = scriptSrc;
+      document.head.appendChild(turbineScript);
+    }
   });
 
   afterEach(function () {
@@ -47,6 +72,10 @@ describe('index', function () {
     delete window.__satelliteLoaded;
     window.localStorage.removeItem('com.adobe.reactor.debug');
     window.localStorage.removeItem('com.adobe.reactor.hideActivity');
+    if (document.getElementById(turbineScriptId)) {
+      var node = document.getElementById(turbineScriptId);
+      node.parentNode.removeChild(node);
+    }
   });
 
   it('starts up just fine when container.company.cdnAllowList is undefined', function () {
@@ -382,7 +411,20 @@ describe('index', function () {
     describe('prompts the user to see the thrown error when', function () {
       describe('there is not a proper turbineEmbedCode', function () {
         beforeEach(function () {
-          spyOnProperty(document, 'currentScript', 'get').and.returnValue(null);
+          if (typeof document.currentScript !== 'undefined') {
+            // modern browsers
+            currentScriptSpy.and.returnValue({
+              src: null,
+              getAttribute: function () {
+                return null;
+              }
+            });
+          }
+          if (document.getElementById(turbineScriptId)) {
+            // IE. Remove to flag there's no found turbine script
+            var node = document.getElementById(turbineScriptId);
+            node.parentNode.removeChild(node);
+          }
         });
 
         it('the approved hosts list is empty', function () {
@@ -403,12 +445,6 @@ describe('index', function () {
       });
 
       describe('there is a proper turbineEmbedCode', function () {
-        beforeEach(function () {
-          spyOnProperty(document, 'currentScript', 'get').and.returnValue({
-            src: 'https://fake.adobeassets.com:443'
-          });
-        });
-
         it('the approved hosts list is empty', function () {
           window._satellite.container.company.cdnAllowList = [];
 

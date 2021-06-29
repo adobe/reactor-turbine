@@ -51,6 +51,8 @@ var getNamespacedStorage = require('./getNamespacedStorage');
 
 var hydrateModuleProvider = require('./hydrateModuleProvider');
 var hydrateSatelliteObject = require('./hydrateSatelliteObject');
+var IEGetTurbineScript = require('../temporaryHelpers/findPageScript')
+  .getTurbine;
 
 var traverseDelegateProperties = require('./traverseDelegateProperties');
 
@@ -69,8 +71,10 @@ if (_satellite && !window.__satelliteLoaded) {
 
   // DYNAMIC URL
   var currentScriptSource = '';
-  if (document.currentScript && document.currentScript.src) {
-    currentScriptSource = document.currentScript.src;
+  if (document.currentScript && document.currentScript.getAttribute('src')) {
+    currentScriptSource = document.currentScript.getAttribute('src');
+  } else if (IEGetTurbineScript()) {
+    currentScriptSource = IEGetTurbineScript().getAttribute('src');
   }
   var dynamicHostResolver;
   try {

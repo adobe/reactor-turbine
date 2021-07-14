@@ -207,6 +207,30 @@ describe('createDynamicHostResolver returns a function that when called', functi
       );
     });
 
+    it('removes port 80 from the as a part of url decoration', function () {
+      turbineEmbedCode = 'https://assets.adobedtm.com:80/lib/dev.js';
+      dynamicHostResolver = createDynamicHostResolver(
+        turbineEmbedCode,
+        cdnAllowList
+      );
+
+      expect(dynamicHostResolver.decorateWithDynamicHost('my/file.js')).toBe(
+        'https://assets.adobedtm.com/my/file.js'
+      );
+    });
+
+    it('removes port 443 from the as a part of url decoration', function () {
+      turbineEmbedCode = 'https://assets.adobedtm.com:443/lib/dev.js';
+      dynamicHostResolver = createDynamicHostResolver(
+        turbineEmbedCode,
+        cdnAllowList
+      );
+
+      expect(dynamicHostResolver.decorateWithDynamicHost('my/file.js')).toBe(
+        'https://assets.adobedtm.com/my/file.js'
+      );
+    });
+
     it('will throw an error for unknown protocols', function () {
       expect(function () {
         turbineEmbedCode = 'file://assets.adobedtm.com:8080/lib/dev.js';

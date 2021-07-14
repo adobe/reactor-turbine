@@ -23,10 +23,16 @@ module.exports = function (moduleProvider, replaceTokens) {
       throw new Error(MODULE_NOT_FUNCTION_ERROR);
     }
 
-    var settings = replaceTokens(
-      moduleDescriptor.settings || {},
+    var settingsWithReplacedDynamicURLs = moduleProvider.decorateSettingsWithDelegateFilePaths(
+      moduleDescriptor.modulePath,
+      moduleDescriptor.settings || {}
+    );
+    var moduleDescriptorSettings = replaceTokens(
+      settingsWithReplacedDynamicURLs,
       syntheticEvent
     );
-    return moduleExports.bind(null, settings).apply(null, moduleCallParameters);
+    return moduleExports
+      .bind(null, moduleDescriptorSettings)
+      .apply(null, moduleCallParameters);
   };
 };

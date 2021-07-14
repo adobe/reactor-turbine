@@ -13,6 +13,8 @@
 'use strict';
 
 var injectHydrateModuleProvider = require('inject-loader!../hydrateModuleProvider');
+var logger = require('../logger');
+var createDynamicHostResolver = require('../createDynamicHostResolver');
 
 describe('hydrateModuleProvider', function () {
   var container;
@@ -20,6 +22,7 @@ describe('hydrateModuleProvider', function () {
   var replaceTokens;
   var getDataElementValue;
   var debugController;
+  var dynamicHostResolver;
 
   beforeEach(function () {
     container = {
@@ -53,6 +56,8 @@ describe('hydrateModuleProvider', function () {
       onDebugChanged: undefined,
       getDebugEnabled: true
     });
+
+    dynamicHostResolver = createDynamicHostResolver(undefined, false, logger);
   });
 
   it('registers all modules', function () {
@@ -77,7 +82,12 @@ describe('hydrateModuleProvider', function () {
       }
     };
 
-    hydrateModuleProvider(container, moduleProvider, debugController);
+    hydrateModuleProvider(
+      container,
+      moduleProvider,
+      debugController,
+      dynamicHostResolver
+    );
 
     expect(moduleProvider.registerModule).toHaveBeenCalledWith(
       'ext-a/a1.js',
@@ -115,7 +125,12 @@ describe('hydrateModuleProvider', function () {
   it('hydrates module cache', function () {
     var hydrateModuleProvider = injectHydrateModuleProvider();
 
-    hydrateModuleProvider(container, moduleProvider, debugController);
+    hydrateModuleProvider(
+      container,
+      moduleProvider,
+      debugController,
+      dynamicHostResolver
+    );
 
     expect(moduleProvider.hydrateCache).toHaveBeenCalled();
   });
@@ -138,7 +153,12 @@ describe('hydrateModuleProvider', function () {
         './createPublicRequire': createPublicRequire
       });
 
-      hydrateModuleProvider(container, moduleProvider, debugController);
+      hydrateModuleProvider(
+        container,
+        moduleProvider,
+        debugController,
+        dynamicHostResolver
+      );
     });
 
     it('is the publicRequire returned from createPublicRequire', function () {
@@ -204,7 +224,8 @@ describe('hydrateModuleProvider', function () {
         moduleProvider,
         debugController,
         replaceTokens,
-        getDataElementValue
+        getDataElementValue,
+        dynamicHostResolver
       );
       turbine = moduleProvider.registerModule.calls.mostRecent().args[4];
     });
@@ -227,6 +248,7 @@ describe('hydrateModuleProvider', function () {
 
     it('contains getHostedLibFileUrl', function () {
       expect(createGetHostedLibFileUrl).toHaveBeenCalledWith(
+        dynamicHostResolver,
         'somebaseurl',
         true
       );

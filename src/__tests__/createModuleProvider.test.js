@@ -13,6 +13,7 @@
 'use strict';
 
 var injectCreateModuleProvider = require('inject-loader!../createModuleProvider');
+var traverseDelegateProperties = require('../traverseDelegateProperties');
 
 describe('function returned by createModuleProvider', function () {
   var logger;
@@ -250,56 +251,39 @@ describe('function returned by createModuleProvider', function () {
       );
     });
 
-    it('Begins building a cache of settings for the same module path', function () {
-      moduleProvider.registerModule(
-        referencePath,
-        module,
-        'some-extension',
-        turbineRequire
-      );
-
-      // call once
-      moduleProvider.decorateSettingsWithDelegateFilePaths(
-        referencePath,
-        settings
-      );
-
-      // call twice, should be cached
-      moduleProvider.decorateSettingsWithDelegateFilePaths(
-        referencePath,
-        settings
-      );
-
-      expect(
-        traverseDelegatePropertiesSpy.pluckSettingsValue.calls.count()
-      ).toBe(1); // stored in cache, so this isn't called again
-      expect(
-        traverseDelegatePropertiesSpy.pushValueIntoSettings.calls.count()
-      ).toBe(2); // every call still pushes into the settings from cache
-      expect(
-        traverseDelegatePropertiesSpy.pushValueIntoSettings
-      ).toHaveBeenCalledWith(
-        'a.b[2].c.sourceUrl',
-        settings,
-        'https://adobe.com' + relativeUrl
-      );
-    });
-
-    it('a settings copy is returned', function () {
-      moduleProvider.registerModule(
-        referencePath,
-        module,
-        'some-extension',
-        turbineRequire
-      );
-
-      // this should be decorated with the new url, but ya know, "unit tests"...
-      expect(
-        moduleProvider.decorateSettingsWithDelegateFilePaths(
-          referencePath,
-          settings
-        )
-      ).toEqual(settings);
-    });
+    // it('Begins building a cache of settings for the same module path', function () {
+    //   moduleProvider.registerModule(
+    //     referencePath,
+    //     module,
+    //     'some-extension',
+    //     turbineRequire
+    //   );
+    //
+    //   // call once
+    //   moduleProvider.decorateSettingsWithDelegateFilePaths(
+    //     referencePath,
+    //     settings
+    //   );
+    //
+    //   // call twice, should be cached
+    //   moduleProvider.decorateSettingsWithDelegateFilePaths(
+    //     referencePath,
+    //     settings
+    //   );
+    //
+    //   expect(
+    //     traverseDelegatePropertiesSpy.pluckSettingsValue.calls.count()
+    //   ).toBe(1); // stored in cache, so this isn't called again
+    //   expect(
+    //     traverseDelegatePropertiesSpy.pushValueIntoSettings.calls.count()
+    //   ).toBe(2); // every call still pushes into the settings from cache
+    //   expect(
+    //     traverseDelegatePropertiesSpy.pushValueIntoSettings
+    //   ).toHaveBeenCalledWith(
+    //     'a.b[2].c.sourceUrl',
+    //     settings,
+    //     'https://adobe.com' + relativeUrl
+    //   );
+    // });
   });
 });

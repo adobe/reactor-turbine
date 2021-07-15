@@ -144,7 +144,7 @@ describe('verify pluckSettingsValue', function () {
   });
 });
 
-describe('verify pluckSettingsValue', function () {
+describe('verify pushSettingsValue', function () {
   describe('basic input/output', function () {
     it('handles undefined', function () {
       expect(pushValueIntoSettings(undefined, undefined, 'new value')).toBe(
@@ -157,8 +157,168 @@ describe('verify pluckSettingsValue', function () {
     });
   });
 
-  describe('Update a complicated nested property', function () {
-    it('pushes down into settings', function () {
+  describe('update tests', function () {
+    it('can update a settings object containing one value', function () {
+      var oldSettings = {
+        source: '/some/relative/url'
+      };
+
+      var newSettings = pushValueIntoSettings(
+        'source',
+        oldSettings,
+        'https://somedomain.com'
+      );
+
+      var expectedNewSettings = {
+        source: 'https://somedomain.com'
+      };
+
+      expect(newSettings).toEqual(expectedNewSettings);
+    });
+
+    it('can update a settings array containing one value', function () {
+      var oldSettings = {
+        sources: ['0', '1', '2']
+      };
+
+      var newSettings = pushValueIntoSettings(
+        'sources[1]',
+        oldSettings,
+        'https://somedomain.com'
+      );
+
+      var expectedNewSettings = {
+        sources: ['0', 'https://somedomain.com', '2']
+      };
+
+      expect(newSettings).toEqual(expectedNewSettings);
+    });
+
+    it('can update a top level setting (array)', function () {
+      var oldSettings = {
+        a: {
+          b: {
+            value: 'foo',
+            secondValue: 'world'
+          },
+          nestedList: ['0', '1', '2']
+        },
+        someList: ['a', 'b', 'c']
+      };
+
+      var newSettings = pushValueIntoSettings(
+        'someList[0]',
+        oldSettings,
+        'bar-boo'
+      );
+
+      var expectedNewSettings = {
+        a: {
+          b: {
+            value: 'foo',
+            secondValue: 'world'
+          },
+          nestedList: ['0', '1', '2']
+        },
+        someList: ['bar-boo', 'b', 'c']
+      };
+
+      expect(newSettings).toEqual(expectedNewSettings);
+    });
+
+    it('can update a top level setting (object)', function () {
+      var oldSettings = {
+        a: {
+          b: {
+            value: 'foo',
+            secondValue: 'world'
+          },
+          nestedList: ['0', '1', '2']
+        },
+        someList: ['a', 'b', 'c'],
+        topValue: 'foo-boo'
+      };
+
+      var newSettings = pushValueIntoSettings(
+        'topValue',
+        oldSettings,
+        'bar-boo'
+      );
+
+      var expectedNewSettings = {
+        a: {
+          b: {
+            value: 'foo',
+            secondValue: 'world'
+          },
+          nestedList: ['0', '1', '2']
+        },
+        someList: ['a', 'b', 'c'],
+        topValue: 'bar-boo'
+      };
+
+      expect(newSettings).toEqual(expectedNewSettings);
+    });
+
+    it('pushes down into a list in the middle of settings', function () {
+      var oldSettings = {
+        a: {
+          b: {
+            value: 'foo',
+            secondValue: 'world'
+          },
+          nestedList: ['0', '1', '2']
+        },
+        someList: ['a', 'b', 'c']
+      };
+
+      var newSettings = pushValueIntoSettings(
+        'a.nestedList[0]',
+        oldSettings,
+        'bar'
+      );
+
+      var expectedNewSettings = {
+        a: {
+          b: {
+            value: 'foo',
+            secondValue: 'world'
+          },
+          nestedList: ['bar', '1', '2']
+        },
+        someList: ['a', 'b', 'c']
+      };
+
+      expect(newSettings).toEqual(expectedNewSettings);
+    });
+
+    it('pushes down into an object in the middle of settings', function () {
+      var oldSettings = {
+        a: {
+          b: {
+            value: 'foo',
+            secondValue: 'world'
+          }
+        },
+        someList: ['a', 'b', 'c']
+      };
+
+      var newSettings = pushValueIntoSettings('a.b.value', oldSettings, 'bar');
+
+      var expectedNewSettings = {
+        a: {
+          b: {
+            value: 'bar',
+            secondValue: 'world'
+          }
+        },
+        someList: ['a', 'b', 'c']
+      };
+
+      expect(newSettings).toEqual(expectedNewSettings);
+    });
+
+    it('pushes down into a complicated settings', function () {
       var oldSettings = {
         a: {
           b: [

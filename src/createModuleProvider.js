@@ -89,7 +89,7 @@ module.exports = function (
    *   }
    * }
    */
-  var fileTransformsCacheByReferencePath = {};
+  // var fileTransformsCacheByReferencePath = {};
   var decorateSettingsWithDelegateFilePaths = function (
     referencePath,
     settings
@@ -101,16 +101,15 @@ module.exports = function (
 
     var settingsCopy = objectAssign({}, settings);
 
-    // store into the cache an object that is referenced by referencePath
-    if (!fileTransformsCacheByReferencePath.hasOwnProperty(referencePath)) {
-      fileTransformsCacheByReferencePath[referencePath] = {};
-    }
-    // pull the cache object
-    var cache = fileTransformsCacheByReferencePath[referencePath];
+    // // store into the cache an object that is referenced by referencePath
+    // if (!fileTransformsCacheByReferencePath.hasOwnProperty(referencePath)) {
+    //   fileTransformsCacheByReferencePath[referencePath] = {};
+    // }
+    // // pull the cache object
+    // var cache = fileTransformsCacheByReferencePath[referencePath];
 
     // see if the module has file paths
     var module = getModule(referencePath);
-
     if (
       module &&
       module.definition.hasOwnProperty('filePaths') &&
@@ -118,28 +117,51 @@ module.exports = function (
     ) {
       // pull out the file paths by the module's reference path and loop over each urlPath
       module.definition.filePaths.forEach(function (urlSettingPath) {
-        if (!cache.hasOwnProperty(urlSettingPath)) {
-          // accumulate the settings over time that need to be URL transformed
-          var url = traverseDelegateProperties.pluckSettingsValue(
+        var url = traverseDelegateProperties.pluckSettingsValue(
+          urlSettingPath,
+          settingsCopy
+        );
+        if (url) {
+          // NOTE: without caching, it might be worth while to allow pushValueIntoSettings
+          // to modify the passed in settings object. Leaving it for now in case we want to cache.
+          settingsCopy = traverseDelegateProperties.pushValueIntoSettings(
             urlSettingPath,
-            settingsCopy
+            settingsCopy,
+            decorateWithDynamicHost(url)
           );
-          if (url) {
-            url = decorateWithDynamicHost(url);
-          }
-          cache[urlSettingPath] = url;
         }
       });
     }
 
-    Object.keys(cache).forEach(function (urlSettingPath) {
-      var decoratedUrlValue = cache[urlSettingPath];
-      traverseDelegateProperties.pushValueIntoSettings(
-        urlSettingPath,
-        settingsCopy,
-        decoratedUrlValue
-      );
-    });
+    // if (
+    //   module &&
+    //   module.definition.hasOwnProperty('filePaths') &&
+    //   Array.isArray(module.definition.filePaths)
+    // ) {
+    //   // pull out the file paths by the module's reference path and loop over each urlPath
+    //   module.definition.filePaths.forEach(function (urlSettingPath) {
+    //     if (!cache.hasOwnProperty(urlSettingPath)) {
+    //       // accumulate the settings over time that need to be URL transformed
+    //       var url = traverseDelegateProperties.pluckSettingsValue(
+    //         urlSettingPath,
+    //         settingsCopy
+    //       );
+    //       if (url) {
+    //         url = decorateWithDynamicHost(url);
+    //       }
+    //       cache[urlSettingPath] = url;
+    //     }
+    //   });
+    // }
+
+    // Object.keys(cache).forEach(function (urlSettingPath) {
+    //   var decoratedUrlValue = cache[urlSettingPath];
+    //   settingsCopy = traverseDelegateProperties.pushValueIntoSettings(
+    //     urlSettingPath,
+    //     settingsCopy,
+    //     decoratedUrlValue
+    //   );
+    // });
 
     // return the decorated settings object
     return settingsCopy;

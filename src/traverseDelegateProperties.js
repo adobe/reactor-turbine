@@ -78,10 +78,12 @@ function pushValueIntoSettings(pathString, settings, value) {
   var settingsCopy = objectAssign({}, settings);
 
   var pathSegments = pathString.split('.');
-  var nextSettingsLevel = settingsCopy;
+  var nextSettingsLevel = settingsCopy; // 2 references now point to "settingsCopy"
 
+  // Pull off because this is the ultimate variable that needs to be granted the passed in value
   var finalSegment = pathSegments.pop();
 
+  // traverse down to the inner-most path
   pathSegments.forEach(function (pathSegment, index) {
     if (isArrayReference(pathSegment)) {
       var nextPathKeyParts = sanitizeArrayKeyAndSplit(pathSegment);
@@ -92,6 +94,7 @@ function pushValueIntoSettings(pathString, settings, value) {
     }
   });
 
+  // update the value
   if (isArrayReference(finalSegment)) {
     var nextPathKeyParts = sanitizeArrayKeyAndSplit(finalSegment);
     nextSettingsLevel[nextPathKeyParts.arrName][

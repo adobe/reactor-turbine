@@ -117,6 +117,23 @@ module.exports = function (
     ) {
       // pull out the file paths by the module's reference path and loop over each urlPath
       module.definition.filePaths.forEach(function (urlSettingPath) {
+        // The custom code action provides the ability to have the source code in the 'source'
+        // variable or to have an external file. Therefore, this module has 2 behaviors.
+        // It also does not provide a value of false for isExternal just as all other extensions
+        // that use fileTransform do not provide an isExternal variable check. Therefore, we need
+        // to treat Adobe's custom code action special, and don't augment the 'source' variable
+        // if isExternal is not also present.
+        var isAdobeCustomCodeAction = /^core\/.*actions.*\/customCode\.js$/.test(
+          referencePath
+        );
+        if (
+          isAdobeCustomCodeAction &&
+          urlSettingPath === 'source' &&
+          !settingsCopy.isExternal
+        ) {
+          return;
+        }
+
         var url = traverseDelegateProperties.pluckSettingsValue(
           urlSettingPath,
           settingsCopy

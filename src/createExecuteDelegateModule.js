@@ -23,10 +23,19 @@ module.exports = function (moduleProvider, replaceTokens) {
       throw new Error(MODULE_NOT_FUNCTION_ERROR);
     }
 
-    var settingsWithReplacedDynamicURLs = moduleProvider.decorateSettingsWithDelegateFilePaths(
-      moduleDescriptor.modulePath,
-      moduleDescriptor.settings || {}
+    // dynamically replace the host on the module settings
+    var moduleDefinition = moduleProvider.getModuleDefinition(
+      moduleDescriptor.modulePath
     );
+    var moduleFilePaths = Array.isArray(moduleDefinition.filePaths)
+      ? moduleDefinition.filePaths
+      : [];
+    var settingsWithReplacedDynamicURLs = moduleProvider.decorateSettingsWithDelegateFilePaths(
+      moduleDescriptor.settings || {},
+      moduleFilePaths,
+      moduleDescriptor.modulePath
+    );
+    // replace tokens
     var moduleDescriptorSettings = replaceTokens(
       settingsWithReplacedDynamicURLs,
       syntheticEvent

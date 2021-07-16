@@ -13,7 +13,6 @@
 'use strict';
 
 var injectCreateModuleProvider = require('inject-loader!../createModuleProvider');
-var traverseDelegateProperties = require('../traverseDelegateProperties');
 
 describe('function returned by createModuleProvider', function () {
   var logger;
@@ -249,6 +248,55 @@ describe('function returned by createModuleProvider', function () {
         settings,
         'https://adobe.com' + relativeUrl
       );
+    });
+
+    describe('handles the Adobe Custom Code action correctly', function () {
+      beforeEach(function () {
+        referencePath = 'core/src/lib/actions/customCode.js';
+
+        moduleProvider.registerModule(
+          referencePath,
+          {
+            referencePath: referencePath,
+            filePaths: ['source']
+          },
+          'customCodeAction',
+          turbineRequire
+        );
+      });
+
+      it('does not transform when isExternal is not present', function () {
+        settings = {
+          source: 'some source code',
+          isExternal: undefined
+        };
+
+        expect(
+          moduleProvider.decorateSettingsWithDelegateFilePaths(
+            referencePath,
+            settings
+          )
+        ).toEqual(settings);
+      });
+
+      it('transforms when isExternal=true', function () {
+        settings = {
+          source: 'some/relative/url',
+          isExternal: true
+        };
+
+        moduleProvider.decorateSettingsWithDelegateFilePaths(
+          referencePath,
+          settings
+        );
+        expect(
+          traverseDelegatePropertiesSpy.pushValueIntoSettings
+        ).toHaveBeenCalledWith(
+          'source',
+          settings,
+          'https://adobe.com/some/relative/url'
+        );
+      });
     });
 
     // it('Begins building a cache of settings for the same module path', function () {

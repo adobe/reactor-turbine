@@ -80,7 +80,7 @@ module.exports = function (
     return module.exports;
   };
 
-  /*
+  /**
    * Stored by reference path, holds the modules settings that need to be transformed
    * into a dynamic URL.
    * {
@@ -88,97 +88,64 @@ module.exports = function (
    *     'setting.nested[4].path': 'relative-url'
    *   }
    * }
+   *
+   * @param settings - The settings to decorate
+   * @param filePaths - The list of paths down to each setting that needs to transform
+   * @param [moduleReferencePath] - If the filePaths come from a module, declare which one
    */
-  // var fileTransformsCacheByReferencePath = {};
   var decorateSettingsWithDelegateFilePaths = function (
-    referencePath,
-    settings
+    settings,
+    filePaths,
+    moduleReferencePath
   ) {
     // nothing to do
-    if (!isDynamicEnforced || !settings || !Object.keys(settings).length) {
+    if (
+      !isDynamicEnforced ||
+      !settings ||
+      !Object.keys(settings).length ||
+      !Array.isArray(filePaths) ||
+      !filePaths.length
+    ) {
       return settings;
     }
 
     var settingsCopy = objectAssign({}, settings);
 
-    // // store into the cache an object that is referenced by referencePath
-    // if (!fileTransformsCacheByReferencePath.hasOwnProperty(referencePath)) {
-    //   fileTransformsCacheByReferencePath[referencePath] = {};
-    // }
-    // // pull the cache object
-    // var cache = fileTransformsCacheByReferencePath[referencePath];
+    // pull out the file paths by the module's reference path and loop over each urlPath
+    filePaths.forEach(function (urlSettingPath) {
+      // The custom code action provides the ability to have the source code in the 'source'
+      // variable or to have an external file. Therefore, this module has 2 behaviors.
+      // It also does not provide a value of false for isExternal just as all other extensions
+      // that use fileTransform do not provide an isExternal variable check. Therefore, we need
+      // to treat Adobe's custom code action special, and don't augment the 'source' variable
+      // if isExternal is not also present.
 
-    // see if the module has file paths
-    var module = getModule(referencePath);
-    if (
-      module &&
-      module.definition.hasOwnProperty('filePaths') &&
-      Array.isArray(module.definition.filePaths)
-    ) {
-      // pull out the file paths by the module's reference path and loop over each urlPath
-      module.definition.filePaths.forEach(function (urlSettingPath) {
-        // The custom code action provides the ability to have the source code in the 'source'
-        // variable or to have an external file. Therefore, this module has 2 behaviors.
-        // It also does not provide a value of false for isExternal just as all other extensions
-        // that use fileTransform do not provide an isExternal variable check. Therefore, we need
-        // to treat Adobe's custom code action special, and don't augment the 'source' variable
-        // if isExternal is not also present.
-        var isAdobeCustomCodeAction = /^core\/.*actions.*\/customCode\.js$/.test(
-          referencePath
-        );
-        if (
-          isAdobeCustomCodeAction &&
-          urlSettingPath === 'source' &&
-          !settingsCopy.isExternal
-        ) {
-          return;
-        }
+      var isAdobeCustomCodeAction = Boolean(
+        moduleReferencePath != null &&
+          /^core\/.*actions.*\/customCode\.js$/.test(moduleReferencePath)
+      );
+      if (
+        isAdobeCustomCodeAction &&
+        urlSettingPath === 'source' &&
+        !settingsCopy.isExternal
+      ) {
+        return;
+      }
 
-        var url = traverseDelegateProperties.pluckSettingsValue(
+      var url = traverseDelegateProperties.pluckSettingsValue(
+        urlSettingPath,
+        settingsCopy
+      );
+      if (url) {
+        // NOTE: without caching, it might be worth while to allow pushValueIntoSettings
+        // to modify the passed in settings object. Leaving it for now in case we want to cache.
+        settingsCopy = traverseDelegateProperties.pushValueIntoSettings(
           urlSettingPath,
-          settingsCopy
+          settingsCopy,
+          decorateWithDynamicHost(url)
         );
-        if (url) {
-          // NOTE: without caching, it might be worth while to allow pushValueIntoSettings
-          // to modify the passed in settings object. Leaving it for now in case we want to cache.
-          settingsCopy = traverseDelegateProperties.pushValueIntoSettings(
-            urlSettingPath,
-            settingsCopy,
-            decorateWithDynamicHost(url)
-          );
-        }
-      });
-    }
-
-    // if (
-    //   module &&
-    //   module.definition.hasOwnProperty('filePaths') &&
-    //   Array.isArray(module.definition.filePaths)
-    // ) {
-    //   // pull out the file paths by the module's reference path and loop over each urlPath
-    //   module.definition.filePaths.forEach(function (urlSettingPath) {
-    //     if (!cache.hasOwnProperty(urlSettingPath)) {
-    //       // accumulate the settings over time that need to be URL transformed
-    //       var url = traverseDelegateProperties.pluckSettingsValue(
-    //         urlSettingPath,
-    //         settingsCopy
-    //       );
-    //       if (url) {
-    //         url = decorateWithDynamicHost(url);
-    //       }
-    //       cache[urlSettingPath] = url;
-    //     }
-    //   });
-    // }
-
-    // Object.keys(cache).forEach(function (urlSettingPath) {
-    //   var decoratedUrlValue = cache[urlSettingPath];
-    //   settingsCopy = traverseDelegateProperties.pushValueIntoSettings(
-    //     urlSettingPath,
-    //     settingsCopy,
-    //     decoratedUrlValue
-    //   );
-    // });
+      }
+    });
 
     // return the decorated settings object
     return settingsCopy;

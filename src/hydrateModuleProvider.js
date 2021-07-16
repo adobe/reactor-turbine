@@ -37,9 +37,16 @@ module.exports = function (
 
     Object.keys(extensions).forEach(function (extensionName) {
       var extension = extensions[extensionName];
+      var extensionSettings = extension.settings;
+      if (Array.isArray(extension.filePaths)) {
+        extensionSettings = moduleProvider.decorateSettingsWithDelegateFilePaths(
+          extensionSettings,
+          extension.filePaths
+        );
+      }
       var getExtensionSettings = createGetExtensionSettings(
         replaceTokens,
-        extension.settings
+        extensionSettings
       );
 
       if (extension.modules) {

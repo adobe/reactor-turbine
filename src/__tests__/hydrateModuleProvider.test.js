@@ -54,11 +54,15 @@ describe('hydrateModuleProvider', function () {
     replaceTokens = function () {};
     getDataElementValue = function () {};
     debugController = jasmine.createSpyObj('debugController', {
-      onDebugChanged: undefined,
+      onDebugChanged: jasmine.createSpy('onDebugChanged'),
       getDebugEnabled: true
     });
 
-    dynamicHostResolver = createDynamicHostResolver(undefined, false, logger);
+    dynamicHostResolver = createDynamicHostResolver(
+      undefined,
+      false,
+      debugController
+    );
   });
 
   it('registers all modules', function () {

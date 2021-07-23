@@ -14,9 +14,12 @@
 
 var createGetHostedLibFileUrl = require('../createGetHostedLibFileUrl');
 var createDynamicHostResolver = require('../createDynamicHostResolver');
-var logger = require('../logger');
 
-var dynamicHostResolver = createDynamicHostResolver(undefined, false, logger);
+var dynamicHostResolver = createDynamicHostResolver(
+  undefined,
+  false,
+  jasmine.createSpyObj('debugController', ['onDebugChanged'])
+);
 
 describe('function returned by createGetHostedLibFileUrl', function () {
   it('returns full hosted lib path url', function () {

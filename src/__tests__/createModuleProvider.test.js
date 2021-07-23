@@ -220,9 +220,9 @@ describe('function returned by createModuleProvider', function () {
           moduleReferencePath
         );
 
-        expect(
-          traverseDelegatePropertiesSpy.pluckSettingsValue.calls.count()
-        ).toBe(1);
+        // expect(
+        //   traverseDelegatePropertiesSpy.pluckSettingsValue.calls.count()
+        // ).toBe(1);
         expect(
           traverseDelegatePropertiesSpy.pushValueIntoSettings.calls.count()
         ).toBe(1);
@@ -231,7 +231,7 @@ describe('function returned by createModuleProvider', function () {
         ).toHaveBeenCalledWith(
           'a.b[2].c.sourceUrl',
           settings,
-          'https://adobe.com' + relativeUrl
+          decorateWithDynamicHostSpy
         );
       });
 
@@ -285,7 +285,7 @@ describe('function returned by createModuleProvider', function () {
           ).toHaveBeenCalledWith(
             'source',
             settings,
-            'https://adobe.com/some/relative/url'
+            decorateWithDynamicHostSpy
           );
         });
       });

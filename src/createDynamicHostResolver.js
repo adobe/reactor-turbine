@@ -10,7 +10,9 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-module.exports = function (turbineEmbedCode, cdnAllowList) {
+var window = require('@adobe/reactor-window');
+
+module.exports = function (turbineEmbedCode, cdnAllowList, debugController) {
   // even an empty list is flagging to us that we're trying to enforce dynamic
   var isDynamicEnforced = Array.isArray(cdnAllowList);
   var embedPattern = /^https?:\/\/.*/;
@@ -87,9 +89,23 @@ module.exports = function (turbineEmbedCode, cdnAllowList) {
     return sourceUrl;
   };
 
-  return {
-    isDynamicEnforced: isDynamicEnforced,
+  var dynamicHostResolver = {
     getTurbineHost: getTurbineHost,
-    decorateWithDynamicHost: decorateWithDynamicHost
+    decorateWithDynamicHost: decorateWithDynamicHost,
+    get isDynamicEnforced() {
+      return isDynamicEnforced;
+    }
   };
+
+  if (window) {
+    debugController.onDebugChanged(function (isEnabled) {
+      if (isEnabled) {
+        window.dynamicHostResolver = dynamicHostResolver;
+      } else {
+        delete window.dynamicHostResolver;
+      }
+    });
+  }
+
+  return dynamicHostResolver;
 };

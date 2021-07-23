@@ -64,7 +64,6 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged && lint-staged",
       "pre-push": "npm test"
     }
   },

@@ -132,19 +132,14 @@ module.exports = function (
         return;
       }
 
-      var url = traverseDelegateProperties.pluckSettingsValue(
+      // TODO: @roan we need to really cache this stuff
+      // NOTE: without caching, it might be worth while to allow pushValueIntoSettings
+      // to modify the passed in settings object. Leaving it for now in case we want to cache.
+      settingsCopy = traverseDelegateProperties.pushValueIntoSettings(
         urlSettingPath,
-        settingsCopy
+        settingsCopy,
+        decorateWithDynamicHost
       );
-      if (url) {
-        // NOTE: without caching, it might be worth while to allow pushValueIntoSettings
-        // to modify the passed in settings object. Leaving it for now in case we want to cache.
-        settingsCopy = traverseDelegateProperties.pushValueIntoSettings(
-          urlSettingPath,
-          settingsCopy,
-          decorateWithDynamicHost(url)
-        );
-      }
     });
 
     // return the decorated settings object

@@ -69,6 +69,9 @@ if (_satellite && !window.__satelliteLoaded) {
   // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
   delete _satellite.container;
 
+  var localStorage = getNamespacedStorage('localStorage');
+  var debugController = createDebugController(localStorage, logger);
+
   // DYNAMIC URL
   var currentScriptSource = '';
   if (document.currentScript && document.currentScript.getAttribute('src')) {
@@ -80,15 +83,13 @@ if (_satellite && !window.__satelliteLoaded) {
   try {
     dynamicHostResolver = createDynamicHostResolver(
       currentScriptSource,
-      container.company.cdnAllowList
+      container.company.cdnAllowList,
+      debugController
     );
   } catch (e) {
     logger.warn('Please review the following error:');
     throw e; // We don't want to continue allowing Turbine to start up if we detect an error in here
   }
-
-  window.dynamicHostResolver = dynamicHostResolver;
-  console.log('added dynamic host resolver to the window');
 
   var undefinedVarsReturnEmpty =
     container.property.settings.undefinedVarsReturnEmpty;
@@ -144,9 +145,6 @@ if (_satellite && !window.__satelliteLoaded) {
   );
 
   replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
-
-  var localStorage = getNamespacedStorage('localStorage');
-  var debugController = createDebugController(localStorage, logger);
 
   // Important to hydrate satellite object before we hydrate the module provider or init rules.
   // When we hydrate module provider, we also execute extension code which may be

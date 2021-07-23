@@ -3,14 +3,12 @@ var objectAssign = require('@adobe/reactor-object-assign');
 function isArrayReference(str) {
   return isString(str) && str.indexOf('[') !== -1 && str.indexOf(']') !== -1;
 }
-function sanitizeArrayKeyAndSplit(key) {
-  var parts = key.replace('[', '.').replace(']', '').split('.');
-  var arrName = parts[0];
-  var arrIndex = parts[1];
-  return {
-    arrName: arrName,
-    arrIndex: arrIndex
-  };
+function sanitizeArrayKey(pathStrSegment) {
+  return pathStrSegment.substr(
+    0,
+    // the name goes up to the start of the array bracket: 'someArrayName[]'
+    pathStrSegment.indexOf('[')
+  );
 }
 
 function isObject(value) {
@@ -47,7 +45,7 @@ function traverseDelegateProperties(pathArray, settingsSlice) {
   var nextPropertyValue;
 
   if (isArrayReference(nextPathKey)) {
-    var nextPathKeyParts = sanitizeArrayKeyAndSplit(nextPathKey);
+    var nextPathKeyParts = sanitizeArrayKey(nextPathKey);
     nextPropertyValue =
       settingsSlice[nextPathKeyParts.arrName][nextPathKeyParts.arrIndex];
   } else {
@@ -70,44 +68,127 @@ function pluckSettingsValue(pathString, settings) {
   return traverseDelegateProperties(pathString.split('.'), settings);
 }
 
-function pushValueIntoSettings(pathString, settings, value) {
-  if (!isString(pathString) || !isObject(settings)) {
-    return undefined;
+// function pushValueIntoSettings(pathString, settings, value) {
+//   if (!isString(pathString) || !isObject(settings)) {
+//     return undefined;
+//   }
+//
+//   var settingsCopy = objectAssign({}, settings);
+//
+//   var pathSegments = pathString.split('.');
+//   var nextSettingsLevel = settingsCopy; // 2 references now point to "settingsCopy"
+//
+//   // Pull off because this is the ultimate variable that needs to be granted the passed in value
+//   var finalSegment = pathSegments.pop();
+//
+//   // traverse down to the inner-most path
+//   pathSegments.forEach(function (pathSegment, index) {
+//     if (isArrayReference(pathSegment)) {
+//       var nextPathKeyParts = sanitizeArrayKeyAndSplit(pathSegment);
+//       nextSettingsLevel =
+//         nextSettingsLevel[nextPathKeyParts.arrName][nextPathKeyParts.arrIndex];
+//     } else {
+//       nextSettingsLevel = nextSettingsLevel[pathSegment];
+//     }
+//   });
+//
+//   // update the value
+//   if (isArrayReference(finalSegment)) {
+//     var nextPathKeyParts = sanitizeArrayKeyAndSplit(finalSegment);
+//     nextSettingsLevel[nextPathKeyParts.arrName][
+//       nextPathKeyParts.arrIndex
+//     ] = value;
+//   } else {
+//     nextSettingsLevel[finalSegment] = value;
+//   }
+//
+//   return settingsCopy;
+// }
+
+function pushValueIntoSettings(
+  filePathString,
+  settings,
+  decorateWithDynamicHost
+) {
+  // nothing to do
+  if (
+    !isString(filePathString) ||
+    !filePathString.length ||
+    !isObject(settings)
+  ) {
+    return;
   }
 
-  var settingsCopy = objectAssign({}, settings);
+  // get the next key to observe
+  var pathSegments = filePathString.split('.');
+  var settingToReplace = pathSegments.pop();
+  if (!settingToReplace) {
+    var error = new Error();
+    error.code = 'malformed-path-string';
+    throw error;
+  }
 
-  var pathSegments = pathString.split('.');
-  var nextSettingsLevel = settingsCopy; // 2 references now point to "settingsCopy"
+  // base case
+  if (settings.hasOwnProperty(settingToReplace)) {
+    var url = settings[settingToReplace];
+    settings[settingToReplace] = decorateWithDynamicHost(url);
+    return;
+  }
 
-  // Pull off because this is the ultimate variable that needs to be granted the passed in value
-  var finalSegment = pathSegments.pop();
+  // still more work to do
+  if (pathSegments.length) {
+    var currentKey = pathSegments.shift();
+    // the next layer down will need the setting to replace back on the end
+    var remainingPathString = pathSegments.concat(settingToReplace).join('.');
 
-  // traverse down to the inner-most path
-  pathSegments.forEach(function (pathSegment, index) {
-    if (isArrayReference(pathSegment)) {
-      var nextPathKeyParts = sanitizeArrayKeyAndSplit(pathSegment);
-      nextSettingsLevel =
-        nextSettingsLevel[nextPathKeyParts.arrName][nextPathKeyParts.arrIndex];
+    if (isArrayReference(currentKey)) {
+      // 'someArrayReference[]' --> 'someArrayReference'
+      currentKey = sanitizeArrayKey(currentKey);
+      var settingsValue = settings[currentKey];
+      if (Array.isArray(settingsValue)) {
+        settingsValue.forEach(function (arrayEntryObject) {
+          return pushValueIntoSettings(
+            remainingPathString,
+            arrayEntryObject,
+            decorateWithDynamicHost
+          );
+        });
+      }
     } else {
-      nextSettingsLevel = nextSettingsLevel[pathSegment];
+      pushValueIntoSettings(
+        remainingPathString,
+        settings[currentKey],
+        decorateWithDynamicHost
+      );
     }
-  });
-
-  // update the value
-  if (isArrayReference(finalSegment)) {
-    var nextPathKeyParts = sanitizeArrayKeyAndSplit(finalSegment);
-    nextSettingsLevel[nextPathKeyParts.arrName][
-      nextPathKeyParts.arrIndex
-    ] = value;
-  } else {
-    nextSettingsLevel[finalSegment] = value;
   }
-
-  return settingsCopy;
 }
 
 module.exports = {
   pluckSettingsValue: pluckSettingsValue,
-  pushValueIntoSettings: pushValueIntoSettings
+  pushValueIntoSettings: function (
+    filePathString,
+    settings,
+    decorateWithDynamicHost
+  ) {
+    if (!isString(filePathString) || !isObject(settings)) {
+      return settings;
+    }
+
+    var settingsCopy = objectAssign({}, settings);
+    try {
+      pushValueIntoSettings(
+        filePathString,
+        settingsCopy,
+        decorateWithDynamicHost
+      );
+    } catch (e) {
+      if (e.code === 'malformed-path-string') {
+        throw new Error(
+          'The following pathString was malformed: ' + filePathString
+        );
+      }
+    }
+    return settingsCopy;
+  }
 };

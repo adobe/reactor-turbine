@@ -82,7 +82,7 @@ module.exports = function (turbineEmbedCode, cdnAllowList, debugController) {
    * @returns {string|*}
    */
   var decorateWithDynamicHost = function (sourceUrl) {
-    if (shouldAugment) {
+    if (shouldAugment && typeof sourceUrl === 'string') {
       var urlParts = [
         getTurbineHost(),
         sourceUrl.charAt(0) === '/' ? sourceUrl.slice(1) : sourceUrl

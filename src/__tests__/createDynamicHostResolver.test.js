@@ -11,7 +11,9 @@
  ****************************************************************************************/
 
 var createDynamicHostResolver = require('../createDynamicHostResolver');
+var createDebugController = require('../createDebugController');
 
+var loggerSpy = jasmine.createSpy('logger');
 var consoleSpy;
 var turbineEmbedCode;
 var cdnAllowList;
@@ -20,6 +22,7 @@ var dynamicHostResolver;
 describe('createDynamicHostResolver returns a function that when called', function () {
   var debugController;
   beforeEach(function () {
+    delete window.dynamicHostResolver;
     consoleSpy = spyOn(console, 'warn');
     debugController = jasmine.createSpyObj('debugController', [
       'onDebugChanged'
@@ -286,9 +289,83 @@ describe('createDynamicHostResolver returns a function that when called', functi
         );
       }
     );
+
+    describe('does not decorate a "url" that is not a string', function () {
+      var dynamicHostResolver;
+      beforeEach(function () {
+        turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
+        dynamicHostResolver = createDynamicHostResolver(
+          turbineEmbedCode,
+          cdnAllowList,
+          debugController
+        );
+      });
+
+      it('number case', function () {
+        expect(dynamicHostResolver.decorateWithDynamicHost(5)).toBe(5);
+      });
+
+      it('object case', function () {
+        var myObject = { hello: 'world' };
+        expect(dynamicHostResolver.decorateWithDynamicHost(myObject)).toBe(
+          myObject
+        );
+      });
+
+      it('array case', function () {
+        var myList = ['my', 'list'];
+        expect(dynamicHostResolver.decorateWithDynamicHost(myList)).toBe(
+          myList
+        );
+      });
+
+      it('null case', function () {
+        expect(dynamicHostResolver.decorateWithDynamicHost(null)).toBe(null);
+      });
+
+      it('undefined case', function () {
+        expect(dynamicHostResolver.decorateWithDynamicHost(undefined)).toBe(
+          undefined
+        );
+      });
+    });
+
+    it('adds the dynamicHostResolver to the window when debug is enabled', function () {
+      expect(window.dynamicHostResolver).toBe(undefined);
+
+      var localStorage = {
+        setItem: jasmine.createSpy(),
+        getItem: jasmine.createSpy().and.returnValue('false') // output disabled
+      };
+      debugController = createDebugController(localStorage, loggerSpy);
+      turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
+      createDynamicHostResolver(
+        turbineEmbedCode,
+        cdnAllowList,
+        debugController
+      );
+      debugController.setDebugEnabled(true); // enable output
+
+      expect(window.dynamicHostResolver).not.toBe(undefined);
+    });
+
+    it('does not add the dynamicHostResolver to the window when debug is disabled', function () {
+      expect(window.dynamicHostResolver).toBe(undefined);
+
+      var localStorage = {
+        setItem: jasmine.createSpy(),
+        getItem: jasmine.createSpy().and.returnValue('true') // output enabled
+      };
+      debugController = createDebugController(localStorage, loggerSpy);
+      turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
+      createDynamicHostResolver(
+        turbineEmbedCode,
+        cdnAllowList,
+        debugController
+      );
+      debugController.setDebugEnabled(false); // disable output
+
+      expect(window.dynamicHostResolver).toBe(undefined);
+    });
   });
-
-  it('adds the dynamicHostResolver to the window when debug is enabled', function () {});
-
-  it('does not add the dynamicHostResolver to the window when debug is enabled', function () {});
 });

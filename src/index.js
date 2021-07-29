@@ -54,7 +54,7 @@ var hydrateSatelliteObject = require('./hydrateSatelliteObject');
 var IEGetTurbineScript = require('../temporaryHelpers/findPageScript')
   .getTurbine;
 
-var traverseDelegateProperties = require('./traverseDelegateProperties');
+var createSettingsFileTransformer = require('./createSettingsFileTransformer');
 
 var logger = require('./logger');
 
@@ -72,7 +72,6 @@ if (_satellite && !window.__satelliteLoaded) {
   var localStorage = getNamespacedStorage('localStorage');
   var debugController = createDebugController(localStorage, logger);
 
-  // DYNAMIC URL
   var currentScriptSource = '';
   if (document.currentScript && document.currentScript.getAttribute('src')) {
     currentScriptSource = document.currentScript.getAttribute('src');
@@ -91,6 +90,15 @@ if (_satellite && !window.__satelliteLoaded) {
     throw e; // We don't want to continue allowing Turbine to start up if we detect an error in here
   }
 
+  var settingsFileTransformer = createSettingsFileTransformer(
+    dynamicHostResolver.isDynamicEnforced,
+    dynamicHostResolver.decorateWithDynamicHost
+  );
+
+  var moduleProvider = createModuleProvider();
+
+  var replaceTokens;
+
   var undefinedVarsReturnEmpty =
     container.property.settings.undefinedVarsReturnEmpty;
   var ruleComponentSequencingEnabled =
@@ -104,14 +112,6 @@ if (_satellite && !window.__satelliteLoaded) {
   var getDataElementDefinition = function (name) {
     return dataElements[name];
   };
-
-  var moduleProvider = createModuleProvider(
-    traverseDelegateProperties,
-    dynamicHostResolver.isDynamicEnforced,
-    dynamicHostResolver.decorateWithDynamicHost
-  );
-
-  var replaceTokens;
 
   // We support data elements referencing other data elements. In order to be able to retrieve a
   // data element value, we need to be able to replace data element tokens inside its settings
@@ -163,13 +163,15 @@ if (_satellite && !window.__satelliteLoaded) {
     debugController,
     replaceTokens,
     getDataElementValue,
+    settingsFileTransformer,
     dynamicHostResolver.decorateWithDynamicHost
   );
 
   var notifyMonitors = createNotifyMonitors(_satellite);
   var executeDelegateModule = createExecuteDelegateModule(
     moduleProvider,
-    replaceTokens
+    replaceTokens,
+    settingsFileTransformer
   );
 
   var getModuleDisplayNameByRuleComponent = createGetModuleDisplayNameByRuleComponent(

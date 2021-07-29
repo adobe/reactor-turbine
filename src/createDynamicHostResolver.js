@@ -15,15 +15,15 @@ var window = require('@adobe/reactor-window');
 module.exports = function (turbineEmbedCode, cdnAllowList, debugController) {
   // even an empty list is flagging to us that we're trying to enforce dynamic
   var isDynamicEnforced = Array.isArray(cdnAllowList);
-  var embedPattern = /^https?:\/\/.*/;
+  var shouldAugment = Boolean(isDynamicEnforced && turbineEmbedCode);
 
   // TODO: web only? I think embedded TVs wouldn't have
   //  __satellite.container.dynamicEnforced turned on
   var turbineUrl = document.createElement('a');
   turbineUrl.href = turbineEmbedCode;
   if (
-    (!embedPattern.test(turbineEmbedCode) || !turbineUrl.host) &&
-    isDynamicEnforced === true
+    (!/^https?:\/\/.*/.test(turbineEmbedCode) || !turbineUrl.host) &&
+    isDynamicEnforced
   ) {
     var missingEmbedCodeError = new Error(
       'Unable to find the Library Embed Code for Dynamic Host Resolution.'
@@ -41,14 +41,17 @@ module.exports = function (turbineEmbedCode, cdnAllowList, debugController) {
     throw dynamicDeniedError;
   }
 
-  var shouldAugment = Boolean(isDynamicEnforced && turbineUrl);
-
   /**
    * Returns the host of the Turbine embed code, or an empty string if Dynamic Host
    * is not enabled.
    * @returns {string}
    */
+  var memoizedHostResult;
   var getTurbineHost = function () {
+    if (memoizedHostResult != null) {
+      return memoizedHostResult;
+    }
+
     if (shouldAugment) {
       // be sure we always force https to Adobe managed domains.
       // IE 10/11 returns the :443 protocol when modern browsers don't, so this replacement
@@ -64,10 +67,12 @@ module.exports = function (turbineEmbedCode, cdnAllowList, debugController) {
         sanitizedHost = sanitizedHost.replace(':443/', '');
       }
 
-      return 'https://' + sanitizedHost;
+      memoizedHostResult = 'https://' + sanitizedHost;
+    } else {
+      memoizedHostResult = '';
     }
 
-    return '';
+    return memoizedHostResult;
   };
 
   /**

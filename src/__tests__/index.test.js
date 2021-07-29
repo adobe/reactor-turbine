@@ -289,9 +289,10 @@ describe('index', function () {
     var hydrateModuleProvider = jasmine.createSpy();
     var moduleProvider = { type: 'moduleProvider' };
     var debugController = { type: 'debugController' };
-    var replaceTokens = function () {};
-    var getDataElementValue = function () {};
-    var decorateWithDynamicHost = function () {};
+    var replaceTokens = jasmine.createSpy('replaceTokens');
+    var getDataElementValue = jasmine.createSpy('getDataElementValue');
+    var settingsFileTransformer = jasmine.createSpy('settingsFileTransformer');
+    var decorateWithDynamicHost = jasmine.createSpy('decorateWithDynamicHost');
     injectIndex({
       './hydrateModuleProvider': hydrateModuleProvider,
       './createModuleProvider': function () {
@@ -310,6 +311,9 @@ describe('index', function () {
         return {
           decorateWithDynamicHost: decorateWithDynamicHost
         };
+      },
+      './createSettingsFileTransformer': function () {
+        return settingsFileTransformer;
       }
     });
 
@@ -319,6 +323,7 @@ describe('index', function () {
       debugController,
       replaceTokens,
       getDataElementValue,
+      settingsFileTransformer,
       decorateWithDynamicHost
     );
   });

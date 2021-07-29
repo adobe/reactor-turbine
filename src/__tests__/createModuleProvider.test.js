@@ -24,7 +24,7 @@ describe('function returned by createModuleProvider', function () {
   var extractModuleExports = require('../extractModuleExports');
   var createModuleProvider;
   var extractModuleExportsSpy;
-  var traverseDelegatePropertiesSpy;
+  var settingsFileTransformerSpy;
   var decorateWithDynamicHostSpy;
   var isDynamicEnforced;
   var turbineRequire;
@@ -41,7 +41,7 @@ describe('function returned by createModuleProvider', function () {
       './extractModuleExports': extractModuleExportsSpy
     });
 
-    traverseDelegatePropertiesSpy = {
+    settingsFileTransformerSpy = {
       pluckSettingsValue: jasmine.createSpy(),
       pushValueIntoSettings: jasmine.createSpy()
     };
@@ -55,7 +55,7 @@ describe('function returned by createModuleProvider', function () {
       });
 
     moduleProvider = createModuleProvider(
-      traverseDelegatePropertiesSpy,
+      settingsFileTransformerSpy,
       isDynamicEnforced,
       decorateWithDynamicHostSpy
     );
@@ -161,12 +161,12 @@ describe('function returned by createModuleProvider', function () {
         .and.callFake(function (url) {
           return 'https://adobe.com' + url;
         });
-      traverseDelegatePropertiesSpy = {
+      settingsFileTransformerSpy = {
         pluckSettingsValue: jasmine.createSpy().and.returnValue(relativeUrl),
         pushValueIntoSettings: jasmine.createSpy()
       };
       moduleProvider = createModuleProvider(
-        traverseDelegatePropertiesSpy,
+        settingsFileTransformerSpy,
         isDynamicEnforced,
         decorateWithDynamicHostSpy
       );
@@ -186,7 +186,7 @@ describe('function returned by createModuleProvider', function () {
       it('does not decorate urls when dynamic host is turned off', function () {
         isDynamicEnforced = false;
         moduleProvider = createModuleProvider(
-          traverseDelegatePropertiesSpy,
+          settingsFileTransformerSpy,
           isDynamicEnforced,
           decorateWithDynamicHostSpy
         );
@@ -197,11 +197,9 @@ describe('function returned by createModuleProvider', function () {
           moduleReferencePath
         );
 
+        expect(settingsFileTransformerSpy.pluckSettingsValue).not.toHaveBeenCalled();
         expect(
-          traverseDelegatePropertiesSpy.pluckSettingsValue
-        ).not.toHaveBeenCalled();
-        expect(
-          traverseDelegatePropertiesSpy.pushValueIntoSettings
+          settingsFileTransformerSpy.pushValueIntoSettings
         ).not.toHaveBeenCalled();
         expect(decorateWithDynamicHostSpy).not.toHaveBeenCalled();
       });
@@ -221,13 +219,13 @@ describe('function returned by createModuleProvider', function () {
         );
 
         // expect(
-        //   traverseDelegatePropertiesSpy.pluckSettingsValue.calls.count()
+        //   settingsFileTransformerSpy.pluckSettingsValue.calls.count()
         // ).toBe(1);
+        expect(settingsFileTransformerSpy.pushValueIntoSettings.calls.count()).toBe(
+          1
+        );
         expect(
-          traverseDelegatePropertiesSpy.pushValueIntoSettings.calls.count()
-        ).toBe(1);
-        expect(
-          traverseDelegatePropertiesSpy.pushValueIntoSettings
+          settingsFileTransformerSpy.pushValueIntoSettings
         ).toHaveBeenCalledWith(
           'a.b[2].c.sourceUrl',
           settings,
@@ -264,7 +262,7 @@ describe('function returned by createModuleProvider', function () {
           );
 
           expect(
-            traverseDelegatePropertiesSpy.pushValueIntoSettings
+            settingsFileTransformerSpy.pushValueIntoSettings
           ).not.toHaveBeenCalled();
         });
 
@@ -281,7 +279,7 @@ describe('function returned by createModuleProvider', function () {
             moduleReferencePath
           );
           expect(
-            traverseDelegatePropertiesSpy.pushValueIntoSettings
+            settingsFileTransformerSpy.pushValueIntoSettings
           ).toHaveBeenCalledWith(
             'source',
             settings,
@@ -318,13 +316,13 @@ describe('function returned by createModuleProvider', function () {
     //   );
     //
     //   expect(
-    //     traverseDelegatePropertiesSpy.pluckSettingsValue.calls.count()
+    //     settingsFileTransformerSpy.pluckSettingsValue.calls.count()
     //   ).toBe(1); // stored in cache, so this isn't called again
     //   expect(
-    //     traverseDelegatePropertiesSpy.pushValueIntoSettings.calls.count()
+    //     settingsFileTransformerSpy.pushValueIntoSettings.calls.count()
     //   ).toBe(2); // every call still pushes into the settings from cache
     //   expect(
-    //     traverseDelegatePropertiesSpy.pushValueIntoSettings
+    //     settingsFileTransformerSpy.pushValueIntoSettings
     //   ).toHaveBeenCalledWith(
     //     'a.b[2].c.sourceUrl',
     //     settings,

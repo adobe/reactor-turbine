@@ -32,6 +32,7 @@ var getTurbine = function () {
   return byRegexPattern(new RegExp(/(launch|satelliteLib)-[^\/]+.js(\?.*)?$/));
 };
 
+// NOTE: this entire module can be dropped when IE 10/11 support is dropped.
 module.exports = {
   getTurbine: getTurbine,
   byRegexPattern: byRegexPattern

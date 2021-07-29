@@ -12,7 +12,11 @@
 
 var MODULE_NOT_FUNCTION_ERROR = 'Module did not export a function.';
 
-module.exports = function (moduleProvider, replaceTokens) {
+module.exports = function (
+  moduleProvider,
+  replaceTokens,
+  settingsFileTransformer
+) {
   return function (moduleDescriptor, syntheticEvent, moduleCallParameters) {
     moduleCallParameters = moduleCallParameters || [];
     var moduleExports = moduleProvider.getModuleExports(
@@ -30,7 +34,7 @@ module.exports = function (moduleProvider, replaceTokens) {
     var moduleFilePaths = Array.isArray(moduleDefinition.filePaths)
       ? moduleDefinition.filePaths
       : [];
-    var settingsWithReplacedDynamicURLs = moduleProvider.decorateSettingsWithDelegateFilePaths(
+    var settingsWithReplacedDynamicURLs = settingsFileTransformer(
       moduleDescriptor.settings || {},
       moduleFilePaths,
       moduleDescriptor.modulePath

@@ -29,17 +29,17 @@ describe('createExecuteDelegateModule returns a function that when called', func
 
     var moduleProvider = {
       getModuleExports: getModuleExportsSpy,
-      decorateSettingsWithDelegateFilePaths: jasmine.createSpy(),
       getModuleDefinition: jasmine.createSpy().and.returnValue({})
     };
     var replaceTokens = emptyFn;
+    var settingsFileTransformer = emptyFn;
 
     expect(
-      createExecuteDelegateModule(moduleProvider, replaceTokens)(
-        moduleDescriptor,
-        event,
-        moduleCallParameters
-      )
+      createExecuteDelegateModule(
+        moduleProvider,
+        replaceTokens,
+        settingsFileTransformer
+      )(moduleDescriptor, event, moduleCallParameters)
     ).toBe('module result');
     expect(getModuleExportsSpy).toHaveBeenCalledWith('path');
     expect(moduleExportsSpy).toHaveBeenCalledWith(undefined, 'a', 'b');
@@ -55,15 +55,16 @@ describe('createExecuteDelegateModule returns a function that when called', func
         getModuleExports: function () {
           return moduleExportsSpy;
         },
-        decorateSettingsWithDelegateFilePaths: jasmine.createSpy(),
         getModuleDefinition: jasmine.createSpy().and.returnValue({})
       };
       var replaceTokens = emptyFn;
+      var settingsFileTransformer = emptyFn;
 
-      createExecuteDelegateModule(moduleProvider, replaceTokens)(
-        moduleDescriptor,
-        event
-      );
+      createExecuteDelegateModule(
+        moduleProvider,
+        replaceTokens,
+        settingsFileTransformer
+      )(moduleDescriptor, event);
 
       expect(moduleExportsSpy).toHaveBeenCalledWith(undefined);
     }
@@ -74,17 +75,17 @@ describe('createExecuteDelegateModule returns a function that when called', func
       getModuleExports: function () {
         return 5;
       },
-      decorateSettingsWithDelegateFilePaths: jasmine.createSpy(),
       getModuleDefinition: jasmine.createSpy().and.returnValue({})
     };
     var replaceTokens = emptyFn;
+    var settingsFileTransformer = emptyFn;
 
     expect(function () {
-      createExecuteDelegateModule(moduleProvider, replaceTokens)(
-        moduleDescriptor,
-        event,
-        moduleCallParameters
-      );
+      createExecuteDelegateModule(
+        moduleProvider,
+        replaceTokens,
+        settingsFileTransformer()
+      )(moduleDescriptor, event, moduleCallParameters);
     }).toThrow(new Error('Module did not export a function.'));
   });
 
@@ -96,26 +97,38 @@ describe('createExecuteDelegateModule returns a function that when called', func
         settings = s;
       });
 
+    var moduleDefinition = {
+      filePaths: ['someKey']
+    };
     var moduleProvider = {
       getModuleExports: function () {
         return moduleExportsSpy;
       },
-      decorateSettingsWithDelegateFilePaths: jasmine.createSpy(),
-      getModuleDefinition: jasmine.createSpy().and.returnValue({})
+      getModuleDefinition: jasmine.createSpy().and.returnValue(moduleDefinition)
     };
     var replaceTokens = function () {
       return { key: 'replaced tokens value' };
     };
 
-    createExecuteDelegateModule(moduleProvider, replaceTokens)(
-      moduleDescriptor,
-      event,
-      moduleCallParameters
-    );
+    var settingsFileTransformerSpy = jasmine
+      .createSpy('settingsFileTransformer')
+      .and.returnValue(moduleDescriptor.settings);
+
+    createExecuteDelegateModule(
+      moduleProvider,
+      replaceTokens,
+      settingsFileTransformerSpy
+    )(moduleDescriptor, event, moduleCallParameters);
 
     expect(settings).toEqual({
       key: 'replaced tokens value'
     });
+
+    expect(settingsFileTransformerSpy).toHaveBeenCalledWith(
+      moduleDescriptor.settings,
+      moduleDefinition.filePaths,
+      moduleDescriptor.modulePath
+    );
   });
 
   it(
@@ -128,19 +141,22 @@ describe('createExecuteDelegateModule returns a function that when called', func
         getModuleExports: function () {
           return emptyFn;
         },
-        decorateSettingsWithDelegateFilePaths: jasmine
-          .createSpy()
-          .and.callFake(function (settings) {
-            return settings;
-          }),
         getModuleDefinition: jasmine.createSpy().and.returnValue({})
       };
 
-      createExecuteDelegateModule(moduleProvider, replaceTokensSpy)(
-        moduleDescriptor,
-        event,
-        moduleCallParameters
-      );
+      // descriptor has no settings, so the code is creating an empty object to
+      // pass here, which we will reflect back.
+      var settingsFileTransformer = jasmine
+        .createSpy()
+        .and.callFake(function (settings) {
+          return settings;
+        });
+
+      createExecuteDelegateModule(
+        moduleProvider,
+        replaceTokensSpy,
+        settingsFileTransformer
+      )(moduleDescriptor, event, moduleCallParameters);
 
       expect(replaceTokensSpy).toHaveBeenCalledWith({}, event);
     }
@@ -159,21 +175,22 @@ describe('createExecuteDelegateModule returns a function that when called', func
         getModuleExports: function () {
           return emptyFn;
         },
-        decorateSettingsWithDelegateFilePaths: jasmine.createSpy(),
         getModuleDefinition: jasmine.createSpy().and.returnValue({
           filePaths: ['source']
         })
       };
 
-      createExecuteDelegateModule(moduleProvider, replaceTokens)(
-        moduleDescriptor,
-        event,
-        moduleCallParameters
+      var settingsFileTransformerSpy = jasmine.createSpy(
+        'settingsFileTransformer'
       );
 
-      expect(
-        moduleProvider.decorateSettingsWithDelegateFilePaths
-      ).toHaveBeenCalledWith(
+      createExecuteDelegateModule(
+        moduleProvider,
+        replaceTokens,
+        settingsFileTransformerSpy
+      )(moduleDescriptor, event, moduleCallParameters);
+
+      expect(settingsFileTransformerSpy).toHaveBeenCalledWith(
         moduleDescriptor.settings,
         ['source'],
         moduleDescriptor.modulePath
@@ -192,19 +209,24 @@ describe('createExecuteDelegateModule returns a function that when called', func
           getModuleExports: function () {
             return emptyFn;
           },
-          decorateSettingsWithDelegateFilePaths: jasmine.createSpy(),
           getModuleDefinition: jasmine.createSpy().and.returnValue({})
         };
 
-        createExecuteDelegateModule(moduleProvider, replaceTokens)(
-          moduleDescriptor,
-          event,
-          moduleCallParameters
+        var settingsFileTransformerSpy = jasmine.createSpy(
+          'settingsFileTransformer'
         );
 
-        expect(
-          moduleProvider.decorateSettingsWithDelegateFilePaths
-        ).toHaveBeenCalledWith({}, [], moduleDescriptor.modulePath);
+        createExecuteDelegateModule(
+          moduleProvider,
+          replaceTokens,
+          settingsFileTransformerSpy
+        )(moduleDescriptor, event, moduleCallParameters);
+
+        expect(settingsFileTransformerSpy).toHaveBeenCalledWith(
+          {},
+          [],
+          moduleDescriptor.modulePath
+        );
       }
     );
   });

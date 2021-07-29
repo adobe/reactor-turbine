@@ -23,6 +23,7 @@ module.exports = function (
   debugController,
   replaceTokens,
   getDataElementValue,
+  settingsFileTransformer,
   decorateWithDynamicHost
 ) {
   var extensions = container.extensions;
@@ -39,7 +40,7 @@ module.exports = function (
       var extension = extensions[extensionName];
       var extensionSettings = extension.settings;
       if (Array.isArray(extension.filePaths)) {
-        extensionSettings = moduleProvider.decorateSettingsWithDelegateFilePaths(
+        extensionSettings = settingsFileTransformer(
           extensionSettings,
           extension.filePaths
         );

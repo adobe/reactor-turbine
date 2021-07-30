@@ -1,7 +1,23 @@
-var objectAssign = require('@adobe/reactor-object-assign');
+/***************************************************************************************
+ * (c) 2021 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ ****************************************************************************************/
+
+var isPlainObject = require('is-plain-object');
 
 function isArrayReference(str) {
-  return isString(str) && str.indexOf('[') !== -1 && str.indexOf(']') !== -1;
+  return (
+    typeof str === 'string' &&
+    str.indexOf('[') !== -1 &&
+    str.indexOf(']') !== -1
+  );
 }
 function sanitizeArrayKey(pathStrSegment) {
   return pathStrSegment.substr(
@@ -11,90 +27,54 @@ function sanitizeArrayKey(pathStrSegment) {
   );
 }
 
-function isObject(value) {
-  if (value == null) {
-    return false;
-  }
-
-  return Boolean(
-    typeof value === 'object' &&
-      Object.prototype.toString.call(value) === '[object Object]' &&
-      !Array.isArray(value)
-  );
-}
-
-function isString(value) {
-  var type = typeof value;
-  return Boolean(
-    type === 'string' ||
-      (type === 'object' &&
-        value != null &&
-        !Array.isArray(value) &&
-        Object.prototype.toString.call(value) === '[object String]')
-  );
-}
-
-function traverseIntoSettings(
-  filePathString,
-  settings,
-  decorateWithDynamicHost
-) {
+/**
+ * Recursive function to loop through settings and look for the setting to transform,
+ * which is the final entry within the pathSegments array. Alters settings in-place.
+ * @param {Array} pathSegments
+ * @param {Object} settings
+ * @param {Function} decorateWithDynamicHost
+ */
+function traverseIntoSettings(pathSegments, settings, decorateWithDynamicHost) {
   // nothing to do
-  if (
-    !isString(filePathString) ||
-    !filePathString.length ||
-    !isObject(settings)
-  ) {
+  if (!pathSegments.length || !isPlainObject(settings)) {
     return;
   }
 
-  // get the next key to observe
-  var pathSegments = filePathString.split('.');
-  var settingToReplace = pathSegments.pop();
-  if (!settingToReplace) {
-    var error = new Error();
-    error.code = 'malformed-path-string';
-    throw error;
-  }
+  var currentKey = pathSegments[0];
 
   // base case
-  if (
-    settings.hasOwnProperty(settingToReplace) &&
-    !pathSegments.length &&
-    isString(settings[settingToReplace])
-  ) {
-    settings[settingToReplace] = decorateWithDynamicHost(
-      settings[settingToReplace]
-    );
+  if (pathSegments.length === 1) {
+    if (
+      settings.hasOwnProperty(currentKey) &&
+      typeof settings[currentKey] === 'string'
+    ) {
+      settings[currentKey] = decorateWithDynamicHost(settings[currentKey]);
+    }
     return;
   }
 
   // still more work to do
-  if (pathSegments.length) {
-    var currentKey = pathSegments.shift();
-    // the next layer down will need the setting to replace back on the end
-    var remainingPathString = pathSegments.concat(settingToReplace).join('.');
-
-    if (isArrayReference(currentKey)) {
-      // 'someArrayReference[]' --> 'someArrayReference'
-      currentKey = sanitizeArrayKey(currentKey);
-      var settingsValue = settings[currentKey];
-      if (Array.isArray(settingsValue)) {
-        settingsValue.forEach(function (arrayEntryObject) {
-          return traverseIntoSettings(
-            remainingPathString,
-            arrayEntryObject,
-            decorateWithDynamicHost
-          );
-        });
-      }
-    } else {
-      return traverseIntoSettings(
-        remainingPathString,
-        settings[currentKey],
-        decorateWithDynamicHost
-      );
+  var remainingPathSegments = pathSegments.slice(1);
+  if (isArrayReference(currentKey)) {
+    // 'someArrayReference[]' --> 'someArrayReference'
+    currentKey = sanitizeArrayKey(currentKey);
+    var settingsValue = settings[currentKey];
+    if (Array.isArray(settingsValue)) {
+      settingsValue.forEach(function (arrayEntryObject) {
+        return traverseIntoSettings(
+          remainingPathSegments,
+          arrayEntryObject,
+          decorateWithDynamicHost
+        );
+      });
     }
+  } else {
+    // object case
+    return traverseIntoSettings(
+      remainingPathSegments,
+      settings[currentKey],
+      decorateWithDynamicHost
+    );
   }
 }
 
@@ -111,15 +91,13 @@ module.exports = function (isDynamicEnforced, decorateWithDynamicHost) {
   return function (settings, filePaths, moduleReferencePath) {
     if (
       !isDynamicEnforced ||
-      !isObject(settings) ||
+      !isPlainObject(settings) ||
       !Object.keys(settings).length ||
       !Array.isArray(filePaths) ||
       !filePaths.length
     ) {
       return settings;
     }
-
-    var settingsCopy = objectAssign({}, settings);
 
     // pull out the file paths by the module's reference path and loop over each urlPath
     filePaths.forEach(function (filePathString) {
@@ -136,7 +114,7 @@ module.exports = function (isDynamicEnforced, decorateWithDynamicHost) {
       if (
         isAdobeCustomCodeAction &&
         filePathString === 'source' &&
-        !settingsCopy.isExternal
+        !settings.isExternal
       ) {
         return;
       }
@@ -144,8 +122,8 @@ module.exports = function (isDynamicEnforced, decorateWithDynamicHost) {
       try {
         // modify the object in place
         traverseIntoSettings(
-          filePathString,
-          settingsCopy,
+          filePathString.split('.'),
+          settings,
           decorateWithDynamicHost
         );
       } catch (e) {
@@ -157,6 +135,6 @@ module.exports = function (isDynamicEnforced, decorateWithDynamicHost) {
       }
     });
 
-    return settingsCopy;
+    return settings;
   };
 };

@@ -111,6 +111,31 @@ describe('index', function () {
     expect(window._satellite.container).toBe(undefined);
   });
 
+  it(
+    'redefines container.buildInfo.environment to point to ' +
+      'container.environment.container.stage ',
+    function () {
+      var container = window._satellite.container;
+      container.buildInfo = {
+        environment: undefined
+      };
+      container.environment = {
+        id: 'the-environment-id',
+        stage: 'the-environment-stage-in-environment'
+      };
+      injectIndex({
+        './logger': logger
+      });
+      expect(container.buildInfo.environment).toBe(
+        'the-environment-stage-in-environment'
+      );
+      expect(logger.deprecation).toHaveBeenCalledWith(
+        'container.buildInfo.environment is deprecated.' +
+          'Please use `container.environment.stage` instead'
+      );
+    }
+  );
+
   it('migrates cookie data', function () {
     var migrateCookieDataSpy = jasmine.createSpy();
 

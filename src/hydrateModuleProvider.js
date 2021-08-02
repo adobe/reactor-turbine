@@ -28,6 +28,7 @@ module.exports = function (
 ) {
   var extensions = container.extensions;
   var buildInfo = container.buildInfo;
+  var environment = container.environment;
   var propertySettings = container.property.settings;
 
   if (extensions) {
@@ -59,6 +60,11 @@ module.exports = function (
         );
         var turbine = {
           buildInfo: buildInfo,
+          environment: environment,
+          property: {
+            name: container.property.name,
+            id: container.property.id
+          },
           getDataElementValue: getDataElementValue,
           getExtensionSettings: getExtensionSettings,
           getHostedLibFileUrl: getHostedLibFileUrl,

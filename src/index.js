@@ -12,6 +12,7 @@
 
 // DYNAMIC URL
 var document = require('@adobe/reactor-document');
+var objectAssign = require('@adobe/reactor-object-assign');
 var createDynamicHostResolver = require('./createDynamicHostResolver');
 var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
 
@@ -68,6 +69,22 @@ if (_satellite && !window.__satelliteLoaded) {
 
   // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
   delete _satellite.container;
+
+  /*
+    get rid of container.buildInfo decoration once deprecation is finished of 
+    buildInfo.environment string
+   */
+  var buildInfo = objectAssign({}, container.buildInfo);
+  Object.defineProperty(buildInfo, 'environment', {
+    get: function () {
+      logger.deprecation(
+        'container.buildInfo.environment is deprecated.' +
+          'Please use `container.environment.stage` instead'
+      );
+      return container.environment.stage;
+    }
+  });
+  container.buildInfo = buildInfo;
 
   var localStorage = getNamespacedStorage('localStorage');
   var debugController = createDebugController(localStorage, logger);

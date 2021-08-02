@@ -38,6 +38,8 @@ describe('hydrateModuleProvider', function () {
         }
       },
       property: {
+        name: 'property name',
+        id: 'property-id',
         settings: {}
       },
       buildInfo: {
@@ -286,6 +288,13 @@ describe('hydrateModuleProvider', function () {
     it('contains logger', function () {
       expect(logger.createPrefixedLogger).toHaveBeenCalledWith('Extension A');
       expect(turbine.logger).toBe(prefixedLogger);
+    });
+
+    it('contains property information similar to _satellite.property', function () {
+      expect(turbine.property).toEqual({
+        name: 'property name',
+        id: 'property-id'
+      });
     });
 
     it('contains propertySettings', function () {

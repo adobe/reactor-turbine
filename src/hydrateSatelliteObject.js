@@ -42,12 +42,15 @@ module.exports = function (
   // container.property also has property settings, but it shouldn't concern the user.
   // By limiting our API exposure to necessities, we provide more flexibility in the future.
   _satellite.property = {
-    name: container.property.name
+    name: container.property.name,
+    id: container.property.id
   };
 
   _satellite.company = container.company;
 
   _satellite.buildInfo = container.buildInfo;
+
+  _satellite.environment = container.environment;
 
   _satellite.logger = customScriptPrefixedLogger;
 

@@ -17,26 +17,31 @@ var injectHydrateSatelliteObject = require('inject-loader!../hydrateSatelliteObj
 describe('hydrateSatelliteObject', function () {
   var _satellite;
 
-  var container = {
-    company: {
-      orgId: 'CB20F0CC53FCF3AC0A4C98A1@AdobeOrg'
-    },
-    property: {
-      name: 'Test Property',
-      settings: {
-        foo: 'bar'
-      }
-    },
-    buildInfo: {
-      buildDate: '2018-11-08T23:46:28Z',
-      environment: 'development',
-      turbineBuildDate: '2018-11-07T23:14:07Z',
-      turbineVersion: '25.2.2'
-    }
-  };
+  var container;
 
   beforeEach(function () {
     _satellite = {};
+    container = {
+      company: {
+        orgId: 'CB20F0CC53FCF3AC0A4C98A1@AdobeOrg'
+      },
+      property: {
+        name: 'Test Property',
+        id: 'property-id',
+        settings: {
+          foo: 'bar'
+        }
+      },
+      buildInfo: {
+        buildDate: '2018-11-08T23:46:28Z',
+        turbineBuildDate: '2018-11-07T23:14:07Z',
+        turbineVersion: '25.2.2'
+      },
+      environment: {
+        id: 'environment-id',
+        stage: 'development'
+      }
+    };
   });
 
   it('should add a track function on _satellite', function () {
@@ -67,6 +72,7 @@ describe('hydrateSatelliteObject', function () {
     var hydrateSatelliteObject = injectHydrateSatelliteObject();
     hydrateSatelliteObject(_satellite, container);
     expect(_satellite.property.name).toEqual('Test Property');
+    expect(_satellite.property.id).toEqual('property-id');
     expect(_satellite.property.settings).toBeUndefined();
   });
 
@@ -79,9 +85,32 @@ describe('hydrateSatelliteObject', function () {
   });
 
   it('should add build info on _satellite', function () {
+    var logger = {
+      deprecation: jasmine.createSpy('deprecation'),
+      createPrefixedLogger: function () {}
+    };
+    // make sure this isn't messed with when it gets passed
+    Object.defineProperty(container.buildInfo, 'environment', {
+      get: function () {
+        logger.deprecation('use container.environment.stage instead.');
+        return container.environment.stage;
+      }
+    });
+    var hydrateSatelliteObject = injectHydrateSatelliteObject({
+      './logger': logger
+    });
+    hydrateSatelliteObject(_satellite, container);
+    expect(_satellite.buildInfo).toEqual(container.buildInfo);
+    expect(_satellite.buildInfo.environment).toBe('development');
+    expect(logger.deprecation).toHaveBeenCalledWith(
+      'use container.environment.stage instead.'
+    );
+  });
+
+  it('should add environment info on _satellite', function () {
     var hydrateSatelliteObject = injectHydrateSatelliteObject();
     hydrateSatelliteObject(_satellite, container);
-    expect(_satellite.buildInfo.environment).toEqual('development');
+    expect(_satellite.environment).toEqual(container.environment);
   });
 
   it('should add setDebug function on _satellite', function () {

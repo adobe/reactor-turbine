@@ -119,20 +119,12 @@ module.exports = function (isDynamicEnforced, decorateWithDynamicHost) {
         return;
       }
 
-      try {
-        // modify the object in place
-        traverseIntoSettings(
-          filePathString.split('.'),
-          settings,
-          decorateWithDynamicHost
-        );
-      } catch (e) {
-        if (e.code === 'malformed-path-string') {
-          throw new Error(
-            'The following pathString was malformed: ' + filePathString
-          );
-        }
-      }
+      // modify the object in place
+      traverseIntoSettings(
+        filePathString.split('.'),
+        settings,
+        decorateWithDynamicHost
+      );
     });
 
     return settings;

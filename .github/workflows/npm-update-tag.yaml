@@ -21,7 +21,9 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 14.x
-          token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
+      - run: npm dist-tag add @adobe/reactor-turbine@${{version}} ${{tag}}
+        env:
+          NPM_TOKEN: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
+        with:
           tag: ${{ github.event.inputs.tag }}
           version: ${{ github.event.inputs.version }}
-        run: NPM_TOKEN=${{token}} npm dist-tag add @adobe/reactor-turbine@${{version}} ${{tag}}

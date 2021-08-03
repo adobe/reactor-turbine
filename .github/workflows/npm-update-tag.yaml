@@ -21,6 +21,4 @@ jobs:
         with:
           node-version: 14.x
       - name: Update Tag
-        run: npm dist-tag add @adobe/reactor-turbine@${{ github.event.inputs.version }} ${{ github.event.inputs.tag }}
-        env:
-          NPM_TOKEN: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
+        run: NPM_TOKEN=${{ secrets.ADOBE_BOT_NPM_TOKEN }} npm dist-tag add @adobe/reactor-turbine@${{ github.event.inputs.version }} ${{ github.event.inputs.tag }}

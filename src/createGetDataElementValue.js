@@ -35,7 +35,8 @@ module.exports = function (
   moduleProvider,
   getDataElementDefinition,
   replaceTokens,
-  undefinedVarsReturnEmpty
+  undefinedVarsReturnEmpty,
+  settingsFileTransformer
 ) {
   return function (name, syntheticEvent) {
     var dataDef = getDataElementDefinition(name);
@@ -63,9 +64,19 @@ module.exports = function (
 
     var value;
 
+    var dataElementSettings = dataDef.settings || {};
+    if (!dataDef.hasTransformedFilePaths && dataDef.filePaths) {
+      settingsFileTransformer(
+        dataElementSettings,
+        dataDef.filePaths,
+        dataDef.modulePath
+      );
+      dataDef.hasTransformedFilePaths = true;
+    }
+
     try {
       value = moduleExports(
-        replaceTokens(dataDef.settings, syntheticEvent),
+        replaceTokens(dataElementSettings, syntheticEvent),
         syntheticEvent
       );
     } catch (e) {

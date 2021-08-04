@@ -31,9 +31,6 @@ module.exports = function (
     var moduleDefinition = moduleProvider.getModuleDefinition(
       moduleDescriptor.modulePath
     );
-    var moduleFilePaths = Array.isArray(moduleDefinition.filePaths)
-      ? moduleDefinition.filePaths
-      : [];
 
     // We're transforming URLs in-place to ensure that the developer's settings object reference
     // is the same object reference as moduleDescriptor.settings. Therefore, we must only transform
@@ -41,13 +38,16 @@ module.exports = function (
     // the module descriptor of each event, condition, and action so that we aren't modifying the
     // settings object.
     var moduleSettings = moduleDescriptor.settings || {};
-    if (!moduleDescriptor.hasDynamicTransform) {
+    if (
+      !moduleDescriptor.hasTransformedFilePaths &&
+      moduleDefinition.filePaths
+    ) {
       settingsFileTransformer(
         moduleSettings,
-        moduleFilePaths,
+        moduleDefinition.filePaths,
         moduleDescriptor.modulePath
       );
-      moduleDescriptor.hasDynamicTransform = true;
+      moduleDescriptor.hasTransformedFilePaths = true;
     }
 
     // replace tokens

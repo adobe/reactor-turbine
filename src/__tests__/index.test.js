@@ -168,19 +168,25 @@ describe('index', function () {
 
   it('creates getDataElementValue', function () {
     var createGetDataElementValue = jasmine.createSpy();
+    var settingsFileTransformer = jasmine.createSpy('settingsFileTransformer');
+    var createSettingsFileTransformer = function () {
+      return settingsFileTransformer;
+    };
     var moduleProvider = function () {};
     injectIndex({
       './createGetDataElementValue': createGetDataElementValue,
       './createModuleProvider': function () {
         return moduleProvider;
-      }
+      },
+      './createSettingsFileTransformer': createSettingsFileTransformer
     });
 
     expect(createGetDataElementValue).toHaveBeenCalledWith(
       moduleProvider,
       jasmine.any(Function),
       jasmine.any(Function),
-      true
+      true,
+      settingsFileTransformer
     );
   });
 

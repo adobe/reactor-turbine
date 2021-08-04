@@ -34,14 +34,25 @@ module.exports = function (
     var moduleFilePaths = Array.isArray(moduleDefinition.filePaths)
       ? moduleDefinition.filePaths
       : [];
-    var settingsWithReplacedDynamicURLs = settingsFileTransformer(
-      moduleDescriptor.settings || {},
-      moduleFilePaths,
-      moduleDescriptor.modulePath
-    );
+
+    // We're transforming URLs in-place to ensure that the developer's settings object reference
+    // is the same object reference as moduleDescriptor.settings. Therefore, we must only transform
+    // the settings one time and save a reference saying that we've done that. We're saving this in
+    // the module descriptor of each event, condition, and action so that we aren't modifying the
+    // settings object.
+    var moduleSettings = moduleDescriptor.settings || {};
+    if (!moduleDescriptor.hasDynamicTransform) {
+      settingsFileTransformer(
+        moduleSettings,
+        moduleFilePaths,
+        moduleDescriptor.modulePath
+      );
+      moduleDescriptor.hasDynamicTransform = true;
+    }
+
     // replace tokens
     var moduleDescriptorSettings = replaceTokens(
-      settingsWithReplacedDynamicURLs,
+      moduleSettings,
       syntheticEvent
     );
     return moduleExports

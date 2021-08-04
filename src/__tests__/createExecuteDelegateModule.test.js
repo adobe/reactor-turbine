@@ -13,12 +13,21 @@ governing permissions and limitations under the License.
 'use strict';
 
 var createExecuteDelegateModule = require('../createExecuteDelegateModule');
+var createSettingsFileTransformer = require('../createSettingsFileTransformer');
+var decorateWithDynamicHostFake;
 var emptyFn = function () {};
 var event = { $type: 'type' };
-var moduleDescriptor = { modulePath: 'path', settings: { key: 'value' } };
+var moduleDescriptor;
 var moduleCallParameters = ['a', 'b'];
 
 describe('createExecuteDelegateModule returns a function that when called', function () {
+  beforeEach(function () {
+    moduleDescriptor = { modulePath: 'path', settings: { key: 'value' } };
+    decorateWithDynamicHostFake = function (url) {
+      return 'https://assets.adobedtm.com' + url;
+    };
+  });
+
   it('returns the module export function result', function () {
     var moduleExportsSpy = jasmine
       .createSpy('moduleExports')
@@ -69,6 +78,83 @@ describe('createExecuteDelegateModule returns a function that when called', func
       expect(moduleExportsSpy).toHaveBeenCalledWith(undefined);
     }
   );
+
+  it('The moduleDescriptor.settings is only handed to settingsFileTransformer once', function () {
+    var moduleExportsSpy = jasmine.createSpy('moduleExports');
+    var settingsFileTransformer = createSettingsFileTransformer(
+      true,
+      decorateWithDynamicHostFake
+    );
+
+    var settingsFileTransformerSpy = jasmine
+      .createSpy('settingsFileTransform')
+      .and.callFake(settingsFileTransformer);
+
+    var moduleProvider = {
+      getModuleExports: function () {
+        return moduleExportsSpy;
+      },
+      getModuleDefinition: jasmine.createSpy().and.returnValue({
+        filePaths: ['someUrl', 'a.b.someUrl', 'someList[].someUrl']
+      })
+    };
+    var replaceTokens = emptyFn;
+
+    var executeDelegateModule = createExecuteDelegateModule(
+      moduleProvider,
+      replaceTokens,
+      settingsFileTransformerSpy
+    );
+
+    moduleDescriptor.modulePath = 'someModule/folder/lib.js';
+    moduleDescriptor.settings = {
+      key: 'value',
+      someUrl: '/some/relative/url',
+      a: {
+        b: {
+          value: 'foo',
+          secondValue: 'world',
+          someUrl: '/some/relative/url'
+        },
+        nestedList: [{}, {}, {}]
+      },
+      someList: [{ someUrl: '/some/relative/url' }]
+    };
+
+    /** --- yes, really call this twice --- **/
+    executeDelegateModule(moduleDescriptor);
+    expect(moduleDescriptor.hasDynamicTransform).toBeTrue();
+    executeDelegateModule(moduleDescriptor);
+    expect(moduleDescriptor.hasDynamicTransform).toBeTrue();
+    /** ---           ---             --- **/
+
+    // the customer added some keys later after some transformation
+    moduleDescriptor.settings.addedByCustomer = {
+      someKey: 'is-still-here'
+    };
+    moduleDescriptor.settings.alsoAddedByCustomer = 'is-string-still-here';
+    executeDelegateModule(moduleDescriptor);
+    expect(moduleDescriptor.hasDynamicTransform).toBeTrue();
+
+    expect(moduleDescriptor.settings).toEqual({
+      key: 'value',
+      someUrl: 'https://assets.adobedtm.com/some/relative/url',
+      a: {
+        b: {
+          value: 'foo',
+          secondValue: 'world',
+          someUrl: 'https://assets.adobedtm.com/some/relative/url'
+        },
+        nestedList: [{}, {}, {}]
+      },
+      someList: [{ someUrl: 'https://assets.adobedtm.com/some/relative/url' }],
+      addedByCustomer: {
+        someKey: 'is-still-here'
+      },
+      alsoAddedByCustomer: 'is-string-still-here'
+    });
+    expect(settingsFileTransformerSpy).toHaveBeenCalledTimes(1);
+  });
 
   it('throws an error if the module export is not a function', function () {
     var moduleProvider = {

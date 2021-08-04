@@ -147,7 +147,8 @@ if (_satellite && !window.__satelliteLoaded) {
     moduleProvider,
     getDataElementDefinition,
     proxyReplaceTokens,
-    undefinedVarsReturnEmpty
+    undefinedVarsReturnEmpty,
+    settingsFileTransformer
   );
 
   var customVars = {};

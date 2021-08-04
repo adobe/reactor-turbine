@@ -123,9 +123,9 @@ describe('createExecuteDelegateModule returns a function that when called', func
 
     /** --- yes, really call this twice --- **/
     executeDelegateModule(moduleDescriptor);
-    expect(moduleDescriptor.hasDynamicTransform).toBeTrue();
+    expect(moduleDescriptor.hasTransformedFilePaths).toBeTrue();
     executeDelegateModule(moduleDescriptor);
-    expect(moduleDescriptor.hasDynamicTransform).toBeTrue();
+    expect(moduleDescriptor.hasTransformedFilePaths).toBeTrue();
     /** ---           ---             --- **/
 
     // the customer added some keys later after some transformation
@@ -134,7 +134,7 @@ describe('createExecuteDelegateModule returns a function that when called', func
     };
     moduleDescriptor.settings.alsoAddedByCustomer = 'is-string-still-here';
     executeDelegateModule(moduleDescriptor);
-    expect(moduleDescriptor.hasDynamicTransform).toBeTrue();
+    expect(moduleDescriptor.hasTransformedFilePaths).toBeTrue();
 
     expect(moduleDescriptor.settings).toEqual({
       key: 'value',
@@ -295,7 +295,9 @@ describe('createExecuteDelegateModule returns a function that when called', func
           getModuleExports: function () {
             return emptyFn;
           },
-          getModuleDefinition: jasmine.createSpy().and.returnValue({})
+          getModuleDefinition: jasmine.createSpy().and.returnValue({
+            filePaths: []
+          })
         };
 
         var settingsFileTransformerSpy = jasmine.createSpy(

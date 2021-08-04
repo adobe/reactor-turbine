@@ -100,9 +100,6 @@ module.exports = function (isDynamicEnforced, decorateWithDynamicHost) {
       return settings;
     }
 
-    // if the settings are modified in place, they're no longer relative when we arrive here
-    var settingsCopy = objectAssign({}, settings);
-
     // pull out the file paths by the module's reference path and loop over each urlPath
     filePaths.forEach(function (filePathString) {
       // The custom code action provides the ability to have the source code in the 'source'
@@ -118,7 +115,7 @@ module.exports = function (isDynamicEnforced, decorateWithDynamicHost) {
       if (
         isAdobeCustomCodeAction &&
         filePathString === 'source' &&
-        !settingsCopy.isExternal
+        !settings.isExternal
       ) {
         return;
       }
@@ -126,11 +123,11 @@ module.exports = function (isDynamicEnforced, decorateWithDynamicHost) {
       // modify the object in place
       traverseIntoSettings(
         filePathString.split('.'),
-        settingsCopy,
+        settings,
         decorateWithDynamicHost
       );
     });
 
-    return settingsCopy;
+    return settings;
   };
 };

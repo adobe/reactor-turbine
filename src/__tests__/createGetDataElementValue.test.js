@@ -40,6 +40,9 @@ describe('function returned by createGetDataElementValue', function () {
         return function (settings) {
           return settings.foo;
         };
+      },
+      getModuleDefinition: function () {
+        return {};
       }
     };
     var getDataElementDefinition = function () {
@@ -71,6 +74,9 @@ describe('function returned by createGetDataElementValue', function () {
         return function (settings, event) {
           return event.foo;
         };
+      },
+      getModuleDefinition: function () {
+        return {};
       }
     };
     var getDataElementDefinition = function () {
@@ -106,6 +112,9 @@ describe('function returned by createGetDataElementValue', function () {
         return function (settings) {
           return settings.foo;
         };
+      },
+      getModuleDefinition: function () {
+        return {};
       }
     };
     var getDataElementDefinition = function () {
@@ -144,6 +153,9 @@ describe('function returned by createGetDataElementValue', function () {
         return function () {
           return 'bar';
         };
+      },
+      getModuleDefinition: function () {
+        return {};
       }
     };
     var getDataElementDefinition = function () {
@@ -174,6 +186,9 @@ describe('function returned by createGetDataElementValue', function () {
     var moduleProvider = {
       getModuleExports: function () {
         return function () {};
+      },
+      getModuleDefinition: function () {
+        return {};
       }
     };
     var getDataElementDefinition = function () {
@@ -228,6 +243,9 @@ describe('function returned by createGetDataElementValue', function () {
     var moduleProvider = {
       getModuleExports: function () {
         return function () {};
+      },
+      getModuleDefinition: function () {
+        return {};
       }
     };
     var getDataElementDefinition = function () {
@@ -266,6 +284,9 @@ describe('function returned by createGetDataElementValue', function () {
             return function () {
               return dataElementValue;
             };
+          },
+          getModuleDefinition: function () {
+            return {};
           }
         };
         var getDataElementDefinition = function () {
@@ -295,6 +316,9 @@ describe('function returned by createGetDataElementValue', function () {
           return function () {
             return dataElementValue;
           };
+        },
+        getModuleDefinition: function () {
+          return {};
         }
       };
       var getDataElementDefinition = function () {
@@ -333,6 +357,9 @@ describe('function returned by createGetDataElementValue', function () {
             return function () {
               return dataElementValue;
             };
+          },
+          getModuleDefinition: function () {
+            return {};
           }
         };
         var getDataElementDefinition = function () {
@@ -367,6 +394,9 @@ describe('function returned by createGetDataElementValue', function () {
             return function () {
               return dataElementValue;
             };
+          },
+          getModuleDefinition: function () {
+            return {};
           }
         };
         var getDataElementDefinition = function () {
@@ -399,6 +429,9 @@ describe('function returned by createGetDataElementValue', function () {
             return function () {
               return dataElementValue;
             };
+          },
+          getModuleDefinition: function () {
+            return {};
           }
         };
         var getDataElementDefinition = function () {
@@ -429,6 +462,9 @@ describe('function returned by createGetDataElementValue', function () {
         return function (settings) {
           return settings.foo;
         };
+      },
+      getModuleDefinition: function () {
+        return {};
       }
     };
     var getDataElementDefinition = function () {
@@ -457,6 +493,9 @@ describe('function returned by createGetDataElementValue', function () {
     var moduleProvider = {
       getModuleExports: function () {
         return function () {};
+      },
+      getModuleDefinition: function () {
+        return {};
       }
     };
     var getDataElementDefinition = function () {
@@ -486,6 +525,9 @@ describe('function returned by createGetDataElementValue', function () {
         return function (settings) {
           return settings.foo;
         };
+      },
+      getModuleDefinition: function () {
+        return {};
       }
     };
     var getDataElementDefinition = function () {
@@ -535,6 +577,11 @@ describe('function returned by createGetDataElementValue', function () {
         return function (settings) {
           return settings.foo;
         };
+      },
+      getModuleDefinition: function () {
+        return {
+          filePaths: ['someUrl', 'a.b.someUrl', 'someList[].someUrl']
+        };
       }
     };
 
@@ -552,16 +599,14 @@ describe('function returned by createGetDataElementValue', function () {
         },
         someList: [{ someUrl: '/some/relative/url' }]
       },
-      modulePath: 'core/src/lib/dataElements/customCode.js',
-      filePaths: ['someUrl', 'a.b.someUrl', 'someList[].someUrl']
+      modulePath: 'core/src/lib/dataElements/customCode.js'
     };
     var getDataElementDefinition = function () {
       return dataDef;
     };
-
     var replaceTokens = function () {};
-
     var undefinedVarsReturnEmpty = false;
+
     var getDataElementValue = createGetDataElementValue(
       moduleProvider,
       getDataElementDefinition,
@@ -593,12 +638,73 @@ describe('function returned by createGetDataElementValue', function () {
     expect(settingsFileTransformerSpy).toHaveBeenCalledTimes(1);
   });
 
+  it(
+    'is called with an empty settings object if dataDef.settings ' +
+      ' is missing',
+    function () {
+      var decorateWithDynamicHostFake = jasmine
+        .createSpy('dynamicHostResolver')
+        .and.callFake(function (url) {
+          return 'https://assets.adobedtm.com' + url;
+        });
+      settingsFileTransformer = createSettingsFileTransformer(
+        true,
+        decorateWithDynamicHostFake
+      );
+      var settingsFileTransformerSpy = jasmine
+        .createSpy('settingsFileTransform')
+        .and.callFake(settingsFileTransformer);
+
+      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
+      var moduleProvider = {
+        getModuleExports: function () {
+          return function (settings) {
+            return settings.foo;
+          };
+        },
+        getModuleDefinition: function () {
+          return {
+            filePaths: ['someUrl', 'a.b.someUrl', 'someList[].someUrl']
+          };
+        }
+      };
+
+      var dataDef = {
+        modulePath: 'core/src/lib/dataElements/customCode.js'
+      };
+      var getDataElementDefinition = function () {
+        return dataDef;
+      };
+      var replaceTokens = function () {};
+      var undefinedVarsReturnEmpty = false;
+
+      var getDataElementValue = createGetDataElementValue(
+        moduleProvider,
+        getDataElementDefinition,
+        replaceTokens,
+        undefinedVarsReturnEmpty,
+        settingsFileTransformerSpy
+      );
+
+      getDataElementValue();
+
+      expect(settingsFileTransformerSpy).toHaveBeenCalledWith(
+        {},
+        moduleProvider.getModuleDefinition().filePaths,
+        dataDef.modulePath
+      );
+    }
+  );
+
   describe('error handling', function () {
     it('logs an error when retrieving data element module exports fails', function () {
       var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
         getModuleExports: function () {
           throw new Error('noob tried to divide by zero');
+        },
+        getModuleDefinition: function () {
+          return {};
         }
       };
       var getDataElementDefinition = function () {
@@ -633,6 +739,9 @@ describe('function returned by createGetDataElementValue', function () {
           return function () {
             throw new Error('noob tried to divide by zero');
           };
+        },
+        getModuleDefinition: function () {
+          return {};
         }
       };
       var getDataElementDefinition = function () {
@@ -664,6 +773,9 @@ describe('function returned by createGetDataElementValue', function () {
       var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
         getModuleExports: function () {
+          return {};
+        },
+        getModuleDefinition: function () {
           return {};
         }
       };

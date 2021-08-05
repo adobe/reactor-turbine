@@ -47,9 +47,11 @@ module.exports = function (
 
     var storageDuration = dataDef.storageDuration;
     var moduleExports;
+    var moduleDefinition;
 
     try {
       moduleExports = moduleProvider.getModuleExports(dataDef.modulePath);
+      moduleDefinition = moduleProvider.getModuleDefinition(dataDef.modulePath);
     } catch (e) {
       logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
       return;
@@ -65,10 +67,10 @@ module.exports = function (
     var value;
 
     var dataElementSettings = dataDef.settings || {};
-    if (!dataDef.hasTransformedFilePaths && dataDef.filePaths) {
+    if (!dataDef.hasTransformedFilePaths && moduleDefinition.filePaths) {
       settingsFileTransformer(
         dataElementSettings,
-        dataDef.filePaths,
+        moduleDefinition.filePaths,
         dataDef.modulePath
       );
       dataDef.hasTransformedFilePaths = true;

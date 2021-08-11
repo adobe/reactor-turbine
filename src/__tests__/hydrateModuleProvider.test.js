@@ -13,13 +13,17 @@
 'use strict';
 
 var injectHydrateModuleProvider = require('inject-loader!../hydrateModuleProvider');
+var createDynamicHostResolver = require('../createDynamicHostResolver');
+var createSettingsFileTransformer = require('../createSettingsFileTransformer');
 
 describe('hydrateModuleProvider', function () {
   var container;
   var moduleProvider;
   var replaceTokens;
   var getDataElementValue;
-  var debugController;
+  var debugControllerSpy;
+  var settingsFileTransformer;
+  var decorateWithDynamicHost;
 
   beforeEach(function () {
     container = {
@@ -34,6 +38,8 @@ describe('hydrateModuleProvider', function () {
         }
       },
       property: {
+        name: 'property name',
+        id: 'property-id',
         settings: {}
       },
       buildInfo: {
@@ -44,15 +50,26 @@ describe('hydrateModuleProvider', function () {
     moduleProvider = jasmine.createSpyObj('moduleProvider', [
       'registerModule',
       'hydrateCache',
-      'getModuleExports'
+      'getModuleExports',
+      'decorateSettingsWithDelegateFilePaths'
     ]);
 
     replaceTokens = function () {};
     getDataElementValue = function () {};
-    debugController = jasmine.createSpyObj('debugController', {
-      onDebugChanged: undefined,
+    debugControllerSpy = jasmine.createSpyObj('debugController', {
+      onDebugChanged: jasmine.createSpy('onDebugChanged'),
       getDebugEnabled: true
     });
+
+    decorateWithDynamicHost = createDynamicHostResolver(
+      'https://assets.adobedtm.com',
+      ['assets.adobedtm.com'],
+      debugControllerSpy
+    ).decorateWithDynamicHost;
+    settingsFileTransformer = createSettingsFileTransformer(
+      true,
+      decorateWithDynamicHost
+    );
   });
 
   it('registers all modules', function () {
@@ -77,7 +94,15 @@ describe('hydrateModuleProvider', function () {
       }
     };
 
-    hydrateModuleProvider(container, moduleProvider, debugController);
+    hydrateModuleProvider(
+      container,
+      moduleProvider,
+      debugControllerSpy,
+      replaceTokens,
+      getDataElementValue,
+      settingsFileTransformer,
+      decorateWithDynamicHost
+    );
 
     expect(moduleProvider.registerModule).toHaveBeenCalledWith(
       'ext-a/a1.js',
@@ -115,7 +140,15 @@ describe('hydrateModuleProvider', function () {
   it('hydrates module cache', function () {
     var hydrateModuleProvider = injectHydrateModuleProvider();
 
-    hydrateModuleProvider(container, moduleProvider, debugController);
+    hydrateModuleProvider(
+      container,
+      moduleProvider,
+      debugControllerSpy,
+      replaceTokens,
+      getDataElementValue,
+      settingsFileTransformer,
+      decorateWithDynamicHost
+    );
 
     expect(moduleProvider.hydrateCache).toHaveBeenCalled();
   });
@@ -138,7 +171,15 @@ describe('hydrateModuleProvider', function () {
         './createPublicRequire': createPublicRequire
       });
 
-      hydrateModuleProvider(container, moduleProvider, debugController);
+      hydrateModuleProvider(
+        container,
+        moduleProvider,
+        debugControllerSpy,
+        replaceTokens,
+        getDataElementValue,
+        settingsFileTransformer,
+        decorateWithDynamicHost
+      );
     });
 
     it('is the publicRequire returned from createPublicRequire', function () {
@@ -202,9 +243,11 @@ describe('hydrateModuleProvider', function () {
       hydrateModuleProvider(
         container,
         moduleProvider,
-        debugController,
+        debugControllerSpy,
         replaceTokens,
-        getDataElementValue
+        getDataElementValue,
+        settingsFileTransformer,
+        decorateWithDynamicHost
       );
       turbine = moduleProvider.registerModule.calls.mostRecent().args[4];
     });
@@ -227,6 +270,7 @@ describe('hydrateModuleProvider', function () {
 
     it('contains getHostedLibFileUrl', function () {
       expect(createGetHostedLibFileUrl).toHaveBeenCalledWith(
+        decorateWithDynamicHost,
         'somebaseurl',
         true
       );
@@ -246,6 +290,13 @@ describe('hydrateModuleProvider', function () {
       expect(turbine.logger).toBe(prefixedLogger);
     });
 
+    it('contains property information similar to _satellite.property', function () {
+      expect(turbine.property).toEqual({
+        name: 'property name',
+        id: 'property-id'
+      });
+    });
+
     it('contains propertySettings', function () {
       expect(turbine.propertySettings).toBe(container.property.settings);
     });
@@ -255,13 +306,112 @@ describe('hydrateModuleProvider', function () {
     });
 
     it('contains onDebugChanged', function () {
-      expect(turbine.onDebugChanged).toBe(debugController.onDebugChanged);
+      expect(turbine.onDebugChanged).toBe(debugControllerSpy.onDebugChanged);
     });
 
     it('contains debugEnabled', function () {
       expect(turbine.debugEnabled).toBe(true);
-      expect(debugController.getDebugEnabled.and.returnValue(false));
+      expect(debugControllerSpy.getDebugEnabled.and.returnValue(false));
       expect(turbine.debugEnabled).toBe(false);
+    });
+  });
+
+  describe('does not transform file paths', function () {
+    var settingsFileTransformerSpy;
+    beforeEach(function () {
+      settingsFileTransformerSpy = jasmine.createSpy('settingsFileTransformer');
+    });
+
+    it('when extension.filePaths is missing', function () {
+      var hydrateModuleProvider = injectHydrateModuleProvider();
+      var a1Module = function () {};
+      var extensionA = {
+        modules: {
+          'ext-a/a1.js': a1Module
+        },
+        settings: {
+          source: 'some/url'
+        }
+      };
+
+      container.extensions = {
+        'ext-a': extensionA
+      };
+
+      hydrateModuleProvider(
+        container,
+        moduleProvider,
+        replaceTokens,
+        getDataElementValue,
+        debugControllerSpy,
+        settingsFileTransformerSpy,
+        decorateWithDynamicHost
+      );
+
+      expect(settingsFileTransformerSpy).not.toHaveBeenCalled();
+    });
+
+    it('when extension.filePaths is not an array', function () {
+      var hydrateModuleProvider = injectHydrateModuleProvider();
+      var a1Module = function () {};
+      var extensionA = {
+        modules: {
+          'ext-a/a1.js': a1Module
+        },
+        filePaths: { not: 'an array' },
+        settings: {
+          source: 'some/url'
+        }
+      };
+
+      container.extensions = {
+        'ext-a': extensionA
+      };
+
+      hydrateModuleProvider(
+        container,
+        moduleProvider,
+        debugControllerSpy,
+        replaceTokens,
+        getDataElementValue,
+        settingsFileTransformerSpy,
+        decorateWithDynamicHost
+      );
+
+      expect(settingsFileTransformerSpy).not.toHaveBeenCalled();
+    });
+
+    it('transforms file paths when extension.filePaths is present', function () {
+      var hydrateModuleProvider = injectHydrateModuleProvider();
+      var a1Module = function () {};
+      var extensionA = {
+        modules: {
+          'ext-a/a1.js': a1Module
+        },
+        filePaths: ['source'],
+        settings: {
+          source: 'some/url'
+        }
+      };
+
+      container.extensions = {
+        'ext-a': extensionA
+      };
+
+      hydrateModuleProvider(
+        container,
+        moduleProvider,
+        debugControllerSpy,
+        replaceTokens,
+        getDataElementValue,
+        settingsFileTransformerSpy,
+        decorateWithDynamicHost
+      );
+
+      expect(settingsFileTransformerSpy).toHaveBeenCalledWith(
+        extensionA.settings,
+        extensionA.filePaths
+      );
     });
   });
 });

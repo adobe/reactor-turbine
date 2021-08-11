@@ -10,6 +10,10 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+// DYNAMIC URL
+var document = require('@adobe/reactor-document');
+var objectAssign = require('@adobe/reactor-object-assign');
+var createDynamicHostResolver = require('./createDynamicHostResolver');
 var buildRuleExecutionOrder = require('./buildRuleExecutionOrder');
 
 var createDebugController = require('./createDebugController');
@@ -48,6 +52,10 @@ var getNamespacedStorage = require('./getNamespacedStorage');
 
 var hydrateModuleProvider = require('./hydrateModuleProvider');
 var hydrateSatelliteObject = require('./hydrateSatelliteObject');
+var IEGetTurbineScript = require('../temporaryHelpers/findPageScript')
+  .getTurbine;
+
+var createSettingsFileTransformer = require('./createSettingsFileTransformer');
 
 var logger = require('./logger');
 
@@ -62,6 +70,52 @@ if (_satellite && !window.__satelliteLoaded) {
   // Remove container in public scope ASAP so it can't be manipulated by extension or user code.
   delete _satellite.container;
 
+  /*
+    get rid of container.buildInfo decoration once deprecation is finished of 
+    buildInfo.environment string
+   */
+  var buildInfo = objectAssign({}, container.buildInfo);
+  Object.defineProperty(buildInfo, 'environment', {
+    get: function () {
+      logger.deprecation(
+        'container.buildInfo.environment is deprecated.' +
+          'Please use `container.environment.stage` instead'
+      );
+      return container.environment.stage;
+    }
+  });
+  container.buildInfo = buildInfo;
+
+  var localStorage = getNamespacedStorage('localStorage');
+  var debugController = createDebugController(localStorage, logger);
+
+  var currentScriptSource = '';
+  if (document.currentScript && document.currentScript.getAttribute('src')) {
+    currentScriptSource = document.currentScript.getAttribute('src');
+  } else if (IEGetTurbineScript()) {
+    currentScriptSource = IEGetTurbineScript().getAttribute('src');
+  }
+  var dynamicHostResolver;
+  try {
+    dynamicHostResolver = createDynamicHostResolver(
+      currentScriptSource,
+      container.company.cdnAllowList,
+      debugController
+    );
+  } catch (e) {
+    logger.warn('Please review the following error:');
+    throw e; // We don't want to continue allowing Turbine to start up if we detect an error in here
+  }
+
+  var settingsFileTransformer = createSettingsFileTransformer(
+    dynamicHostResolver.isDynamicEnforced,
+    dynamicHostResolver.decorateWithDynamicHost
+  );
+
+  var moduleProvider = createModuleProvider();
+
+  var replaceTokens;
+
   var undefinedVarsReturnEmpty =
     container.property.settings.undefinedVarsReturnEmpty;
   var ruleComponentSequencingEnabled =
@@ -75,10 +129,6 @@ if (_satellite && !window.__satelliteLoaded) {
   var getDataElementDefinition = function (name) {
     return dataElements[name];
   };
-
-  var moduleProvider = createModuleProvider();
-
-  var replaceTokens;
 
   // We support data elements referencing other data elements. In order to be able to retrieve a
   // data element value, we need to be able to replace data element tokens inside its settings
@@ -97,7 +147,8 @@ if (_satellite && !window.__satelliteLoaded) {
     moduleProvider,
     getDataElementDefinition,
     proxyReplaceTokens,
-    undefinedVarsReturnEmpty
+    undefinedVarsReturnEmpty,
+    settingsFileTransformer
   );
 
   var customVars = {};
@@ -112,9 +163,6 @@ if (_satellite && !window.__satelliteLoaded) {
   );
 
   replaceTokens = createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty);
-
-  var localStorage = getNamespacedStorage('localStorage');
-  var debugController = createDebugController(localStorage, logger);
 
   // Important to hydrate satellite object before we hydrate the module provider or init rules.
   // When we hydrate module provider, we also execute extension code which may be
@@ -132,13 +180,16 @@ if (_satellite && !window.__satelliteLoaded) {
     moduleProvider,
     debugController,
     replaceTokens,
-    getDataElementValue
+    getDataElementValue,
+    settingsFileTransformer,
+    dynamicHostResolver.decorateWithDynamicHost
   );
 
   var notifyMonitors = createNotifyMonitors(_satellite);
   var executeDelegateModule = createExecuteDelegateModule(
     moduleProvider,
-    replaceTokens
+    replaceTokens,
+    settingsFileTransformer
   );
 
   var getModuleDisplayNameByRuleComponent = createGetModuleDisplayNameByRuleComponent(

@@ -13,10 +13,18 @@
 'use strict';
 
 var createGetHostedLibFileUrl = require('../createGetHostedLibFileUrl');
+var createDynamicHostResolver = require('../createDynamicHostResolver');
+
+var dynamicHostResolver = createDynamicHostResolver(
+  undefined,
+  false,
+  jasmine.createSpyObj('debugController', ['onDebugChanged'])
+);
 
 describe('function returned by createGetHostedLibFileUrl', function () {
   it('returns full hosted lib path url', function () {
     var getHostedLibFileUrl = createGetHostedLibFileUrl(
+      dynamicHostResolver.decorateWithDynamicHost,
       '//example.com/',
       false
     );
@@ -26,6 +34,7 @@ describe('function returned by createGetHostedLibFileUrl', function () {
   describe('for a minified build', function () {
     it('returns full hosted lib path url for a file', function () {
       var getHostedLibFileUrl = createGetHostedLibFileUrl(
+        dynamicHostResolver.decorateWithDynamicHost,
         '//example.com/',
         true
       );
@@ -36,6 +45,7 @@ describe('function returned by createGetHostedLibFileUrl', function () {
 
     it('returns full hosted lib path url for a file with multiple dots', function () {
       var getHostedLibFileUrl = createGetHostedLibFileUrl(
+        dynamicHostResolver.decorateWithDynamicHost,
         '//example.com/',
         true
       );
@@ -46,6 +56,7 @@ describe('function returned by createGetHostedLibFileUrl', function () {
 
     it('returns full hosted lib path url for a file without extension', function () {
       var getHostedLibFileUrl = createGetHostedLibFileUrl(
+        dynamicHostResolver.decorateWithDynamicHost,
         '//example.com/',
         true
       );

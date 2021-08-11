@@ -22,10 +22,13 @@ module.exports = function (
   moduleProvider,
   debugController,
   replaceTokens,
-  getDataElementValue
+  getDataElementValue,
+  settingsFileTransformer,
+  decorateWithDynamicHost
 ) {
   var extensions = container.extensions;
   var buildInfo = container.buildInfo;
+  var environment = container.environment;
   var propertySettings = container.property.settings;
 
   if (extensions) {
@@ -36,19 +39,32 @@ module.exports = function (
 
     Object.keys(extensions).forEach(function (extensionName) {
       var extension = extensions[extensionName];
+      var extensionSettings = extension.settings;
+      if (Array.isArray(extension.filePaths)) {
+        extensionSettings = settingsFileTransformer(
+          extensionSettings,
+          extension.filePaths
+        );
+      }
       var getExtensionSettings = createGetExtensionSettings(
         replaceTokens,
-        extension.settings
+        extensionSettings
       );
 
       if (extension.modules) {
         var prefixedLogger = logger.createPrefixedLogger(extension.displayName);
         var getHostedLibFileUrl = createGetHostedLibFileUrl(
+          decorateWithDynamicHost,
           extension.hostedLibFilesBaseUrl,
           buildInfo.minified
         );
         var turbine = {
           buildInfo: buildInfo,
+          environment: environment,
+          property: {
+            name: container.property.name,
+            id: container.property.id
+          },
           getDataElementValue: getDataElementValue,
           getExtensionSettings: getExtensionSettings,
           getHostedLibFileUrl: getHostedLibFileUrl,

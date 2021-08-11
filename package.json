@@ -1,6 +1,6 @@
 {
   "name": "@adobe/reactor-turbine",
-  "version": "27.1.4",
+  "version": "27.2.0-beta.china-cdn.4",
   "description": "Launch rule engine which processes rules on client websites and delegates logic to extensions.",
   "license": "Apache-2.0",
   "scripts": {
@@ -64,7 +64,6 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged && lint-staged",
       "pre-push": "npm test"
     }
   },

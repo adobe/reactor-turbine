@@ -14,7 +14,14 @@
 
 var injectIndex = require('inject-loader!../index');
 
+var logger;
+
 describe('index', function () {
+  var turbineScriptId = 'turbine-script-id';
+  var currentScriptSpy;
+  var scriptSrc =
+    'https://fake.adobeassets.com:443/launch-ENabc123-development.min.js';
+
   beforeEach(function () {
     window._satellite = {
       container: {
@@ -23,9 +30,41 @@ describe('index', function () {
             undefinedVarsReturnEmpty: true,
             ruleComponentSequencingEnabled: false
           }
+        },
+        company: {
+          cdnAllowList: undefined
         }
       }
     };
+
+    logger = jasmine.createSpyObj('logger', [
+      'log',
+      'info',
+      'debug',
+      'warn',
+      'error',
+      'deprecation'
+    ]);
+
+    if (typeof document.currentScript !== 'undefined') {
+      // modern browsers
+      currentScriptSpy = spyOnProperty(
+        document,
+        'currentScript',
+        'get'
+      ).and.returnValue({
+        src: scriptSrc,
+        getAttribute: function () {
+          return scriptSrc;
+        }
+      });
+    } else {
+      // IE
+      var turbineScript = document.createElement('script');
+      turbineScript.id = turbineScriptId;
+      turbineScript.src = scriptSrc;
+      document.head.appendChild(turbineScript);
+    }
   });
 
   afterEach(function () {
@@ -33,6 +72,22 @@ describe('index', function () {
     delete window.__satelliteLoaded;
     window.localStorage.removeItem('com.adobe.reactor.debug');
     window.localStorage.removeItem('com.adobe.reactor.hideActivity');
+    if (document.getElementById(turbineScriptId)) {
+      var node = document.getElementById(turbineScriptId);
+      node.parentNode.removeChild(node);
+    }
+  });
+
+  it('starts up just fine when container.company.cdnAllowList is undefined', function () {
+    expect(function () {
+      injectIndex({
+        './logger': logger
+      });
+    }).not.toThrow();
+
+    expect(logger.warn).not.toHaveBeenCalledWith(
+      'Please review the following error:'
+    );
   });
 
   it('exports the window._satellite object', function () {
@@ -55,6 +110,31 @@ describe('index', function () {
     injectIndex();
     expect(window._satellite.container).toBe(undefined);
   });
+
+  it(
+    'redefines container.buildInfo.environment to point to ' +
+      'container.environment.container.stage ',
+    function () {
+      var container = window._satellite.container;
+      container.buildInfo = {
+        environment: undefined
+      };
+      container.environment = {
+        id: 'the-environment-id',
+        stage: 'the-environment-stage-in-environment'
+      };
+      injectIndex({
+        './logger': logger
+      });
+      expect(container.buildInfo.environment).toBe(
+        'the-environment-stage-in-environment'
+      );
+      expect(logger.deprecation).toHaveBeenCalledWith(
+        'container.buildInfo.environment is deprecated.' +
+          'Please use `container.environment.stage` instead'
+      );
+    }
+  );
 
   it('migrates cookie data', function () {
     var migrateCookieDataSpy = jasmine.createSpy();
@@ -88,19 +168,25 @@ describe('index', function () {
 
   it('creates getDataElementValue', function () {
     var createGetDataElementValue = jasmine.createSpy();
+    var settingsFileTransformer = jasmine.createSpy('settingsFileTransformer');
+    var createSettingsFileTransformer = function () {
+      return settingsFileTransformer;
+    };
     var moduleProvider = function () {};
     injectIndex({
       './createGetDataElementValue': createGetDataElementValue,
       './createModuleProvider': function () {
         return moduleProvider;
-      }
+      },
+      './createSettingsFileTransformer': createSettingsFileTransformer
     });
 
     expect(createGetDataElementValue).toHaveBeenCalledWith(
       moduleProvider,
       jasmine.any(Function),
       jasmine.any(Function),
-      true
+      true,
+      settingsFileTransformer
     );
   });
 
@@ -182,7 +268,6 @@ describe('index', function () {
   });
 
   it("sets logger output enabled when local storage item is 'true'", function () {
-    var logger = {};
     window.localStorage.setItem('com.adobe.reactor.debug', true);
 
     injectIndex({
@@ -196,7 +281,6 @@ describe('index', function () {
     'sets logger output disabled when local storage item is anything ' +
       "other than 'true'",
     function () {
-      var logger = {};
       window.localStorage.setItem('com.adobe.reactor.debug', false);
 
       injectIndex({
@@ -236,8 +320,10 @@ describe('index', function () {
     var hydrateModuleProvider = jasmine.createSpy();
     var moduleProvider = { type: 'moduleProvider' };
     var debugController = { type: 'debugController' };
-    var replaceTokens = function () {};
-    var getDataElementValue = function () {};
+    var replaceTokens = jasmine.createSpy('replaceTokens');
+    var getDataElementValue = jasmine.createSpy('getDataElementValue');
+    var settingsFileTransformer = jasmine.createSpy('settingsFileTransformer');
+    var decorateWithDynamicHost = jasmine.createSpy('decorateWithDynamicHost');
     injectIndex({
       './hydrateModuleProvider': hydrateModuleProvider,
       './createModuleProvider': function () {
@@ -251,6 +337,14 @@ describe('index', function () {
       },
       './createGetDataElementValue': function () {
         return getDataElementValue;
+      },
+      './createDynamicHostResolver': function () {
+        return {
+          decorateWithDynamicHost: decorateWithDynamicHost
+        };
+      },
+      './createSettingsFileTransformer': function () {
+        return settingsFileTransformer;
       }
     });
 
@@ -259,7 +353,9 @@ describe('index', function () {
       moduleProvider,
       debugController,
       replaceTokens,
-      getDataElementValue
+      getDataElementValue,
+      settingsFileTransformer,
+      decorateWithDynamicHost
     );
   });
 
@@ -344,6 +440,84 @@ describe('index', function () {
       expect(window.localStorage.getItem('com.adobe.reactor.debug')).toBe(
         'true'
       );
+    });
+  });
+
+  describe('dynamic host', function () {
+    describe('prompts the user to see the thrown error when', function () {
+      describe('there is not a proper turbineEmbedCode', function () {
+        beforeEach(function () {
+          if (typeof document.currentScript !== 'undefined') {
+            // modern browsers
+            currentScriptSpy.and.returnValue({
+              src: null,
+              getAttribute: function () {
+                return null;
+              }
+            });
+          }
+          if (document.getElementById(turbineScriptId)) {
+            // IE. Remove to flag there's no found turbine script
+            var node = document.getElementById(turbineScriptId);
+            node.parentNode.removeChild(node);
+          }
+        });
+
+        it('the approved hosts list is empty', function () {
+          window._satellite.container.company.cdnAllowList = [];
+
+          expect(function () {
+            injectIndex({
+              './logger': logger
+            });
+          }).toThrowError(
+            'Unable to find the Library Embed Code for Dynamic Host Resolution.'
+          );
+
+          expect(logger.warn).toHaveBeenCalledWith(
+            'Please review the following error:'
+          );
+        });
+      });
+
+      describe('there is a proper turbineEmbedCode', function () {
+        it('the approved hosts list is empty', function () {
+          window._satellite.container.company.cdnAllowList = [];
+
+          expect(function () {
+            injectIndex({
+              './logger': logger
+            });
+          }).toThrowError(
+            'This library is not authorized for this domain. ' +
+              'Please contact your CSM for more information.'
+          );
+
+          expect(logger.warn).toHaveBeenCalledWith(
+            'Please review the following error:'
+          );
+        });
+
+        it('the turbine embed code is not in the list of approved hosts', function () {
+          window._satellite.container.company.cdnAllowList = [
+            'first.domain.com',
+            'second.domain.com'
+          ];
+
+          expect(function () {
+            injectIndex({
+              './logger': logger
+            });
+          }).toThrowError(
+            'This library is not authorized for this domain. ' +
+              'Please contact your CSM for more information.'
+          );
+
+          expect(logger.warn).toHaveBeenCalledWith(
+            'Please review the following error:'
+          );
+        });
+      });
     });
   });
 });

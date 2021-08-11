@@ -54,7 +54,7 @@ describe('isDynamicEnforced=false', function () {
     });
 
     it('handles null', function () {
-      expect(settingsFileTransformer(null, null, null)).toBe(null);
+      expect(settingsFileTransformer(null, null, null)).toBe(undefined);
     });
 
     it('reflects back out a settings object untouched', function () {
@@ -67,14 +67,22 @@ describe('isDynamicEnforced=false', function () {
         ],
         someUrl: '/some/relativeUrl'
       };
+      var oldReference = oldSettings;
 
-      var newSettings = settingsFileTransformer(oldSettings, [
-        'someUrl',
-        'key2[].someUrl'
-      ]);
+      var expectedSettings = {
+        key1: 'foo',
+        key2: [
+          {
+            someUrl: '/some/relative/url'
+          }
+        ],
+        someUrl: '/some/relativeUrl'
+      };
 
-      expect(oldSettings).toEqual(newSettings);
-      expect(oldSettings === newSettings).toBeTrue();
+      settingsFileTransformer(oldSettings, ['someUrl', 'key2[].someUrl']);
+
+      expect(oldSettings).toEqual(expectedSettings);
+      expect(oldReference === oldSettings).toBeTrue();
     });
   });
 });
@@ -96,7 +104,7 @@ describe('isDynamicEnforced=true', function () {
     });
 
     it('handles null', function () {
-      expect(settingsFileTransformer(null, null, null)).toBe(null);
+      expect(settingsFileTransformer(null, null, null)).toBe(undefined);
     });
   });
 
@@ -105,17 +113,13 @@ describe('isDynamicEnforced=true', function () {
       source: '/some/relative/url'
     };
 
-    var newSettings = settingsFileTransformer(
-      oldSettings,
-      ['source'],
-      moduleReferencePath
-    );
+    settingsFileTransformer(oldSettings, ['source'], moduleReferencePath);
 
     var expectedNewSettings = {
       source: 'https://assets.adobedtm.com/some/relative/url'
     };
 
-    expect(newSettings).toEqual(expectedNewSettings);
+    expect(oldSettings).toEqual(expectedNewSettings);
   });
 
   it('can update a top level setting (array)', function () {
@@ -135,7 +139,7 @@ describe('isDynamicEnforced=true', function () {
       ]
     };
 
-    var newSettings = settingsFileTransformer(
+    settingsFileTransformer(
       oldSettings,
       ['sources[].someUrl'],
       moduleReferencePath
@@ -157,7 +161,7 @@ describe('isDynamicEnforced=true', function () {
       ]
     };
 
-    expect(newSettings).toEqual(expectedNewSettings);
+    expect(oldSettings).toEqual(expectedNewSettings);
   });
 
   it('can update a top level setting (object)', function () {
@@ -173,11 +177,7 @@ describe('isDynamicEnforced=true', function () {
       topValue: '/some/relative/url'
     };
 
-    var newSettings = settingsFileTransformer(
-      oldSettings,
-      ['topValue'],
-      moduleReferencePath
-    );
+    settingsFileTransformer(oldSettings, ['topValue'], moduleReferencePath);
 
     var expectedNewSettings = {
       a: {
@@ -191,7 +191,7 @@ describe('isDynamicEnforced=true', function () {
       topValue: 'https://assets.adobedtm.com/some/relative/url'
     };
 
-    expect(newSettings).toEqual(expectedNewSettings);
+    expect(oldSettings).toEqual(expectedNewSettings);
   });
 
   it('can update a nested object', function () {
@@ -211,11 +211,7 @@ describe('isDynamicEnforced=true', function () {
       ]
     };
 
-    var newSettings = settingsFileTransformer(
-      oldSettings,
-      ['a.b.someUrl'],
-      moduleReferencePath
-    );
+    settingsFileTransformer(oldSettings, ['a.b.someUrl'], moduleReferencePath);
 
     var expectedNewSettings = {
       a: {
@@ -233,7 +229,7 @@ describe('isDynamicEnforced=true', function () {
       ]
     };
 
-    expect(newSettings).toEqual(expectedNewSettings);
+    expect(oldSettings).toEqual(expectedNewSettings);
   });
 
   it('can update a nested object', function () {
@@ -253,11 +249,7 @@ describe('isDynamicEnforced=true', function () {
       ]
     };
 
-    var newSettings = settingsFileTransformer(
-      oldSettings,
-      ['a.b.someUrl'],
-      moduleReferencePath
-    );
+    settingsFileTransformer(oldSettings, ['a.b.someUrl'], moduleReferencePath);
 
     var expectedNewSettings = {
       a: {
@@ -275,7 +267,7 @@ describe('isDynamicEnforced=true', function () {
       ]
     };
 
-    expect(newSettings).toEqual(expectedNewSettings);
+    expect(oldSettings).toEqual(expectedNewSettings);
   });
 
   it('does not unexpectedly transform a setting too early', function () {
@@ -301,7 +293,7 @@ describe('isDynamicEnforced=true', function () {
       }
     };
 
-    var newSettings = settingsFileTransformer(
+    settingsFileTransformer(
       oldSettings,
       ['a.someUrl.nestedList[].someUrl'],
       moduleReferencePath
@@ -329,7 +321,7 @@ describe('isDynamicEnforced=true', function () {
       }
     };
 
-    expect(newSettings).toEqual(expectedNewSettings);
+    expect(oldSettings).toEqual(expectedNewSettings);
   });
 
   it('transforms many file paths', function () {
@@ -374,7 +366,7 @@ describe('isDynamicEnforced=true', function () {
       ]
     };
 
-    var newSettings = settingsFileTransformer(
+    settingsFileTransformer(
       oldSettings,
       [
         'a.someUrl.nestedList[].someUrl',
@@ -427,7 +419,7 @@ describe('isDynamicEnforced=true', function () {
       ]
     };
 
-    expect(newSettings).toEqual(expectedNewSettings);
+    expect(oldSettings).toEqual(expectedNewSettings);
   });
 
   describe('leaves values alone that are not strings', function () {
@@ -436,13 +428,9 @@ describe('isDynamicEnforced=true', function () {
         someKey: 5
       };
 
-      var newSettings = settingsFileTransformer(
-        oldSettings,
-        ['someKey'],
-        moduleReferencePath
-      );
+      settingsFileTransformer(oldSettings, ['someKey'], moduleReferencePath);
 
-      expect(oldSettings).toEqual(newSettings);
+      expect(oldSettings).toEqual({ someKey: 5 });
     });
 
     it('boolean check', function () {
@@ -452,7 +440,7 @@ describe('isDynamicEnforced=true', function () {
 
       var newSettings = settingsFileTransformer(oldSettings, ['someKey']);
 
-      expect(oldSettings).toEqual(newSettings);
+      expect(oldSettings).toEqual({ someKey: true });
     });
 
     it('object check', function () {
@@ -466,7 +454,7 @@ describe('isDynamicEnforced=true', function () {
         moduleReferencePath
       );
 
-      expect(oldSettings).toEqual(newSettings);
+      expect(oldSettings).toEqual({ someKey: { isAnObject: true } });
     });
 
     it('array check', function () {
@@ -474,13 +462,9 @@ describe('isDynamicEnforced=true', function () {
         someKey: ['is', 'a', 'list']
       };
 
-      var newSettings = settingsFileTransformer(
-        oldSettings,
-        ['someKey'],
-        moduleReferencePath
-      );
+      settingsFileTransformer(oldSettings, ['someKey'], moduleReferencePath);
 
-      expect(oldSettings).toEqual(newSettings);
+      expect(oldSettings).toEqual({ someKey: ['is', 'a', 'list'] });
     });
   });
 
@@ -490,13 +474,16 @@ describe('isDynamicEnforced=true', function () {
       someOtherKey: '/some/relative/url'
     };
 
-    var newSettings = settingsFileTransformer(
+    settingsFileTransformer(
       oldSettings,
       ['this.key[].doesNotExist'],
       moduleReferencePath
     );
 
-    expect(oldSettings).toEqual(newSettings);
+    expect(oldSettings).toEqual({
+      someKey: { isAnObject: true },
+      someOtherKey: '/some/relative/url'
+    });
   });
 
   describe('handles the Adobe Custom Code action correctly', function () {
@@ -504,19 +491,19 @@ describe('isDynamicEnforced=true', function () {
       moduleReferencePath = 'core/src/lib/actions/customCode.js';
     });
 
-    it('does not transform when isExternal is not present', function () {
+    // @TODO: make sure this makes sense
+    it('transforms when isExternal is not present', function () {
       var oldSettings = {
         source: '/some/relative/url',
         isExternal: undefined
       };
 
-      var newSettings = settingsFileTransformer(
-        oldSettings,
-        ['source'],
-        moduleReferencePath
-      );
+      settingsFileTransformer(oldSettings, ['source'], moduleReferencePath);
 
-      expect(oldSettings).toEqual(newSettings);
+      expect(oldSettings).toEqual({
+        source: 'https://assets.adobedtm.com/some/relative/url',
+        isExternal: undefined
+      });
     });
 
     it('does not transform when isExternal=false', function () {
@@ -525,13 +512,12 @@ describe('isDynamicEnforced=true', function () {
         isExternal: false
       };
 
-      var newSettings = settingsFileTransformer(
-        oldSettings,
-        ['source'],
-        moduleReferencePath
-      );
+      settingsFileTransformer(oldSettings, ['source'], moduleReferencePath);
 
-      expect(oldSettings).toEqual(newSettings);
+      expect(oldSettings).toEqual({
+        source: '/some/relative/url',
+        isExternal: false
+      });
     });
 
     it('transforms when isExternal=true', function () {
@@ -540,18 +526,14 @@ describe('isDynamicEnforced=true', function () {
         isExternal: true
       };
 
-      var newSettings = settingsFileTransformer(
-        oldSettings,
-        ['source'],
-        moduleReferencePath
-      );
+      settingsFileTransformer(oldSettings, ['source'], moduleReferencePath);
 
       var expectedNewSettings = {
         source: 'https://assets.adobedtm.com/some/relative/url',
         isExternal: true
       };
 
-      expect(newSettings).toEqual(expectedNewSettings);
+      expect(oldSettings).toEqual(expectedNewSettings);
     });
   });
 });

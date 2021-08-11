@@ -39,12 +39,9 @@ module.exports = function (
 
     Object.keys(extensions).forEach(function (extensionName) {
       var extension = extensions[extensionName];
-      var extensionSettings = extension.settings;
+      var extensionSettings = extension.settings || {};
       if (Array.isArray(extension.filePaths)) {
-        extensionSettings = settingsFileTransformer(
-          extensionSettings,
-          extension.filePaths
-        );
+        settingsFileTransformer(extensionSettings, extension.filePaths);
       }
       var getExtensionSettings = createGetExtensionSettings(
         replaceTokens,

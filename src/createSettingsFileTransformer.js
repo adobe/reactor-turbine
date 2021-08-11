@@ -97,26 +97,14 @@ module.exports = function (isDynamicEnforced, decorateWithDynamicHost) {
       !Array.isArray(filePaths) ||
       !filePaths.length
     ) {
-      return settings;
+      return;
     }
 
     // pull out the file paths by the module's reference path and loop over each urlPath
     filePaths.forEach(function (filePathString) {
-      // The custom code action provides the ability to have the source code in the 'source'
-      // variable or to have an external file. Therefore, this module has 2 behaviors.
-      // It also does not provide a value of false for isExternal just as all other extensions
-      // that use fileTransform do not provide an isExternal variable check. Therefore, we need
-      // to treat Adobe's custom code action special, and don't augment the 'source' variable
-      // if isExternal is not also present.
-      var isAdobeCustomCodeAction = Boolean(
-        moduleReferencePath != null &&
-          /^core\/.*actions.*\/customCode\.js$/.test(moduleReferencePath)
-      );
-      if (
-        isAdobeCustomCodeAction &&
-        filePathString === 'source' &&
-        !settings.isExternal
-      ) {
+      // isExternal is not emitted for extensions that use the fileTransform, however CustomCode
+      // emits an explicit true or false.
+      if (settings.isExternal === false) {
         return;
       }
 
@@ -128,6 +116,6 @@ module.exports = function (isDynamicEnforced, decorateWithDynamicHost) {
       );
     });
 
-    return settings;
+    return;
   };
 };

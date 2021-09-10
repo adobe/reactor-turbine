@@ -44,6 +44,7 @@ var serialize = function (value) {
     // in Chrome with the window object, it will throw "TypeError: Converting circular structure
     // to JSON"
     serialized = JSON.stringify(value);
+    // eslint-disable-next-line no-empty
   } catch (e) {}
 
   return serialized;

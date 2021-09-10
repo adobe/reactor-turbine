@@ -11,7 +11,6 @@
  ****************************************************************************************/
 
 var isPlainObject = require('is-plain-object');
-var objectAssign = require('@adobe/reactor-object-assign');
 
 function isArrayReference(str) {
   return (

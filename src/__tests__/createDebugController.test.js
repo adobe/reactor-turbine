@@ -21,7 +21,6 @@ describe('function returned by createDebugController', function () {
     logger = {
       outputEnabled: false
     };
-    debugController = createDebugController(localStorage, logger);
   });
 
   it('returns whether debug is enabled', function () {

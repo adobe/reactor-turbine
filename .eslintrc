@@ -4,7 +4,7 @@
     "jasmine": true,
     "node": true
   },
-  "extends": ["plugin:prettier/recommended"],
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
   "rules": {
     "camelcase": [2, { "properties": "always" }],
     "indent": [2, 2, { "SwitchCase": 1 }], // 2 spaces indentation
@@ -37,7 +37,8 @@
     "comma-style": [2],
     "one-var": [2, "never"],
     "brace-style": [2, "1tbs", { "allowSingleLine": true }],
-    "consistent-this": [0, "self"]
+    "consistent-this": [0, "self"],
+    "no-prototype-builtins": 0
   },
   "globals": {
     "_satellite": true

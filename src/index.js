@@ -55,6 +55,8 @@ var hydrateSatelliteObject = require('./hydrateSatelliteObject');
 var IEGetTurbineScript = require('../temporaryHelpers/findPageScript')
   .getTurbine;
 
+var isLibraryLoadedAsync = require('./isLibraryLoadedAsync');
+
 var createSettingsFileTransformer = require('./createSettingsFileTransformer');
 
 var logger = require('./logger');
@@ -71,7 +73,7 @@ if (_satellite && !window.__satelliteLoaded) {
   delete _satellite.container;
 
   /*
-    get rid of container.buildInfo decoration once deprecation is finished of 
+    get rid of container.buildInfo decoration once deprecation is finished of
     buildInfo.environment string
    */
   var buildInfo = objectAssign({}, container.buildInfo);
@@ -182,7 +184,8 @@ if (_satellite && !window.__satelliteLoaded) {
     replaceTokens,
     getDataElementValue,
     settingsFileTransformer,
-    dynamicHostResolver.decorateWithDynamicHost
+    dynamicHostResolver.decorateWithDynamicHost,
+    isLibraryLoadedAsync
   );
 
   var notifyMonitors = createNotifyMonitors(_satellite);
@@ -263,7 +266,20 @@ if (_satellite && !window.__satelliteLoaded) {
     logger
   );
 
-  initRules(buildRuleExecutionOrder, container.rules || [], initEventModule);
+  if (isLibraryLoadedAsync()) {
+    moduleProvider.getHydrateCachePromise().then(function () {
+      initRules(
+        buildRuleExecutionOrder,
+        container.rules || [],
+        initEventModule
+      );
+
+      window.dispatchEvent(new CustomEvent('turbineRulesInitialized'));
+    });
+  } else {
+    initRules(buildRuleExecutionOrder, container.rules || [], initEventModule);
+    window.dispatchEvent(new CustomEvent('turbineRulesInitialized'));
+  }
 }
 
 // Rollup's iife option always sets a global with whatever is exported, so we'll set the

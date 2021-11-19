@@ -24,7 +24,8 @@ module.exports = function (
   replaceTokens,
   getDataElementValue,
   settingsFileTransformer,
-  decorateWithDynamicHost
+  decorateWithDynamicHost,
+  isLibraryLoadedAsync
 ) {
   var extensions = container.extensions;
   var buildInfo = container.buildInfo;
@@ -107,7 +108,7 @@ module.exports = function (
     // We need to do the extraction here in order for the moduleProvider to
     // have all the modules previously registered. (eg. when moduleA needs moduleB, both modules
     // must exist inside moduleProvider).
-    moduleProvider.hydrateCache();
+    moduleProvider.hydrateCache(isLibraryLoadedAsync);
   }
   return moduleProvider;
 };

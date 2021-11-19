@@ -10,8 +10,10 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var Promise = require('@adobe/reactor-promise');
 var extractModuleExports = require('./extractModuleExports');
 var logger = require('./logger');
+var hydrateCachePromise = Promise.resolve();
 
 module.exports = function () {
   var moduleByReferencePath = {};
@@ -43,20 +45,46 @@ module.exports = function () {
     moduleByReferencePath[referencePath] = module;
   };
 
-  var hydrateCache = function () {
+  var initializeModule = function (referencePath) {
+    try {
+      getModuleExports(referencePath);
+    } catch (e) {
+      var errorMessage =
+        'Error initializing module ' +
+        referencePath +
+        '. ' +
+        e.message +
+        (e.stack ? '\n' + e.stack : '');
+      logger.error(errorMessage);
+    }
+  };
+
+  var hydrateCacheAsync = function () {
     Object.keys(moduleByReferencePath).forEach(function (referencePath) {
-      try {
-        getModuleExports(referencePath);
-      } catch (e) {
-        var errorMessage =
-          'Error initializing module ' +
-          referencePath +
-          '. ' +
-          e.message +
-          (e.stack ? '\n' + e.stack : '');
-        logger.error(errorMessage);
-      }
+      hydrateCachePromise = hydrateCachePromise
+        .then(initializeModule.bind(null, referencePath))
+        .then(function () {
+          return new Promise(function (resolve) {
+            setTimeout(resolve, 0);
+          });
+        });
     });
+  };
+
+  var hydrateCacheSync = function () {
+    Object.keys(moduleByReferencePath).forEach(initializeModule);
+  };
+
+  var hydrateCache = function (isLibraryLoadedAsync) {
+    if (isLibraryLoadedAsync()) {
+      hydrateCacheAsync();
+    } else {
+      hydrateCacheSync();
+    }
+  };
+
+  var getHydrateCachePromise = function () {
+    return hydrateCachePromise;
   };
 
   var getModuleExports = function (referencePath) {
@@ -86,6 +114,7 @@ module.exports = function () {
   return {
     registerModule: registerModule,
     hydrateCache: hydrateCache,
+    getHydrateCachePromise: getHydrateCachePromise,
     getModuleExports: getModuleExports,
     getModuleDefinition: getModuleDefinition,
     getModuleExtensionName: getModuleExtensionName

@@ -474,7 +474,7 @@ describe('index', function () {
             'Unable to find the Library Embed Code for Dynamic Host Resolution.'
           );
 
-          expect(logger.warn).toHaveBeenCalledWith(
+          expect(logger.warn).toHaveBeenCalledOnceWith(
             'Please review the following error:'
           );
         });
@@ -493,7 +493,7 @@ describe('index', function () {
               'Please contact your CSM for more information.'
           );
 
-          expect(logger.warn).toHaveBeenCalledWith(
+          expect(logger.warn).toHaveBeenCalledOnceWith(
             'Please review the following error:'
           );
         });
@@ -513,7 +513,7 @@ describe('index', function () {
               'Please contact your CSM for more information.'
           );
 
-          expect(logger.warn).toHaveBeenCalledWith(
+          expect(logger.warn).toHaveBeenCalledOnceWith(
             'Please review the following error:'
           );
         });

@@ -12,11 +12,18 @@
 
 var window = require('@adobe/reactor-window');
 
-module.exports = function (turbineEmbedCode, cdnAllowList, debugController) {
+module.exports = function (
+  turbineEmbedCode,
+  dynamicCdnEnabled,
+  cdnAllowList,
+  debugController
+) {
   // A missing list means that we are not trying to dynamic replace (archives,
   // sftp, no premium CDN option enabled on the company).
   // even an empty list is flagging to us that we're trying to enforce dynamic
-  var isDynamicEnforced = Array.isArray(cdnAllowList);
+  var isDynamicEnforced = Boolean(
+    dynamicCdnEnabled && Array.isArray(cdnAllowList)
+  );
   var shouldAugment = Boolean(isDynamicEnforced && turbineEmbedCode);
 
   // using document.createElement('a') because IE10/11 doesn't support new URL()

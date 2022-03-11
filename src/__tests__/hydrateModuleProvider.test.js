@@ -63,7 +63,8 @@ describe('hydrateModuleProvider', function () {
 
     decorateWithDynamicHost = createDynamicHostResolver(
       'https://assets.adobedtm.com',
-      ['assets.adobedtm.com'],
+      true, //dynamicCdnEnabled
+      ['assets.adobedtm.com'], //cdnAllowList
       debugControllerSpy
     ).decorateWithDynamicHost;
     settingsFileTransformer = createSettingsFileTransformer(

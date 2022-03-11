@@ -32,6 +32,7 @@ describe('index', function () {
           }
         },
         company: {
+          dynamicCdnEnabled: true,
           cdnAllowList: undefined
         }
       }
@@ -463,59 +464,71 @@ describe('index', function () {
           }
         });
 
-        it('the approved hosts list is empty', function () {
-          window._satellite.container.company.cdnAllowList = [];
+        describe('isDynamicEnforced=true', function () {
+          beforeEach(function () {
+            window._satellite.container.company.isDynamicEnforced = true;
+          });
 
-          expect(function () {
-            injectIndex({
-              './logger': logger
-            });
-          }).toThrowError(
-            'Unable to find the Library Embed Code for Dynamic Host Resolution.'
-          );
+          it('and the approved hosts list is empty', function () {
+            window._satellite.container.company.cdnAllowList = [];
 
-          expect(logger.warn).toHaveBeenCalledOnceWith(
-            'Please review the following error:'
-          );
+            expect(function () {
+              injectIndex({
+                './logger': logger
+              });
+            }).toThrowError(
+              'Unable to find the Library Embed Code for Dynamic Host Resolution.'
+            );
+
+            expect(logger.warn).toHaveBeenCalledOnceWith(
+              'Please review the following error:'
+            );
+          });
         });
       });
 
       describe('there is a proper turbineEmbedCode', function () {
-        it('the approved hosts list is empty', function () {
-          window._satellite.container.company.cdnAllowList = [];
+        describe('isDynamicEnforced=true', function () {
+          beforeEach(function () {
+            window._satellite.container.company.isDynamicEnforced = true;
+          });
 
-          expect(function () {
-            injectIndex({
-              './logger': logger
-            });
-          }).toThrowError(
-            'This library is not authorized for this domain. ' +
-              'Please contact your CSM for more information.'
-          );
+          it('and the approved hosts list is empty', function () {
+            window._satellite.container.company.cdnAllowList = [];
 
-          expect(logger.warn).toHaveBeenCalledOnceWith(
-            'Please review the following error:'
-          );
-        });
+            expect(function () {
+              injectIndex({
+                './logger': logger
+              });
+            }).toThrowError(
+              'This library is not authorized for this domain. ' +
+                'Please contact your CSM for more information.'
+            );
 
-        it('the turbine embed code is not in the list of approved hosts', function () {
-          window._satellite.container.company.cdnAllowList = [
-            'first.domain.com',
-            'second.domain.com'
-          ];
+            expect(logger.warn).toHaveBeenCalledOnceWith(
+              'Please review the following error:'
+            );
+          });
 
-          expect(function () {
-            injectIndex({
-              './logger': logger
-            });
-          }).toThrowError(
-            'This library is not authorized for this domain. ' +
-              'Please contact your CSM for more information.'
-          );
+          it('and the turbine embed code is not in the list of approved hosts', function () {
+            window._satellite.container.company.cdnAllowList = [
+              'first.domain.com',
+              'second.domain.com'
+            ];
 
-          expect(logger.warn).toHaveBeenCalledOnceWith(
-            'Please review the following error:'
-          );
+            expect(function () {
+              injectIndex({
+                './logger': logger
+              });
+            }).toThrowError(
+              'This library is not authorized for this domain. ' +
+                'Please contact your CSM for more information.'
+            );
+
+            expect(logger.warn).toHaveBeenCalledOnceWith(
+              'Please review the following error:'
+            );
+          });
         });
       });
     });

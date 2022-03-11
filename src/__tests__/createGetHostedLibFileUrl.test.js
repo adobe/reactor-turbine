@@ -18,6 +18,7 @@ var createDynamicHostResolver = require('../createDynamicHostResolver');
 var dynamicHostResolver = createDynamicHostResolver(
   undefined,
   false,
+  undefined,
   jasmine.createSpyObj('debugController', ['onDebugChanged'])
 );
 

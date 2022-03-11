@@ -160,7 +160,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
 
     describe('handles embed codes that begin with //', function () {
       describe('when isDynamicEnforced=true', function () {
-        it('and is http', function () {
+        it('and the window protocol is http', function () {
           var mockWindow = createMockWindowProtocol('http');
           createDynamicHostResolver = injectCreateDynamicHostResolver({
             '@adobe/reactor-window': mockWindow
@@ -178,7 +178,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
           );
         });
 
-        it('and is https', function () {
+        it('and the window protocol is https', function () {
           turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
           dynamicHostResolver = createDynamicHostResolver(
             turbineEmbedCode,
@@ -193,7 +193,41 @@ describe('createDynamicHostResolver returns a function that when called', functi
         });
       });
 
-      it('when isDynamicEnforced=false', function () {});
+      describe('when isDynamicEnforced=false', function () {
+        it('and the window protocol is http', function () {
+          var mockWindow = createMockWindowProtocol('http');
+          createDynamicHostResolver = injectCreateDynamicHostResolver({
+            '@adobe/reactor-window': mockWindow
+          });
+          turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
+
+          dynamicHostResolver = createDynamicHostResolver(
+            turbineEmbedCode,
+            undefined, // cdnAllowList,
+            debugController
+          );
+
+          // simple reflection out of the dynamic resolver
+          expect(dynamicHostResolver.decorateWithDynamicHost('/my/url')).toBe(
+            '/my/url'
+          );
+        });
+
+        it('and the window protocol is https', function () {
+          turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
+
+          dynamicHostResolver = createDynamicHostResolver(
+            turbineEmbedCode,
+            undefined, // cdnAllowList,
+            debugController
+          );
+
+          // simple reflection out of the dynamic resolver
+          expect(dynamicHostResolver.decorateWithDynamicHost('/my/url')).toBe(
+            '/my/url'
+          );
+        });
+      });
     });
 
     it('creates the resolver silently with a proper turbineEmbedCode', function () {

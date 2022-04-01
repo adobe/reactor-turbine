@@ -189,20 +189,20 @@ describe('createDynamicHostResolver returns a function that when called', functi
           );
         });
 
-        // it('and the window protocol is https', function () {
-        //   turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
-        //   dynamicHostResolver = createDynamicHostResolver(
-        //     turbineEmbedCode,
-        //     dynamicCdnEnabled,
-        //     cdnAllowList,
-        //     debugController
-        //   );
-        //
-        //   expect(consoleSpy).not.toHaveBeenCalled();
-        //   expect(dynamicHostResolver.decorateWithDynamicHost('/my/url')).toBe(
-        //     'https://assets.adobedtm.com/my/url'
-        //   );
-        // });
+        it('and the window protocol is https', function () {
+          turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
+          dynamicHostResolver = createDynamicHostResolver(
+            turbineEmbedCode,
+            dynamicCdnEnabled,
+            cdnAllowList,
+            debugController
+          );
+
+          expect(consoleSpy).not.toHaveBeenCalled();
+          expect(dynamicHostResolver.decorateWithDynamicHost('/my/url')).toBe(
+            'https://assets.adobedtm.com/my/url'
+          );
+        });
       });
 
       describe('when isDynamicEnforced=false', function () {

@@ -29,7 +29,6 @@ module.exports = function (
   // using document.createElement('a') because IE10/11 doesn't support new URL()
   var turbineUrl = document.createElement('a');
   if (isDynamicEnforced) {
-    // throw whenever we can't determine the embed code
     var throwUnavailableEmbedCode = function () {
       var missingEmbedCodeError = new Error(
         'Unable to find the Library Embed Code for Dynamic Host Resolution.'
@@ -38,12 +37,17 @@ module.exports = function (
       throw missingEmbedCodeError;
     };
     if (turbineEmbedCode) {
-      var urlMatcher = /^((https?:)?\/\/).+/;
-      if (!urlMatcher.test(turbineEmbedCode)) {
+      if (!/^((https?:)?\/\/).+/.test(turbineEmbedCode)) {
         throwUnavailableEmbedCode();
       }
-      turbineUrl.href = turbineEmbedCode;
+      if (/^\/\/.+/.test(turbineEmbedCode)) {
+        // for IE 10, you must throw on the protocol
+        turbineUrl.href = window.location.protocol + turbineEmbedCode;
+      } else {
+        turbineUrl.href = turbineEmbedCode;
+      }
     }
+
     // check URL construction
     if (!turbineUrl.hostname) {
       throwUnavailableEmbedCode();

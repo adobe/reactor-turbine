@@ -38,23 +38,14 @@ module.exports = function (
       throw missingEmbedCodeError;
     };
     if (turbineEmbedCode) {
-      var httpsMatcher = new RegExp(/^https?:\/\/.*/);
-      var doubleSlashMatcher = new RegExp(/^\/\/.*/);
-      if (
-        !httpsMatcher.test(turbineEmbedCode) &&
-        !doubleSlashMatcher.test(turbineEmbedCode)
-      ) {
+      var urlMatcher = /^((https?:)?\/\/).+/;
+      if (!urlMatcher.test(turbineEmbedCode)) {
         throwUnavailableEmbedCode();
       }
-      // try to construct the url
-      if (!httpsMatcher.test(turbineEmbedCode)) {
-        turbineUrl.href = window.location.protocol + turbineEmbedCode;
-      } else {
-        turbineUrl.href = turbineEmbedCode;
-      }
+      turbineUrl.href = turbineEmbedCode;
     }
     // check URL construction
-    if (!turbineUrl.host) {
+    if (!turbineUrl.hostname) {
       throwUnavailableEmbedCode();
     }
     // is this within the allowed list of hosts?

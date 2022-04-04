@@ -99,6 +99,7 @@ if (_satellite && !window.__satelliteLoaded) {
   try {
     dynamicHostResolver = createDynamicHostResolver(
       currentScriptSource,
+      Boolean(container.company.dynamicCdnEnabled),
       container.company.cdnAllowList,
       debugController
     );

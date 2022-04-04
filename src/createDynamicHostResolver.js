@@ -12,33 +12,55 @@
 
 var window = require('@adobe/reactor-window');
 
-module.exports = function (turbineEmbedCode, cdnAllowList, debugController) {
+module.exports = function (
+  turbineEmbedCode,
+  dynamicCdnEnabled,
+  cdnAllowList,
+  debugController
+) {
+  // A missing list means that we are not trying to dynamic replace (archives,
+  // sftp, no premium CDN option enabled on the company).
   // even an empty list is flagging to us that we're trying to enforce dynamic
-  var isDynamicEnforced = Array.isArray(cdnAllowList);
+  var isDynamicEnforced = Boolean(
+    dynamicCdnEnabled && Array.isArray(cdnAllowList)
+  );
   var shouldAugment = Boolean(isDynamicEnforced && turbineEmbedCode);
 
-  // TODO: web only? I think embedded TVs wouldn't have
-  //  __satellite.container.dynamicEnforced turned on
+  // using document.createElement('a') because IE10/11 doesn't support new URL()
   var turbineUrl = document.createElement('a');
-  turbineUrl.href = turbineEmbedCode;
-  if (
-    (!/^https?:\/\/.*/.test(turbineEmbedCode) || !turbineUrl.host) &&
-    isDynamicEnforced
-  ) {
-    var missingEmbedCodeError = new Error(
-      'Unable to find the Library Embed Code for Dynamic Host Resolution.'
-    );
-    missingEmbedCodeError.code = 'dynamic_host_resolver_constructor_error';
-    throw missingEmbedCodeError;
-  }
+  if (isDynamicEnforced) {
+    var throwUnavailableEmbedCode = function () {
+      var missingEmbedCodeError = new Error(
+        'Unable to find the Library Embed Code for Dynamic Host Resolution.'
+      );
+      missingEmbedCodeError.code = 'dynamic_host_resolver_constructor_error';
+      throw missingEmbedCodeError;
+    };
+    if (turbineEmbedCode) {
+      if (!/^((https?:)?\/\/).+/.test(turbineEmbedCode)) {
+        throwUnavailableEmbedCode();
+      }
+      if (/^\/\/.+/.test(turbineEmbedCode)) {
+        // for IE 10, you must throw on the protocol
+        turbineUrl.href = window.location.protocol + turbineEmbedCode;
+      } else {
+        turbineUrl.href = turbineEmbedCode;
+      }
+    }
 
-  if (isDynamicEnforced && cdnAllowList.indexOf(turbineUrl.hostname) === -1) {
-    var dynamicDeniedError = new Error(
-      'This library is not authorized for this domain. ' +
-        'Please contact your CSM for more information.'
-    );
-    dynamicDeniedError.code = 'dynamic_host_not_allowed';
-    throw dynamicDeniedError;
+    // check URL construction
+    if (!turbineUrl.hostname) {
+      throwUnavailableEmbedCode();
+    }
+    // is this within the allowed list of hosts?
+    if (cdnAllowList.indexOf(turbineUrl.hostname) === -1) {
+      var dynamicDeniedError = new Error(
+        'This library is not authorized for this domain. ' +
+          'Please contact your CSM for more information.'
+      );
+      dynamicDeniedError.code = 'dynamic_host_not_allowed';
+      throw dynamicDeniedError;
+    }
   }
 
   /**
@@ -67,7 +89,7 @@ module.exports = function (turbineEmbedCode, cdnAllowList, debugController) {
         sanitizedHost = sanitizedHost.replace(':443/', '');
       }
 
-      memoizedHostResult = 'https://' + sanitizedHost;
+      memoizedHostResult = turbineUrl.protocol + '//' + sanitizedHost;
     } else {
       memoizedHostResult = '';
     }

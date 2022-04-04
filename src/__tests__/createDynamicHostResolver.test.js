@@ -10,23 +10,39 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var createDynamicHostResolver = require('../createDynamicHostResolver');
+var injectCreateDynamicHostResolver = require('inject-loader!../createDynamicHostResolver');
 var createDebugController = require('../createDebugController');
 
 var loggerSpy = jasmine.createSpy('logger');
 var consoleSpy;
 var turbineEmbedCode;
+var dynamicCdnEnabled;
 var cdnAllowList;
 var dynamicHostResolver;
+
+var createMockWindowProtocol = function (protocol) {
+  return {
+    location: {
+      protocol: protocol + ':'
+    }
+  };
+};
+var createDynamicHostResolver;
+var mockWindow;
 
 describe('createDynamicHostResolver returns a function that when called', function () {
   var debugController;
   beforeEach(function () {
     delete window.dynamicHostResolver;
+    mockWindow = createMockWindowProtocol('https');
+    createDynamicHostResolver = injectCreateDynamicHostResolver({
+      '@adobe/reactor-window': mockWindow
+    });
     consoleSpy = spyOn(console, 'warn');
     debugController = jasmine.createSpyObj('debugController', [
       'onDebugChanged'
     ]);
+    dynamicCdnEnabled = true;
   });
 
   describe('with an undefined cdnAllowList (no decoration should be done)', function () {
@@ -37,6 +53,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
     it('fails silently on creating a URL', function () {
       dynamicHostResolver = createDynamicHostResolver(
         undefined, // turbineEmbedCode
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -48,6 +65,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -59,6 +77,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'file://assets.adobedtm.com:8080/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -69,6 +88,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
     it('reflects back what is sent in when turbineEmbedCode is not resolved', function () {
       dynamicHostResolver = createDynamicHostResolver(
         undefined, // turbineEmbedCode
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -82,6 +102,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -101,6 +122,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       expect(function () {
         createDynamicHostResolver(
           undefined, // turbineEmbedCode
+          dynamicCdnEnabled,
           cdnAllowList,
           debugController
         );
@@ -115,12 +137,14 @@ describe('createDynamicHostResolver returns a function that when called', functi
       function () {
         expect(function () {
           createDynamicHostResolver(
-            'fake.adobeassets.com',
+            '//fake.adobeassets.com',
+            dynamicCdnEnabled,
             cdnAllowList,
             debugController
           );
         }).toThrowError(
-          'Unable to find the Library Embed Code for Dynamic Host Resolution.'
+          'This library is not authorized for this domain. ' +
+            'Please contact your CSM for more information.'
         );
       }
     );
@@ -135,6 +159,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       expect(function () {
         dynamicHostResolver = createDynamicHostResolver(
           undefined, // turbineEmbedCode
+          dynamicCdnEnabled,
           cdnAllowList,
           debugController
         );
@@ -143,10 +168,87 @@ describe('createDynamicHostResolver returns a function that when called', functi
       );
     });
 
+    describe('handles embed codes that begin with //', function () {
+      describe('when isDynamicEnforced=true', function () {
+        it('and the window protocol is http', function () {
+          var mockWindow = createMockWindowProtocol('http');
+          createDynamicHostResolver = injectCreateDynamicHostResolver({
+            '@adobe/reactor-window': mockWindow
+          });
+          turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
+          dynamicHostResolver = createDynamicHostResolver(
+            turbineEmbedCode,
+            dynamicCdnEnabled,
+            cdnAllowList,
+            debugController
+          );
+
+          expect(consoleSpy).not.toHaveBeenCalled();
+          expect(dynamicHostResolver.decorateWithDynamicHost('/my/url')).toBe(
+            'http://assets.adobedtm.com/my/url'
+          );
+        });
+
+        it('and the window protocol is https', function () {
+          turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
+          dynamicHostResolver = createDynamicHostResolver(
+            turbineEmbedCode,
+            dynamicCdnEnabled,
+            cdnAllowList,
+            debugController
+          );
+
+          expect(consoleSpy).not.toHaveBeenCalled();
+          expect(dynamicHostResolver.decorateWithDynamicHost('/my/url')).toBe(
+            'https://assets.adobedtm.com/my/url'
+          );
+        });
+      });
+
+      describe('when isDynamicEnforced=false', function () {
+        it('and the window protocol is http', function () {
+          var mockWindow = createMockWindowProtocol('http');
+          createDynamicHostResolver = injectCreateDynamicHostResolver({
+            '@adobe/reactor-window': mockWindow
+          });
+          turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
+
+          dynamicHostResolver = createDynamicHostResolver(
+            turbineEmbedCode,
+            dynamicCdnEnabled,
+            undefined, // cdnAllowList,
+            debugController
+          );
+
+          // simple reflection out of the dynamic resolver
+          expect(dynamicHostResolver.decorateWithDynamicHost('/my/url')).toBe(
+            '/my/url'
+          );
+        });
+
+        it('and the window protocol is https', function () {
+          turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
+
+          dynamicHostResolver = createDynamicHostResolver(
+            turbineEmbedCode,
+            dynamicCdnEnabled,
+            undefined, // cdnAllowList,
+            debugController
+          );
+
+          // simple reflection out of the dynamic resolver
+          expect(dynamicHostResolver.decorateWithDynamicHost('/my/url')).toBe(
+            '/my/url'
+          );
+        });
+      });
+    });
+
     it('creates the resolver silently with a proper turbineEmbedCode', function () {
       turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -158,6 +260,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -171,6 +274,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -184,6 +288,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'https://assets.adobedtm.com:8080/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -193,10 +298,11 @@ describe('createDynamicHostResolver returns a function that when called', functi
       );
     });
 
-    it('upgrades to https all the time', function () {
-      turbineEmbedCode = 'http://assets.adobedtm.com/lib/dev.js';
+    it('leaves explicit https as https', function () {
+      turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -206,10 +312,25 @@ describe('createDynamicHostResolver returns a function that when called', functi
       );
     });
 
+    it('leaves explicit http as http', function () {
+      turbineEmbedCode = 'http://assets.adobedtm.com/lib/dev.js';
+      dynamicHostResolver = createDynamicHostResolver(
+        turbineEmbedCode,
+        dynamicCdnEnabled,
+        cdnAllowList,
+        debugController
+      );
+
+      expect(dynamicHostResolver.decorateWithDynamicHost('my/url')).toBe(
+        'http://assets.adobedtm.com/my/url'
+      );
+    });
+
     it('returns the protocol as a part of URL decoration', function () {
       turbineEmbedCode = 'https://assets.adobedtm.com:8080/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -223,6 +344,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'https://assets.adobedtm.com:8080/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -236,6 +358,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'https://assets.adobedtm.com:80/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -249,6 +372,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'https://assets.adobedtm.com:443/lib/dev.js';
       dynamicHostResolver = createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
@@ -263,6 +387,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
         turbineEmbedCode = 'file://assets.adobedtm.com:8080/lib/dev.js';
         dynamicHostResolver = createDynamicHostResolver(
           turbineEmbedCode,
+          dynamicCdnEnabled,
           cdnAllowList,
           debugController
         );
@@ -280,6 +405,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
         expect(function () {
           createDynamicHostResolver(
             'https://foo-bar-domain.com:443',
+            dynamicCdnEnabled,
             cdnAllowList,
             debugController
           );
@@ -296,6 +422,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
         turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
         dynamicHostResolver = createDynamicHostResolver(
           turbineEmbedCode,
+          dynamicCdnEnabled,
           cdnAllowList,
           debugController
         );
@@ -341,12 +468,13 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
       createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
       debugController.setDebugEnabled(true); // enable output
 
-      expect(window.dynamicHostResolver).not.toBe(undefined);
+      expect(mockWindow.dynamicHostResolver).not.toBe(undefined);
     });
 
     it('does not add the dynamicHostResolver to the window when debug is disabled', function () {
@@ -360,12 +488,13 @@ describe('createDynamicHostResolver returns a function that when called', functi
       turbineEmbedCode = 'https://assets.adobedtm.com/lib/dev.js';
       createDynamicHostResolver(
         turbineEmbedCode,
+        dynamicCdnEnabled,
         cdnAllowList,
         debugController
       );
       debugController.setDebugEnabled(false); // disable output
 
-      expect(window.dynamicHostResolver).toBe(undefined);
+      expect(mockWindow.dynamicHostResolver).toBe(undefined);
     });
   });
 });

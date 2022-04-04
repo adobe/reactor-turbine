@@ -13,8 +13,8 @@
 var createSettingsFileTransformer = require('../createSettingsFileTransformer');
 var createDynamicHostResolver = require('../createDynamicHostResolver');
 
-// TODO start here, refactor test calls. pull in tests from createModuleProvider
 var turbineEmbedCode = 'https://assets.adobedtm.com';
+var dynamicCdnEnabled = true;
 var cdnAllowList = ['assets.adobedtm.com'];
 
 var isDynamicEnforced;
@@ -28,6 +28,7 @@ beforeAll(function () {
   ]);
   dynamicHostResolver = createDynamicHostResolver(
     turbineEmbedCode,
+    dynamicCdnEnabled,
     cdnAllowList,
     debugController
   );

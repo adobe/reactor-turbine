@@ -189,7 +189,8 @@ module.exports = function(config) {
       },
       module: {
         rules: rules
-      }
+      },
+      target: ['web', 'es5']
     },
     webpackServer: {
       debug: false,

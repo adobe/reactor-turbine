@@ -59,64 +59,24 @@ if (argv.coverage) {
 
 module.exports = function(config) {
   config.set({
-    hostname: '0.0.0.0',
-
+    autoWatch: true,
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
-
-    // frameworks to use
-    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine', 'jasmine-matchers'],
-
-    // list of files / patterns to load in the browser
-    files: [
-      {
-        pattern: 'testIndex.js',
-        watched: false,
-        included: true,
-        served: true
-      },
-      // Used in load-script core module test.
-      {
-        pattern: 'coreModulePackages/loadScript/empty.js',
-        watched: false,
-        included: false,
-        served: true
-      }
-    ],
-
-    // list of files to exclude
-    exclude: ['**/*.test.js'],
-
-    // preprocess matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-      'testIndex.js': ['webpack']
-    },
-
-    // test results reporter to use
-    // possible values: 'dots', 'progress'
-    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: reporters,
-
-    // web server port
-    port: 9876,
-
-    // enable / disable colors in the output (reporters and logs)
-    colors: true,
-
-    // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN
-    //    || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
-
-    // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
-
-    // start these browsers
+    browserDisconnectTimeout: 180000,
+    browserDisconnectTolerance: 3,
+    browserNoActivityTimeout: 300000,
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: argv.browsers,
-
+    captureTimeout: 180000,
+    colors: true,
+    // how many browser should be started simultaneous
+    concurrency: Infinity,
+    coverageReporter: {
+      reporters: [
+        { type: 'html' },
+        { type: 'lcovonly', subdir: '.', file: 'lcov.info' }
+      ]
+    },
     customLaunchers: {
       SL_CHROME: {
         base: 'SauceLabs',
@@ -167,7 +127,41 @@ module.exports = function(config) {
         platformVersion: '7.1'
       }
     },
-
+    exclude: ['**/*.test.js'],
+    // list of files / patterns to load in the browser
+    files: [
+      {
+        pattern: 'testIndex.js',
+        watched: false,
+        included: true,
+        served: true
+      },
+      // Used in load-script core module test.
+      {
+        pattern: 'coreModulePackages/loadScript/empty.js',
+        watched: false,
+        included: false,
+        served: true
+      }
+    ],
+    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+    frameworks: ['jasmine', 'jasmine-matchers', 'webpack'],
+    hostname: '0.0.0.0',
+    // level of logging
+    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN
+    //    || config.LOG_INFO || config.LOG_DEBUG
+    logLevel: config.LOG_INFO,
+    // preprocess matching files before serving them to the browser
+    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+    preprocessors: {
+      'testIndex.js': ['webpack']
+    },
+    // web server port
+    port: 9876,
+    // test results reporter to use
+    // possible values: 'dots', 'progress'
+    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+    reporters: reporters,
     sauceLabs: {
       buildId: buildId,
       testName: 'reactor-turbine Unit Test',
@@ -181,27 +175,9 @@ module.exports = function(config) {
         noSslBumpDomains: 'all'
       }
     },
-
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: argv.singleRun,
-
-    // Concurrency level
-    // how many browser should be started simultaneous
-    concurrency: Infinity,
-
-    coverageReporter: {
-      reporters: [
-        { type: 'html' },
-        { type: 'lcovonly', subdir: '.', file: 'lcov.info' }
-      ]
-    },
-
-    captureTimeout: 180000,
-    browserDisconnectTimeout: 180000,
-    browserDisconnectTolerance: 3,
-    browserNoActivityTimeout: 300000,
-
     webpack: {
       mode: 'development',
       externals: {
@@ -213,9 +189,9 @@ module.exports = function(config) {
       },
       module: {
         rules: rules
-      }
+      },
+      target: ['web', 'es5']
     },
-
     webpackServer: {
       debug: false,
       progress: true,

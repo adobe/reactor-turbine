@@ -16,8 +16,6 @@ if (process.env.CI) {
     ')';
 
   defaultBrowsers = [
-    'SL_IE10',
-    'SL_IE11',
     'SL_EDGE',
     'SL_CHROME',
     'SL_FIREFOX',
@@ -94,16 +92,6 @@ module.exports = function(config) {
         // https://support.saucelabs.com/hc/en-us/community/posts/360016821133-Tests-on-Safari-11-started-failing-between-2018-07-19-and-2018-07-20
         platform: 'macOS 10.13',
         version: 'latest'
-      },
-      SL_IE10: {
-        base: 'SauceLabs',
-        browserName: 'internet explorer',
-        version: '10'
-      },
-      SL_IE11: {
-        base: 'SauceLabs',
-        browserName: 'internet explorer',
-        version: '11'
       },
       SL_EDGE: {
         base: 'SauceLabs',
@@ -189,8 +177,7 @@ module.exports = function(config) {
       },
       module: {
         rules: rules
-      },
-      target: ['web', 'es5']
+      }
     },
     webpackServer: {
       debug: false,

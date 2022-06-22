@@ -1,6 +1,6 @@
 {
   "name": "@adobe/reactor-turbine",
-  "version": "27.3.1",
+  "version": "27.3.2",
   "description": "Launch rule engine which processes rules on client websites and delegates logic to extensions.",
   "license": "Apache-2.0",
   "scripts": {
@@ -59,7 +59,7 @@
     "pretty-quick": "^3.1.0",
     "rollup": "^2.36.1",
     "uglify-js": "^3.9.4",
-    "webpack": "^5.72.1",
+    "webpack": "^5.73.0",
     "yargs": "^15.3.1"
   },
   "husky": {

@@ -1,7 +1,7 @@
 {
   "name": "@adobe/reactor-turbine",
   "version": "27.3.3-latest",
-  "description": "Launch rule engine which processes rules on client websites and delegates logic to extensions.",
+  "description": "Tags rule engine which processes rules on client websites and delegates logic to extensions.",
   "license": "Apache-2.0",
   "scripts": {
     "build": "npm run clean && rollup -c && npm run minify",

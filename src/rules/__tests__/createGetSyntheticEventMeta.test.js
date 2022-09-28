@@ -37,9 +37,8 @@ describe('createGetSyntheticEventMeta returns an object with the expected args',
       event: { modulePath: 'event1 path', settings: { key: 'value' } }
     };
 
-    var syntheticEvent = createGetSyntheticEventMeta(moduleProvider)(
-      ruleEventPair
-    );
+    var syntheticEvent =
+      createGetSyntheticEventMeta(moduleProvider)(ruleEventPair);
 
     expect(getModuleDefinitionSpy).toHaveBeenCalledWith('event1 path');
     expect(getModuleExtensionNameSpy).toHaveBeenCalledWith('event1 path');

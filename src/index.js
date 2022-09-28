@@ -47,13 +47,12 @@ var initRules = require('./rules/initRules');
 var normalizeRuleComponentError = require('./rules/normalizeRuleComponentError');
 var normalizeSyntheticEvent = require('./rules/normalizeSyntheticEvent');
 
-var dataElementSafe = require('./dataElementSafe');
 var getNamespacedStorage = require('./getNamespacedStorage');
 
 var hydrateModuleProvider = require('./hydrateModuleProvider');
 var hydrateSatelliteObject = require('./hydrateSatelliteObject');
-var IEGetTurbineScript = require('../temporaryHelpers/findPageScript')
-  .getTurbine;
+var IEGetTurbineScript =
+  require('../temporaryHelpers/findPageScript').getTurbine;
 
 var createSettingsFileTransformer = require('./createSettingsFileTransformer');
 
@@ -71,7 +70,7 @@ if (_satellite && !window.__satelliteLoaded) {
   delete _satellite.container;
 
   /*
-    get rid of container.buildInfo decoration once deprecation is finished of 
+    get rid of container.buildInfo decoration once deprecation is finished of
     buildInfo.environment string
    */
   var buildInfo = objectAssign({}, container.buildInfo);
@@ -123,9 +122,6 @@ if (_satellite && !window.__satelliteLoaded) {
     container.property.settings.ruleComponentSequencingEnabled;
 
   var dataElements = container.dataElements || {};
-
-  // Remove when migration period has ended.
-  dataElementSafe.migrateCookieData(dataElements);
 
   var getDataElementDefinition = function (name) {
     return dataElements[name];
@@ -193,9 +189,8 @@ if (_satellite && !window.__satelliteLoaded) {
     settingsFileTransformer
   );
 
-  var getModuleDisplayNameByRuleComponent = createGetModuleDisplayNameByRuleComponent(
-    moduleProvider
-  );
+  var getModuleDisplayNameByRuleComponent =
+    createGetModuleDisplayNameByRuleComponent(moduleProvider);
   var logConditionNotMet = createLogConditionNotMet(
     getModuleDisplayNameByRuleComponent,
     logger,

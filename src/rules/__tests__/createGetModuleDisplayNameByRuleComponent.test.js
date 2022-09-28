@@ -30,9 +30,10 @@ describe(
         modulePath: 'event module path'
       };
 
-      var displayName = createGetModuleDisplayNameByRuleComponent(
-        moduleProvider
-      )(ruleComponent);
+      var displayName =
+        createGetModuleDisplayNameByRuleComponent(moduleProvider)(
+          ruleComponent
+        );
 
       expect(getModuleDefinitionSpy).toHaveBeenCalledWith('event module path');
       expect(displayName).toBe('display name');
@@ -46,9 +47,10 @@ describe(
         modulePath: 'event module path'
       };
 
-      var displayName = createGetModuleDisplayNameByRuleComponent(
-        moduleProvider
-      )(ruleComponent);
+      var displayName =
+        createGetModuleDisplayNameByRuleComponent(moduleProvider)(
+          ruleComponent
+        );
 
       expect(displayName).toBe('event module path');
     });

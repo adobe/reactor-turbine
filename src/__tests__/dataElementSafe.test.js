@@ -48,65 +48,6 @@ describe('dataElementSafe', function () {
     ).toBe('"qux"');
   });
 
-  it('migrates cookie data once', function () {
-    // It's really not important that we migrate session-based data since it only affects
-    // a user that came from a page running DTM to a page running Launch and only the first visit.
-    // We do it anyway because we would have to add code just to not do it.
-
-    var dataElements = {
-      foo: {
-        storageDuration: 'session'
-      },
-      baz: {
-        storageDuration: 'visitor'
-      },
-      neverused: {
-        storageDuration: 'visitor'
-      }
-    };
-
-    cookie.set('_sdsat_foo', 'bar');
-    cookie.set('_sdsat_baz', 'qux');
-
-    dataElementSafe.migrateCookieData(dataElements);
-
-    expect(
-      window.sessionStorage.getItem('com.adobe.reactor.dataElements.foo')
-    ).toBe('"bar"');
-    expect(dataElementSafe.getValue('foo', 'session')).toBe('bar');
-    expect(
-      window.localStorage.getItem('com.adobe.reactor.dataElements.baz')
-    ).toBe('"qux"');
-    expect(dataElementSafe.getValue('baz', 'visitor')).toBe('qux');
-    expect(
-      window.localStorage.getItem('com.adobe.reactor.dataElements.neverused')
-    ).toBe(null);
-    expect(dataElementSafe.getValue('neverused', 'visitor')).toBeNull();
-
-    // This tests that migration only occurs a single time.
-    expect(
-      window.localStorage.getItem(
-        'com.adobe.reactor.dataElementCookiesMigrated'
-      )
-    ).toBe('true');
-
-    dataElementSafe.setValue('foo', 'session', 'bar123');
-    dataElementSafe.setValue('baz', 'visitor', 'qux123');
-
-    // If migration didn't only occur a single time, this second migration would overwrite the
-    // values we just set.
-    dataElementSafe.migrateCookieData(dataElements);
-
-    expect(
-      window.sessionStorage.getItem('com.adobe.reactor.dataElements.foo')
-    ).toBe('"bar123"');
-    expect(dataElementSafe.getValue('foo', 'session')).toBe('bar123');
-    expect(
-      window.localStorage.getItem('com.adobe.reactor.dataElements.baz')
-    ).toBe('"qux123"');
-    expect(dataElementSafe.getValue('baz', 'visitor')).toBe('qux123');
-  });
-
   ['pageview', 'session', 'visitor'].forEach(function (storageDuration) {
     it('returns null when never previously stored', function () {
       expect(

@@ -10,15 +10,10 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var cookie = require('@adobe/reactor-cookie');
 var getNamespacedStorage = require('./getNamespacedStorage');
 
-var COOKIE_PREFIX = '_sdsat_';
-
 var DATA_ELEMENTS_NAMESPACE = 'dataElements.';
-var MIGRATED_KEY = 'dataElementCookiesMigrated';
 
-var reactorLocalStorage = getNamespacedStorage('localStorage');
 var dataElementSessionStorage = getNamespacedStorage(
   'sessionStorage',
   DATA_ELEMENTS_NAMESPACE
@@ -89,33 +84,7 @@ var getValue = function (key, storageDuration) {
   }
 };
 
-// Remove when migration period has ended. We intentionally leave cookies as they are so that if
-// DTM is running on the same domain it can still use the persisted values. Our migration strategy
-// is essentially copying data from cookies and then diverging the storage mechanism between
-// DTM and Launch (DTM uses cookies and Launch uses session and local storage).
-var migrateDataElement = function (dataElementName, storageDuration) {
-  var storedValue = cookie.get(COOKIE_PREFIX + dataElementName);
-
-  if (storedValue !== undefined) {
-    setValue(dataElementName, storageDuration, storedValue);
-  }
-};
-
-var migrateCookieData = function (dataElements) {
-  if (!reactorLocalStorage.getItem(MIGRATED_KEY)) {
-    Object.keys(dataElements).forEach(function (dataElementName) {
-      migrateDataElement(
-        dataElementName,
-        dataElements[dataElementName].storageDuration
-      );
-    });
-
-    reactorLocalStorage.setItem(MIGRATED_KEY, true);
-  }
-};
-
 module.exports = {
   setValue: setValue,
-  getValue: getValue,
-  migrateCookieData: migrateCookieData
+  getValue: getValue
 };

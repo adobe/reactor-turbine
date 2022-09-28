@@ -137,27 +137,6 @@ describe('index', function () {
     }
   );
 
-  it('migrates cookie data', function () {
-    var migrateCookieDataSpy = jasmine.createSpy();
-
-    var dataElements = {
-      foo: {
-        modulePath: 'core/foo.js',
-        storageDuration: 'visitor'
-      }
-    };
-
-    window._satellite.container.dataElements = dataElements;
-
-    injectIndex({
-      './dataElementSafe': {
-        migrateCookieData: migrateCookieDataSpy
-      }
-    });
-
-    expect(migrateCookieDataSpy).toHaveBeenCalledWith(dataElements);
-  });
-
   it('creates moduleProvider', function () {
     var createModuleProvider = jasmine.createSpy();
     injectIndex({

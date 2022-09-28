@@ -1,6 +1,6 @@
 {
   "name": "@adobe/reactor-turbine",
-  "version": "27.3.4",
+  "version": "27.4.0",
   "description": "Tags rule engine which processes rules on client websites and delegates logic to extensions.",
   "license": "Apache-2.0",
   "scripts": {

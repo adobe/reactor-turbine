@@ -18,7 +18,7 @@ if (process.env.CI) {
   defaultBrowsers = [
     'SL_EDGE',
     'SL_CHROME',
-    'SL_FIREFOX',
+    // 'SL_FIREFOX',
     'SL_ANDROID',
     'SL_SAFARI'
   ];

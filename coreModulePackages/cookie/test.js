@@ -18,9 +18,16 @@ describe('cookie', function () {
     expect(cookie.get).toEqual(jasmine.any(Function));
     expect(cookie.set).toEqual(jasmine.any(Function));
     expect(cookie.remove).toEqual(jasmine.any(Function));
+    expect(cookie.createCookieJarWithConverter).toEqual(jasmine.any(Function));
+    var cookieJarWithConverter = cookie.createCookieJarWithConverter({
+      write: {}
+    });
+    expect(cookieJarWithConverter.get).toEqual(jasmine.any(Function));
+    expect(cookieJarWithConverter.set).toEqual(jasmine.any(Function));
+    expect(cookieJarWithConverter.remove).toEqual(jasmine.any(Function));
   });
 
   it('does not expose other methods supported by the underlying implementation', function () {
-    expect(Object.keys(cookie).length).toBe(3);
+    expect(Object.keys(cookie).length).toBe(4);
   });
 });

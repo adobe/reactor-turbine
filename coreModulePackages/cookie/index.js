@@ -17,8 +17,20 @@ var cookie = require('js-cookie');
 // we have a little more flexibility to change the underlying implementation later. If clear
 // use cases come up for needing the other methods js-cookie exposes, we can re-evaluate whether
 // we want to expose them here.
+
+var createCookieJarWithConverter = function (args) {
+  var cookieJar = cookie.withConverter(args);
+
+  return {
+    get: cookieJar.get,
+    set: cookieJar.set,
+    remove: cookieJar.remove
+  };
+};
+
 module.exports = {
   get: cookie.get,
   set: cookie.set,
-  remove: cookie.remove
+  remove: cookie.remove,
+  createCookieJarWithConverter: createCookieJarWithConverter
 };

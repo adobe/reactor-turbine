@@ -24,6 +24,11 @@ module.exports = {
       // Remove leading ?, #, & for some leniency so you can pass in location.search or
       // location.hash directly.
       string = string.trim().replace(/^[?#&]/, '');
+      
+      // Remove instances of 2 or more % characters to prevent decodeURIComponent errors
+      if (string.indexOf('%%') !== -1){
+            string.replace(/%%+/gi, '');
+      }
     }
     return querystring.parse(string);
   },

@@ -27,6 +27,19 @@ describe('queryString', function () {
         baz: 'qux'
       });
     });
+
+    it('supports multiple parameters with the same name', function () {
+      expect(queryString.parse('foo=bar&foo=baz')).toEqual({
+        foo: ['bar', 'baz']
+      });
+    });
+
+    it('supports empty query strings', function () {
+      expect(queryString.parse('foo=&bar=')).toEqual({
+        foo: '',
+        bar: ''
+      });
+    });
   });
 
   describe('stringify', function () {
@@ -39,5 +52,43 @@ describe('queryString', function () {
 
   it('does not expose other methods supported by the underlying implementation', function () {
     expect(Object.keys(queryString).length).toBe(2);
+  });
+
+  it('handles objects with array and string', function () {
+    expect(
+      queryString.stringify({
+        foo: 'bar',
+        baz: ['qux', 'quux'],
+        corge: '',
+        n: 5
+      })
+    ).toEqual('foo=bar&baz=qux&baz=quux&corge=&n=5');
+  });
+
+  it('handles objects with strings with spaces', function () {
+    expect(
+      queryString.stringify({
+        foo: 'bar qux zoo'
+      })
+    ).toEqual('foo=bar%20qux%20zoo');
+  });
+
+  it('handles objects with multiple levels', function () {
+    expect(
+      queryString.stringify({
+        foo: 'bar',
+        o: { a: 5 }
+      })
+    ).toEqual('foo=bar&o=');
+  });
+
+  it('handles objects with null or undefined', function () {
+    expect(
+      queryString.stringify({
+        foo: 'bar',
+        o: null,
+        z: undefined
+      })
+    ).toEqual('foo=bar&o=&z=');
   });
 });

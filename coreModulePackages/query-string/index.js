@@ -37,14 +37,20 @@ var parseQueryString = function (query) {
   var cleanQuery = query.trim().replace(/^[?#&]/, '');
   var params = new URLSearchParams(cleanQuery);
 
-  params.keys().forEach(function (key) {
-    var values = params.getAll(key);
-    if (values.length === 1) {
-      result[key] = values[0];
-    } else {
-      result[key] = values;
+  var iter = params.keys();
+  do {
+    var v = iter.next();
+    var key = v.value;
+
+    if (key) {
+      var values = params.getAll(key);
+      if (values.length === 1) {
+        result[key] = values[0];
+      } else {
+        result[key] = values;
+      }
     }
-  });
+  } while (v.done === false);
 
   return result;
 };

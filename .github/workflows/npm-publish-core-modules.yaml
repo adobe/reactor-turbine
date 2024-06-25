@@ -1,0 +1,28 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: Core Modules NPM publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: 'The core module you wish to publish: cookie | document | loadScript | objectAssign | promise | query-string | window'
+        required: true
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Core Module Name
+        if: ${{ github.event.inputs.tag != 'cookie' && github.event.inputs.tag != 'document' && github.event.inputs.tag != 'loadScript' && github.event.inputs.tag != 'objectAssign' && github.event.inputs.tag != 'promise' && github.event.inputs.tag != 'query-string' && github.event.inputs.tag != 'window' }}
+        run: |
+          echo 'Only the modules "cookie", "document", "loadScript", "objectAssign", "promise", "query-string" and "window" are supported. You entered "${{ github.event.inputs.tag }}"'
+          exit 1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+      - name: Publish Core module
+        working-directory: ./coreModulePackages/${{ github.event.inputs.module }}
+        run: ls -lia

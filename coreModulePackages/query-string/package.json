@@ -1,6 +1,6 @@
 {
   "name": "@adobe/reactor-query-string",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Utility for parsing and serializing URL query strings. Intended for use in Adobe Launch extensions.",
   "license": "Apache-2.0",
   "author": {
@@ -11,8 +11,5 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:adobe/reactor-turbine.git"
-  },
-  "dependencies": {
-    "querystring": "0.2.0"
   }
 }

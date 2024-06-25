@@ -26,9 +26,8 @@ jobs:
       - name: Install core module dependencies
         working-directory: ./coreModulePackages/${{ github.event.inputs.module }}
         run: npm ci
-      - name: Publish core module to NPM
-        working-directory: ./coreModulePackages/${{ github.event.inputs.module }}
-        uses: JS-DevTools/npm-publish@v3
+      - uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
+          package: ./coreModulePackages/${{ github.event.inputs.module }}
           dryRun: true

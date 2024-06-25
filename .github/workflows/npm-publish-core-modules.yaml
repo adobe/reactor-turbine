@@ -15,9 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check Core Module Name
-        if: ${{ github.event.inputs.tag != 'cookie' && github.event.inputs.tag != 'document' && github.event.inputs.tag != 'loadScript' && github.event.inputs.tag != 'objectAssign' && github.event.inputs.tag != 'promise' && github.event.inputs.tag != 'query-string' && github.event.inputs.tag != 'window' }}
+        if: ${{ github.event.inputs.module != 'cookie' && github.event.inputs.module != 'document' && github.event.inputs.module != 'loadScript' && github.event.inputs.module != 'objectAssign' && github.event.inputs.module != 'promise' && github.event.inputs.module != 'query-string' && github.event.inputs.module != 'window' }}
         run: |
-          echo 'Only the modules "cookie", "document", "loadScript", "objectAssign", "promise", "query-string" and "window" are supported. You entered "${{ github.event.inputs.tag }}"'
+          echo 'Only the modules "cookie", "document", "loadScript", "objectAssign", "promise", "query-string" and "window" are supported. You entered "${{ github.event.inputs.module }}"'
           exit 1
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

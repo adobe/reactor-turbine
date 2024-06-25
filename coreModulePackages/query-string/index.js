@@ -55,27 +55,31 @@ var parseQueryString = function (query) {
   return result;
 };
 
-var spaceToken = '{{space}}';
+/**
+ * Transform an object into a query string.
+ *
+ * Keys having object values are ignored.
+ *
+ * @param {object} the object to transform into a query string
+ * @returns {string} the parsed query string
+ */
 
-var stringify = function (object) {
+var stringifyObject = function (object) {
+  var spaceToken = '{{space}}';
   var params = new URLSearchParams();
-  object = Object.keys(object).reduce(function (acc, k) {
-    if (typeof object[k] === 'string') {
-      acc[k] = object[k].replace(/ /g, spaceToken);
-    } else if (
-      Array.isArray(object[k]) ||
-      ['boolean', 'number'].includes(typeof object[k])
-    ) {
-      acc[k] = object[k];
-    } else {
-      acc[k] = '';
-    }
-
-    return acc;
-  }, {});
 
   Object.keys(object).forEach(function (key) {
     var value = object[key];
+
+    if (typeof object[key] === 'string') {
+      value = value.replace(/ /g, spaceToken);
+    } else if (
+      ['object', 'undefined'].includes(typeof value) &&
+      !Array.isArray(value)
+    ) {
+      value = '';
+    }
+
     if (Array.isArray(value)) {
       value.forEach(function (arrayValue) {
         params.append(key, arrayValue);
@@ -99,6 +103,6 @@ module.exports = {
     return parseQueryString(string);
   },
   stringify: function (object) {
-    return stringify(object);
+    return stringifyObject(object);
   }
 };

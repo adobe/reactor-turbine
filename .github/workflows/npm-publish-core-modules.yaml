@@ -30,4 +30,3 @@ jobs:
         with:
           token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
           package: ./coreModulePackages/${{ github.event.inputs.module }}
-          dryRun: true

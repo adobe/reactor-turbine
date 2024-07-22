@@ -40,6 +40,12 @@ describe('queryString', function () {
         bar: ''
       });
     });
+
+    it('supports invalid query strings', function () {
+      expect(queryString.parse('?cid=%test')).toEqual({
+        cid: '%test'
+      });
+    });
   });
 
   describe('stringify', function () {

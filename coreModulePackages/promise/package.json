@@ -1,7 +1,7 @@
 {
   "name": "@adobe/reactor-promise",
-  "version": "1.2.0",
-  "description": "Promise implementation. Exposes the \"promise-polyfill\" npm package. Intended for use in Adobe Launch extensions.",
+  "version": "2.0.0",
+  "description": "Promise native implementation. Intended for use in Adobe Launch extensions.",
   "license": "Apache-2.0",
   "author": {
     "name": "Adobe Systems",
@@ -11,8 +11,5 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:adobe/reactor-turbine.git"
-  },
-  "dependencies": {
-    "promise-polyfill": "8.1.3"
   }
 }

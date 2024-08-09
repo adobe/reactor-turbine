@@ -11,4 +11,4 @@
  ****************************************************************************************/
 'use strict';
 
-module.exports = require('object-assign');
+module.exports = Object.assign;

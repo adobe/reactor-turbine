@@ -17,6 +17,4 @@
 // and `require('promise-polyfill')` for building Turbine.
 module.exports =
   (typeof window !== 'undefined' && window.Promise) ||
-  (typeof global !== 'undefined' && global.Promise) ||
-  require('promise-polyfill').default ||
-  require('promise-polyfill');
+  (typeof global !== 'undefined' && global.Promise);

@@ -12,7 +12,8 @@
     "prepublishOnly": "npm run build",
     "test": "karma start",
     "test:watch": "karma start --no-single-run --no-coverage",
-    "lint": "eslint 'src/**/*.js' 'coreModulePackages/**/*.js'"
+    "lint": "eslint 'src/**/*.js' 'coreModulePackages/**/*.js'",
+    "prepare": "husky install"
   },
   "author": {
     "name": "Adobe Systems",
@@ -60,11 +61,6 @@
     "uglify-js": "^3.19.2",
     "webpack": "^5.94.0",
     "yargs": "^17.7.2"
-  },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm test"
-    }
   },
   "lint-staged": {
     "(src/**/*.js|coreModulePackages/**/*.js)": [

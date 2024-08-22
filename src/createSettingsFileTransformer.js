@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var isPlainObject = require('is-plain-object');
+var { isPlainObject } = require('is-plain-object');
 
 function isArrayReference(str) {
   return (

@@ -27,6 +27,7 @@ module.exports = function (storageType, additionalNamespace) {
     getItem: function (name) {
       try {
         return window[storageType].getItem(finalNamespace + name);
+        // eslint-disable-next-line no-unused-vars
       } catch (e) {
         return null;
       }
@@ -41,6 +42,7 @@ module.exports = function (storageType, additionalNamespace) {
       try {
         window[storageType].setItem(finalNamespace + name, value);
         return true;
+        // eslint-disable-next-line no-unused-vars
       } catch (e) {
         return false;
       }

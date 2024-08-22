@@ -12,7 +12,7 @@
 
 var logger = require('../logger');
 var objectAssign = require('@adobe/reactor-object-assign');
-var isPlainObject = require('is-plain-object');
+var { isPlainObject } = require('is-plain-object');
 
 /**
  * Normalizes a synthetic event so that it exists and has at least meta.

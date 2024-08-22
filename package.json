@@ -68,6 +68,14 @@
     ]
   },
   "engines": {
-    "node": ">=v14.21.2"
+    "node": ">=v20.17.0"
+  },
+  "overrides": {
+    "inject-loader": {
+      "webpack": "^5.94.0"
+    },
+    "istanbul-instrumenter-loader": {
+      "webpack": "^5.94.0"
+    }
   }
 }

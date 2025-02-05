@@ -17,5 +17,14 @@ module.exports = function (script, require, turbine) {
 
   script.call(module.exports, module, module.exports, require, turbine);
 
+  if (
+    module &&
+    module.exports &&
+    module.exports.__esModule &&
+    Object.prototype.hasOwnProperty.call(module.exports, 'default')
+  ) {
+    return module.exports.default;
+  }
+
   return module.exports;
 };

@@ -38,4 +38,19 @@ describe('extract module exports', function () {
 
     expect(extractModuleExports(moduleScript)).toEqual(moduleExports);
   });
+
+  it('returns the extracted exports from a transpiled module using babel', function () {
+    var moduleExports = 'exportedvalue';
+
+    var moduleScript = function (module, exports) {
+      Object.defineProperty(exports, '__esModule', {
+        value: true
+      });
+      exports.default = void 0;
+      var _default = moduleExports;
+      exports.default = _default;
+    };
+
+    expect(extractModuleExports(moduleScript)).toEqual(moduleExports);
+  });
 });

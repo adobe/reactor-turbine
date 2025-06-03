@@ -18,7 +18,7 @@
  * @returns {Function}
  */
 module.exports = function (replaceTokens, settings) {
-  return function () {
-    return settings ? replaceTokens(settings) : {};
+  return function (syntheticEvent) {
+    return settings ? replaceTokens(settings, syntheticEvent) : {};
   };
 };

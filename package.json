@@ -1,6 +1,6 @@
 {
   "name": "@adobe/reactor-turbine",
-  "version": "28.1.0",
+  "version": "28.2.0-beta.1",
   "description": "Tags rule engine which processes rules on client websites and delegates logic to extensions.",
   "license": "Apache-2.0",
   "scripts": {
@@ -36,16 +36,16 @@
     "is-plain-object": "^5.0.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "camelize": "1.0.1",
-    "eslint": "^9.26.0",
-    "eslint-config-prettier": "^10.1.3",
-    "eslint-plugin-prettier": "^5.4.0",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.0",
     "husky": "^9.1.7",
     "inject-loader": "^4.0.1",
     "istanbul-instrumenter-loader": "^3.0.1",
-    "jasmine-core": "^5.7.1",
+    "jasmine-core": "^5.8.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
     "karma-coverage": "^2.2.1",
@@ -56,13 +56,13 @@
     "karma-sauce-launcher": "^4.3.6",
     "karma-webpack": "^5.0.1",
     "kebab-case": "2.0.2",
-    "lint-staged": "^15.5.2",
-    "prettier": "3.5.3",
-    "pretty-quick": "^4.1.1",
-    "rollup": "^4.40.2",
+    "lint-staged": "^16.1.2",
+    "prettier": "3.6.0",
+    "pretty-quick": "^4.2.2",
+    "rollup": "^4.44.0",
     "uglify-js": "^3.19.3",
-    "webpack": "^5.99.8",
-    "yargs": "^17.7.2"
+    "webpack": "^5.99.9",
+    "yargs": "^18.0.0"
   },
   "lint-staged": {
     "(src/**/*.js|coreModulePackages/**/*.js)": [
@@ -74,7 +74,7 @@
   },
   "overrides": {
     "inject-loader": {
-      "webpack": "^5.99.8"
+      "webpack": "^5.99.9"
     },
     "istanbul-instrumenter-loader": {
       "webpack": "^5.94.0"

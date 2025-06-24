@@ -36,12 +36,15 @@ jobs:
         with:
           username: ${{ secrets.SAUCE_USERNAME }}
           accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          noSSLBumpDomains: all
+          noProxyCaching: true
           tunnelIdentifier: github-action-tunnel
       - run: npm test
         env:
           SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
           SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
-      - uses: JS-DevTools/npm-publish@v1
+      - uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
           tag: ${{ github.event.inputs.tag }}
+          access: 'public'

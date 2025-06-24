@@ -34,6 +34,8 @@ jobs:
         with:
           username: ${{ secrets.SAUCE_USERNAME }}
           accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          noSSLBumpDomains: all
+          noProxyCaching: true
           tunnelIdentifier: github-action-tunnel
       - run: npm test
         env:

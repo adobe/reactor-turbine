@@ -1,27 +1,21 @@
 'use strict';
 
-var path = require('path');
+const path = require('path');
+const yargs = require('yargs');
 
-var defaultBrowsers = ['Chrome'];
-var reporters = ['dots'];
-var startConnect = false;
-var buildId;
+const argv = yargs
+  .array('browsers')
+  .default('browsers', ['Chrome'])
+  .default('singleRun', true)
+  .default('coverage', true).argv;
+
+const reporters = ['dots'];
+let startConnect = false;
+let buildId;
 
 if (process.env.CI) {
-  buildId =
-    'CI #' +
-    process.env.GITHUB_RUN_NUMBER +
-    ' (' +
-    process.env.GITHUB_RUN_ID +
-    ')';
-
-  defaultBrowsers = [
-    'SL_EDGE',
-    'SL_CHROME',
-    // 'SL_FIREFOX',
-    // 'SL_ANDROID', // nuking for now
-    'SL_SAFARI'
-  ];
+  buildId = `CI #${process.env.GITHUB_RUN_NUMBER} (${process.env.GITHUB_RUN_ID})`;
+  argv.browsers = ['SL_EDGE', 'SL_CHROME', 'SL_SAFARI'];
   reporters.push('saucelabs');
 } else {
   startConnect = true;
@@ -31,12 +25,6 @@ if (process.env.SAUCE_USERNAME) {
   reporters.push('saucelabs');
 }
 
-var argv = require('yargs')
-  .array('browsers')
-  .default('browsers', defaultBrowsers)
-  .default('singleRun', true)
-  .default('coverage', true).argv;
-
 var rules = [];
 
 if (argv.coverage) {
@@ -44,13 +32,13 @@ if (argv.coverage) {
     test: /\.js$/,
     include: path.resolve('src'),
     exclude: new RegExp('__tests__'),
-    loader: 'istanbul-instrumenter-loader'
+    loader: 'babel-loader'
   });
   rules.push({
     test: /index.js$/,
     include: path.resolve('coreModulePackages'),
     exclude: new RegExp('node_modules'),
-    loader: 'istanbul-instrumenter-loader'
+    loader: 'babel-loader'
   });
   reporters.push('coverage');
 }

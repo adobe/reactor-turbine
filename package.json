@@ -36,15 +36,17 @@
     "is-plain-object": "^5.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.27.4",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
+    "babel-loader": "^10.0.0",
+    "babel-plugin-istanbul": "^7.0.0",
     "camelize": "1.0.1",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.0",
     "husky": "^9.1.7",
     "inject-loader": "^4.0.1",
-    "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-core": "^5.8.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
@@ -75,9 +77,6 @@
   "overrides": {
     "inject-loader": {
       "webpack": "^5.99.9"
-    },
-    "istanbul-instrumenter-loader": {
-      "webpack": "^5.94.0"
     }
   }
 }

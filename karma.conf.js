@@ -19,7 +19,7 @@ if (process.env.CI) {
     'SL_EDGE',
     'SL_CHROME',
     // 'SL_FIREFOX',
-    'SL_ANDROID',
+    // 'SL_ANDROID', // nuking for now
     'SL_SAFARI'
   ];
   reporters.push('saucelabs');
@@ -90,7 +90,7 @@ module.exports = function (config) {
         base: 'SauceLabs',
         browserName: 'safari',
         // https://support.saucelabs.com/hc/en-us/community/posts/360016821133-Tests-on-Safari-11-started-failing-between-2018-07-19-and-2018-07-20
-        platform: 'macOS 10.13',
+        platform: 'macOS 11',
         version: 'latest'
       },
       SL_EDGE: {

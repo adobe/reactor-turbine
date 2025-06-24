@@ -25,21 +25,34 @@ if (process.env.SAUCE_USERNAME) {
   reporters.push('saucelabs');
 }
 
-var rules = [];
-
-if (argv.coverage) {
-  rules.push({
+var rules = [
+  {
     test: /\.js$/,
     include: path.resolve('src'),
     exclude: new RegExp('__tests__'),
-    loader: 'babel-loader'
-  });
-  rules.push({
+    use: {
+      loader: 'babel-loader',
+      options: {
+        presets: [['@babel/env', { targets: '> 0.25%, not dead' }]],
+        plugins: ['babel-plugin-istanbul']
+      }
+    }
+  },
+  {
     test: /index.js$/,
     include: path.resolve('coreModulePackages'),
     exclude: new RegExp('node_modules'),
-    loader: 'babel-loader'
-  });
+    use: {
+      loader: 'babel-loader',
+      options: {
+        presets: [['@babel/env', { targets: '> 0.25%, not dead' }]],
+        plugins: ['babel-plugin-istanbul']
+      }
+    }
+  }
+];
+
+if (argv.coverage) {
   reporters.push('coverage-istanbul');
 }
 
@@ -61,7 +74,7 @@ module.exports = function (config) {
       reports: ['html', 'lcovonly', 'text-summary'],
       'report-config': {
         html: {
-          subdir: 'html'
+          subdir: '.'
         }
       },
       fixWebpackSourcePaths: true,

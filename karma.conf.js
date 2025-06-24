@@ -1,27 +1,21 @@
 'use strict';
 
-var path = require('path');
+const path = require('path');
+const yargs = require('yargs');
 
-var defaultBrowsers = ['Chrome'];
-var reporters = ['dots'];
-var startConnect = false;
-var buildId;
+const argv = yargs
+  .array('browsers')
+  .default('browsers', ['Chrome'])
+  .default('singleRun', true)
+  .default('coverage', true).argv;
+
+const reporters = ['dots'];
+let startConnect = false;
+let buildId;
 
 if (process.env.CI) {
-  buildId =
-    'CI #' +
-    process.env.GITHUB_RUN_NUMBER +
-    ' (' +
-    process.env.GITHUB_RUN_ID +
-    ')';
-
-  defaultBrowsers = [
-    'SL_EDGE',
-    'SL_CHROME',
-    // 'SL_FIREFOX',
-    // 'SL_ANDROID', // nuking for now
-    'SL_SAFARI'
-  ];
+  buildId = `CI #${process.env.GITHUB_RUN_NUMBER} (${process.env.GITHUB_RUN_ID})`;
+  argv.browsers = ['SL_EDGE', 'SL_CHROME', 'SL_SAFARI'];
   reporters.push('saucelabs');
 } else {
   startConnect = true;
@@ -31,28 +25,35 @@ if (process.env.SAUCE_USERNAME) {
   reporters.push('saucelabs');
 }
 
-var argv = require('yargs')
-  .array('browsers')
-  .default('browsers', defaultBrowsers)
-  .default('singleRun', true)
-  .default('coverage', true).argv;
-
-var rules = [];
-
-if (argv.coverage) {
-  rules.push({
+var rules = [
+  {
     test: /\.js$/,
     include: path.resolve('src'),
     exclude: new RegExp('__tests__'),
-    loader: 'istanbul-instrumenter-loader'
-  });
-  rules.push({
+    use: {
+      loader: 'babel-loader',
+      options: {
+        presets: [['@babel/env', { targets: '> 0.25%, not dead' }]],
+        plugins: ['babel-plugin-istanbul']
+      }
+    }
+  },
+  {
     test: /index.js$/,
     include: path.resolve('coreModulePackages'),
     exclude: new RegExp('node_modules'),
-    loader: 'istanbul-instrumenter-loader'
-  });
-  reporters.push('coverage');
+    use: {
+      loader: 'babel-loader',
+      options: {
+        presets: [['@babel/env', { targets: '> 0.25%, not dead' }]],
+        plugins: ['babel-plugin-istanbul']
+      }
+    }
+  }
+];
+
+if (argv.coverage) {
+  reporters.push('coverage-istanbul');
 }
 
 module.exports = function (config) {
@@ -69,11 +70,15 @@ module.exports = function (config) {
     colors: true,
     // how many browser should be started simultaneous
     concurrency: Infinity,
-    coverageReporter: {
-      reporters: [
-        { type: 'html' },
-        { type: 'lcovonly', subdir: '.', file: 'lcov.info' }
-      ]
+    coverageIstanbulReporter: {
+      reports: ['html', 'lcovonly', 'text-summary'],
+      'report-config': {
+        html: {
+          subdir: '.'
+        }
+      },
+      fixWebpackSourcePaths: true,
+      combineBrowserReports: true
     },
     customLaunchers: {
       SL_CHROME: {

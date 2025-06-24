@@ -40,7 +40,7 @@ if (argv.coverage) {
     exclude: new RegExp('node_modules'),
     loader: 'babel-loader'
   });
-  reporters.push('coverage');
+  reporters.push('coverage-istanbul');
 }
 
 module.exports = function (config) {
@@ -57,11 +57,15 @@ module.exports = function (config) {
     colors: true,
     // how many browser should be started simultaneous
     concurrency: Infinity,
-    coverageReporter: {
-      reporters: [
-        { type: 'html' },
-        { type: 'lcovonly', subdir: '.', file: 'lcov.info' }
-      ]
+    coverageIstanbulReporter: {
+      reports: ['html', 'lcovonly', 'text-summary'],
+      'report-config': {
+        html: {
+          subdir: 'html'
+        }
+      },
+      fixWebpackSourcePaths: true,
+      combineBrowserReports: true
     },
     customLaunchers: {
       SL_CHROME: {

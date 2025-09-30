@@ -1,5 +1,6 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import replace from '@rollup/plugin-replace';
 
 export default {
   input: 'src/index.js',
@@ -11,6 +12,10 @@ export default {
     name: '_satellite'
   },
   plugins: [
+    replace({
+      preventAssignment: true,
+      REACTOR_KARMA_CI_UNIT_TEST_MODE: JSON.stringify(false)
+    }),
     nodeResolve({
       preferBuiltins: false
     }),

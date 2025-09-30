@@ -12,7 +12,7 @@
 
 'use strict';
 
-var injectCreatePublicRequire = require('inject-loader!../createPublicRequire');
+var { injectCreatePublicRequire } = require('../createPublicRequire');
 
 describe('function returned by createPublicRequire', function () {
   it('should return the static core modules', function () {
@@ -25,13 +25,15 @@ describe('function returned by createPublicRequire', function () {
     var windowMock = {};
 
     var createPublicRequire = injectCreatePublicRequire({
-      '@adobe/reactor-cookie': cookieMock,
-      '@adobe/reactor-document': documentMock,
-      '@adobe/reactor-load-script': loadScriptMock,
-      '@adobe/reactor-object-assign': objectAssignMock,
-      '@adobe/reactor-promise': promiseMock,
-      '@adobe/reactor-query-string': queryStringMock,
-      '@adobe/reactor-window': windowMock
+      moduleMap: {
+        cookie: cookieMock,
+        document: documentMock,
+        'load-script': loadScriptMock,
+        'object-assign': objectAssignMock,
+        promise: promiseMock,
+        'query-string': queryStringMock,
+        window: windowMock
+      }
     });
 
     var publicRequire = createPublicRequire();
@@ -71,7 +73,7 @@ describe('function returned by createPublicRequire', function () {
 
   it('should throw error when a module that is neither core nor relative is required', function () {
     var createPublicRequire = injectCreatePublicRequire({});
-    var publicRequire = createPublicRequire();
+    var publicRequire = createPublicRequire({});
     expect(function () {
       publicRequire('@adobe/reactor-invalidmodulename');
     }).toThrowError(Error);

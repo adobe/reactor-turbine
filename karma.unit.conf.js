@@ -2,6 +2,7 @@
 
 const path = require('path');
 const yargs = require('yargs');
+const webpack = require('webpack');
 
 const argv = yargs
   .array('browsers')
@@ -124,7 +125,7 @@ module.exports = function (config) {
     // list of files / patterns to load in the browser
     files: [
       {
-        pattern: 'testIndex.js',
+        pattern: 'test.unitIndex.js',
         watched: false,
         included: true,
         served: true
@@ -147,7 +148,7 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'testIndex.js': ['webpack']
+      'test.unitIndex.js': ['webpack']
     },
     // web server port
     port: 9876,
@@ -182,7 +183,12 @@ module.exports = function (config) {
       },
       module: {
         rules: rules
-      }
+      },
+      plugins: [
+        new webpack.DefinePlugin({
+          REACTOR_KARMA_CI_UNIT_TEST_MODE: JSON.stringify(true)
+        })
+      ]
     },
     webpackServer: {
       debug: false,

@@ -12,10 +12,10 @@
 
 'use strict';
 
-var injectCreateModuleProvider = require('inject-loader!../createModuleProvider');
+var { injectCreateModuleProvider } = require('../createModuleProvider');
 
 describe('function returned by createModuleProvider', function () {
-  var logger;
+  var loggerMock;
   var referencePath = 'hello-world/src/foo.js';
   var extensionName = 'test-extension';
   var name = 'foo';
@@ -26,14 +26,14 @@ describe('function returned by createModuleProvider', function () {
   var moduleProvider;
 
   beforeEach(function () {
-    logger = jasmine.createSpyObj('logger', ['log', 'error']);
+    loggerMock = jasmine.createSpyObj('logger', ['log', 'error']);
     extractModuleExportsSpy = jasmine
       .createSpy('extractModuleExports')
       .and.callFake(extractModuleExports);
 
     var createModuleProvider = injectCreateModuleProvider({
-      './logger': logger,
-      './extractModuleExports': extractModuleExportsSpy
+      extractModuleExports: extractModuleExportsSpy,
+      logger: loggerMock
     });
 
     moduleProvider = createModuleProvider();
@@ -79,7 +79,7 @@ describe('function returned by createModuleProvider', function () {
 
     moduleProvider.hydrateCache();
 
-    var errorMessage = logger.error.calls.mostRecent().args[0];
+    var errorMessage = loggerMock.error.calls.mostRecent().args[0];
     expect(errorMessage).toStartWith(
       'Error initializing module ' +
         referencePath +

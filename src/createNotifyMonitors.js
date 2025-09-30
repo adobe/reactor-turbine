@@ -9,28 +9,35 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  ****************************************************************************************/
-var logger = require('./logger');
 
-var warningLogged = false;
+function injectCreateNotifyMonitors({ logger }) {
+  return function createNotifyMonitors(satellite) {
+    var warningLogged = false;
 
-module.exports = function (_satellite) {
-  return function (type, event) {
-    var monitors = _satellite._monitors;
+    return function notifyMonitors(type, event) {
+      var monitors = satellite._monitors;
 
-    if (monitors) {
-      if (!warningLogged) {
-        logger.warn(
-          'The _satellite._monitors API may change at any time and should only ' +
-            'be used for debugging.'
-        );
-        warningLogged = true;
-      }
-
-      monitors.forEach(function (monitor) {
-        if (monitor[type]) {
-          monitor[type](event);
+      if (monitors) {
+        if (!warningLogged) {
+          logger.warn(
+            'The _satellite._monitors API may change at any time and should only ' +
+              'be used for debugging.'
+          );
+          warningLogged = true;
         }
-      });
-    }
+
+        monitors.forEach(function (monitor) {
+          if (monitor[type]) {
+            monitor[type](event);
+          }
+        });
+      }
+    };
   };
-};
+}
+
+var logger = require('./logger');
+module.exports = injectCreateNotifyMonitors({ logger });
+
+// For testing only
+module.exports.injectCreateNotifyMonitors = injectCreateNotifyMonitors;

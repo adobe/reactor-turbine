@@ -11,7 +11,7 @@
  ****************************************************************************************/
 
 'use strict';
-var injectCreateReplaceTokens = require('inject-loader!../createReplaceTokens');
+var { injectCreateReplaceTokens } = require('../createReplaceTokens');
 
 describe('function returned by replaceTokens', function () {
   var isVar;
@@ -30,7 +30,7 @@ describe('function returned by replaceTokens', function () {
     };
     undefinedVarsReturnEmpty = false;
     createReplaceTokens = injectCreateReplaceTokens({
-      './logger': logger
+      logger
     });
   });
 

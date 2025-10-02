@@ -29,9 +29,17 @@ jobs:
       - name: Linting files
         run: npm run lint
 
+      # Start Sauce Connect tunnel for SauceLabs
+      - name: Start Sauce Connect
+        uses: saucelabs/sauce-connect-action@v2
+        with:
+          username: ${{ secrets.SAUCE_USERNAME }}
+          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          tunnelIdentifier: github-action-tunnel
+
       # Unit Tests Step
       - name: Run unit tests
-        run: npm test
+        run: npm run test:unit:ci
         env:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
@@ -42,4 +50,4 @@ jobs:
 
       # Integration Tests Step
       - name: Run integration tests
-        run: npm run integration-test
+        run: npm run test:integration

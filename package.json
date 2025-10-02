@@ -12,6 +12,7 @@
     "minify": "uglifyjs dist/engine.js -c -m -o dist/engine.min.js",
     "prepublishOnly": "npm run build",
     "test:unit": "karma start karma.unit.conf.js",
+    "test:unit:ci": "npm install karma-sauce-launcher && karma start karma.unit.conf.js",
     "test:integration": "karma start karma.integration.conf.js",
     "test": "npm run build && npm run test:unit && npm run test:integration",
     "test:watch": "karma start --no-single-run --no-coverage",

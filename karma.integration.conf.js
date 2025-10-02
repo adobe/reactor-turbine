@@ -53,7 +53,7 @@ module.exports = function (config) {
     },
 
     // Browser to run tests in
-    browsers: ['Chrome'],
+    browsers: [process.env.CI ? 'ChromeHeadless' : 'Chrome'],
 
     // Exit after running tests
     singleRun: true,

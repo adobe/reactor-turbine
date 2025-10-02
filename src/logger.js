@@ -52,6 +52,19 @@ var launchPrefix = ieVersion === 10 ? '[Launch]' : ROCKET;
 var outputEnabled = false;
 
 /**
+ * Maximum number of deduplicated deprecation messages to hold when outputEnabled is false.
+ * This bounds memory usage.
+ * @type {number}
+ */
+var MAX_DEPRECATION_CACHE_SIZE = 100;
+
+/**
+ * Set to track deduplicated deprecation messages when outputEnabled is false.
+ * @type {Set<string>}
+ */
+var dedupDeprecationMessages = new Set();
+
+/**
  * Processes a log message.
  * @param {string} level The level of message to log.
  * @param {...*} arg Any argument to be logged.
@@ -76,15 +89,14 @@ var process = function (level) {
 var log = process.bind(null, levels.LOG);
 
 /**
- * Outputs informational message to the web console. In some browsers a small "i" icon is
- * displayed next to these items in the web console's log.
+ * Outputs informational message to the web console.
  * @param {...*} arg Any argument to be logged.
  */
 var info = process.bind(null, levels.INFO);
 
 /**
- * Outputs debug message to the web console. In browsers that do not support
- * console.debug, console.info is used instead.
+ * Outputs debug message to the web console.
+ * In browsers that do not support console.debug, console.info is used instead.
  * @param {...*} arg Any argument to be logged.
  */
 var debug = process.bind(null, levels.DEBUG);
@@ -102,40 +114,60 @@ var warn = process.bind(null, levels.WARN);
 var error = process.bind(null, levels.ERROR);
 
 /**
- * Outputs a warning message to the web console.
- * @param {...*} arg Any argument to be logged.
+ * Outputs a deprecation warning to the web console.
+ * Deduplicates messages when output is disabled.
+ * Passes all through when output is enabled.
+ * @param {string} message The deprecation message.
+ * @param {...*} additionalArgs Additional optional args.
  */
 var logDeprecation = function () {
-  var wasEnabled = outputEnabled;
-  outputEnabled = true;
+  var message = arguments[0];
 
-  process.apply(
-    null,
-    Array.prototype.concat(levels.WARN, Array.prototype.slice.call(arguments))
-  );
-
-  if (!wasEnabled) {
-    outputEnabled = false;
+  if (typeof message !== 'string') {
+    message = String(message);
   }
+
+  // Always log when output is enabled
+  if (outputEnabled) {
+    process.apply(
+      null,
+      [levels.WARN].concat(Array.prototype.slice.call(arguments))
+    );
+    return;
+  }
+
+  // When output is disabled: only log first time per unique message
+  if (!dedupDeprecationMessages.has(message)) {
+    dedupDeprecationMessages.add(message);
+
+    // Maintain bounded size
+    if (dedupDeprecationMessages.size > MAX_DEPRECATION_CACHE_SIZE) {
+      var first = dedupDeprecationMessages.values().next().value;
+      dedupDeprecationMessages.delete(first);
+    }
+
+    // Log even though outputEnabled is false (just once per unique message)
+    var wasEnabled = outputEnabled;
+    outputEnabled = true;
+    process.apply(
+      null,
+      [levels.WARN].concat(Array.prototype.slice.call(arguments))
+    );
+    outputEnabled = wasEnabled;
+  }
+
+  // Already logged → suppress
 };
 
-module.exports = {
+// Build the module exports object
+var loggerExports = {
   log: log,
   info: info,
   debug: debug,
   warn: warn,
   error: error,
   deprecation: logDeprecation,
-  /**
-   * Whether logged messages should be output to the console.
-   * @type {boolean}
-   */
-  get outputEnabled() {
-    return outputEnabled;
-  },
-  set outputEnabled(value) {
-    outputEnabled = value;
-  },
+
   /**
    * Creates a logging utility that only exposes logging functionality and prefixes all messages
    * with an identifier.
@@ -152,3 +184,21 @@ module.exports = {
     };
   }
 };
+
+// Define outputEnabled getter/setter with deduplication flush behavior
+Object.defineProperty(loggerExports, 'outputEnabled', {
+  get: function () {
+    return outputEnabled;
+  },
+  set: function (value) {
+    if (outputEnabled === false && value === true) {
+      // Flush deduplication set on enable
+      dedupDeprecationMessages.clear();
+    }
+    outputEnabled = value;
+  },
+  enumerable: true,
+  configurable: true
+});
+
+module.exports = loggerExports;

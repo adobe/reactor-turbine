@@ -17,7 +17,6 @@ let buildId;
 if (process.env.CI) {
   buildId = `CI #${process.env.GITHUB_RUN_NUMBER} (${process.env.GITHUB_RUN_ID})`;
   argv.browsers = ['SL_EDGE', 'SL_CHROME', 'SL_SAFARI'];
-  reporters.push('saucelabs');
 } else {
   startConnect = true;
 }

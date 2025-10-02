@@ -30,22 +30,29 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+
+      # Project  Setup
       - name: Install dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci
-      - uses: saucelabs/sauce-connect-action@v1
-        with:
-          username: ${{ secrets.SAUCE_USERNAME }}
-          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
-          noSSLBumpDomains: all
-          noProxyCaching: true
-          tunnelIdentifier: github-action-tunnel
-      - run: npm test
-        env:
-          SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
-          SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
-      - uses: JS-DevTools/npm-publish@v3
+      - name: Linting files
+        run: npm run lint
+
+      # Unit Tests Step
+      - name: CI Tests For Publish
+        run: npm run test:unit:ci:npm:publish
+
+      # Integration Tests Step
+      - name: Integration Tests For Publish
+        run: npm run test:integration:npm:publish
+
+      # Production Build
+      - name: Build Production Bundle
+        run: npm run build:production
+
+      # Publish to NPM
+      - name: Publish to NPM
+        uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
           tag: ${{ github.event.inputs.tag }}
-          access: 'public'

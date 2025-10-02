@@ -52,7 +52,9 @@ describe('function returned by createPublicRequire', function () {
   it('should call for relative module when relative path is used', function () {
     var relativeModuleMock = {};
 
-    var createPublicRequire = injectCreatePublicRequire({});
+    var createPublicRequire = injectCreatePublicRequire({
+      moduleMap: {}
+    });
 
     var getModuleExportsByRelativePath = jasmine
       .createSpy()
@@ -72,7 +74,9 @@ describe('function returned by createPublicRequire', function () {
   });
 
   it('should throw error when a module that is neither core nor relative is required', function () {
-    var createPublicRequire = injectCreatePublicRequire({});
+    var createPublicRequire = injectCreatePublicRequire({
+      moduleMap: {}
+    });
     var publicRequire = createPublicRequire({});
     expect(function () {
       publicRequire('@adobe/reactor-invalidmodulename');

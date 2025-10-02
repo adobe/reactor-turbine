@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+
 function injectCreateDynamicHostResolver({ window }) {
   return function createDynamicHostResolver(
     turbineEmbedCode,
@@ -137,10 +139,16 @@ function injectCreateDynamicHostResolver({ window }) {
   };
 }
 
-module.exports = injectCreateDynamicHostResolver({
+const validateInjection = validateInjectedParams(
+  injectCreateDynamicHostResolver
+);
+
+module.exports = validateInjection({
   window: require('@adobe/reactor-window')
 });
 
-// For testing only.
-module.exports.injectCreateDynamicHostResolver =
-  injectCreateDynamicHostResolver;
+/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  // For testing only.
+  module.exports.injectCreateDynamicHostResolver = validateInjection;
+}

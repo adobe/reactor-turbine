@@ -12,8 +12,16 @@
 
 'use strict';
 
-// Load unit tests from __tests__ directories
-var testsContext = require.context('./src', true, /__tests__\/.*\.test\.jsx?$/);
+// First, run integrity / sanity tests for production files that export an "injected" function
+require('./src/__tests__/production-exports.integrity.test.js');
+
+// Load unit tests from __tests__ directories, excluding integrity tests
+var testsContext = require.context(
+  './src',
+  true,
+  /__tests__\/(?!.*integrity\.test\.).*\.test\.jsx?$/
+);
+
 testsContext.keys().forEach(testsContext);
 
 // Coverage for all non-test code in src (exclude __tests__ and __integration__)

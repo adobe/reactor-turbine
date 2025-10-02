@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+
 function injectHydrateSatelliteObject({ cookie, logger }) {
   return function hydrateSatelliteObject(
     _satellite,
@@ -169,9 +171,15 @@ function injectHydrateSatelliteObject({ cookie, logger }) {
   };
 }
 
-var cookie = require('@adobe/reactor-cookie');
-var logger = require('./logger');
-module.exports = injectHydrateSatelliteObject({ cookie, logger });
+const validateInjection = validateInjectedParams(injectHydrateSatelliteObject);
 
-// For testing only.
-module.exports.injectHydrateSatelliteObject = injectHydrateSatelliteObject;
+module.exports = validateInjection({
+  cookie: require('@adobe/reactor-cookie'),
+  logger: require('./logger')
+});
+
+/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  // For testing only.
+  module.exports.injectHydrateSatelliteObject = validateInjection;
+}

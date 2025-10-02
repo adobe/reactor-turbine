@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var validateInjectedParams = require('../helpers/validate-expected-inject-params');
+
 function injectNormalizeSyntheticEvent({
   objectAssign,
   isPlainObject,
@@ -37,13 +39,16 @@ function injectNormalizeSyntheticEvent({
   };
 }
 
-var objectAssign = require('@adobe/reactor-object-assign');
-var { isPlainObject } = require('is-plain-object');
-var logger = require('../logger');
-module.exports = injectNormalizeSyntheticEvent({
-  objectAssign,
-  isPlainObject,
-  logger
+const validateInjection = validateInjectedParams(injectNormalizeSyntheticEvent);
+
+module.exports = validateInjection({
+  objectAssign: require('@adobe/reactor-object-assign'),
+  isPlainObject: require('is-plain-object'),
+  logger: require('../logger')
 });
-// For testing only.
-module.exports.injectNormalizeSyntheticEvent = injectNormalizeSyntheticEvent;
+
+/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  // For testing only.
+  module.exports.injectNormalizeSyntheticEvent = validateInjection;
+}

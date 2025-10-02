@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+
 var getErrorMessage = function (
   dataDef,
   dataElementName,
@@ -116,11 +118,18 @@ function injectCreateGetDataElementValue({
   };
 }
 
-module.exports = injectCreateGetDataElementValue({
+const validateInjection = validateInjectedParams(
+  injectCreateGetDataElementValue
+);
+
+module.exports = validateInjection({
   cleanText: require('./cleanText'),
   logger: require('./logger'),
   dataElementSafe: require('./dataElementSafe')
 });
 
-module.exports.injectCreateGetDataElementValue =
-  injectCreateGetDataElementValue;
+/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  // For testing only.
+  module.exports.injectCreateGetDataElementValue = validateInjection;
+}

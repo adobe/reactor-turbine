@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+
 function injectCreateReplaceTokens({ logger }) {
   /**
    * Replacing any variable tokens (%myDataElement%, %this.foo%, etc.) with their associated values.
@@ -111,8 +113,14 @@ function injectCreateReplaceTokens({ logger }) {
   };
 }
 
-var logger = require('./logger');
-module.exports = injectCreateReplaceTokens(logger);
+const validateInjection = validateInjectedParams(injectCreateReplaceTokens);
 
-// For testing only.
-module.exports.injectCreateReplaceTokens = injectCreateReplaceTokens;
+module.exports = validateInjection({
+  logger: require('./logger')
+});
+
+/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  // For testing only.
+  module.exports.injectCreateReplaceTokens = validateInjection;
+}

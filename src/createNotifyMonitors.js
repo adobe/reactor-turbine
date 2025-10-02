@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+
 function injectCreateNotifyMonitors({ logger }) {
   return function createNotifyMonitors(satellite) {
     var warningLogged = false;
@@ -36,8 +38,14 @@ function injectCreateNotifyMonitors({ logger }) {
   };
 }
 
-var logger = require('./logger');
-module.exports = injectCreateNotifyMonitors({ logger });
+const validateInjection = validateInjectedParams(injectCreateNotifyMonitors);
 
-// For testing only
-module.exports.injectCreateNotifyMonitors = injectCreateNotifyMonitors;
+module.exports = validateInjection({
+  logger: require('./logger')
+});
+
+/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  // For testing only
+  module.exports.injectCreateNotifyMonitors = validateInjection;
+}

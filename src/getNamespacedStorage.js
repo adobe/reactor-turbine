@@ -10,8 +10,10 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-function injectGetNamespacedStorage(window, NAMESPACE) {
-  NAMESPACE = NAMESPACE || 'com.adobe.reactor.'; // Default namespace.
+var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+
+function injectGetNamespacedStorage({ window }) {
+  var NAMESPACE = 'com.adobe.reactor.'; // Default namespace.
   return function getNamespacedStorage(storageType, additionalNamespace) {
     var finalNamespace = NAMESPACE + (additionalNamespace || '');
 
@@ -50,8 +52,14 @@ function injectGetNamespacedStorage(window, NAMESPACE) {
   };
 }
 
-var window = require('@adobe/reactor-window');
-module.exports = injectGetNamespacedStorage(window);
+const validateInjection = validateInjectedParams(injectGetNamespacedStorage);
 
-// For testing only.
-module.exports.injectGetNamespacedStorage = injectGetNamespacedStorage;
+module.exports = validateInjection({
+  window: require('@adobe/reactor-window')
+});
+
+/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  // For testing only.
+  module.exports.injectGetNamespacedStorage = validateInjection;
+}

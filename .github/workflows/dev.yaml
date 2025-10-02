@@ -1,6 +1,3 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: ci
 
 on:
@@ -11,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     environment: npm-publish
 
@@ -31,18 +28,18 @@ jobs:
       - run: npm run build --if-present
       - name: Linting files
         run: npm run lint
-      - uses: saucelabs/sauce-connect-action@v1
-        with:
-          username: ${{ secrets.SAUCE_USERNAME }}
-          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
-          noSSLBumpDomains: all
-          noProxyCaching: true
-          tunnelIdentifier: github-action-tunnel
-      - run: npm test
+
+      # Unit Tests Step
+      - name: Run unit tests
+        run: npm test
         env:
-          SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
-          SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Integration Tests Step
+      - name: Run integration tests
+        run: npm run integration-test

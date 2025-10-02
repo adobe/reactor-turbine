@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+
 function injectCreatePublicRequire({ moduleMap }) {
   moduleMap = moduleMap || {};
   return function createPublicRequire(getModuleExportsByRelativePath) {
@@ -33,9 +35,11 @@ function injectCreatePublicRequire({ moduleMap }) {
   };
 }
 
+const validateInjection = validateInjectedParams(injectCreatePublicRequire);
+
 // 'promise' in this context should be lowercase because imports are of the shape:
 // @adobe/reactor-promise, etc.
-module.exports = injectCreatePublicRequire({
+module.exports = validateInjection({
   moduleMap: {
     cookie: require('@adobe/reactor-cookie'),
     document: require('@adobe/reactor-document'),
@@ -47,5 +51,8 @@ module.exports = injectCreatePublicRequire({
   }
 });
 
-// For testing only.
-module.exports.injectCreatePublicRequire = injectCreatePublicRequire;
+/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  // For testing only.
+  module.exports.injectCreatePublicRequire = validateInjection;
+}

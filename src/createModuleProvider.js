@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+
 function injectCreateModuleProvider({ extractModuleExports, logger }) {
   return function createModuleProvider() {
     var moduleByReferencePath = {};
@@ -91,12 +93,15 @@ function injectCreateModuleProvider({ extractModuleExports, logger }) {
   };
 }
 
-var extractModuleExports = require('./extractModuleExports');
-var logger = require('./logger');
-module.exports = injectCreateModuleProvider({
-  extractModuleExports,
-  logger
+const validateInjection = validateInjectedParams(injectCreateModuleProvider);
+
+module.exports = validateInjection({
+  extractModuleExports: require('./extractModuleExports'),
+  logger: require('./logger')
 });
 
-// For testing only.
-module.exports.injectCreateModuleProvider = injectCreateModuleProvider;
+/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  // For testing only.
+  module.exports.injectCreateModuleProvider = validateInjection;
+}

@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+
 function injectHydrateModuleProvider({
   createGetSharedModuleExports,
   createGetExtensionSettings,
@@ -116,7 +118,9 @@ function injectHydrateModuleProvider({
   };
 }
 
-module.exports = injectHydrateModuleProvider({
+const validateInjection = validateInjectedParams(injectHydrateModuleProvider);
+
+module.exports = validateInjection({
   createGetSharedModuleExports: require('./createGetSharedModuleExports'),
   createGetExtensionSettings: require('./createGetExtensionSettings'),
   createGetHostedLibFileUrl: require('./createGetHostedLibFileUrl'),
@@ -125,4 +129,8 @@ module.exports = injectHydrateModuleProvider({
   logger: require('./logger')
 });
 
-module.exports.injectHydrateModuleProvider = injectHydrateModuleProvider;
+/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  // For testing only.
+  module.exports.injectHydrateModuleProvider = validateInjection;
+}

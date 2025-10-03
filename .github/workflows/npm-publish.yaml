@@ -44,7 +44,7 @@ jobs:
 
       # Integration Tests Step
       - name: Integration Tests For Publish
-        run: npm run test:integration:npm:publish
+        run: npm run test:integration:ci:npm:publish
 
       # Production Build
       - name: Build Production Bundle

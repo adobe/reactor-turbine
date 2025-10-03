@@ -5,8 +5,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "npm run clean && rollup -c",
-    "build:production": "NODE_ENV=production npm run build && npm run minify && npm run verify-no-test-code && sh ./verify-no-test-code.sh",
-    "verify-no-test-code": "grep -E 'injectIndex|REACTOR_KARMA_CI_UNIT_TEST_MODE' dist/engine.min.js && echo '❌ Test-only code found in production bundle!' && exit 1 || echo '✅ No test-only code found. dist/engine.min.js is ready for production.'",
+    "build:production": "NODE_ENV=production npm run build && npm run minify && npm run verify-no-test-code",
+    "verify-no-test-code": "bash ./verify-no-test-code.sh",
     "clean": "rm -rf dist",
     "format": "pretty-quick",
     "lint": "eslint 'src/**/*.js' 'coreModulePackages/**/*.js'",
@@ -17,7 +17,7 @@
     "test:unit:ci:pull:request": "npm install karma-sauce-launcher && karma start karma.unit.conf.js",
     "test:unit:ci:npm:publish": "karma start karma.unit.conf.js --browsers=ChromeHeadless --no-coverage",
     "test:integration": "npm run build && karma start karma.integration.conf.js --no-coverage",
-    "test:integration:npm:publish": "npm run build && karma start karma.integration.conf.js --browsers=ChromeHeadless --no-coverage"
+    "test:integration:ci:npm:publish": "npm run build && karma start karma.integration.conf.js --browsers=ChromeHeadless --no-coverage"
   },
   "author": {
     "name": "Adobe Systems",

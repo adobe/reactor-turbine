@@ -51,8 +51,8 @@ module.exports = validateInjection({
   }
 });
 
-/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
 if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
-  // For testing only.
+  /* START.TESTS_ONLY */
   module.exports.injectCreatePublicRequire = validateInjection;
+  /* END.TESTS_ONLY */
 }

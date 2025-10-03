@@ -11,6 +11,7 @@
  ****************************************************************************************/
 
 describe('Integration: dist/engine.js', () => {
+  let initialSatelliteReference;
   beforeAll((done) => {
     // Simulate a container being present before index.js is imported
     window._satellite = {
@@ -33,12 +34,17 @@ describe('Integration: dist/engine.js', () => {
         rules: []
       }
     };
+    initialSatelliteReference = window._satellite;
 
     const script = document.createElement('script');
     script.src = '/base/dist/engine.js'; // '/base/' is Karma's base URL prefix
     script.onload = () => done();
     script.onerror = (e) => done.fail(`Failed to load engine.js: ${e.message}`);
     document.body.appendChild(script);
+  });
+
+  fit('window._satellite should be decorated without the reference changing', async () => {
+    expect(window._satellite).toBe(initialSatelliteReference);
   });
 
   fit('should have expected _satellite functions', async () => {

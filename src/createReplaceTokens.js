@@ -119,8 +119,8 @@ module.exports = validateInjection({
   logger: require('./logger')
 });
 
-/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
 if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
-  // For testing only.
+  /* START.TESTS_ONLY */
   module.exports.injectCreateReplaceTokens = validateInjection;
+  /* END.TESTS_ONLY */
 }

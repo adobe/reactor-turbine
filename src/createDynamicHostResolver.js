@@ -147,8 +147,8 @@ module.exports = validateInjection({
   window: require('@adobe/reactor-window')
 });
 
-/* global REACTOR_KARMA_CI_UNIT_TEST_MODE */
 if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
-  // For testing only.
+  /* START.TESTS_ONLY */
   module.exports.injectCreateDynamicHostResolver = validateInjection;
+  /* END.TESTS_ONLY */
 }

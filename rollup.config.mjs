@@ -13,7 +13,9 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
+import stripCode from 'rollup-plugin-strip-code';
 
+/* eslint-disable camelcase */
 export default {
   input: 'src/index.js',
   output: {
@@ -28,6 +30,12 @@ export default {
       preventAssignment: true,
       REACTOR_KARMA_CI_UNIT_TEST_MODE: JSON.stringify(false)
     }),
+    ...('production' === process.env.NODE_ENV
+      ? [stripCode({
+        start_comment: 'START.TESTS_ONLY',
+        end_comment: 'END.TESTS_ONLY'
+      })]
+      : []),
     nodeResolve({
       preferBuiltins: false
     }),

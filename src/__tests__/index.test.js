@@ -135,6 +135,7 @@ describe('index', function () {
         }
       }
     };
+    window._satellite = satelliteMock;
 
     loggerMock = jasmine.createSpyObj('logger', [
       'log',
@@ -177,25 +178,15 @@ describe('index', function () {
     }
   });
 
-  it(
-    'in test mode, the resolved window._satellite object is the same as the returned ' +
-      'object from createTurbine call',
-    function () {
-      var createTurbine = injectIndex(getRealDeps());
-      var returnedSatellite = createTurbine(satelliteMock);
-      expect(window._satellite).toBe(returnedSatellite);
-    }
-  );
-
   it('starts up just fine when container.company.cdnAllowList is undefined', function () {
     expect(function () {
       delete satelliteMock.container.company.cdnAllowList;
-      var createTurbine = injectIndex(
+      var decorateSatellite = injectIndex(
         injectPartialMocks({
           logger: loggerMock
         })
       );
-      createTurbine(satelliteMock);
+      decorateSatellite(satelliteMock);
     }).not.toThrow();
 
     expect(loggerMock.warn).not.toHaveBeenCalledWith(
@@ -203,31 +194,24 @@ describe('index', function () {
     );
   });
 
-  it('exports the window._satellite object', function () {
-    delete window._satellite;
-    var createTurbine = injectIndex(getRealDeps());
-    createTurbine(satelliteMock);
-    expect(window._satellite).not.toBeFalsy();
-  });
-
   it('prevents turbine from executing multiple times', function () {
     var createModuleProviderMock = jasmine.createSpy();
-    var createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         createModuleProvider: createModuleProviderMock,
         logger: loggerMock
       })
     );
 
-    createTurbine(satelliteMock);
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(createModuleProviderMock).toHaveBeenCalledTimes(1);
   });
 
   it('deletes the container', function () {
-    var createTurbine = injectIndex(getRealDeps());
-    createTurbine(satelliteMock);
+    var decorateSatellite = injectIndex(getRealDeps());
+    decorateSatellite(satelliteMock);
     expect(window._satellite.container).toBe(undefined);
   });
 
@@ -242,12 +226,12 @@ describe('index', function () {
         id: 'the-environment-id',
         stage: 'the-environment-stage-in-environment'
       };
-      var createTurbine = injectIndex(
+      var decorateSatellite = injectIndex(
         injectPartialMocks({
           logger: loggerMock
         })
       );
-      createTurbine(satelliteMock);
+      decorateSatellite(satelliteMock);
 
       expect(window._satellite.buildInfo.environment).toBe(
         'the-environment-stage-in-environment'
@@ -261,12 +245,12 @@ describe('index', function () {
 
   it('creates moduleProvider', function () {
     var createModuleProviderMock = jasmine.createSpy();
-    var createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         createModuleProvider: createModuleProviderMock
       })
     );
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(createModuleProviderMock).toHaveBeenCalled();
   });
@@ -280,7 +264,7 @@ describe('index', function () {
       return settingsFileTransformerMock;
     };
     var moduleProviderMock = function () {};
-    var createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         createGetDataElementValue: createGetDataElementValueMock,
         createModuleProvider: function () {
@@ -289,7 +273,7 @@ describe('index', function () {
         createSettingsFileTransformer: createSettingsFileTransformer
       })
     );
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(createGetDataElementValueMock).toHaveBeenCalledWith(
       moduleProviderMock,
@@ -302,13 +286,13 @@ describe('index', function () {
 
   it('creates setCustomVar', function () {
     var createSetCustomVarMock = jasmine.createSpy();
-    var createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         createSetCustomVar: createSetCustomVarMock,
         logger: loggerMock
       })
     );
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(createSetCustomVarMock).toHaveBeenCalledWith(jasmine.any(Object));
   });
@@ -316,13 +300,13 @@ describe('index', function () {
   it('creates isVar', function () {
     var createIsVarMock = jasmine.createSpy();
 
-    var createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         createIsVar: createIsVarMock,
         logger: loggerMock
       })
     );
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(createIsVarMock).toHaveBeenCalledWith(
       jasmine.any(Object),
@@ -333,7 +317,7 @@ describe('index', function () {
   it('creates getVar', function () {
     var createGetVarMock = jasmine.createSpy();
     var getDataElementValueMock = function () {};
-    var createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         createGetVar: createGetVarMock,
         createGetDataElementValue: function () {
@@ -343,7 +327,7 @@ describe('index', function () {
       })
     );
 
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(createGetVarMock).toHaveBeenCalledWith(
       jasmine.any(Object),
@@ -356,7 +340,7 @@ describe('index', function () {
     var createReplaceTokensMock = jasmine.createSpy();
     var isVarMock = function () {};
     var getVarMock = function () {};
-    var createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         createReplaceTokens: createReplaceTokensMock,
         createIsVar: function () {
@@ -368,7 +352,7 @@ describe('index', function () {
         logger: loggerMock
       })
     );
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(createReplaceTokensMock).toHaveBeenCalledWith(
       isVarMock,
@@ -381,13 +365,13 @@ describe('index', function () {
     var getNamespacedStorageMock = jasmine.createSpy().and.returnValue({
       getItem: function () {}
     });
-    const createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         getNamespacedStorage: getNamespacedStorageMock,
         logger: loggerMock
       })
     );
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(getNamespacedStorageMock).toHaveBeenCalledWith('localStorage');
   });
@@ -395,12 +379,12 @@ describe('index', function () {
   it("sets logger output enabled when local storage item is 'true'", function () {
     window.localStorage.setItem('com.adobe.reactor.debug', true);
 
-    const createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         logger: loggerMock
       })
     );
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(loggerMock.outputEnabled).toBe(true);
   });
@@ -411,12 +395,12 @@ describe('index', function () {
     function () {
       window.localStorage.setItem('com.adobe.reactor.debug', false);
 
-      const createTurbine = injectIndex(
+      var decorateSatellite = injectIndex(
         injectPartialMocks({
           logger: loggerMock
         })
       );
-      createTurbine(satelliteMock);
+      decorateSatellite(satelliteMock);
 
       expect(loggerMock.outputEnabled).toBe(false);
     }
@@ -426,7 +410,7 @@ describe('index', function () {
     var hydrateSatelliteObjectMock = jasmine.createSpy();
     var getVarMock = function () {};
     var setCustomVarMock = function () {};
-    const createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         hydrateSatelliteObject: hydrateSatelliteObjectMock,
         createGetVar: function () {
@@ -442,7 +426,7 @@ describe('index', function () {
     const satelliteWithoutContainerMock = cloneDeep(satelliteMock);
     const satelliteContainerMock = cloneDeep(satelliteMock.container);
     delete satelliteWithoutContainerMock.container;
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(hydrateSatelliteObjectMock).toHaveBeenCalledWith(
       satelliteWithoutContainerMock,
@@ -473,7 +457,7 @@ describe('index', function () {
       'decorateWithDynamicHost'
     );
     const satelliteContainerMock = cloneDeep(satelliteMock.container);
-    var createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         hydrateModuleProvider: hydrateModuleProviderMock,
         createModuleProvider: function () {
@@ -499,7 +483,7 @@ describe('index', function () {
         logger: loggerMock
       })
     );
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(hydrateModuleProviderMock).toHaveBeenCalledWith(
       jasmine.objectContaining({
@@ -524,7 +508,7 @@ describe('index', function () {
     var initRulesMock = jasmine.createSpy();
     var buildRuleExecutionOrderMock = function () {};
     var initEventModuleMock = function () {};
-    var createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         initRules: initRulesMock,
         buildRuleExecutionOrder: buildRuleExecutionOrderMock,
@@ -534,7 +518,7 @@ describe('index', function () {
         logger: loggerMock
       })
     );
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(initRulesMock).toHaveBeenCalledWith(
       buildRuleExecutionOrderMock,
@@ -547,7 +531,7 @@ describe('index', function () {
     delete satelliteMock.container.rules;
     var rules;
 
-    var createTurbine = injectIndex(
+    var decorateSatellite = injectIndex(
       injectPartialMocks({
         initRules: function (_satellite, _rules) {
           rules = _rules;
@@ -555,7 +539,7 @@ describe('index', function () {
         logger: loggerMock
       })
     );
-    createTurbine(satelliteMock);
+    decorateSatellite(satelliteMock);
 
     expect(rules).toEqual([]);
   });
@@ -570,7 +554,7 @@ describe('index', function () {
         foo: dataElementDefinition
       };
       var getDataElementDefinition;
-      var createTurbine = injectIndex(
+      var decorateSatellite = injectIndex(
         injectPartialMocks({
           createIsVar: function (customVars, _getDataElementDefinition) {
             getDataElementDefinition = _getDataElementDefinition;
@@ -579,7 +563,7 @@ describe('index', function () {
           logger: loggerMock
         })
       );
-      createTurbine(satelliteMock);
+      decorateSatellite(satelliteMock);
 
       expect(getDataElementDefinition('foo')).toEqual(dataElementDefinition);
     });
@@ -587,7 +571,7 @@ describe('index', function () {
     it("doesn't throw an error when container doesn't have data elements", function () {
       delete satelliteMock.container.dataElements;
       var getDataElementDefinition;
-      var createTurbine = injectIndex(
+      var decorateSatellite = injectIndex(
         injectPartialMocks({
           createIsVar: function (customVars, _getDataElementDefinition) {
             getDataElementDefinition = _getDataElementDefinition;
@@ -596,7 +580,7 @@ describe('index', function () {
           logger: loggerMock
         })
       );
-      createTurbine(satelliteMock);
+      decorateSatellite(satelliteMock);
 
       expect(getDataElementDefinition('foo')).toBe(undefined);
     });
@@ -605,7 +589,7 @@ describe('index', function () {
   describe('setDebugOutputEnabled', function () {
     it('sets localStorage item', function () {
       var setOutputDebugEnabled;
-      var createTurbine = injectIndex(
+      var decorateSatellite = injectIndex(
         injectPartialMocks({
           hydrateSatelliteObject: function (
             _satellite,
@@ -617,7 +601,7 @@ describe('index', function () {
           logger: loggerMock
         })
       );
-      createTurbine(satelliteMock);
+      decorateSatellite(satelliteMock);
 
       expect(
         window.localStorage.getItem('com.adobe.reactor.debug')
@@ -660,12 +644,12 @@ describe('index', function () {
             satelliteMock.container.company.cdnAllowList = [];
 
             expect(function () {
-              var createTurbine = injectIndex(
+              var decorateSatellite = injectIndex(
                 injectPartialMocks({
                   logger: loggerMock
                 })
               );
-              createTurbine(satelliteMock);
+              decorateSatellite(satelliteMock);
             }).toThrowError(
               'Unable to find the Library Embed Code for Dynamic Host Resolution.'
             );
@@ -687,12 +671,12 @@ describe('index', function () {
             satelliteMock.container.company.cdnAllowList = [];
 
             expect(function () {
-              var createTurbine = injectIndex(
+              var decorateSatellite = injectIndex(
                 injectPartialMocks({
                   logger: loggerMock
                 })
               );
-              createTurbine(satelliteMock);
+              decorateSatellite(satelliteMock);
             }).toThrowError(
               'This library is not authorized for this domain. ' +
                 'Please contact your CSM for more information.'
@@ -710,12 +694,12 @@ describe('index', function () {
             ];
 
             expect(function () {
-              var createTurbine = injectIndex(
+              var decorateSatellite = injectIndex(
                 injectPartialMocks({
                   logger: loggerMock
                 })
               );
-              createTurbine(satelliteMock);
+              decorateSatellite(satelliteMock);
             }).toThrowError(
               'This library is not authorized for this domain. ' +
                 'Please contact your CSM for more information.'

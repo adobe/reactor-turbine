@@ -9,6 +9,9 @@ export default [
     languageOptions: {
       globals: {
         _satellite: true,
+        REACTOR_KARMA_CI_UNIT_TEST_MODE: true,
+        // eslint-disable-next-line camelcase
+        __satelite_loaded: true,
         ...globals.browser,
         ...globals.jasmine,
         ...globals.node

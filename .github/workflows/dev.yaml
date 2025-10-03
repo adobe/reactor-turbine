@@ -44,10 +44,12 @@ jobs:
         env:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      ## Coveralls down.
+      #- name: Coveralls
+      #  uses: coverallsapp/github-action@v2.3.6
+      #  with:
+      #    github-token: ${{ secrets.GITHUB_TOKEN }}
+      #    path-to-lcov: ./coverage/lcov.info
 
       # Integration Tests Step
       - name: Run integration tests

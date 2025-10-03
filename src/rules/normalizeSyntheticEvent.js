@@ -43,7 +43,7 @@ const validateInjection = validateInjectedParams(injectNormalizeSyntheticEvent);
 
 module.exports = validateInjection({
   objectAssign: require('@adobe/reactor-object-assign'),
-  isPlainObject: require('is-plain-object'),
+  isPlainObject: require('is-plain-object').isPlainObject,
   logger: require('../logger')
 });
 

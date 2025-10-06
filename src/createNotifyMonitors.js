@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+var validateInjectedParams = require('./helpers/validate-injected-params');
 
 function injectCreateNotifyMonitors({ logger }) {
   return function createNotifyMonitors(satellite) {

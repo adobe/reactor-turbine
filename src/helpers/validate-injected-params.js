@@ -11,7 +11,7 @@
  ****************************************************************************************/
 
 // reads the function signature and sees if a caller doesn't pass enough parameters
-module.exports = function autoValidate(fn) {
+module.exports = function validateInjectedParams(fn) {
   return function (args = {}) {
     const missing = [];
 

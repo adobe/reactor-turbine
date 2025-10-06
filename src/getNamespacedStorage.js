@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+var validateInjectedParams = require('./helpers/validate-injected-params');
 
 function injectGetNamespacedStorage({ window }) {
   var NAMESPACE = 'com.adobe.reactor.'; // Default namespace.

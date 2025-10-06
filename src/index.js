@@ -1,4 +1,4 @@
-var validateInjectedParams = require('./helpers/validate-expected-inject-params');
+var validateInjectedParams = require('./helpers/validate-injected-params');
 
 function indexDependencyInjector({
   logger,

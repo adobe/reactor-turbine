@@ -1,0 +1,3 @@
+# Ignore generated test files
+src/__integration__/faked-containers/fake-blacksmith-container.js
+

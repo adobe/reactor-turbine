@@ -14,7 +14,7 @@
     "prepare": "husky install",
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "karma start karma.unit.conf.js",
-    "test:unit:ci:pull:request": "npm install karma-sauce-launcher && karma start karma.unit.conf.js",
+    "test:unit:ci:pull:request": "npm install karma-sauce-launcher@4.3.6 && karma start karma.unit.conf.js",
     "test:unit:ci:npm:publish": "karma start karma.unit.conf.js --browsers=ChromeHeadless --no-coverage",
     "test:integration": "npm run build && karma start karma.integration.conf.js --no-coverage",
     "test:integration:ci:npm:publish": "npm run build && karma start karma.integration.conf.js --browsers=ChromeHeadless --no-coverage"

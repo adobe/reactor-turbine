@@ -6,6 +6,11 @@ export default [
   js.configs.recommended,
   eslintPluginPrettierRecommended,
   {
+    ignores: [
+      'src/__integration__/faked-containers/fake-blacksmith-container.js'
+    ]
+  },
+  {
     languageOptions: {
       globals: {
         _satellite: true,

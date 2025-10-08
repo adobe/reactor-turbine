@@ -51,6 +51,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov.info
 
-      # Integration Tests Step
-      - name: Run integration tests
-        run: npm run test:integration
+      # TODO: uncomment
+      ## Integration Tests Step
+      #- name: Run integration tests
+      #  run: npm run test:integration

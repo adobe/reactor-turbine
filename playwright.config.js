@@ -12,10 +12,15 @@
 
 'use strict';
 
-// Only run integration tests
-var testsContext = require.context(
-  './src/__integration__',
-  true,
-  /\.test\.jsx?$/
-);
-testsContext.keys().forEach(testsContext);
+const path = require('path');
+
+module.exports = {
+  testDir: path.join(__dirname, 'src', '__integration__'),
+  timeout: 15 * 1000,
+  use: {
+    headless: true,
+    viewport: { width: 1280, height: 720 },
+    ignoreHTTPSErrors: true
+  },
+  reporter: [['list']]
+};

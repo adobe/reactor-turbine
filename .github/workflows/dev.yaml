@@ -31,39 +31,53 @@ jobs:
       - name: Linting files
         run: npm run lint
 
-#      # If the commit included changing the turbine version, we need to publish to the 'next' tag
-#      - name: Get local version
-#        id: local
-#        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
-#
-#      - name: Get current 'next' tag version from npm
-#        id: npm
-#        run: |
-#          PACKAGE_NAME=$(jq -r .name package.json)
-#          CURRENT_NEXT=$(npm view "$PACKAGE_NAME@next" version 2>/dev/null || echo "0.0.0")
-#          echo "version=$CURRENT_NEXT" >> $GITHUB_OUTPUT
-#
-#      - name: Compare versions
-#        id: compare
-#        run: |
-#          echo "Local version: ${{ steps.local.outputs.version }}"
-#          echo "Next version:  ${{ steps.npm.outputs.version }}"
-#          if [ "${{ steps.local.outputs.version }}" != "${{ steps.npm.outputs.version }}" ]; then
-#            echo "deploy=true" >> $GITHUB_OUTPUT
-#          else
-#            echo "deploy=false" >> $GITHUB_OUTPUT
-#          fi
-#
-#      - name: Deploy package due to commit containing package.json version change
-#        if: steps.compare.outputs.deploy == 'true'
-#        uses: JS-DevTools/npm-publish@v3
-#        with:
-#          token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
-#          tag: "next"
-#
-#      - name: Skip deploy
-#        if: steps.compare.outputs.deploy == 'false'
-#        run: echo "✅ Versions match. No deploy needed."
+      # If the commit included changing the turbine version, we need to publish to the 'next' tag
+      - name: Get local version
+        id: local
+        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+
+      - name: Get current 'next' tag version from npm
+        id: npm
+        run: |
+          PACKAGE_NAME=$(jq -r .name package.json)
+          CURRENT_NEXT=$(npm view "$PACKAGE_NAME@next" version 2>/dev/null || echo "0.0.0")
+          echo "version=$CURRENT_NEXT" >> $GITHUB_OUTPUT
+
+      - name: Compare versions
+        id: compare
+        run: |
+          echo "Local version: ${{ steps.local.outputs.version }}"
+          echo "Next version:  ${{ steps.npm.outputs.version }}"
+          if [ "${{ steps.local.outputs.version }}" != "${{ steps.npm.outputs.version }}" ]; then
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build package due to commit containing package.json version change
+        if: steps.compare.outputs.deploy == 'true'
+        run: npm run build:production
+
+      - name: Deploy package due to commit containing package.json version change
+        if: steps.compare.outputs.deploy == 'true'
+        uses: JS-DevTools/npm-publish@v3
+        with:
+          token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
+          tag: "next"
+
+      # 🔥 Force exit if deploy happened
+      # Exit code 78 tells GitHub Actions to stop the workflow without marking it as failed
+      - name: Stop workflow after deployment due to changing package.json version
+        if: steps.compare.outputs.deploy == 'true'
+        run: |
+          echo "✅ Deployment completed — stopping workflow."
+          echo "⚠️ Rebuild Forge now that we've placed the new version on npm."
+          echo "✅ Then re-run this action to validate the new version."
+          exit 78
+
+      - name: Skip deploy
+        if: steps.compare.outputs.deploy == 'false'
+        run: echo "✅ Versions match. No deploy needed."
 
       # Start Sauce Connect tunnel for SauceLabs
       - name: Start Sauce Connect
@@ -87,24 +101,24 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov.info
 
-#      - name: Create .env file for integration tests
-#        run: |
-#          cat > ci-scripts/setup/.env << EOF
-#          # GitHub Actions environment - integration tests will use mock/test values
-#          RSDK_ADOBE_CLIENT_ID=${{ secrets.RSDK_ADOBE_CLIENT_ID  }}
-#          RSDK_ADOBE_CLIENT_SECRET=${{ secrets.RSDK_ADOBE_CLIENT_SECRET }}
-#          RSDK_ADOBE_SCOPES=${{ secrets.RSDK_ADOBE_SCOPES }}
-#          RSDK_ADOBE_ORG_ID=${{ secrets.RSDK_ADOBE_ORG_ID }}
-#          RSDK_ADOBE_REACTOR_COMPANY_ID=${{ secrets.RSDK_ADOBE_REACTOR_COMPANY_ID }}
-#          RSDK_ADOBE_REACTOR_URL=${{ secrets.RSDK_ADOBE_REACTOR_URL }}
-#          RSDK_ADOBE_ENVIRONMENT=${{ secrets.RSDK_ADOBE_ENVIRONMENT }}
-#          EOF
-#
-#      # Integration Tests Step
-#      - name: Run integration tests
-#        run: npm run test:integration
-#
-#      - name: Clean Sensitive Files
-#        if: always()
-#        run: |
-#          rm -rf ci-scripts/setup/.env
+      - name: Create .env file for integration tests
+        run: |
+          cat > ci-scripts/setup/.env << EOF
+          # GitHub Actions environment - integration tests will use mock/test values
+          RSDK_ADOBE_CLIENT_ID=${{ secrets.RSDK_ADOBE_CLIENT_ID  }}
+          RSDK_ADOBE_CLIENT_SECRET=${{ secrets.RSDK_ADOBE_CLIENT_SECRET }}
+          RSDK_ADOBE_SCOPES=${{ secrets.RSDK_ADOBE_SCOPES }}
+          RSDK_ADOBE_ORG_ID=${{ secrets.RSDK_ADOBE_ORG_ID }}
+          RSDK_ADOBE_REACTOR_COMPANY_ID=${{ secrets.RSDK_ADOBE_REACTOR_COMPANY_ID }}
+          RSDK_ADOBE_REACTOR_URL=${{ secrets.RSDK_ADOBE_REACTOR_URL }}
+          RSDK_ADOBE_ENVIRONMENT=${{ secrets.RSDK_ADOBE_ENVIRONMENT }}
+          EOF
+
+      # Integration Tests Step
+      - name: Run integration tests
+        run: npm run test:integration
+
+      - name: Clean Sensitive Files
+        if: always()
+        run: |
+          rm -rf ci-scripts/setup/.env

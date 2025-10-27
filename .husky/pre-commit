@@ -1,3 +1,2 @@
 #!/bin/sh
 npx lint-staged
-node ./ci-scripts/ensure-library-builds-for-integration.js

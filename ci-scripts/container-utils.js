@@ -30,12 +30,12 @@ function generateVersion() {
 
 /**
  * Generate a unique property name with version
- * @param {string} containerType - Type of container ('Sync' or 'Async')
+ * @param {string} containerType - Type of container being generated
  * @returns {string} Unique property name
  */
 function generatePropertyName({ containerType }) {
   const version = generateVersion();
-  return `Test Turbine v${thisTurbineVersion} ${containerType} Container v${version}`;
+  return `Test Turbine v${thisTurbineVersion} ${containerType} v${version}`;
 }
 
 /**
@@ -402,6 +402,7 @@ async function buildLibrary({ libraryId }) {
  * Prepare a new property containing an environment, library, and a rule to place delegates in.
  * @param {boolean} ruleComponentSequencingEnabled
  * @param ruleName
+ * @param containerType
  * @returns {Promise<{
  * propertyName: string,
  * propertyId: string,
@@ -414,9 +415,10 @@ async function buildLibrary({ libraryId }) {
  */
 async function prepareNewPropertyForDelegates({
   ruleComponentSequencingEnabled = false,
-  ruleName = 'Test Rule'
+  ruleName = 'Test Rule',
+  containerType
 }) {
-  const propertyName = generatePropertyName({ containerType: 'Sync' });
+  const propertyName = generatePropertyName({ containerType });
 
   // 1. Create property
   const property = await createProperty({

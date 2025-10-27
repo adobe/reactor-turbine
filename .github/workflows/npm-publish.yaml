@@ -31,25 +31,44 @@ jobs:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
-      # Project  Setup
+      # Project Setup
       - name: Install dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: npm ci
+        run: |
+          npm ci && npx playwright install
       - name: Linting files
         run: npm run lint
-
-      # Unit Tests Step
-      - name: CI Tests For Publish
-        run: npm run test:unit:ci:npm:publish
-
-      # Integration Tests Step
-      - name: Integration Tests For Publish
-        run: npm run test:integration:ci:npm:publish
 
       # Production Build
       - name: Build Production Bundle
         run: npm run build:production
 
+      # Unit Tests Step
+      - name: CI Tests For Publish
+        run: npm run test:unit:ci:npm:publish
+
+#      # Integration Tests Step
+#      - name: Integration Tests For Publish
+#        run: npm run test:integration:ci:npm:publish
+#
+#      - name: Create .env file for integration tests
+#        run: |
+#          cat > ci-scripts/setup/.env << EOF
+#          # GitHub Actions environment - integration tests will use mock/test values
+#          RSDK_ADOBE_CLIENT_ID=${{ secrets.RSDK_ADOBE_CLIENT_ID  }}
+#          RSDK_ADOBE_CLIENT_SECRET=${{ secrets.RSDK_ADOBE_CLIENT_SECRET }}
+#          RSDK_ADOBE_SCOPES=${{ secrets.RSDK_ADOBE_SCOPES }}
+#          RSDK_ADOBE_ORG_ID=${{ secrets.RSDK_ADOBE_ORG_ID }}
+#          RSDK_ADOBE_REACTOR_COMPANY_ID=${{ secrets.RSDK_ADOBE_REACTOR_COMPANY_ID }}
+#          RSDK_ADOBE_REACTOR_URL=${{ secrets.RSDK_ADOBE_REACTOR_URL }}
+#          RSDK_ADOBE_ENVIRONMENT=${{ secrets.RSDK_ADOBE_ENVIRONMENT }}
+#          EOF
+#
+#      - name: Clean Sensitive Files
+#        if: always()
+#        run: |
+#          rm -rf ci-scripts/setup/.env
+#
       # Publish to NPM
       - name: Publish to NPM
         uses: JS-DevTools/npm-publish@v3

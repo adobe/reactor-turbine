@@ -1,6 +1,6 @@
 {
   "name": "@adobe/reactor-turbine",
-  "version": "29.0.0-beta.2",
+  "version": "29.0.0-beta.4",
   "description": "Tags rule engine which processes rules on client websites and delegates logic to extensions.",
   "license": "Apache-2.0",
   "scripts": {
@@ -20,7 +20,7 @@
     "generate-access-token": "node ci-scripts/setup/generate-access-token.js",
     "ensure-integration-containers": "npm run generate-access-token && node ci-scripts/ensure-library-builds-for-integration.js --",
     "test:integration": "npm run build && npm run ensure-integration-containers && playwright test",
-    "test:integration:ci:npm:publish": "npm run test:integration"
+    "test:integration:ci:npm:publish": "npm run build && npm run ensure-integration-containers -- --force && playwright test"
   },
   "author": {
     "name": "Adobe Systems",

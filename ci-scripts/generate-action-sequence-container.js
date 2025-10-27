@@ -20,7 +20,8 @@ async function generateContainer() {
       launchValidationExtensionId
     } = await ReactorApi.prepareNewPropertyForDelegates({
       ruleName: 'EP Action Promise Rule',
-      ruleComponentSequencingEnabled: true
+      ruleComponentSequencingEnabled: true,
+      containerType: 'ACTION_SEQUENCE_CONTAINER'
     });
 
     const rulesUsed = [];

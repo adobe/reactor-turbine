@@ -26,8 +26,9 @@ jobs:
       # Project Setup
       - name: Install dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: |
-          npm ci && npx playwright install
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install
       - name: Linting files
         run: npm run lint
 

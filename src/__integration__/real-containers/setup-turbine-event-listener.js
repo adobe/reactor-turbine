@@ -130,6 +130,9 @@ module.exports = async function setupTurbineEventListener({
                   expectedActionsFound.length === expectedIds.length &&
                   unexpectedActionsFound.length === 0
                 ) {
+                  const gracePeriodTimeout = !unexpectedIds?.length
+                    ? 0 // there are no unexpectedIds to check, so we don't need a grace period
+                    : 2000;
                   // grace period to see if unexpected actions end up flowing through
                   // after we think we're done
                   window.setTimeout(function () {
@@ -143,7 +146,7 @@ module.exports = async function setupTurbineEventListener({
                         unexpectedActionsFound
                       });
                     }
-                  }, 2000); // don't extend the check for extra actions to come in.
+                  }, gracePeriodTimeout); // don't extend the check for extra actions to come in.
                 }
               } else if (
                 unexpectedIds != null && // unexpectedIds is optional

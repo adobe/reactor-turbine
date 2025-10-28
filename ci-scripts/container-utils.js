@@ -1,7 +1,19 @@
-/**
- * Shared utilities for container generation scripts
- */
+/***************************************************************************************
+ * (c) 2025 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ ****************************************************************************************/
 
+/**
+ * Shared utilities for container generation scripts. Wraps the Reactor SDK to make
+ * creating resources easier.
+ */
 const Reactor = require('./create-reactor-sdk');
 const path = require('path');
 const packageJson = require(path.resolve(__dirname, '..', 'package.json'));
@@ -103,6 +115,13 @@ async function createDevelopmentEnvironment({ propertyId }) {
   return environment;
 }
 
+/**
+ * Ensure an extension is installed on a property, installing it if necessary
+ * @param propertyId
+ * @param extensionPackageName
+ * @param settings
+ * @returns {Promise<{data: *}>}
+ */
 async function ensureExtensionInstalled({
   propertyId,
   extensionPackageName,
@@ -148,6 +167,12 @@ async function ensureExtensionInstalled({
   return extension;
 }
 
+/**
+ * Install an extension with some default settings
+ * @param extensionPackageName
+ * @param propertyId
+ * @returns {Promise<{data: *}>}
+ */
 async function installExtension({ extensionPackageName, propertyId }) {
   if (!extensionPackageName) {
     throw new Error(
@@ -172,23 +197,6 @@ async function installExtension({ extensionPackageName, propertyId }) {
       break;
     case 'core':
       settings = {};
-      break;
-    case 'adobe-analytics':
-      settings = {
-        libraryCode: {
-          type: 'managed',
-          accounts: {
-            production: ['jajasona'],
-            development: ['jajasona']
-          }
-        },
-        trackerProperties: {
-          trackInlineStats: true,
-          trackDownloadLinks: true,
-          trackExternalLinks: true,
-          linkDownloadFileTypes: ['doc', 'docx', 'jpg']
-        }
-      };
       break;
     default:
       settings = {};
@@ -264,6 +272,14 @@ async function createLibrary({
   return await Reactor.createLibrary(propertyId, data);
 }
 
+/**
+ * Create a custom code data element.
+ * @param propertyId
+ * @param coreExtensionId
+ * @param settings
+ * @param restAttributes
+ * @returns {Promise<*>}
+ */
 async function createCustomCodeDataElement({
   propertyId,
   coreExtensionId,

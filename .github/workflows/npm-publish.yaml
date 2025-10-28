@@ -25,18 +25,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/jod'
-      - uses: actions/cache@v4
-        id: npm-cache
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
       # Project Setup
       - name: Install dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install
       - name: Linting files
         run: npm run lint
 

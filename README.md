@@ -17,18 +17,15 @@ Contributions are welcomed! Read the [Contributing Guide](CONTRIBUTING.md) for m
 To get started:
 
 1. Install [node.js](https://nodejs.org/).
-3. Clone the repository.
-4. After navigating into the project directory, install project dependencies by running `npm install`.
+1. Clone the repository.
+1. After navigating into the project directory, install project dependencies by running `npm install`.
+1. `cp .env.example .env` and modify the environment variables as needed.
 
 ### Scripts
 
 To run tests a single time, run the following command:
 
 `npm run test`
-
-To run tests continually while developing, run the following command:
-
-`npm run test:watch`
 
 To ensure your code meets our linting standards, run the following command:
 
@@ -38,6 +35,37 @@ To create a build, run the following command:
 
 `npm run build`
 
+To create a production build, run the following command:
+
+`npm run build:production`
+
+For integration tests, you can run the following commands:
+* To check if the real containers are ready for testing: `npm run ensure-integration-containers`
+* To force a rebuild of all the real containers: `npm run rebuild-integration-containers -- --force`
+* `npm run test:integration`
+
+
+### Pull Request & Deployment Process
+
+When you bump package.json and open a pull request, the `dev.yaml` GitHub Action workflow will verify that the Turbine
+version deployed to the `next` tag on npm matches the version in package.json. **If it does not match**, the workflow
+will perform the following steps:
+
+1. run a production build.
+1. push to the npm `next` tag using the current version in `package.json`.
+1. Exit with `failure code 78`.
+
+In the event that the deployment exits with `failure code 78`, the Reactor team will need to deploy the new version to
+an image. After the deployment is complete, re-run the failed workflow job. It will:
+
+1. verify that the Turbine version deployed to the `next` tag on npm matches the version in package.json.
+1. Run the unit tests
+1. Run Coveralls
+1. Run the integration tests, building new containers if necessary.
+
+If you push a new commit to an open PR without bumping package.json, the versions should match and the tests should run
+uninterrupted.
+
 ## Browser Support
 
 Turbine supports the following browsers:
@@ -45,7 +73,7 @@ Turbine supports the following browsers:
 * Chrome (latest)
 * Safari (latest)
 * Firefox (latest)
-* Internet Explorer (10 and above)
+* Edge (latest)
 * iOS Safari (latest)
 
 ## Licensing

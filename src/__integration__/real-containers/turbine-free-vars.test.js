@@ -46,6 +46,9 @@ test('Verify turbine-free-vars rules', async ({ page }) => {
   expect(unexpectedActionsFound.length).toBe(0);
 });
 
+// TODO
+//  test('verify custom code transforms with entitlements')
+
 // test('Verify Turbine DataElement Custom Code Rule', async ({ page }) => {
 //   await loadHtml({ page });
 //   const expectedActionIds = ['TurbineFreeVars::turbine_cc_data_element-pass::thrownError'];

@@ -1,5 +1,17 @@
 #!/usr/bin/env node
 
+/***************************************************************************************
+ * (c) 2025 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ ****************************************************************************************/
+
 const path = require('path');
 const libraryBuildPathsFile = path.join(__dirname, 'library-build-paths.json');
 
@@ -8,8 +20,6 @@ const packageJson = require(path.join(__dirname, '..', 'package.json'));
 const thisTurbineVersion = packageJson.version;
 
 const containerTypes = {
-  // SYNC_CONTAINER: require('./generate-sync-container'),
-  // ASYNC_CONTAINER: require('./generate-async-container')
   ACTION_SEQUENCE_CONTAINER: require('./generate-action-sequence-container'),
   TURBINE_FREE_VARS_CONTAINER: require('./generate-turbine-free-vars-container')
 };
@@ -80,6 +90,10 @@ const checkUrl = async (url) => {
           console.log('Turbine version mismatch for', url);
           console.log('This Turbine Version:', thisTurbineVersion);
           console.log('Library Turbine version:', libraryTurbineVersion);
+        } else {
+          console.log(
+            `✅ ---Turbine version for the built library matches local version ${thisTurbineVersion}---`
+          );
         }
         return isValid;
       } else {

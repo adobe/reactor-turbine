@@ -1,9 +1,16 @@
 #!/usr/bin/env node
-/**
- * Generate async container for integration testing
+
+/***************************************************************************************
+ * (c) 2025 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
  *
- * This script handles async container generation for testing purposes.
- */
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ ****************************************************************************************/
 
 /* eslint-disable camelcase */
 
@@ -25,11 +32,6 @@ async function generateContainer() {
       containerType: 'TURBINE_FREE_VARS'
     });
 
-    // const adobeAnalyticsExtension = await ReactorApi.installExtension({
-    //   extensionPackageName: 'adobe-analytics',
-    //   propertyId
-    // });
-    // const adobeAnalyticsExtensionId = adobeAnalyticsExtension.data.id;
     const dataElementsUsed = [];
     const dataElement1 = await ReactorApi.createCustomCodeDataElement({
       propertyId,
@@ -82,6 +84,7 @@ async function generateContainer() {
       console.log('Error creating rule 1');
       throw err;
     }
+
     try {
       /**** rule 2, Turbine Custom Event Code Rule, custom event ****/
       const rule2 = await ReactorApi.createRule({
@@ -121,6 +124,7 @@ async function generateContainer() {
       console.log('Error creating rule 2');
       throw err;
     }
+
     try {
       /**** rule 3, Turbine Custom Condition Code Rule, custom event ****/
       const rule3 = await ReactorApi.createRule({
@@ -170,6 +174,7 @@ async function generateContainer() {
       console.log('Error creating rule 3');
       throw err;
     }
+
     try {
       /**** rule 4, Turbine Embedded Action Custom Code Rule, custom event ****/
       const rule4 = await ReactorApi.createRule({
@@ -206,6 +211,7 @@ async function generateContainer() {
       console.log('Error creating rule 4');
       throw err;
     }
+
     try {
       /**** rule 5, Turbine Embedded Action Custom Code Rule, custom event ****/
       const rule5 = await ReactorApi.createRule({

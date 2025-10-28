@@ -10,7 +10,8 @@ const thisTurbineVersion = packageJson.version;
 const containerTypes = {
   // SYNC_CONTAINER: require('./generate-sync-container'),
   // ASYNC_CONTAINER: require('./generate-async-container')
-  ACTION_SEQUENCE_CONTAINER: require('./generate-action-sequence-container')
+  ACTION_SEQUENCE_CONTAINER: require('./generate-action-sequence-container'),
+  TURBINE_FREE_VARS_CONTAINER: require('./generate-turbine-free-vars-container')
 };
 
 // Function that returns the build library URL
@@ -57,6 +58,10 @@ let jsonModified = false;
 // Function to check if a URL returns valid content
 const checkUrl = async (url) => {
   try {
+    if (!url?.length) {
+      return false;
+    }
+
     const response = await fetch(url, {
       method: 'GET',
       signal: AbortSignal.timeout(10000) // 10 second timeout
@@ -111,7 +116,7 @@ const checkUrl = async (url) => {
     console.log(
       `Processing ${containerType} (container ${current}/${containerTypeNames.length})`
     );
-    let { libraryLink } = libraryBuildPathJson[containerType];
+    let { libraryLink } = libraryBuildPathJson[containerType] || {};
     let isValid = false;
 
     // we have a prior build url, see if the url is valid

@@ -173,6 +173,23 @@ async function installExtension({ extensionPackageName, propertyId }) {
     case 'core':
       settings = {};
       break;
+    case 'adobe-analytics':
+      settings = {
+        libraryCode: {
+          type: 'managed',
+          accounts: {
+            production: ['jajasona'],
+            development: ['jajasona']
+          }
+        },
+        trackerProperties: {
+          trackInlineStats: true,
+          trackDownloadLinks: true,
+          trackExternalLinks: true,
+          linkDownloadFileTypes: ['doc', 'docx', 'jpg']
+        }
+      };
+      break;
     default:
       settings = {};
       break;
@@ -245,6 +262,34 @@ async function createLibrary({
   }
 
   return await Reactor.createLibrary(propertyId, data);
+}
+
+async function createCustomCodeDataElement({
+  propertyId,
+  coreExtensionId,
+  attributes: { settings = {}, ...restAttributes } = {}
+}) {
+  const data = {
+    attributes: {
+      delegate_descriptor_id: 'core::dataElements::custom-code',
+      force_lower_case: false,
+      // name: attributes.name
+      // storage_duration: attributes.storage_duration
+      settings: JSON.stringify(settings || {}),
+      ...restAttributes
+    },
+    type: 'data_elements',
+    relationships: {
+      extension: {
+        data: {
+          id: coreExtensionId,
+          type: 'extensions'
+        }
+      }
+    }
+  };
+
+  return await Reactor.createDataElement(propertyId, data);
 }
 
 /**
@@ -415,7 +460,7 @@ async function buildLibrary({ libraryId }) {
  */
 async function prepareNewPropertyForDelegates({
   ruleComponentSequencingEnabled = false,
-  ruleName = 'Test Rule',
+  undefinedVarsReturnsEmpty = false,
   containerType
 }) {
   const propertyName = generatePropertyName({ containerType });
@@ -424,7 +469,8 @@ async function prepareNewPropertyForDelegates({
   const property = await createProperty({
     propertyName,
     attributes: {
-      ruleComponentSequencingEnabled: Boolean(ruleComponentSequencingEnabled)
+      ruleComponentSequencingEnabled: Boolean(ruleComponentSequencingEnabled),
+      undefinedVarsReturnsEmpty: Boolean(undefinedVarsReturnsEmpty)
     }
   });
   const propertyId = property.data.id;
@@ -466,20 +512,11 @@ async function prepareNewPropertyForDelegates({
     `✅ checked the launch validation extension (${launchValidationExtensionId})`
   );
 
-  // 4. make a rule
-  const rule = await createRule({
-    propertyId,
-    ruleName
-  });
-  const ruleId = rule.data.id;
-  console.log(`✅ created rule ${ruleName}`);
-
   return {
     propertyName,
     propertyId,
     propertyLink,
     environmentId,
-    ruleId,
     coreExtensionId,
     launchValidationExtensionId,
     libraryLink
@@ -497,5 +534,6 @@ module.exports = {
   createClickEvent,
   createBrowserCondition,
   prepareNewPropertyForDelegates,
-  createRuleComponent
+  createRuleComponent,
+  createCustomCodeDataElement
 };

@@ -15,11 +15,9 @@ async function generateContainer() {
       propertyLink /* /CO.../properties/PR... */,
       libraryLink /* assets.adobedtm.com/.../.min.js */,
       environmentId,
-      ruleId: rule1ID,
       coreExtensionId,
       launchValidationExtensionId
     } = await ReactorApi.prepareNewPropertyForDelegates({
-      ruleName: 'EP Action Promise Rule',
       ruleComponentSequencingEnabled: true,
       containerType: 'ACTION_SEQUENCE_CONTAINER'
     });
@@ -27,12 +25,17 @@ async function generateContainer() {
     const rulesUsed = [];
     try {
       /**** rule 1, EPActionPromiseRule, dom-ready ****/
-      rulesUsed.push(rule1ID);
+      const rule1 = await ReactorApi.createRule({
+        propertyId,
+        ruleName: 'EP Action Promise Rule'
+      });
+      const rule1Id = rule1.data.id;
+      rulesUsed.push(rule1Id);
       // event
       await ReactorApi.createRuleComponent({
         propertyId,
         extensionId: coreExtensionId,
-        ruleId: rule1ID,
+        ruleId: rule1Id,
         delegateDescriptorId: 'core::events::dom-ready',
         ruleComponentName: 'dom ready'
       });
@@ -40,7 +43,7 @@ async function generateContainer() {
       await ReactorApi.createRuleComponent({
         propertyId,
         extensionId: launchValidationExtensionId,
-        ruleId: rule1ID,
+        ruleId: rule1Id,
         delegateDescriptorId:
           'launch-validation::actions::action-promise-no-dom-element',
         settings: {
@@ -53,7 +56,7 @@ async function generateContainer() {
       await ReactorApi.createRuleComponent({
         propertyId,
         extensionId: launchValidationExtensionId,
-        ruleId: rule1ID,
+        ruleId: rule1Id,
         delegateDescriptorId:
           'launch-validation::actions::action-direct-no-dom-element',
         settings: {
@@ -66,7 +69,7 @@ async function generateContainer() {
       await ReactorApi.createRuleComponent({
         propertyId,
         extensionId: launchValidationExtensionId,
-        ruleId: rule1ID,
+        ruleId: rule1Id,
         delegateDescriptorId:
           'launch-validation::actions::action-promise-timeout-no-dom-element',
         settings: {
@@ -360,7 +363,7 @@ async function generateContainer() {
     console.log('✅ made a library');
 
     const completedBuild = await ReactorApi.buildLibrary({ libraryId });
-    console.log('✅ create sync build', completedBuild.data.id);
+    console.log('✅ create build', completedBuild.data.id);
     /*** create Library ***/
 
     return {
@@ -379,13 +382,13 @@ if (require.main === module) {
   generateContainer()
     .then(({ success, propertyLink, libraryLink, propertyName, error }) => {
       if (success) {
-        console.log('Async container generated successfully!');
+        console.log('Action_Sequence container generated successfully!');
         console.log(propertyName);
         console.log('Property Link:', propertyLink);
         console.log('Library Build:', libraryLink);
         process.exit(0);
       } else {
-        console.error('Failed to generate async container:', error);
+        console.error('Failed to generate Action_Sequence container:', error);
         process.exit(1);
       }
     })

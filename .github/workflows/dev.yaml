@@ -71,9 +71,10 @@ jobs:
       - name: Stop workflow after deployment due to changing package.json version
         if: steps.compare.outputs.deploy == 'true'
         run: |
-          echo "✅ Deployment completed — stopping workflow."
-          echo "⚠️ Rebuild Forge now that we've placed the new version on npm."
-          echo "✅ Then re-run this action to validate the new version."
+          echo "✅ Deployment completed — stopping workflow." >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ Rebuild Forge now that we've placed the new version on npm." >> $GITHUB_STEP_SUMMARY
+          echo "✅ Then re-run this action to validate the new version." >> $GITHUB_STEP_SUMMARY
+          echo "exiting with code 78." >> $GITHUB_STEP_SUMMARY
           exit 78
 
       - name: Skip deploy

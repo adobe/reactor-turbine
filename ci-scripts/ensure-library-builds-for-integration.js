@@ -21,7 +21,7 @@ const thisTurbineVersion = packageJson.version;
 
 const containerTypes = {
   ACTION_SEQUENCE_CONTAINER: require('./generate-action-sequence-container'),
-  TURBINE_FREE_VARS_CONTAINER: require('./generate-turbine-free-vars-container')
+  TURBINE_CHECKS_CDN_DISABLED: require('./generate-turbine-checks-container-dynamic-cdn-disabled')
 };
 
 // Function that returns the build library URL

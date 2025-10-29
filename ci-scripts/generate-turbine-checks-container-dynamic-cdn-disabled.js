@@ -29,7 +29,7 @@ async function generateContainer() {
     } = await ReactorApi.prepareNewPropertyForDelegates({
       ruleComponentSequencingEnabled: true,
       undefinedVarsReturnsEmpty: true,
-      containerType: 'TURBINE_FREE_VARS'
+      containerType: 'TURBINE_CHECKS_CDN_DISABLED'
     });
 
     const dataElementsUsed = [];

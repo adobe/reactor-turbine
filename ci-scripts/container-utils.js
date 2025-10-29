@@ -332,6 +332,7 @@ async function createRule({ propertyId, ruleName }) {
  * @param delegateDescriptorId - ex: 'core::events::click'
  * @param ruleComponentName - The name to be used for the rule component
  * @param order
+ * @param attributeOverrides
  * @returns {Promise<Object>} The created Rule Component
  */
 async function createRuleComponent({
@@ -341,13 +342,15 @@ async function createRuleComponent({
   settings,
   delegateDescriptorId,
   ruleComponentName,
-  order = 0
+  order = 0,
+  attributeOverrides = {}
 }) {
   const data = {
     attributes: {
       name: ruleComponentName,
       settings: JSON.stringify(settings),
-      delegate_descriptor_id: delegateDescriptorId
+      delegate_descriptor_id: delegateDescriptorId,
+      ...attributeOverrides
     },
     relationships: {
       extension: {
@@ -372,6 +375,41 @@ async function createRuleComponent({
   }
 
   return await Reactor.createRuleComponent(propertyId, data);
+}
+
+/**
+ * Create an action that respects promise chain resolves by setting delayNext to true and calls the
+ * underlying createRuleComponent function.
+ * @param propertyId
+ * @param extensionId
+ * @param ruleId
+ * @param settings
+ * @param delegateDescriptorId
+ * @param ruleComponentName
+ * @param order
+ * @returns {Promise<Object>}
+ */
+async function createActionThatRespectsPromiseChainResolves({
+  propertyId,
+  extensionId,
+  ruleId,
+  settings,
+  delegateDescriptorId,
+  ruleComponentName,
+  order = 0
+}) {
+  return await createRuleComponent({
+    propertyId,
+    extensionId,
+    ruleId,
+    settings,
+    delegateDescriptorId,
+    ruleComponentName,
+    order,
+    attributeOverrides: {
+      delayNext: true
+    }
+  });
 }
 
 /**
@@ -551,5 +589,6 @@ module.exports = {
   createBrowserCondition,
   prepareNewPropertyForDelegates,
   createRuleComponent,
-  createCustomCodeDataElement
+  createCustomCodeDataElement,
+  createActionThatRespectsPromiseChainResolves
 };

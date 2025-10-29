@@ -47,7 +47,7 @@ async function generateContainer() {
         ruleComponentName: 'dom ready'
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: launchValidationExtensionId,
         ruleId: rule1Id,
@@ -60,7 +60,7 @@ async function generateContainer() {
         order: 0
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: launchValidationExtensionId,
         ruleId: rule1Id,
@@ -73,7 +73,7 @@ async function generateContainer() {
         order: 1
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: launchValidationExtensionId,
         ruleId: rule1Id,
@@ -101,7 +101,7 @@ async function generateContainer() {
       const rule2Id = rule2.data.id;
       rulesUsed.push(rule2Id);
       // event
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule2Id,
@@ -109,7 +109,7 @@ async function generateContainer() {
         ruleComponentName: 'page bottom'
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: launchValidationExtensionId,
         ruleId: rule2Id,
@@ -123,7 +123,7 @@ async function generateContainer() {
         order: 0
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: launchValidationExtensionId,
         ruleId: rule2Id,
@@ -137,7 +137,7 @@ async function generateContainer() {
         order: 1
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: launchValidationExtensionId,
         ruleId: rule2Id,
@@ -173,7 +173,7 @@ async function generateContainer() {
         ruleComponentName: 'dom ready'
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule3Id,
@@ -188,7 +188,7 @@ async function generateContainer() {
         order: 0
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule3Id,
@@ -202,7 +202,7 @@ async function generateContainer() {
         order: 1
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule3Id,
@@ -224,6 +224,15 @@ async function generateContainer() {
 
     try {
       /**** rule 4, HTMLActionCustomCodeRuleOnSuccess, dom-ready ****/
+      // This tests that if there's onCustomCodeSuccess calls that it doesn't break anything.
+      // onCustomCodeSuccess is useless because when forge sees that a user writes in custom code
+      // the word "onCustomCodeSuccess" or "onCustomCodeFailure", they both get re-bound by Forge
+      // to look something like this: _satellite._onCustomCodeSuccess.bind(null, "${reactorCallbackId}")
+      // and _satellite._onCustomCodeFailure.bind(null, "${reactorCallbackId}").
+      // In the case of _onCustomCodeSuccess, it will follow the code path within core extension's
+      // "decorateHtmlCode.js" and will look up the callback ID and resolve. In the case that this special string
+      // from Forge is missing, meaning that the user never wrote "onCustomCodeSuccess" in their code,
+      // then the core extension immediately resolves the Promise. Thus all of this garbage is a giant no-op.
       const rule4 = await ReactorApi.createRule({
         propertyId,
         ruleName: 'HTML Action Custom Code Rule onCustomCodeSuccess'
@@ -239,7 +248,7 @@ async function generateContainer() {
         ruleComponentName: 'dom ready'
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule4Id,
@@ -248,13 +257,13 @@ async function generateContainer() {
           language: 'html',
           source:
             // eslint-disable-next-line max-len
-            '<!-- Some comment -->\n<script>\n setTimeout(function() { \n\t markTurbineTestExecuted("HTMLActionCustomCodeRuleOnSuccess::sequence-action-html-1-pass", new Date().toISOString()); \n\t onCustomCodeSuccess(); \n }, 250);\n</script>'
+            '<!-- Some comment -->\n<script>\n setTimeout(function() { \n\t onCustomCodeSuccess(); \n\t markTurbineTestExecuted("HTMLActionCustomCodeRuleOnSuccess::sequence-action-html-1-pass", new Date().toISOString()); \n }, 250);\n</script>'
         },
         ruleComponentName: '(0) Custom Code Resolve',
         order: 0
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule4Id,
@@ -269,7 +278,7 @@ async function generateContainer() {
         order: 1
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule4Id,
@@ -278,7 +287,7 @@ async function generateContainer() {
           language: 'html',
           source:
             // eslint-disable-next-line max-len
-            '<script>\n setTimeout(function() { \n\t markTurbineTestExecuted("HTMLActionCustomCodeRuleOnSuccess::sequence-action-html-3-pass", new Date().toISOString()); \n\t onCustomCodeSuccess(); \n }, 250);\n</script>'
+            '<script>\n setTimeout(function() { \n\t onCustomCodeSuccess(); \n\t markTurbineTestExecuted("HTMLActionCustomCodeRuleOnSuccess::sequence-action-html-3-pass", new Date().toISOString()); \n }, 250);\n</script>'
         },
         ruleComponentName: '(2) Custom Code Resolve again',
         order: 2
@@ -290,6 +299,19 @@ async function generateContainer() {
     }
 
     try {
+      // onCustomCodeFailure() references are re-written by Forge to look like:
+      // _satellite._onCustomCodeFailure.bind(null, "${reactorCallbackId}"). This
+      // is inside the custom code file's source. In Turbine, createAddActionToQueue
+      // does a Promise.race between the delegate Module result, and a timeout.
+      // The delegate module for custom code will see that tokens need to be replaced
+      // due to "${reactorCallbackId}" being in the source. A real promise will be handed
+      // back to custom code and it will use PostScribe to write the HTML to the page.
+      // When it writes and subsequently executes
+      // _satellite._onCustomCodeFailure.bind(null, "${reactorCallbackId}"),
+      // where the "${reactorCallbackId}" has been replaced with a callback id,
+      // the decorateHtmlCode file will run and reject the promise handed back to
+      // the promise.race call in createAddActionToQueue, which will log the error
+      // and reject the rest of the action chain.
       /**** rule 5, HTMLActionCustomCodeRuleOnFail, dom-ready ****/
       const rule5 = await ReactorApi.createRule({
         propertyId,
@@ -306,7 +328,7 @@ async function generateContainer() {
         ruleComponentName: 'dom ready'
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule5Id,
@@ -321,7 +343,7 @@ async function generateContainer() {
         order: 0
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule5Id,
@@ -332,11 +354,11 @@ async function generateContainer() {
             // eslint-disable-next-line max-len
             '<script>\n setTimeout(function() { \n\t  onCustomCodeFailure("HTML Custom Code REJECTED"); \n }, 100);\n</script>'
         },
-        ruleComponentName: '(1) Custom Code onCustomCodeFailure',
-        order: 1
+        ruleComponentName: '(2) Custom Code onCustomCodeFailure',
+        order: 2
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule5Id,
@@ -347,8 +369,8 @@ async function generateContainer() {
             // eslint-disable-next-line max-len
             '<!-- Some comment -->\n<script>\n setTimeout(function() { \n\t markTurbineTestExecuted("HTMLActionCustomCodeRuleOnFail::sequence-action-html-3-fail", new Date().toISOString()); \n }, 0);\n</script>'
         },
-        ruleComponentName: '(2) Custom Code Resolve - do not run',
-        order: 2
+        ruleComponentName: '(3) Custom Code Resolve - do not run',
+        order: 3
       });
       /**** end rule 5, HTMLActionCustomCodeRuleOnFail, dom-ready ****/
     } catch (err) {

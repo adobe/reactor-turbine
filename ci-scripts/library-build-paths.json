@@ -1,12 +1,12 @@
 {
-  "ACTION_SEQUENCE_CONTAINER": {
-    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/1944f53b01e0/launch-07127246d6dc-development.js",
-    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PRf12fc0f2d3a84cbc8f1312da4d16e873",
-    "propertyName": "Test Turbine v29.0.0-beta.5 ACTION_SEQUENCE_CONTAINER v2025-10-28 034937"
-  },
   "TURBINE_FREE_VARS_CONTAINER": {
-    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/cff741695a28/launch-73ec8130f094-development.js",
-    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PR023677e4fbc3488cb4c9393e5a8fa148",
-    "propertyName": "Test Turbine v29.0.0-beta.5 TURBINE_FREE_VARS v2025-10-28 055939"
+    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/ffd98b11c75f/launch-bf489fb09eae-development.js",
+    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PR80f88e212c764056a35db12ff64b243f",
+    "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_FREE_VARS v2025-10-29 212611"
+  },
+  "ACTION_SEQUENCE_CONTAINER": {
+    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/fde95f0c0d7e/launch-96b5c6d10356-development.js",
+    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PR03b9627ffa6f4450bdcbb6e681fcc334",
+    "propertyName": "Test Turbine v29.0.0-beta.7 ACTION_SEQUENCE_CONTAINER v2025-10-29 212549"
   }
 }

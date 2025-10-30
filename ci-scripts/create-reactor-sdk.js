@@ -17,9 +17,10 @@ require('dotenv').config({
   path: path.resolve(__dirname, 'setup', '.env.access-token')
 });
 
-const reactor = new Reactor(process.env.RSDK_ACCESS_TOKEN, {
-  reactorUrl: process.env.RSDK_ADOBE_REACTOR_URL,
-  customHeaders: { 'x-gw-ims-org-id': process.env.RSDK_ADOBE_ORG_ID },
-  enableLogging: false
-});
-module.exports = reactor;
+module.exports = function createReactorSdk({ accessToken, reactorUrl, orgId }) {
+  return new Reactor(accessToken, {
+    reactorUrl: reactorUrl,
+    customHeaders: { 'x-gw-ims-org-id': orgId },
+    enableLogging: false
+  });
+};

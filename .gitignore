@@ -2,8 +2,8 @@ node_modules
 /coverage
 /dist
 ci-scripts/setup/.env
-**/.env.local
-**/.env.*.local
+**/.env*
+!**/.env-example
 **/.*access-token
 
 #playwright

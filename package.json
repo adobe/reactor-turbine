@@ -17,8 +17,8 @@
     "test:unit": "karma start karma.unit.conf.js",
     "test:unit:ci:pull:request": "npm install karma-sauce-launcher@4.3.6 && karma start karma.unit.conf.js",
     "test:unit:ci:npm:publish": "karma start karma.unit.conf.js --browsers=ChromeHeadless --no-coverage",
-    "generate-access-token": "node ci-scripts/setup/generate-access-token.js",
-    "ensure-integration-containers": "npm run generate-access-token && node ci-scripts/ensure-library-builds-for-integration.js --",
+    "generate-access-tokens": "node ci-scripts/setup/generate-access-tokens.js",
+    "ensure-integration-containers": "npm run generate-access-tokens && node ci-scripts/ensure-library-builds-for-integration.js --",
     "test:integration": "npm run build && npm run ensure-integration-containers && playwright test",
     "test:integration:ci:npm:publish": "npm run build && npm run ensure-integration-containers -- --force && playwright test"
   },
@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@adobe/auth-token": "^1.0.1",
-    "@adobe/reactor-sdk": "^2.0.0-beta.5",
+    "@adobe/reactor-sdk": "^2.0.0-beta.6",
     "@babel/core": "^7.27.4",
     "@babel/preset-env": "^7.27.2",
     "@playwright/test": "^1.56.1",

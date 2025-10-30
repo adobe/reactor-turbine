@@ -12,7 +12,11 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-const ReactorApi = require('./container-utils');
+const supportedCompanies = require('./setup/supportedCompanies.json');
+const createWrappedReactorApi = require('./container-utils');
+const ReactorApi = createWrappedReactorApi({
+  companyType: supportedCompanies.DEFAULT_COMPANY
+});
 
 async function generateContainer() {
   try {

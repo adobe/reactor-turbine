@@ -11,30 +11,37 @@
  ****************************************************************************************/
 
 /**
- * Shared utilities for container generation scripts. Wraps the Reactor SDK to make
+ * Shared utilities for library generation scripts. Wraps the Reactor SDK to make
  * creating resources easier.
  */
-const createReactorSdk = require('./create-reactor-sdk');
+const Reactor = require('@adobe/reactor-sdk').default;
 const path = require('path');
 const packageJson = require(path.resolve(__dirname, '..', 'package.json'));
 const thisTurbineVersion = packageJson.version;
 require('dotenv').config({ path: path.resolve(__dirname, 'setup', '.env') });
+const supportedCompanyTypes = require('./setup/supportedCompanyTypes.json');
 
-const supportedCompanies = require('./setup/supportedCompanies.json');
+function createReactorSdk({ accessToken, reactorUrl, orgId }) {
+  return new Reactor(accessToken, {
+    reactorUrl: reactorUrl,
+    customHeaders: { 'x-gw-ims-org-id': orgId },
+    enableLogging: false
+  });
+}
 
 /* eslint-disable camelcase */
 
-module.exports = function createContainerUtils({ companyType }) {
-  if (!supportedCompanies.hasOwnProperty(companyType)) {
+module.exports = function createWrappedReactorApi({ companyType }) {
+  if (!supportedCompanyTypes.hasOwnProperty(companyType)) {
     throw new Error(
       `The company type "${companyType}" is not any of the container types
-      ${Object.keys(supportedCompanies).join(', ')}`
+      ${Object.keys(supportedCompanyTypes).join(', ')}`
     );
   }
 
   let companyId;
   let Reactor;
-  if (companyType === supportedCompanies.DEFAULT_COMPANY) {
+  if (companyType === supportedCompanyTypes.DEFAULT_COMPANY) {
     companyId = process.env.RSDK_ADOBE_REACTOR_DEFAULT_COMPANY_ID;
     require('dotenv').config({
       path: path.resolve(
@@ -82,12 +89,12 @@ module.exports = function createContainerUtils({ companyType }) {
 
   /**
    * Generate a unique property name with version
-   * @param {string} containerType - Type of container being generated
+   * @param {string} libraryVariantName - Type of container being generated
    * @returns {string} Unique property name
    */
-  function generatePropertyName({ containerType }) {
+  function generatePropertyName({ libraryVariantName }) {
     const version = generateVersion();
-    return `Test Turbine v${thisTurbineVersion} ${containerType} v${version}`;
+    return `Test Turbine v${thisTurbineVersion} ${libraryVariantName} v${version}`;
   }
 
   /**
@@ -547,7 +554,7 @@ module.exports = function createContainerUtils({ companyType }) {
    * Prepare a new property containing an environment, library, and a rule to place delegates in.
    * @param {boolean} ruleComponentSequencingEnabled
    * @param ruleName
-   * @param containerType
+   * @param libraryVariantName
    * @returns {Promise<{
    * propertyName: string,
    * propertyId: string,
@@ -561,9 +568,9 @@ module.exports = function createContainerUtils({ companyType }) {
   async function prepareNewPropertyForDelegates({
     ruleComponentSequencingEnabled = false,
     undefinedVarsReturnsEmpty = false,
-    containerType
+    libraryVariantName
   }) {
-    const propertyName = generatePropertyName({ containerType });
+    const propertyName = generatePropertyName({ libraryVariantName });
 
     // 1. Create property
     const property = await createProperty({

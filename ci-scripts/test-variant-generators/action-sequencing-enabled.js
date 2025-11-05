@@ -12,10 +12,10 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-const supportedCompanies = require('../setup/supportedCompanies.json');
-const createWrappedReactorApi = require('../container-utils');
+const supportedCompanyTypes = require('../setup/supportedCompanyTypes.json');
+const createWrappedReactorApi = require('../reactor-sdk-wrapper');
 const ReactorApi = createWrappedReactorApi({
-  companyType: supportedCompanies.DEFAULT_COMPANY
+  companyType: supportedCompanyTypes.DEFAULT_COMPANY
 });
 
 async function generateContainer() {
@@ -30,7 +30,7 @@ async function generateContainer() {
       launchValidationExtensionId
     } = await ReactorApi.prepareNewPropertyForDelegates({
       ruleComponentSequencingEnabled: true,
-      containerType: 'ACTION_SEQUENCE_CONTAINER'
+      libraryVariantName: 'ACTION_SEQUENCE_CONTAINER'
     });
 
     const rulesUsed = [];

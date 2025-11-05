@@ -33,7 +33,7 @@ async function generateContainer() {
     } = await ReactorApi.prepareNewPropertyForDelegates({
       ruleComponentSequencingEnabled: true,
       undefinedVarsReturnsEmpty: true,
-      libraryVariantName: 'TURBINE_CHECKS_PREM_CDN_DISABLED'
+      libraryVariantName: 'TURBINE_CHECKS_PREM_CDN_ENABLED'
     });
 
     const dataElementsUsed = [];
@@ -44,7 +44,7 @@ async function generateContainer() {
         name: 'turbine-dataElement-Custom_Code',
         settings: {
           source:
-            // eslint-disable-next-line max-len
+          // eslint-disable-next-line max-len
             "try {var t = turbine;} catch(err) { markTurbineTestExecuted('TurbineFreeVars::turbine_cc_data_element-pass::thrownError', new Date().toISOString()); }"
         },
         storage_duration: 'pageview'
@@ -105,7 +105,7 @@ async function generateContainer() {
         delegateDescriptorId: 'core::events::custom-code',
         settings: {
           source:
-            // eslint-disable-next-line max-len
+          // eslint-disable-next-line max-len
             'try {var t = turbine;} catch(err) { markTurbineTestExecuted("TurbineNotAvailableCustomCodeEvent::sequence-event-js-1::thrownError::pass", new Date().toISOString()); trigger(); }'
         },
         ruleComponentName: 'Custom Code Event'
@@ -127,129 +127,6 @@ async function generateContainer() {
       /**** end rule 2, Turbine Custom Event Code Rule, custom event ****/
     } catch (err) {
       console.log('Error creating rule 2');
-      throw err;
-    }
-
-    try {
-      /**** rule 3, Turbine Custom Condition Code Rule, custom event ****/
-      const rule3 = await ReactorApi.createRule({
-        propertyId,
-        ruleName: 'Turbine Not Available Custom Code Condition'
-      });
-      const rule3Id = rule3.data.id;
-      rulesUsed.push(rule3Id);
-      // event
-      await ReactorApi.createRuleComponent({
-        propertyId,
-        extensionId: coreExtensionId,
-        ruleId: rule3Id,
-        delegateDescriptorId: 'core::events::dom-ready',
-        ruleComponentName: 'dom ready'
-      });
-      // condition
-      await ReactorApi.createRuleComponent({
-        propertyId,
-        extensionId: coreExtensionId,
-        ruleId: rule3Id,
-        delegateDescriptorId: 'core::conditions::custom-code',
-        settings: {
-          source:
-            // eslint-disable-next-line max-len
-            'try {var t = turbine;} catch(err) { markTurbineTestExecuted("TurbineNotAvailableCustomCodeCondition::sequence-condition-js-1::thrownError::pass", new Date().toISOString()); return true; }'
-        },
-        ruleComponentName: 'Custom Code Condition'
-      });
-      // action
-      await ReactorApi.createRuleComponent({
-        propertyId,
-        extensionId: coreExtensionId,
-        ruleId: rule3Id,
-        delegateDescriptorId: 'core::actions::custom-code',
-        settings: {
-          language: 'javascript',
-          source:
-            // eslint-disable-next-line max-len
-            'markTurbineTestExecuted("TurbineNotAvailableCustomCodeCondition::sequence-action-js-2-pass", new Date().toISOString());'
-        },
-        ruleComponentName: '(0) Custom Code Resolve',
-        order: 0
-      });
-      /**** end rule 3, Turbine Custom Condition Code Rule, custom event ****/
-    } catch (err) {
-      console.log('Error creating rule 3');
-      throw err;
-    }
-
-    try {
-      /**** rule 4, Turbine Embedded Action Custom Code Rule, custom event ****/
-      const rule4 = await ReactorApi.createRule({
-        propertyId,
-        ruleName: 'Turbine Not Available Custom Code Action Embedded'
-      });
-      const rule4Id = rule4.data.id;
-      rulesUsed.push(rule4Id);
-      // event
-      await ReactorApi.createRuleComponent({
-        propertyId,
-        extensionId: coreExtensionId,
-        ruleId: rule4Id,
-        delegateDescriptorId: 'core::events::page-bottom',
-        ruleComponentName: 'page bottom'
-      });
-      // action
-      await ReactorApi.createRuleComponent({
-        propertyId,
-        extensionId: coreExtensionId,
-        ruleId: rule4Id,
-        delegateDescriptorId: 'core::actions::custom-code',
-        settings: {
-          language: 'javascript',
-          source:
-            // eslint-disable-next-line max-len
-            'try {var t = turbine;} catch(err) { markTurbineTestExecuted("TurbineNotAvailableCustomCodeActionEmbedded::sequence-action-js-1::thrownError::pass", new Date().toISOString()); }'
-        },
-        ruleComponentName: '(0) Turbine Embedded Action Custom Code',
-        order: 0
-      });
-      /**** end rule 4, Turbine Embedded Action Custom Code Rule, custom event ****/
-    } catch (err) {
-      console.log('Error creating rule 4');
-      throw err;
-    }
-
-    try {
-      /**** rule 5, Turbine Embedded Action Custom Code Rule, custom event ****/
-      const rule5 = await ReactorApi.createRule({
-        propertyId,
-        ruleName: 'Turbine Not Available Custom Code Action Linked'
-      });
-      const rule5Id = rule5.data.id;
-      rulesUsed.push(rule5Id);
-      // event
-      await ReactorApi.createRuleComponent({
-        propertyId,
-        extensionId: coreExtensionId,
-        ruleId: rule5Id,
-        delegateDescriptorId: 'core::events::dom-ready',
-        ruleComponentName: 'dom ready' // custom code actions for dom-ready place the file on the CDN
-      });
-      // action
-      await ReactorApi.createRuleComponent({
-        propertyId,
-        extensionId: coreExtensionId,
-        ruleId: rule5Id,
-        delegateDescriptorId: 'core::actions::custom-code',
-        settings: {
-          language: 'javascript',
-          source:
-            // eslint-disable-next-line max-len
-            'try {var t = turbine;} catch(err) { markTurbineTestExecuted("TurbineNotAvailableCustomCodeActionLinked::sequence-action-js-1::thrownError::pass", new Date().toISOString()); }'
-        },
-        ruleComponentName: '(0) Turbine Linked Action Custom Code',
-        order: 0
-      });
-    } catch (err) {
-      console.log('Error creating rule 5');
       throw err;
     }
 

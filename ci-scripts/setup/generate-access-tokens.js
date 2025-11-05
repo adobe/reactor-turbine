@@ -13,22 +13,22 @@ governing permissions and limitations under the License.
 const fs = require('fs');
 const path = require('path');
 const { auth } = require('@adobe/auth-token');
-const supportedCompanies = require('./supportedCompanies.json');
+const supportedCompanyTypes = require('./supportedCompanyTypes.json');
 
 // load main env for client id/secret, etc
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 async function generateAccessToken(companyType) {
-  if (!supportedCompanies.hasOwnProperty(companyType)) {
+  if (!supportedCompanyTypes.hasOwnProperty(companyType)) {
     console.error(
       `The company type "${companyType}" is not any of the container types
-      ${Object.keys(supportedCompanies).join(', ')}`
+      ${Object.keys(supportedCompanyTypes).join(', ')}`
     );
     process.exit(1);
   }
 
   let config;
-  if (companyType === supportedCompanies.DEFAULT_COMPANY) {
+  if (companyType === supportedCompanyTypes.DEFAULT_COMPANY) {
     if (
       !process.env.RSDK_ADOBE_DEFAULT_COMPANY_CLIENT_ID ||
       !process.env.RSDK_ADOBE_DEFAULT_COMPANY_CLIENT_SECRET ||
@@ -79,8 +79,8 @@ async function generateAccessToken(companyType) {
 
 async function main() {
   const [defaultToken, premiumToken] = await Promise.all([
-    generateAccessToken(supportedCompanies.DEFAULT_COMPANY),
-    generateAccessToken(supportedCompanies.PREMIUM_COMPANY)
+    generateAccessToken(supportedCompanyTypes.DEFAULT_COMPANY),
+    generateAccessToken(supportedCompanyTypes.PREMIUM_COMPANY)
   ]);
   const accessTokenDefaultCompanyEnvPath = path.resolve(
     __dirname,

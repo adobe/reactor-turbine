@@ -17,7 +17,7 @@
 const supportedCompanyTypes = require('../setup/supportedCompanyTypes.json');
 const createWrappedReactorApi = require('../reactor-sdk-wrapper');
 const ReactorApi = createWrappedReactorApi({
-  companyType: supportedCompanyTypes.DEFAULT_COMPANY
+  companyType: supportedCompanyTypes.PREMIUM_COMPANY
 });
 
 async function generateContainer() {
@@ -41,11 +41,11 @@ async function generateContainer() {
       propertyId,
       coreExtensionId,
       attributes: {
-        name: 'turbine-dataElement-Custom_Code',
+        name: 'premium-cdn-enabled-file-transform-data-element',
         settings: {
           source:
-          // eslint-disable-next-line max-len
-            "try {var t = turbine;} catch(err) { markTurbineTestExecuted('TurbineFreeVars::turbine_cc_data_element-pass::thrownError', new Date().toISOString()); }"
+            // eslint-disable-next-line max-len
+            "markTurbineTestExecuted('PremiumCDNEnabled::turbine_cc_data_element-file-transform-pass', new Date().toISOString());"
         },
         storage_duration: 'pageview'
       }
@@ -54,10 +54,10 @@ async function generateContainer() {
 
     const rulesUsed = [];
     try {
-      /**** rule 1, Turbine DE Custom Code Rule, dom-ready ****/
+      /**** rule 1, Custom Condition File Transform ****/
       const rule1 = await ReactorApi.createRule({
         propertyId,
-        ruleName: 'Turbine DataElement Custom Code Rule'
+        ruleName: 'Premium CDN Custom Condition File Transform'
       });
       const rule1Id = rule1.data.id;
       rulesUsed.push(rule1Id);
@@ -69,31 +69,43 @@ async function generateContainer() {
         delegateDescriptorId: 'core::events::dom-ready',
         ruleComponentName: 'dom ready'
       });
-      // action
+      // condition
       await ReactorApi.createRuleComponent({
         propertyId,
-        extensionId: coreExtensionId,
+        extensionId: launchValidationExtensionId,
         ruleId: rule1Id,
-        delegateDescriptorId: 'core::actions::custom-code',
+        delegateDescriptorId: 'launch-validation::conditions::file-transform',
         settings: {
-          language: 'javascript',
-          // eslint-disable-next-line max-len
-          source: '_satellite.getVar("turbine-dataElement-Custom_Code");' // will produce a result of "TurbineFreeVars::turbine_cc_data_element-pass"
+          fileValue: 'var tmpConditionVal = "fileComparisonValue";',
+          staticValue: 'fileComparisonValue'
         },
-        ruleComponentName: '(0) getVar Turbine-DataElement-CustomCode',
-        order: 0
+        ruleComponentName: 'Custom Code File Transform Condition'
       });
-      /**** end rule 1, Turbine DE Custom Code Rule, dom-ready ****/
+      // action
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
+        propertyId,
+        extensionId: launchValidationExtensionId,
+        ruleId: rule1Id,
+        delegateDescriptorId:
+          'launch-validation::actions::action-direct-no-dom-element',
+        settings: {
+          testIdentifier:
+            'PremiumCDNEnabledCustomConditionFileTransform::sequence-action-js-3-pass'
+        },
+        ruleComponentName: '(1) Action Direct No DOM Element',
+        order: 1
+      });
+      /**** end rule 1, Custom Condition File Transform ****/
     } catch (err) {
       console.log('Error creating rule 1');
       throw err;
     }
 
     try {
-      /**** rule 2, Turbine Custom Event Code Rule, custom event ****/
+      /**** rule 2, Custom Action File Transform ****/
       const rule2 = await ReactorApi.createRule({
         propertyId,
-        ruleName: 'Turbine Not Available Custom Code Event'
+        ruleName: 'Premium CDN Custom Action File Transform'
       });
       const rule2Id = rule2.data.id;
       rulesUsed.push(rule2Id);
@@ -102,29 +114,27 @@ async function generateContainer() {
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule2Id,
-        delegateDescriptorId: 'core::events::custom-code',
-        settings: {
-          source:
-          // eslint-disable-next-line max-len
-            'try {var t = turbine;} catch(err) { markTurbineTestExecuted("TurbineNotAvailableCustomCodeEvent::sequence-event-js-1::thrownError::pass", new Date().toISOString()); trigger(); }'
-        },
-        ruleComponentName: 'Custom Code Event'
+        delegateDescriptorId: 'core::events::dom-ready',
+        ruleComponentName: 'dom ready'
       });
       // action
-      await ReactorApi.createRuleComponent({
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
         propertyId,
         extensionId: launchValidationExtensionId,
         ruleId: rule2Id,
         delegateDescriptorId:
-          'launch-validation::actions::action-direct-no-dom-element',
+          'launch-validation::actions::action-verify-file-transform-no-dom-element',
         settings: {
+          rawFileValue: 'fileComparisonValue',
+          fileValue: 'var tmpConditionVal = "fileComparisonValue";',
+          staticValue: 'fileComparisonValue',
           testIdentifier:
-            'TurbineNotAvailableCustomCodeEvent::sequence-action-js-2-pass'
+            'PremiumCDNEnabledCustomActionFileTransform::sequence-action-js-2-pass'
         },
-        ruleComponentName: '(0) Action Direct No DOM Element Verify',
-        order: 0
+        ruleComponentName: '(1) Action Verify File Transform No DOM Element',
+        order: 1
       });
-      /**** end rule 2, Turbine Custom Event Code Rule, custom event ****/
+      /**** end rule 1, Custom Condition File Transform ****/
     } catch (err) {
       console.log('Error creating rule 2');
       throw err;

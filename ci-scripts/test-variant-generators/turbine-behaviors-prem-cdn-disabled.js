@@ -45,7 +45,7 @@ async function generateContainer() {
         settings: {
           source:
             // eslint-disable-next-line max-len
-            "try {var t = turbine.debugEnabled;} catch(err) { markTurbineTestExecuted('TurbineFreeVars::turbine_cc_data_element-pass::thrownError', new Date().toISOString()); }"
+            "try {var t = turbine;} catch(err) { markTurbineTestExecuted('TurbineFreeVars::turbine_cc_data_element-pass::thrownError', new Date().toISOString()); }"
         },
         storage_duration: 'pageview'
       }
@@ -93,7 +93,7 @@ async function generateContainer() {
       /**** rule 2, Turbine Custom Event Code Rule, custom event ****/
       const rule2 = await ReactorApi.createRule({
         propertyId,
-        ruleName: 'Turbine Event Custom Code Rule'
+        ruleName: 'Turbine Not Available Custom Code Event'
       });
       const rule2Id = rule2.data.id;
       rulesUsed.push(rule2Id);
@@ -106,7 +106,7 @@ async function generateContainer() {
         settings: {
           source:
             // eslint-disable-next-line max-len
-            'try {var t = turbine.debugEnabled;} catch(err) { markTurbineTestExecuted("TurbineEventCustomCodeRule::sequence-event-js-1-pass::thrownError", new Date().toISOString()); trigger(); }'
+            'try {var t = turbine;} catch(err) { markTurbineTestExecuted("TurbineNotAvailableCustomCodeEvent::sequence-event-js-1::thrownError::pass", new Date().toISOString()); trigger(); }'
         },
         ruleComponentName: 'Custom Code Event'
       });
@@ -118,7 +118,8 @@ async function generateContainer() {
         delegateDescriptorId:
           'launch-validation::actions::action-direct-no-dom-element',
         settings: {
-          testIdentifier: 'TurbineEventCustomCodeRule::sequence-event-js-2-pass'
+          testIdentifier:
+            'TurbineNotAvailableCustomCodeEvent::sequence-action-js-2-pass'
         },
         ruleComponentName: '(0) Action Direct No DOM Element Verify',
         order: 0
@@ -133,7 +134,7 @@ async function generateContainer() {
       /**** rule 3, Turbine Custom Condition Code Rule, custom event ****/
       const rule3 = await ReactorApi.createRule({
         propertyId,
-        ruleName: 'Turbine Condition Custom Code Rule'
+        ruleName: 'Turbine Not Available Custom Code Condition'
       });
       const rule3Id = rule3.data.id;
       rulesUsed.push(rule3Id);
@@ -154,7 +155,7 @@ async function generateContainer() {
         settings: {
           source:
             // eslint-disable-next-line max-len
-            'try {var t = turbine.debugEnabled;} catch(err) { markTurbineTestExecuted("TurbineConditionCustomCodeRule::sequence-condition-js-1-pass::thrownError", new Date().toISOString()); return true; }'
+            'try {var t = turbine;} catch(err) { markTurbineTestExecuted("TurbineNotAvailableCustomCodeCondition::sequence-condition-js-1::thrownError::pass", new Date().toISOString()); return true; }'
         },
         ruleComponentName: 'Custom Code Condition'
       });
@@ -168,7 +169,7 @@ async function generateContainer() {
           language: 'javascript',
           source:
             // eslint-disable-next-line max-len
-            'markTurbineTestExecuted("TurbineConditionCustomCodeRule::sequence-action-js-1-pass", new Date().toISOString());'
+            'markTurbineTestExecuted("TurbineNotAvailableCustomCodeCondition::sequence-action-js-2-pass", new Date().toISOString());'
         },
         ruleComponentName: '(0) Custom Code Resolve',
         order: 0
@@ -183,7 +184,7 @@ async function generateContainer() {
       /**** rule 4, Turbine Embedded Action Custom Code Rule, custom event ****/
       const rule4 = await ReactorApi.createRule({
         propertyId,
-        ruleName: 'Turbine Embedded Action Custom Code Rule'
+        ruleName: 'Turbine Not Available Custom Code Action Embedded'
       });
       const rule4Id = rule4.data.id;
       rulesUsed.push(rule4Id);
@@ -205,7 +206,7 @@ async function generateContainer() {
           language: 'javascript',
           source:
             // eslint-disable-next-line max-len
-            'try {var t = turbine.debugEnabled;} catch(err) { markTurbineTestExecuted("TurbineEmbeddedActionCustomCodeRule::sequence-action-js-1-pass::thrownError", new Date().toISOString()); }'
+            'try {var t = turbine;} catch(err) { markTurbineTestExecuted("TurbineNotAvailableCustomCodeActionEmbedded::sequence-action-js-1::thrownError::pass", new Date().toISOString()); }'
         },
         ruleComponentName: '(0) Turbine Embedded Action Custom Code',
         order: 0
@@ -220,7 +221,7 @@ async function generateContainer() {
       /**** rule 5, Turbine Embedded Action Custom Code Rule, custom event ****/
       const rule5 = await ReactorApi.createRule({
         propertyId,
-        ruleName: 'Turbine Linked Action Custom Code Rule'
+        ruleName: 'Turbine Not Available Custom Code Action Linked'
       });
       const rule5Id = rule5.data.id;
       rulesUsed.push(rule5Id);
@@ -230,7 +231,7 @@ async function generateContainer() {
         extensionId: coreExtensionId,
         ruleId: rule5Id,
         delegateDescriptorId: 'core::events::dom-ready',
-        ruleComponentName: 'dom ready'
+        ruleComponentName: 'dom ready' // custom code actions for dom-ready place the file on the CDN
       });
       // action
       await ReactorApi.createRuleComponent({
@@ -242,7 +243,7 @@ async function generateContainer() {
           language: 'javascript',
           source:
             // eslint-disable-next-line max-len
-            'try {var t = turbine.debugEnabled;} catch(err) { markTurbineTestExecuted("TurbineLinkedActionCustomCode::sequence-action-js-1-pass::thrownError", new Date().toISOString()); }'
+            'try {var t = turbine;} catch(err) { markTurbineTestExecuted("TurbineNotAvailableCustomCodeActionLinked::sequence-action-js-1::thrownError::pass", new Date().toISOString()); }'
         },
         ruleComponentName: '(0) Turbine Linked Action Custom Code',
         order: 0

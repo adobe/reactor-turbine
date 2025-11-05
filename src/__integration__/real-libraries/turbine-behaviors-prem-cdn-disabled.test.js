@@ -55,6 +55,11 @@ test('custom code transforms on standard host (not dynamicCDN)', async ({
     url: libraryBuildPathsFile.TURBINE_CHECKS_CDN_DISABLED.libraryLink
   });
 
+  await expect(
+    page.evaluate(() => window._satellite.company.dynamicCdnEnabled),
+    'Expected window._satellite.company.dynamicCdnEnabled to be defined:false.'
+  ).resolves.toBe(false);
+
   const rules = await page.evaluate(() => window._satellite._container.rules);
 
   let isLibraryLoadedCustomCodeAssertions = 0;

@@ -8,5 +8,10 @@
     "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/5f4b46ca5294/launch-aa85db6d2b17-development.js",
     "propertyLink": "/undefined/properties/PRa2a4f704b81f4361a0e57ecddf950bca",
     "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_CHECKS_PREM_CDN_DISABLED v2025-11-05 201847"
+  },
+  "TURBINE_CHECKS_CDN_ENABLED": {
+    "libraryLink": "https://assets.adobedtm.com/staging/a9f4a379fa75/113ec1bf66be/launch-8868bef37e8f-development.js",
+    "propertyLink": "/undefined/properties/PR933f6608e9bd46a2bb53ddc6fd9ae1c1",
+    "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_CHECKS_PREM_CDN_ENABLED v2025-11-05 230209"
   }
 }

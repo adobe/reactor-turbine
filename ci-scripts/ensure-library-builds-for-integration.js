@@ -21,7 +21,8 @@ const thisTurbineVersion = packageJson.version;
 
 const turbineLogicTestVariants = {
   ACTION_SEQUENCING_ENABLED: require('./test-variant-generators/action-sequencing-enabled'),
-  TURBINE_CHECKS_CDN_DISABLED: require('./test-variant-generators/turbine-behaviors-prem-cdn-disabled')
+  TURBINE_CHECKS_CDN_DISABLED: require('./test-variant-generators/turbine-behaviors-prem-cdn-disabled'),
+  TURBINE_CHECKS_CDN_ENABLED: require('./test-variant-generators/turbine-behaviors-prem-cdn-enabled')
 };
 
 // Function that returns the build library URL
@@ -109,11 +110,12 @@ const checkUrl = async (url) => {
 };
 
 // Check all test variant library URLs
-(async () => {
+(async function ensureLibraryBuildsForIntegration() {
   const testVariantNames = Object.keys(turbineLogicTestVariants);
   const forceBuild = process.argv.includes('--force');
 
-  const saveLibraryDetails = (type, details) => {
+  // update a JSON object to be written back to disk at the end
+  const setLibraryDetailsToSave = (type, details) => {
     if (!Object.keys(details).length) {
       throw new Error('The details used to save to the JSON file were empty');
     }
@@ -151,7 +153,7 @@ const checkUrl = async (url) => {
             freshLibraryLink
         );
       }
-      saveLibraryDetails(testVariantName, {
+      setLibraryDetailsToSave(testVariantName, {
         libraryLink: freshLibraryLink,
         propertyLink,
         propertyName

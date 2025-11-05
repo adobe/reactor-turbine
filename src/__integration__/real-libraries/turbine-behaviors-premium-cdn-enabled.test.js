@@ -10,10 +10,67 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
+const libraryBuildPathsFile = require('../../../ci-scripts/library-build-paths.json');
+const loadHtml = require('./setup/load-page-environment-html');
 const { test, expect } = require('@playwright/test');
+const setupTurbineEventListener = require('./setup/setup-turbine-event-listener');
 
-test('it should pass', () => {
-  expect(1 + 1).toBe(2);
+test('Premium CDN is enabled for the testing library', async ({ page }) => {
+  await loadHtml({ page });
+
+  // Inject the script dynamically (don't navigate away)
+  await page.addScriptTag({
+    url: libraryBuildPathsFile.TURBINE_CHECKS_CDN_ENABLED.libraryLink
+  });
+
+  await expect(
+    page.evaluate(() => window._satellite.company.dynamicCdnEnabled),
+    'Expected window._satellite.company.dynamicCdnEnabled to be defined:true.'
+  ).resolves.toBe(true);
+});
+
+test('it can File-Transform a ConditiZon', async ({ page }) => {
+  await loadHtml({ page });
+  const expectedActionIds = [
+    'PremiumCDNEnabledCustomConditionFileTransform::sequence-action-js-3-pass'
+  ];
+  const resultsPromise = setupTurbineEventListener({
+    page,
+    expectedActionIds
+  });
+
+  // Inject the script dynamically (don't navigate away)
+  await page.addScriptTag({
+    url: libraryBuildPathsFile.TURBINE_CHECKS_CDN_ENABLED.libraryLink
+  });
+
+  const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
+  expect(expectedActionsFound.map((a) => a.actionId)).toEqual(
+    expectedActionIds
+  );
+  expect(unexpectedActionsFound.length).toBe(0);
+});
+
+test('it can File-Transform an Action', async ({ page }) => {
+  await loadHtml({ page });
+  const expectedActionIds = [
+    'PremiumCDNEnabledCustomActionFileTransform::sequence-action-js-2-pass'
+  ];
+  const resultsPromise = setupTurbineEventListener({
+    page,
+    expectedActionIds
+  });
+
+  // Inject the script dynamically (don't navigate away)
+  await page.addScriptTag({
+    url: libraryBuildPathsFile.TURBINE_CHECKS_CDN_ENABLED.libraryLink
+  });
+
+  const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
+  expect(expectedActionsFound.map((a) => a.actionId)).toEqual(
+    expectedActionIds
+  );
+  expect(unexpectedActionsFound.length).toBe(0);
 });
 
 // TODO

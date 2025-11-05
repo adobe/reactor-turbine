@@ -40,8 +40,8 @@ To create a production build, run the following command:
 `npm run build:production`
 
 For integration tests, you can run the following commands:
-* To check if the real containers are ready for testing: `npm run ensure-integration-containers`
-* To force a rebuild of all the real containers: `npm run rebuild-integration-containers -- --force`
+* To check if the real integration libraries are ready for testing: `npm run ensure-integration-test-libraries`
+* To force a rebuild of all the real libraries for testing: `npm run ensure-integration-test-libraries -- --force`
 * `npm run test:integration`
 
 
@@ -61,7 +61,7 @@ an image. After the deployment is complete, re-run the failed workflow job. It w
 1. verify that the Turbine version deployed to the `next` tag on npm matches the version in package.json.
 1. Run the unit tests
 1. Run Coveralls
-1. Run the integration tests, building new containers if necessary.
+1. Run the integration tests, building new test scenario libraries if necessary.
 
 If you push a new commit to an open PR without bumping package.json, the versions should match and the tests should run
 uninterrupted.

@@ -7,7 +7,7 @@ export default [
   eslintPluginPrettierRecommended,
   {
     ignores: [
-      'src/__integration__/faked-containers/fake-blacksmith-container.js'
+      'src/__integration__/faked-libraries/fake-blacksmith-container.js'
     ]
   },
   {

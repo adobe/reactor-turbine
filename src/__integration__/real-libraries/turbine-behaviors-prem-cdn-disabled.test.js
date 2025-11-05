@@ -11,9 +11,9 @@
  ****************************************************************************************/
 
 const libraryBuildPathsFile = require('../../../ci-scripts/library-build-paths.json');
-const loadHtml = require('../load-page-environment-html');
+const loadHtml = require('./setup/load-page-environment-html');
 const { test, expect } = require('@playwright/test');
-const setupTurbineEventListener = require('./setup-turbine-event-listener');
+const setupTurbineEventListener = require('./setup/setup-turbine-event-listener');
 
 test('Verify turbine-free-vars rules', async ({ page }) => {
   await loadHtml({ page });

@@ -11,9 +11,9 @@
  ****************************************************************************************/
 
 const libraryBuildPathsFile = require('../../../ci-scripts/library-build-paths.json');
-const loadHtml = require('../load-page-environment-html');
+const loadHtml = require('./setup/load-page-environment-html');
 const { test, expect } = require('@playwright/test');
-const setupTurbineEventListener = require('./setup-turbine-event-listener');
+const setupTurbineEventListener = require('./setup/setup-turbine-event-listener');
 
 test('Verify a Basic Action Sequence using a promise from a EP', async ({
   page
@@ -31,7 +31,7 @@ test('Verify a Basic Action Sequence using a promise from a EP', async ({
 
   // Inject the script dynamically (don't navigate away)
   await page.addScriptTag({
-    url: libraryBuildPathsFile.ACTION_SEQUENCE_CONTAINER.libraryLink
+    url: libraryBuildPathsFile.ACTION_SEQUENCING_ENABLED.libraryLink
   });
 
   const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
@@ -60,7 +60,7 @@ test('Verify Failure Action Sequence using a promise from a EP', async ({
 
   // Inject the script dynamically (don't navigate away)
   await page.addScriptTag({
-    url: libraryBuildPathsFile.ACTION_SEQUENCE_CONTAINER.libraryLink
+    url: libraryBuildPathsFile.ACTION_SEQUENCING_ENABLED.libraryLink
   });
 
   const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
@@ -86,7 +86,7 @@ test('Verify Basic Action Sequence using a Promise in JS Custom code', async ({
 
   // Inject the script dynamically (don't navigate away)
   await page.addScriptTag({
-    url: libraryBuildPathsFile.ACTION_SEQUENCE_CONTAINER.libraryLink
+    url: libraryBuildPathsFile.ACTION_SEQUENCING_ENABLED.libraryLink
   });
 
   const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
@@ -112,7 +112,7 @@ test('Verify Action Sequence using a onCustomCodeSuccess() in HTML Custom code',
 
   // Inject the script dynamically (don't navigate away)
   await page.addScriptTag({
-    url: libraryBuildPathsFile.ACTION_SEQUENCE_CONTAINER.libraryLink
+    url: libraryBuildPathsFile.ACTION_SEQUENCING_ENABLED.libraryLink
   });
 
   const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
@@ -140,7 +140,7 @@ test('Verify Failure of an Action Sequence using onCustomCodeFailure() in HTML C
 
   // Inject the script dynamically (don't navigate away)
   await page.addScriptTag({
-    url: libraryBuildPathsFile.ACTION_SEQUENCE_CONTAINER.libraryLink
+    url: libraryBuildPathsFile.ACTION_SEQUENCING_ENABLED.libraryLink
   });
 
   const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;

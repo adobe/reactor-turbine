@@ -97,6 +97,15 @@ module.exports = async function setupTurbineEventListener({
                 console.log(timeoutMessage);
               });
 
+              // debug if we have things coming through we didn't document as unexpected for the test
+              if (expectedActionsFound.length !== expectedIds.length) {
+                console.log('expectedActionIds.length:', expectedIds.length);
+                console.log(
+                  'expectedActionsFound.length:',
+                  expectedActionsFound.length
+                );
+              }
+
               if (!(error instanceof Error)) {
                 window[rejectFuncName](
                   new Error(
@@ -156,6 +165,10 @@ module.exports = async function setupTurbineEventListener({
                 // The timeout will print the order of all messages received.
                 unexpectedActionsFound.push(messageDetails);
                 timeoutMessages.push('^---- This action was NOT expected!');
+              } else {
+                timeoutMessages.push(
+                  "^---- This action came through but wasn't documented as unexpected!"
+                );
               }
             };
 

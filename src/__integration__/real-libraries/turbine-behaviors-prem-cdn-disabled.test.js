@@ -15,16 +15,18 @@ const loadHtml = require('./setup/load-page-environment-html');
 const { test, expect } = require('@playwright/test');
 const setupTurbineEventListener = require('./setup/setup-turbine-event-listener');
 
-test('Verify turbine-free-vars rules', async ({ page }) => {
+test('Verify turbine is not available in custom code events, conditions, actions', async ({
+  page
+}) => {
   await loadHtml({ page });
   const expectedActionIds = [
-    'TurbineFreeVars::turbine_cc_data_element-pass::thrownError',
-    'TurbineEventCustomCodeRule::sequence-event-js-1-pass::thrownError',
-    'TurbineEventCustomCodeRule::sequence-event-js-2-pass',
-    'TurbineConditionCustomCodeRule::sequence-condition-js-1-pass::thrownError',
-    'TurbineConditionCustomCodeRule::sequence-action-js-1-pass',
-    'TurbineEmbeddedActionCustomCodeRule::sequence-action-js-1-pass::thrownError',
-    'TurbineLinkedActionCustomCode::sequence-action-js-1-pass::thrownError'
+    'TurbineFreeVars::turbine_cc_data_element-pass::thrownError', // in the setup, we called getVar
+    'TurbineNotAvailableCustomCodeEvent::sequence-event-js-1::thrownError::pass',
+    'TurbineNotAvailableCustomCodeEvent::sequence-action-js-2-pass',
+    'TurbineNotAvailableCustomCodeCondition::sequence-condition-js-1::thrownError::pass',
+    'TurbineNotAvailableCustomCodeCondition::sequence-action-js-2-pass',
+    'TurbineNotAvailableCustomCodeActionEmbedded::sequence-action-js-1::thrownError::pass',
+    'TurbineNotAvailableCustomCodeActionLinked::sequence-action-js-1::thrownError::pass'
   ];
   const resultsPromise = setupTurbineEventListener({
     page,

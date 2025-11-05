@@ -18,9 +18,9 @@
     "test:unit:ci:pull:request": "npm install karma-sauce-launcher@4.3.6 && karma start karma.unit.conf.js",
     "test:unit:ci:npm:publish": "karma start karma.unit.conf.js --browsers=ChromeHeadless --no-coverage",
     "generate-access-tokens": "node ci-scripts/setup/generate-access-tokens.js",
-    "ensure-integration-containers": "npm run generate-access-tokens && node ci-scripts/ensure-library-builds-for-integration.js --",
-    "test:integration": "npm run build && npm run ensure-integration-containers && playwright test",
-    "test:integration:ci:npm:publish": "npm run build && npm run ensure-integration-containers -- --force && playwright test"
+    "ensure-integration-test-libraries": "npm run generate-access-tokens && node ci-scripts/ensure-library-builds-for-integration.js --",
+    "test:integration": "npm run build && npm run ensure-integration-test-libraries && playwright test",
+    "test:integration:ci:npm:publish": "npm run build && npm run ensure-integration-test-libraries -- --force && playwright test"
   },
   "author": {
     "name": "Adobe Systems",

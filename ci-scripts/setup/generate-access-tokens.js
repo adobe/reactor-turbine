@@ -18,7 +18,7 @@ const supportedCompanies = require('./supportedCompanies.json');
 // load main env for client id/secret, etc
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
-async function generateAccessTokens(companyType) {
+async function generateAccessToken(companyType) {
   if (!supportedCompanies.hasOwnProperty(companyType)) {
     console.error(
       `The company type "${companyType}" is not any of the container types
@@ -79,8 +79,8 @@ async function generateAccessTokens(companyType) {
 
 async function main() {
   const [defaultToken, premiumToken] = await Promise.all([
-    generateAccessTokens(supportedCompanies.DEFAULT_COMPANY),
-    generateAccessTokens(supportedCompanies.PREMIUM_COMPANY)
+    generateAccessToken(supportedCompanies.DEFAULT_COMPANY),
+    generateAccessToken(supportedCompanies.PREMIUM_COMPANY)
   ]);
   const accessTokenDefaultCompanyEnvPath = path.resolve(
     __dirname,

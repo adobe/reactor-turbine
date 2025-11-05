@@ -14,8 +14,8 @@
 
 /* eslint-disable camelcase */
 
-const supportedCompanies = require('./setup/supportedCompanies.json');
-const createWrappedReactorApi = require('./container-utils');
+const supportedCompanies = require('../setup/supportedCompanies.json');
+const createWrappedReactorApi = require('../container-utils');
 const ReactorApi = createWrappedReactorApi({
   companyType: supportedCompanies.DEFAULT_COMPANY
 });

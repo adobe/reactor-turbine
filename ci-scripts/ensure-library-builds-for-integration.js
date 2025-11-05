@@ -19,33 +19,29 @@ const fs = require('fs');
 const packageJson = require(path.join(__dirname, '..', 'package.json'));
 const thisTurbineVersion = packageJson.version;
 
-const containerTypes = {
-  ACTION_SEQUENCE_CONTAINER: require('./generate-action-sequence-container'),
-  TURBINE_CHECKS_CDN_DISABLED: require('./generate-turbine-checks-container-dynamic-cdn-disabled')
+const turbineLogicTestVariants = {
+  ACTION_SEQUENCING_ENABLED: require('./test-variant-generators/action-sequencing-enabled'),
+  TURBINE_CHECKS_CDN_DISABLED: require('./test-variant-generators/turbine-behaviors-prem-cdn-disabled')
 };
 
 // Function that returns the build library URL
-const buildLibrary = async (containerType) => {
-  console.log(`Building ${containerType}...`);
+const buildLibrary = async (testVariant) => {
+  console.log(`Building ${testVariant}...`);
   // invoke the generateContainer function.
-  const { success, error, ...rest } = await containerTypes[containerType]();
+  const { success, error, ...rest } =
+    await turbineLogicTestVariants[testVariant]();
 
   if (success) {
     const { libraryLink, propertyLink, propertyName } = rest;
-    console.log(
-      `Successfully generated ${containerType} container:`,
-      libraryLink
-    );
+    console.log(`Successfully generated ${testVariant} library:`, libraryLink);
     return {
       libraryLink,
       propertyLink,
       propertyName
     };
   } else {
-    console.error(`Failed to generate "${containerType}" container:`, error);
-    throw new Error(
-      `Failed to generate "${containerType}" container: ${error}`
-    );
+    console.error(`Failed to generate "${testVariant}" library:`, error);
+    throw new Error(`Failed to generate "${testVariant}" library: ${error}`);
   }
 };
 
@@ -112,9 +108,9 @@ const checkUrl = async (url) => {
   }
 };
 
-// Check all container URLs
+// Check all test variant library URLs
 (async () => {
-  const containerTypeNames = Object.keys(containerTypes);
+  const testVariantNames = Object.keys(turbineLogicTestVariants);
   const forceBuild = process.argv.includes('--force');
 
   const saveLibraryDetails = (type, details) => {
@@ -126,11 +122,11 @@ const checkUrl = async (url) => {
   };
 
   let current = 1;
-  for (const containerType of containerTypeNames) {
+  for (const testVariantName of testVariantNames) {
     console.log(
-      `Processing ${containerType} (container ${current}/${containerTypeNames.length})`
+      `Processing ${testVariantName} (library ${current}/${testVariantNames.length})`
     );
-    let { libraryLink } = libraryBuildPathJson[containerType] || {};
+    let { libraryLink } = libraryBuildPathJson[testVariantName] || {};
     let isValid = false;
 
     // we have a prior build url, see if the url is valid
@@ -144,7 +140,7 @@ const checkUrl = async (url) => {
         libraryLink: freshLibraryLink,
         propertyLink,
         propertyName
-      } = await buildLibrary(containerType);
+      } = await buildLibrary(testVariantName);
       if (freshLibraryLink.includes('.min.js')) {
         freshLibraryLink = freshLibraryLink.replace('.min.js', '.js');
       }
@@ -155,7 +151,7 @@ const checkUrl = async (url) => {
             freshLibraryLink
         );
       }
-      saveLibraryDetails(containerType, {
+      saveLibraryDetails(testVariantName, {
         libraryLink: freshLibraryLink,
         propertyLink,
         propertyName
@@ -174,9 +170,9 @@ const checkUrl = async (url) => {
     console.log('Updated library-build-paths.json with new URLs');
   } else {
     console.log(
-      'JSON was unmodified - All container types were publicly accessible'
+      'JSON was unmodified - All test variant libraries were publicly accessible'
     );
   }
 
-  console.log('All container URLs processed successfully');
+  console.log('All test variant library URLs processed successfully');
 })();

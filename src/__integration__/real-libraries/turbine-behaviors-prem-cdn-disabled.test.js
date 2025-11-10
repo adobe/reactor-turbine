@@ -19,7 +19,7 @@ test('Verify turbine is not available in custom code events, conditions, actions
   page
 }) => {
   await loadHtml({ page });
-  const expectedActionIds = [
+  const expectedTestIdentifiers = [
     'TurbineFreeVars::turbine_cc_data_element-pass::thrownError', // in the setup, we called getVar
     'TurbineNotAvailableCustomCodeEvent::sequence-event-js-1::thrownError::pass',
     'TurbineNotAvailableCustomCodeEvent::sequence-action-js-2-pass',
@@ -30,7 +30,7 @@ test('Verify turbine is not available in custom code events, conditions, actions
   ];
   const resultsPromise = setupTurbineEventListener({
     page,
-    expectedActionIds
+    expectedTestIdentifiers
   });
 
   // Inject the script dynamically (don't navigate away)
@@ -38,12 +38,15 @@ test('Verify turbine is not available in custom code events, conditions, actions
     url: libraryBuildPathsFile.TURBINE_CHECKS_CDN_DISABLED.libraryLink
   });
 
-  const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
-  expect(expectedActionsFound.length).toBe(expectedActionIds.length);
-  expectedActionsFound.forEach(({ actionId: a }) => {
-    expect(expectedActionIds.includes(a)).toBe(true);
+  const { expectedTestIdentifiersFound, unexpectedTestIdentifiersFound } =
+    await resultsPromise;
+  expect(expectedTestIdentifiersFound.length).toBe(
+    expectedTestIdentifiers.length
+  );
+  expectedTestIdentifiersFound.forEach(({ testIdentifier }) => {
+    expect(expectedTestIdentifiers.includes(testIdentifier)).toBe(true);
   });
-  expect(unexpectedActionsFound.length).toBe(0);
+  expect(unexpectedTestIdentifiersFound.length).toBe(0);
 });
 
 test('custom code transforms on standard host (not dynamicCDN)', async ({

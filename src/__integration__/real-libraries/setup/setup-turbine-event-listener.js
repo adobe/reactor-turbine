@@ -10,22 +10,26 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-// DEFAULT TIMEOUTS: 10s test overall, 5s waiting for expected actions to come through
+// DEFAULT TIMEOUTS: 10s test overall, 5s waiting for expected identifiers to come through
 module.exports = async function setupTurbineEventListener({
   page,
-  expectedActionIds,
-  unexpectedActionIds,
+  expectedTestIdentifiers,
+  unexpectedTestIdentifiers,
   extendTimeoutsByMs = 0
 }) {
-  if (!Array.isArray(expectedActionIds) || !expectedActionIds.length) {
-    throw new Error('No expected action ids defined for test scenario');
+  if (
+    !Array.isArray(expectedTestIdentifiers) ||
+    !expectedTestIdentifiers.length
+  ) {
+    throw new Error('No expected test identifiers defined for test scenario');
   }
   if (
-    unexpectedActionIds != null &&
-    (!Array.isArray(unexpectedActionIds) || !unexpectedActionIds.length)
+    unexpectedTestIdentifiers != null &&
+    (!Array.isArray(unexpectedTestIdentifiers) ||
+      !unexpectedTestIdentifiers.length)
   ) {
     throw new Error(
-      'Unexpected action ids must be a non-empty array, if defined'
+      'Unexpected test identifiers must be a non-empty array, if defined'
     );
   }
 
@@ -78,15 +82,15 @@ module.exports = async function setupTurbineEventListener({
         ({
           doneFuncName,
           rejectFuncName,
-          expectedIds,
-          unexpectedIds,
+          expectedIdentifiers,
+          unexpectedIdentifiers,
           extendTimeoutsBy
         }) => {
           try {
             // stores calls to window.markTurbineTestExecuted into an array to return to playwright later
-            const expectedActionsFound = [];
-            const unexpectedActionsFound = [];
-            // on timeout, log out what actions were received.
+            const expectedTestIdentifiersFound = [];
+            const unexpectedTestIdentifiersFound = [];
+            // on timeout, log out what test identifiers were received.
             const timeoutMessages = [];
 
             function rejectTestAndDebug(error) {
@@ -98,11 +102,17 @@ module.exports = async function setupTurbineEventListener({
               });
 
               // debug if we have things coming through we didn't document as unexpected for the test
-              if (expectedActionsFound.length !== expectedIds.length) {
-                console.log('expectedActionIds.length:', expectedIds.length);
+              if (
+                expectedTestIdentifiersFound.length !==
+                expectedIdentifiers.length
+              ) {
                 console.log(
-                  'expectedActionsFound.length:',
-                  expectedActionsFound.length
+                  'expectedIdentifiers.length:',
+                  expectedIdentifiers.length
+                );
+                console.log(
+                  'expectedTestIdentifiersFound.length:',
+                  expectedTestIdentifiersFound.length
                 );
               }
 
@@ -119,65 +129,73 @@ module.exports = async function setupTurbineEventListener({
             }
 
             /** called from the Turbine runtime **/
-            window.markTurbineTestExecuted = function (actionId, timestamp) {
-              if (!actionId?.length) {
+            window.markTurbineTestExecuted = function (
+              testIdentifier,
+              timestamp
+            ) {
+              if (!testIdentifier?.length) {
                 rejectTestAndDebug(
                   new Error(
-                    'An actionId came through undefined or empty. There is a problem with the setup of a rule.'
+                    'A test identifier came through undefined or empty. There is a problem with the setup of a rule.'
                   )
                 );
               }
-              const messageDetails = { actionId, timestamp };
+              const messageDetails = { testIdentifier, timestamp };
               // if a test times out, then we'll log every message received IN THE ORDER it was received.
               timeoutMessages.push(
                 `called window.markTurbineTestExecuted with ${JSON.stringify(messageDetails)}`
               );
-              if (expectedIds.includes(actionId)) {
-                expectedActionsFound.push(messageDetails);
+              if (expectedIdentifiers.includes(testIdentifier)) {
+                expectedTestIdentifiersFound.push(messageDetails);
                 // we think we should be done
                 if (
-                  expectedActionsFound.length === expectedIds.length &&
-                  unexpectedActionsFound.length === 0
+                  expectedTestIdentifiersFound.length ===
+                    expectedIdentifiers.length &&
+                  unexpectedTestIdentifiersFound.length === 0
                 ) {
-                  const gracePeriodTimeout = !unexpectedIds?.length
+                  const gracePeriodTimeout = !unexpectedIdentifiers?.length
                     ? 0 // there are no unexpectedIds to check, so we don't need a grace period
                     : 2000;
-                  // grace period to see if unexpected actions end up flowing through
+                  // grace period to see if unexpected test identifiers end up flowing through
                   // after we think we're done
                   window.setTimeout(function () {
                     if (
-                      expectedActionsFound.length === expectedIds.length &&
-                      unexpectedActionsFound.length === 0
+                      expectedTestIdentifiersFound.length ===
+                        expectedIdentifiers.length &&
+                      unexpectedTestIdentifiersFound.length === 0
                     ) {
                       window[doneFuncName]({
-                        expectedActionsFound,
-                        // unexpectedActionsFound should always be empty. assert in test file.
-                        unexpectedActionsFound
+                        expectedTestIdentifiersFound,
+                        // unexpectedTestIdentifiersFound should always be empty. assert in test file.
+                        unexpectedTestIdentifiersFound
                       });
                     }
-                  }, gracePeriodTimeout); // don't extend the check for extra actions to come in.
+                  }, gracePeriodTimeout); // don't extend the check for extra test identifiers to come in.
                 }
               } else if (
-                unexpectedIds != null && // unexpectedIds is optional
-                unexpectedIds.includes(actionId)
+                unexpectedIdentifiers != null && // unexpectedIds is optional
+                unexpectedIdentifiers.includes(testIdentifier)
               ) {
-                // ❌ An unexpected action fired, capture it so our resolve condition fails
+                // ❌ An unexpected identifier fired, capture it so our resolve condition fails
                 // The timeout will print the order of all messages received.
-                unexpectedActionsFound.push(messageDetails);
-                timeoutMessages.push('^---- This action was NOT expected!');
+                unexpectedTestIdentifiersFound.push(messageDetails);
+                timeoutMessages.push(
+                  '^---- This test identifier was NOT expected!'
+                );
               } else {
                 timeoutMessages.push(
-                  "^---- This action came through but wasn't documented as unexpected!"
+                  "^---- This test identifier came through but wasn't documented as unexpected!"
                 );
               }
             };
 
-            // ❌ Timed out after 5s while waiting for all actions received OR received an unexpected action
+            // ❌ Timed out after 5s while waiting for all messages from turbine
+            // received OR received an unexpected identifier
             window.setTimeout(
               rejectTestAndDebug.bind(
                 this,
                 new Error(
-                  'Test timed out after 5s waiting for expected actions'
+                  'Test timed out after 5s waiting for expected test identifiers'
                 )
               ),
               5000 + extendTimeoutsBy
@@ -189,8 +207,8 @@ module.exports = async function setupTurbineEventListener({
         {
           doneFuncName: windowFuncDoneName,
           rejectFuncName: windowFuncRejectName,
-          expectedIds: expectedActionIds,
-          unexpectedIds: unexpectedActionIds,
+          expectedIdentifiers: expectedTestIdentifiers,
+          unexpectedIdentifiers: unexpectedTestIdentifiers,
           extendTimeoutsBy: extendTimeoutsByMs
         }
       )

@@ -19,14 +19,14 @@ test('Verify a Basic Action Sequence using a promise from a EP', async ({
   page
 }) => {
   await loadHtml({ page });
-  const expectedActionIds = [
+  const expectedTestIdentifiers = [
     'EPActionPromiseRule::sequence-action-js-1-pass',
     'EPActionPromiseRule::sequence-action-js-2-pass',
     'EPActionPromiseRule::sequence-action-js-3-pass'
   ];
   const resultsPromise = setupTurbineEventListener({
     page,
-    expectedActionIds
+    expectedTestIdentifiers
   });
 
   // Inject the script dynamically (don't navigate away)
@@ -34,11 +34,12 @@ test('Verify a Basic Action Sequence using a promise from a EP', async ({
     url: libraryBuildPathsFile.ACTION_SEQUENCING_ENABLED.libraryLink
   });
 
-  const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
-  expect(expectedActionsFound.map((a) => a.actionId)).toEqual(
-    expectedActionIds
-  );
-  expect(unexpectedActionsFound.length).toBe(0);
+  const { expectedTestIdentifiersFound, unexpectedTestIdentifiersFound } =
+    await resultsPromise;
+  expect(
+    expectedTestIdentifiersFound.map(({ testIdentifier }) => testIdentifier)
+  ).toEqual(expectedTestIdentifiers);
+  expect(unexpectedTestIdentifiersFound.length).toBe(0);
 });
 
 test('Verify Failure Action Sequence using a promise from a EP', async ({
@@ -46,16 +47,16 @@ test('Verify Failure Action Sequence using a promise from a EP', async ({
 }) => {
   await loadHtml({ page });
 
-  const expectedActionIds = [
+  const expectedTestIdentifiers = [
     'EPActionPromiseRuleFailure::sequence-action-js-1-pass'
   ];
-  const unexpectedActionIds = [
+  const unexpectedTestIdentifiers = [
     'EPActionPromiseRuleFailure::sequence-action-js-3-fail'
   ];
   const resultsPromise = setupTurbineEventListener({
     page,
-    expectedActionIds,
-    unexpectedActionIds
+    expectedTestIdentifiers,
+    unexpectedTestIdentifiers
   });
 
   // Inject the script dynamically (don't navigate away)
@@ -63,25 +64,26 @@ test('Verify Failure Action Sequence using a promise from a EP', async ({
     url: libraryBuildPathsFile.ACTION_SEQUENCING_ENABLED.libraryLink
   });
 
-  const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
-  expect(expectedActionsFound.map((a) => a.actionId)).toEqual(
-    expectedActionIds
-  );
-  expect(unexpectedActionsFound.length).toBe(0);
+  const { expectedTestIdentifiersFound, unexpectedTestIdentifiersFound } =
+    await resultsPromise;
+  expect(
+    expectedTestIdentifiersFound.map(({ testIdentifier }) => testIdentifier)
+  ).toEqual(expectedTestIdentifiers);
+  expect(unexpectedTestIdentifiersFound.length).toBe(0);
 });
 
 test('Verify Basic Action Sequence using a Promise in JS Custom code', async ({
   page
 }) => {
   await loadHtml({ page });
-  const expectedActionIds = [
+  const expectedTestIdentifiers = [
     'JSActionCustomCodeRule::sequence-action-js-1-pass',
     'JSActionCustomCodeRule::sequence-action-js-2-pass',
     'JSActionCustomCodeRule::sequence-action-js-3-pass'
   ];
   const resultsPromise = setupTurbineEventListener({
     page,
-    expectedActionIds
+    expectedTestIdentifiers
   });
 
   // Inject the script dynamically (don't navigate away)
@@ -89,25 +91,26 @@ test('Verify Basic Action Sequence using a Promise in JS Custom code', async ({
     url: libraryBuildPathsFile.ACTION_SEQUENCING_ENABLED.libraryLink
   });
 
-  const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
-  expect(expectedActionsFound.map((a) => a.actionId)).toEqual(
-    expectedActionIds
-  );
-  expect(unexpectedActionsFound.length).toBe(0);
+  const { expectedTestIdentifiersFound, unexpectedTestIdentifiersFound } =
+    await resultsPromise;
+  expect(
+    expectedTestIdentifiersFound.map(({ testIdentifier }) => testIdentifier)
+  ).toEqual(expectedTestIdentifiers);
+  expect(unexpectedTestIdentifiersFound.length).toBe(0);
 });
 
 test('Verify Action Sequence using a onCustomCodeSuccess() in HTML Custom code', async ({
   page
 }) => {
   await loadHtml({ page });
-  const expectedActionIds = [
+  const expectedTestIdentifiers = [
     'HTMLActionCustomCodeRuleOnSuccess::sequence-action-html-1-pass',
     'HTMLActionCustomCodeRuleOnSuccess::sequence-action-html-2-pass',
     'HTMLActionCustomCodeRuleOnSuccess::sequence-action-html-3-pass'
   ];
   const resultsPromise = setupTurbineEventListener({
     page,
-    expectedActionIds
+    expectedTestIdentifiers
   });
 
   // Inject the script dynamically (don't navigate away)
@@ -115,27 +118,28 @@ test('Verify Action Sequence using a onCustomCodeSuccess() in HTML Custom code',
     url: libraryBuildPathsFile.ACTION_SEQUENCING_ENABLED.libraryLink
   });
 
-  const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
-  expect(expectedActionsFound.map((a) => a.actionId)).toEqual(
-    expectedActionIds
-  );
-  expect(unexpectedActionsFound.length).toBe(0);
+  const { expectedTestIdentifiersFound, unexpectedTestIdentifiersFound } =
+    await resultsPromise;
+  expect(
+    expectedTestIdentifiersFound.map(({ testIdentifier }) => testIdentifier)
+  ).toEqual(expectedTestIdentifiers);
+  expect(unexpectedTestIdentifiersFound.length).toBe(0);
 });
 
 test('Verify Failure of an Action Sequence using onCustomCodeFailure() in HTML Custom code', async ({
   page
 }) => {
   await loadHtml({ page });
-  const expectedActionIds = [
+  const expectedTestIdentifiers = [
     'HTMLActionCustomCodeRuleOnFail::sequence-action-html-1-pass'
   ];
-  const unexpectedActionIds = [
+  const unexpectedTestIdentifiers = [
     'HTMLActionCustomCodeRuleOnFail::sequence-action-html-3-fail'
   ];
   const resultsPromise = setupTurbineEventListener({
     page,
-    expectedActionIds,
-    unexpectedActionIds
+    expectedTestIdentifiers,
+    unexpectedTestIdentifiers
   });
 
   // Inject the script dynamically (don't navigate away)
@@ -143,9 +147,10 @@ test('Verify Failure of an Action Sequence using onCustomCodeFailure() in HTML C
     url: libraryBuildPathsFile.ACTION_SEQUENCING_ENABLED.libraryLink
   });
 
-  const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
-  expect(expectedActionsFound.map((a) => a.actionId)).toEqual(
-    expectedActionIds
-  );
-  expect(unexpectedActionsFound.length).toBe(0);
+  const { expectedTestIdentifiersFound, unexpectedTestIdentifiersFound } =
+    await resultsPromise;
+  expect(
+    expectedTestIdentifiersFound.map(({ testIdentifier }) => testIdentifier)
+  ).toEqual(expectedTestIdentifiers);
+  expect(unexpectedTestIdentifiersFound.length).toBe(0);
 });

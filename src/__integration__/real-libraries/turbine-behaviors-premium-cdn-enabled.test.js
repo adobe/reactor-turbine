@@ -29,14 +29,14 @@ test('Premium CDN is enabled for the testing library', async ({ page }) => {
   ).resolves.toBe(true);
 });
 
-test('it can File-Transform a ConditiZon', async ({ page }) => {
+test('it can File-Transform a Condition', async ({ page }) => {
   await loadHtml({ page });
-  const expectedActionIds = [
+  const expectedTestIdentifiers = [
     'PremiumCDNEnabledCustomConditionFileTransform::sequence-action-js-3-pass'
   ];
   const resultsPromise = setupTurbineEventListener({
     page,
-    expectedActionIds
+    expectedTestIdentifiers
   });
 
   // Inject the script dynamically (don't navigate away)
@@ -44,21 +44,22 @@ test('it can File-Transform a ConditiZon', async ({ page }) => {
     url: libraryBuildPathsFile.TURBINE_CHECKS_CDN_ENABLED.libraryLink
   });
 
-  const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
-  expect(expectedActionsFound.map((a) => a.actionId)).toEqual(
-    expectedActionIds
-  );
-  expect(unexpectedActionsFound.length).toBe(0);
+  const { expectedTestIdentifiersFound, unexpectedTestIdentifiersFound } =
+    await resultsPromise;
+  expect(
+    expectedTestIdentifiersFound.map(({ testIdentifier }) => testIdentifier)
+  ).toEqual(expectedTestIdentifiers);
+  expect(unexpectedTestIdentifiersFound.length).toBe(0);
 });
 
 test('it can File-Transform an Action', async ({ page }) => {
   await loadHtml({ page });
-  const expectedActionIds = [
+  const expectedTestIdentifiers = [
     'PremiumCDNEnabledCustomActionFileTransform::sequence-action-js-2-pass'
   ];
   const resultsPromise = setupTurbineEventListener({
     page,
-    expectedActionIds
+    expectedTestIdentifiers
   });
 
   // Inject the script dynamically (don't navigate away)
@@ -66,11 +67,12 @@ test('it can File-Transform an Action', async ({ page }) => {
     url: libraryBuildPathsFile.TURBINE_CHECKS_CDN_ENABLED.libraryLink
   });
 
-  const { expectedActionsFound, unexpectedActionsFound } = await resultsPromise;
-  expect(expectedActionsFound.map((a) => a.actionId)).toEqual(
-    expectedActionIds
-  );
-  expect(unexpectedActionsFound.length).toBe(0);
+  const { expectedTestIdentifiersFound, unexpectedTestIdentifiersFound } =
+    await resultsPromise;
+  expect(
+    expectedTestIdentifiersFound.map(({ testIdentifier }) => testIdentifier)
+  ).toEqual(expectedTestIdentifiers);
+  expect(unexpectedTestIdentifiersFound.length).toBe(0);
 });
 
 // TODO

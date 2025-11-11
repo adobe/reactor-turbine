@@ -24,7 +24,9 @@ var moduleReferencePath;
 
 beforeAll(function () {
   var debugController = jasmine.createSpyObj('debugController', [
-    'onDebugChanged'
+    'onDebugChanged',
+    'getDebugEnabled',
+    'setDebugEnabled'
   ]);
   dynamicHostResolver = createDynamicHostResolver(
     turbineEmbedCode,

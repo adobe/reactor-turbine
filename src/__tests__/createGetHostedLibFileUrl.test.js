@@ -19,7 +19,11 @@ var dynamicHostResolver = createDynamicHostResolver(
   undefined,
   false,
   undefined,
-  jasmine.createSpyObj('debugController', ['onDebugChanged'])
+  jasmine.createSpyObj('debugController', [
+    'onDebugChanged',
+    'getDebugEnabled',
+    'setDebugEnabled'
+  ])
 );
 
 describe('function returned by createGetHostedLibFileUrl', function () {

@@ -560,9 +560,9 @@ module.exports = function createWrappedReactorApi({ companyType }) {
    * propertyId: string,
    * propertyLink: string,
    * environmentId: string,
-   * ruleId: string,
    * coreExtensionId: string,
-   * libraryLink: string
+   * libraryLink: string,
+   * premiumCdnLink?: string,
    * }>}
    */
   async function prepareNewPropertyForDelegates({
@@ -581,7 +581,7 @@ module.exports = function createWrappedReactorApi({ companyType }) {
       }
     });
     const propertyId = property.data.id;
-    const propertyLink = `/${process.env.RSDK_ADOBE_REACTOR_COMPANY_ID}/properties/${propertyId}`;
+    const propertyLink = `/${companyId}/properties/${propertyId}`;
     console.log(
       `✅ created property (${propertyId}) with name ${propertyName}`
     );
@@ -604,6 +604,12 @@ module.exports = function createWrappedReactorApi({ companyType }) {
     } else {
       throw new Error('❌ could not find .min.js link for the library');
     }
+    const premiumCdnLink = environment.data.meta.script_sources.reduce(
+      (acc, src) => {
+        return src.hosting_region === 'China' ? src.debug : acc;
+      },
+      null
+    );
 
     // 3. Ensure extensions available
     const coreExtension = await installExtension({
@@ -621,7 +627,7 @@ module.exports = function createWrappedReactorApi({ companyType }) {
       `✅ checked the launch validation extension (${launchValidationExtensionId})`
     );
 
-    return {
+    let returnResult = {
       propertyName,
       propertyId,
       propertyLink,
@@ -630,6 +636,10 @@ module.exports = function createWrappedReactorApi({ companyType }) {
       launchValidationExtensionId,
       libraryLink
     };
+    if (premiumCdnLink) {
+      returnResult.premiumCdnLink = premiumCdnLink;
+    }
+    return returnResult;
   }
 
   return {

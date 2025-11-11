@@ -125,14 +125,20 @@ function injectCreateDynamicHostResolver({ window }) {
       }
     };
 
+    // when we're in debug mode, this will expose the dynamicHostResolver to
+    // the window for debugging.
     if (window) {
-      debugController.onDebugChanged(function (isEnabled) {
-        if (isEnabled) {
+      function decideToExposeDynamicHostResolver(isDebugEnabled) {
+        if (isDebugEnabled) {
           window.dynamicHostResolver = dynamicHostResolver;
         } else {
           delete window.dynamicHostResolver;
         }
-      });
+      }
+      debugController.onDebugChanged(decideToExposeDynamicHostResolver);
+      // if debug is already enabled when the page is loaded, we won't get a
+      // debugChanged callback, so check it right on page-load.
+      decideToExposeDynamicHostResolver(debugController.getDebugEnabled());
     }
 
     return dynamicHostResolver;

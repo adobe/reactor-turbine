@@ -58,6 +58,13 @@ test('custom code transforms on standard host (not dynamicCDN)', async ({
     url: libraryBuildPathsFile.TURBINE_CHECKS_CDN_DISABLED.libraryLink
   });
 
+  // premium cdn is disabled
+  await expect(
+    page.evaluate(() => window._satellite.company.dynamicCdnEnabled),
+    'Expected window._satellite.company.dynamicCdnEnabled to be defined:false.'
+  ).resolves.toBe(false);
+
+  // the hosted lib files base url should be hardcoded to https://assets.adobedtm.com
   await expect(
     page.evaluate(() => window._satellite.company.dynamicCdnEnabled),
     'Expected window._satellite.company.dynamicCdnEnabled to be defined:false.'

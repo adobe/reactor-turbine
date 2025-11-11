@@ -1,17 +1,18 @@
 {
   "ACTION_SEQUENCING_ENABLED": {
-    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/55938c4d77da/launch-17509fd3151e-development.js",
-    "propertyLink": "/undefined/properties/PRe32e8cfd7cae4233a05dbb25940cfd9f",
-    "propertyName": "Test Turbine v29.0.0-beta.7 ACTION_SEQUENCE_CONTAINER v2025-11-10 191550"
+    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/569653c2333d/launch-dc272d7d8aaa-development.js",
+    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PR69208e0be2fb4c71885f93038f95101a",
+    "propertyName": "Test Turbine v29.0.0-beta.7 ACTION_SEQUENCE_CONTAINER v2025-11-10 225815"
   },
   "TURBINE_CHECKS_CDN_DISABLED": {
-    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/369e7ac51577/launch-97876eb335f0-development.js",
-    "propertyLink": "/undefined/properties/PR73698dd261404e1b87e2c3cb2fe96875",
-    "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_CHECKS_PREM_CDN_DISABLED v2025-11-10 191612"
+    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/4a39754b0a03/launch-2b708d8f19c3-development.js",
+    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PR661e9ec2732a4e2ab3aeb6b5db018eb4",
+    "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_CHECKS_PREM_CDN_DISABLED v2025-11-10 225839"
   },
   "TURBINE_CHECKS_CDN_ENABLED": {
-    "libraryLink": "https://assets.adobedtm.com/staging/a9f4a379fa75/603fbc1c40ea/launch-869a5bc8490d-development.js",
-    "propertyLink": "/undefined/properties/PR9f71c1131f154221a2954c9944853499",
-    "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_CHECKS_PREM_CDN_ENABLED v2025-11-10 191631"
+    "libraryLink": "https://assets.adobedtm.com/staging/a9f4a379fa75/b2d9e8731af0/launch-e5687ce94608-development.js",
+    "propertyLink": "/CO1cf1c3281ab243d485f4a54be3d9d745/properties/PRceb9ec18169246a88d08ae52c03e0eba",
+    "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_CHECKS_PREM_CDN_ENABLED v2025-11-10 231957",
+    "premiumCdnLink": "https://assets.adoberesources.cn/staging/a9f4a379fa75/b2d9e8731af0/launch-e5687ce94608-development.js"
   }
 }

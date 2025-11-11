@@ -27,6 +27,7 @@ async function generateContainer() {
       propertyName,
       propertyLink /* /CO.../properties/PR... */,
       libraryLink /* assets.adobedtm.com/.../.min.js */,
+      premiumCdnLink,
       environmentId,
       coreExtensionId,
       launchValidationExtensionId
@@ -162,6 +163,7 @@ async function generateContainer() {
       success: true,
       propertyLink,
       libraryLink,
+      premiumCdnLink,
       propertyName
     };
   } catch (error) {

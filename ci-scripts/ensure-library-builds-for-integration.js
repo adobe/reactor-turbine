@@ -33,12 +33,13 @@ const buildLibrary = async (testVariant) => {
     await turbineLogicTestVariants[testVariant]();
 
   if (success) {
-    const { libraryLink, propertyLink, propertyName } = rest;
+    const { libraryLink, propertyLink, propertyName, premiumCdnLink } = rest;
     console.log(`Successfully generated ${testVariant} library:`, libraryLink);
     return {
       libraryLink,
       propertyLink,
-      propertyName
+      propertyName,
+      premiumCdnLink
     };
   } else {
     console.error(`Failed to generate "${testVariant}" library:`, error);
@@ -119,6 +120,13 @@ const checkUrl = async (url) => {
     if (!Object.keys(details).length) {
       throw new Error('The details used to save to the JSON file were empty');
     }
+    // not every company will support having a premium cdn link. ensure we don't save an undefined.
+    if (
+      !details.hasOwnProperty('premiumCdnLink') &&
+      !details.premiumCdnLink?.length
+    ) {
+      delete details.premiumCdnLink;
+    }
     libraryBuildPathJson[type] = details;
     jsonModified = true;
   };
@@ -141,7 +149,8 @@ const checkUrl = async (url) => {
       let {
         libraryLink: freshLibraryLink,
         propertyLink,
-        propertyName
+        propertyName,
+        premiumCdnLink
       } = await buildLibrary(testVariantName);
       if (freshLibraryLink.includes('.min.js')) {
         freshLibraryLink = freshLibraryLink.replace('.min.js', '.js');
@@ -156,7 +165,8 @@ const checkUrl = async (url) => {
       setLibraryDetailsToSave(testVariantName, {
         libraryLink: freshLibraryLink,
         propertyLink,
-        propertyName
+        propertyName,
+        premiumCdnLink
       });
     }
 

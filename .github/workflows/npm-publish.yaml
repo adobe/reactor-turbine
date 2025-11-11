@@ -65,8 +65,7 @@ jobs:
         if: always()
         run: |
           rm -rf ci-scripts/setup/.env
-          rm -rf ci-scripts/setup/.env.access-token-default-company
-          rm -rf ci-scripts/setup/.env.access-token-premium-company
+          rm -rf ci-scripts/setup/.env.access-token*
 
       # Publish to NPM
       - name: Publish to NPM

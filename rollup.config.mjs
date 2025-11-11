@@ -15,6 +15,9 @@ import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
 import stripCode from 'rollup-plugin-strip-code';
 
+// The stripCode will strip all code wrapped in START.TESTS_ONLY/END.TESTS_ONLY
+// comments when process.env.NODE_ENV = production (like in package.json build:production).
+
 /* eslint-disable camelcase */
 export default {
   input: 'src/index.js',

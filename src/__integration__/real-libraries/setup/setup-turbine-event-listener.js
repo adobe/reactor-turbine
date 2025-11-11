@@ -38,9 +38,11 @@ module.exports = async function setupTurbineEventListener({
     console.log('Page Log:', msg.text());
   });
 
-  // scope this function to this test to help ensure test sandboxing for results.
-  const windowFuncDoneName = `notifyFinishedTestScenario_${Date.now()}`;
-  const windowFuncRejectName = `notifyRejectTestScenario_${Date.now()}`;
+  // scope the reporters for this call to a uuid. replace hyphens with underscores
+  // to ensure valid function names.
+  const uuid = crypto.randomUUID().replace(/-/g, '_');
+  const windowFuncDoneName = `notifyFinishedTestScenario_${uuid}`;
+  const windowFuncRejectName = `notifyRejectTestScenario_${uuid}`;
 
   let resolvePromise;
   let rejectPromise;

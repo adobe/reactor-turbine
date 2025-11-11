@@ -80,7 +80,8 @@ describe('hydrateModuleProvider', function () {
     getDataElementValue = function () {};
     debugControllerSpy = jasmine.createSpyObj('debugController', {
       onDebugChanged: jasmine.createSpy('onDebugChanged'),
-      getDebugEnabled: true
+      getDebugEnabled: true,
+      setDebugEnabled: jasmine.createSpy('setDebugEnabled')
     });
 
     decorateWithDynamicHost = createDynamicHostResolver(

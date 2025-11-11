@@ -42,7 +42,9 @@ describe('createDynamicHostResolver returns a function that when called', functi
     });
     consoleSpy = spyOn(console, 'warn');
     debugController = jasmine.createSpyObj('debugController', [
-      'onDebugChanged'
+      'onDebugChanged',
+      'getDebugEnabled',
+      'setDebugEnabled'
     ]);
     dynamicCdnEnabled = true;
   });

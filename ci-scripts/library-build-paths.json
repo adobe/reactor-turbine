@@ -1,18 +1,23 @@
 {
   "ACTION_SEQUENCING_ENABLED": {
-    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/569653c2333d/launch-dc272d7d8aaa-development.js",
-    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PR69208e0be2fb4c71885f93038f95101a",
-    "propertyName": "Test Turbine v29.0.0-beta.7 ACTION_SEQUENCE_CONTAINER v2025-11-10 225815"
+    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/0b43c386a465/launch-b0772d47dfd4-development.js",
+    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PR98c2e1fd879a4cd1852fa36fad857b7b",
+    "propertyName": "Test Turbine v29.0.0-beta.7 ACTION_SEQUENCE_ENABLED v2025-11-11 180159"
   },
   "TURBINE_CHECKS_CDN_DISABLED": {
-    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/4a39754b0a03/launch-2b708d8f19c3-development.js",
-    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PR661e9ec2732a4e2ab3aeb6b5db018eb4",
-    "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_CHECKS_PREM_CDN_DISABLED v2025-11-10 225839"
+    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/c517b69d3276/launch-674c6a68732d-development.js",
+    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PRf9070fe85de64fc0a5b576442f43c5b4",
+    "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_CHECKS_PREM_CDN_DISABLED v2025-11-11 180233"
   },
   "TURBINE_CHECKS_CDN_ENABLED": {
-    "libraryLink": "https://assets.adobedtm.com/staging/a9f4a379fa75/b2d9e8731af0/launch-e5687ce94608-development.js",
-    "propertyLink": "/CO1cf1c3281ab243d485f4a54be3d9d745/properties/PRceb9ec18169246a88d08ae52c03e0eba",
-    "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_CHECKS_PREM_CDN_ENABLED v2025-11-10 231957",
-    "premiumCdnLink": "https://assets.adoberesources.cn/staging/a9f4a379fa75/b2d9e8731af0/launch-e5687ce94608-development.js"
+    "libraryLink": "https://assets.adobedtm.com/staging/a9f4a379fa75/bb5730289946/launch-939ceee6f547-development.js",
+    "propertyLink": "/CO1cf1c3281ab243d485f4a54be3d9d745/properties/PR7cc342cc5f9e4f74a938957f3dde2644",
+    "propertyName": "Test Turbine v29.0.0-beta.7 TURBINE_CHECKS_PREM_CDN_ENABLED v2025-11-11 180252",
+    "premiumCdnLink": "https://assets.adoberesources.cn/staging/a9f4a379fa75/bb5730289946/launch-939ceee6f547-development.js"
+  },
+  "ACTION_SEQUENCING_DISABLED": {
+    "libraryLink": "https://assets.adobedtm.com/staging/627495d36fbb/9ea15d228f0c/launch-ad12a3f76905-development.js",
+    "propertyLink": "/COa947e6fc549e443fb1b3f99dccce2d9f/properties/PR93fa913f39a04d5ea4f7bcb62df1fa52",
+    "propertyName": "Test Turbine v29.0.0-beta.7 ACTION_SEQUENCE_DISABLED v2025-11-11 180953"
   }
 }

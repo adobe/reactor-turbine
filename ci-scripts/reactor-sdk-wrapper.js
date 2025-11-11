@@ -101,9 +101,10 @@ module.exports = function createWrappedReactorApi({ companyType }) {
    * Create a property with standard configuration
    * @param {string} propertyName - Name for the property
    * @param {Object} options - Overrides for entries at the same level as 'attributes', etc.
+   * @param attributes
    * @returns {Promise<Object>} Created property
    */
-  async function createProperty({ propertyName, options = {} }) {
+  async function createProperty({ propertyName, attributes = {} }) {
     try {
       return await Reactor.createProperty(companyId, {
         type: 'properties',
@@ -111,11 +112,11 @@ module.exports = function createWrappedReactorApi({ companyType }) {
           name: propertyName,
           domains: ['testing.reactor.turbine.adobe.com'],
           platform: 'web',
-          development: false
-        },
-        undefined_vars_return_empty: false,
-        rule_component_sequencing_enabled: false,
-        ...options
+          development: false,
+          rule_component_sequencing_enabled: false,
+          undefined_vars_return_empty: true,
+          ...attributes
+        }
       });
     } catch (error) {
       console.error('Threw error in createProperty:');
@@ -566,19 +567,18 @@ module.exports = function createWrappedReactorApi({ companyType }) {
    * }>}
    */
   async function prepareNewPropertyForDelegates({
-    ruleComponentSequencingEnabled = false,
-    undefinedVarsReturnsEmpty = false,
-    libraryVariantName
+    libraryVariantName,
+    attributes = {
+      undefined_vars_return_empty: false,
+      rule_component_sequencing_enabled: false
+    }
   }) {
     const propertyName = generatePropertyName({ libraryVariantName });
 
     // 1. Create property
     const property = await createProperty({
       propertyName,
-      attributes: {
-        ruleComponentSequencingEnabled: Boolean(ruleComponentSequencingEnabled),
-        undefinedVarsReturnsEmpty: Boolean(undefinedVarsReturnsEmpty)
-      }
+      attributes
     });
     const propertyId = property.data.id;
     const propertyLink = `/${companyId}/properties/${propertyId}`;

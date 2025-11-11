@@ -21,6 +21,7 @@ const thisTurbineVersion = packageJson.version;
 
 const turbineLogicTestVariants = {
   ACTION_SEQUENCING_ENABLED: require('./test-variant-generators/action-sequencing-enabled'),
+  ACTION_SEQUENCING_DISABLED: require('./test-variant-generators/action-sequencing-disabled'),
   TURBINE_CHECKS_CDN_DISABLED: require('./test-variant-generators/turbine-behaviors-prem-cdn-disabled'),
   TURBINE_CHECKS_CDN_ENABLED: require('./test-variant-generators/turbine-behaviors-prem-cdn-enabled')
 };

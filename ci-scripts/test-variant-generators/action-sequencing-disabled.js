@@ -12,12 +12,10 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-/* eslint-disable camelcase */
-
 const supportedCompanyTypes = require('../setup/supportedCompanyTypes.json');
 const createWrappedReactorApi = require('../reactor-sdk-wrapper');
 const ReactorApi = createWrappedReactorApi({
-  companyType: supportedCompanyTypes.PREMIUM_COMPANY
+  companyType: supportedCompanyTypes.DEFAULT_COMPANY
 });
 
 async function generateContainer() {
@@ -27,39 +25,32 @@ async function generateContainer() {
       propertyName,
       propertyLink /* /CO.../properties/PR... */,
       libraryLink /* assets.adobedtm.com/.../.min.js */,
-      premiumCdnLink,
       environmentId,
       coreExtensionId,
       launchValidationExtensionId
     } = await ReactorApi.prepareNewPropertyForDelegates({
-      libraryVariantName: 'TURBINE_CHECKS_PREM_CDN_ENABLED',
+      libraryVariantName: 'ACTION_SEQUENCE_DISABLED',
       attributes: {
-        rule_component_sequencing_enabled: true
+        // eslint-disable-next-line camelcase
+        rule_component_sequencing_enabled: false
       }
     });
-
-    const dataElementsUsed = [];
-    const dataElement1 = await ReactorApi.createCustomCodeDataElement({
-      propertyId,
-      coreExtensionId,
-      attributes: {
-        name: 'premium-cdn-enabled-file-transform-data-element',
-        settings: {
-          source:
-            // eslint-disable-next-line max-len
-            "markTurbineTestExecuted('PremiumCDNEnabled::turbine_cc_data_element-file-transform-pass', new Date().toISOString());"
-        },
-        storage_duration: 'pageview'
-      }
-    });
-    dataElementsUsed.push(dataElement1.data.id);
 
     const rulesUsed = [];
+
     try {
-      /**** rule 1, Custom Condition File Transform ****/
+      /**
+       * creating actions 1,2,3,4
+       * 1: timeout 1000ms
+       * 2: no timeout
+       * 3: timeout 2000ms
+       * 4: no timeout
+       * expected flow through turbine: 2,4,1,3
+       */
+      /**** rule 1, ActionSequencingDisabled mixing timeouts, page-bottom ****/
       const rule1 = await ReactorApi.createRule({
         propertyId,
-        ruleName: 'Premium CDN Custom Condition File Transform'
+        ruleName: 'ActionSequencingDisabled - mixing in timeouts'
       });
       const rule1Id = rule1.data.id;
       rulesUsed.push(rule1Id);
@@ -68,23 +59,26 @@ async function generateContainer() {
         propertyId,
         extensionId: coreExtensionId,
         ruleId: rule1Id,
-        delegateDescriptorId: 'core::events::dom-ready',
-        ruleComponentName: 'dom ready'
+        delegateDescriptorId: 'core::events::page-bottom',
+        ruleComponentName: 'page bottom'
       });
-      // condition
+      // action
       await ReactorApi.createRuleComponent({
         propertyId,
         extensionId: launchValidationExtensionId,
         ruleId: rule1Id,
-        delegateDescriptorId: 'launch-validation::conditions::file-transform',
+        delegateDescriptorId:
+          'launch-validation::actions::action-promise-timeout-no-dom-element',
         settings: {
-          fileValue: 'var tmpConditionVal = "fileComparisonValue";',
-          staticValue: 'fileComparisonValue'
+          testIdentifier:
+            'ActionSequencingDisabled::with-timeout::sequence-action-js-1-pass',
+          timeout: 1000
         },
-        ruleComponentName: 'Custom Code File Transform Condition'
+        ruleComponentName: '(0) Action Promise No Dom El Timeout 1000ms',
+        order: 0
       });
       // action
-      await ReactorApi.createActionThatRespectsPromiseChainResolves({
+      await ReactorApi.createRuleComponent({
         propertyId,
         extensionId: launchValidationExtensionId,
         ruleId: rule1Id,
@@ -92,51 +86,41 @@ async function generateContainer() {
           'launch-validation::actions::action-direct-no-dom-element',
         settings: {
           testIdentifier:
-            'PremiumCDNEnabledCustomConditionFileTransform::sequence-action-js-3-pass'
+            'ActionSequencingDisabled::no-timeout::sequence-action-js-2-pass'
         },
-        ruleComponentName: '(1) Action Direct No DOM Element',
+        ruleComponentName: '(1) Action Direct No Dom El',
         order: 1
-      });
-      /**** end rule 1, Custom Condition File Transform ****/
-    } catch (err) {
-      console.log('Error creating rule 1');
-      throw err;
-    }
-
-    try {
-      /**** rule 2, Custom Action File Transform ****/
-      const rule2 = await ReactorApi.createRule({
-        propertyId,
-        ruleName: 'Premium CDN Custom Action File Transform'
-      });
-      const rule2Id = rule2.data.id;
-      rulesUsed.push(rule2Id);
-      // event
-      await ReactorApi.createRuleComponent({
-        propertyId,
-        extensionId: coreExtensionId,
-        ruleId: rule2Id,
-        delegateDescriptorId: 'core::events::dom-ready',
-        ruleComponentName: 'dom ready'
       });
       // action
-      await ReactorApi.createActionThatRespectsPromiseChainResolves({
+      await ReactorApi.createRuleComponent({
         propertyId,
         extensionId: launchValidationExtensionId,
-        ruleId: rule2Id,
+        ruleId: rule1Id,
         delegateDescriptorId:
-          'launch-validation::actions::action-verify-file-transform-no-dom-element',
+          'launch-validation::actions::action-promise-timeout-no-dom-element',
         settings: {
-          rawFileValue: 'fileComparisonValue',
-          fileValue: 'var tmpConditionVal = "fileComparisonValue";',
-          staticValue: 'fileComparisonValue',
           testIdentifier:
-            'PremiumCDNEnabledCustomActionFileTransform::sequence-action-js-2-pass'
+            'ActionSequencingDisabled::with-timeout::sequence-action-js-3-pass',
+          timeout: 2000
         },
-        ruleComponentName: '(1) Action Verify File Transform No DOM Element',
-        order: 1
+        ruleComponentName: '(2) Action Promise No Dom El Timeout 1000ms',
+        order: 2
       });
-      /**** end rule 1, Custom Condition File Transform ****/
+      // action
+      await ReactorApi.createRuleComponent({
+        propertyId,
+        extensionId: launchValidationExtensionId,
+        ruleId: rule1Id,
+        delegateDescriptorId:
+          'launch-validation::actions::action-direct-no-dom-element',
+        settings: {
+          testIdentifier:
+            'ActionSequencingDisabled::no-timeout::sequence-action-js-4-pass'
+        },
+        ruleComponentName: '(3) Action Direct No Dom El',
+        order: 3
+      });
+      /**** rule 1, ActionSequencingDisabled mixing timeouts, page-bottom ****/
     } catch (err) {
       console.log('Error creating rule 2');
       throw err;
@@ -150,7 +134,6 @@ async function generateContainer() {
       propertyId,
       environmentId,
       extensionIdsUsed: [coreExtensionId, launchValidationExtensionId],
-      dataElementIds: dataElementsUsed,
       ruleIds: rulesUsed
     });
     const libraryId = library.data.id;
@@ -164,7 +147,6 @@ async function generateContainer() {
       success: true,
       propertyLink,
       libraryLink,
-      premiumCdnLink,
       propertyName
     };
   } catch (error) {
@@ -177,16 +159,14 @@ if (require.main === module) {
   generateContainer()
     .then(({ success, propertyLink, libraryLink, propertyName, error }) => {
       if (success) {
-        console.log(
-          'TURBINE_CHECKS_PREM_CDN_ENABLED library generated successfully!'
-        );
+        console.log('Action_Sequence_Disabled library generated successfully!');
         console.log(propertyName);
         console.log('Property Link:', propertyLink);
         console.log('Library Build:', libraryLink);
         process.exit(0);
       } else {
         console.error(
-          'Failed to generate TURBINE_CHECKS_PREM_CDN_ENABLED library:',
+          'Failed to generate Action_Sequence_Disabled library:',
           error
         );
         process.exit(1);

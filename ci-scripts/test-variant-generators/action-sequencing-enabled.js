@@ -29,8 +29,11 @@ async function generateContainer() {
       coreExtensionId,
       launchValidationExtensionId
     } = await ReactorApi.prepareNewPropertyForDelegates({
-      ruleComponentSequencingEnabled: true,
-      libraryVariantName: 'ACTION_SEQUENCE_CONTAINER'
+      libraryVariantName: 'ACTION_SEQUENCE_ENABLED',
+      attributes: {
+        // eslint-disable-next-line camelcase
+        rule_component_sequencing_enabled: true
+      }
     });
 
     const rulesUsed = [];
@@ -415,13 +418,16 @@ if (require.main === module) {
   generateContainer()
     .then(({ success, propertyLink, libraryLink, propertyName, error }) => {
       if (success) {
-        console.log('Action_Sequence container generated successfully!');
+        console.log('Action_Sequence_Enabled library generated successfully!');
         console.log(propertyName);
         console.log('Property Link:', propertyLink);
         console.log('Library Build:', libraryLink);
         process.exit(0);
       } else {
-        console.error('Failed to generate Action_Sequence container:', error);
+        console.error(
+          'Failed to generate Action_Sequence_Enabled library:',
+          error
+        );
         process.exit(1);
       }
     })

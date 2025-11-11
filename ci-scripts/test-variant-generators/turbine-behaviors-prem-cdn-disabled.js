@@ -33,7 +33,10 @@ async function generateContainer() {
     } = await ReactorApi.prepareNewPropertyForDelegates({
       ruleComponentSequencingEnabled: true,
       undefinedVarsReturnsEmpty: true,
-      libraryVariantName: 'TURBINE_CHECKS_PREM_CDN_DISABLED'
+      libraryVariantName: 'TURBINE_CHECKS_PREM_CDN_DISABLED',
+      attributes: {
+        rule_component_sequencing_enabled: true
+      }
     });
 
     const dataElementsUsed = [];
@@ -287,13 +290,18 @@ if (require.main === module) {
   generateContainer()
     .then(({ success, propertyLink, libraryLink, propertyName, error }) => {
       if (success) {
-        console.log('Turbine_Free_Vars container generated successfully!');
+        console.log(
+          'TURBINE_CHECKS_PREM_CDN_DISABLED library generated successfully!'
+        );
         console.log(propertyName);
         console.log('Property Link:', propertyLink);
         console.log('Library Build:', libraryLink);
         process.exit(0);
       } else {
-        console.error('Failed to generate Turbine_Free_Vars container:', error);
+        console.error(
+          'Failed to generate TURBINE_CHECKS_PREM_CDN_DISABLED library:',
+          error
+        );
         process.exit(1);
       }
     })

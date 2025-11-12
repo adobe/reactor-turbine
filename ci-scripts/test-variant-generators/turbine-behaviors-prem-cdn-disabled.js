@@ -15,12 +15,13 @@
 /* eslint-disable camelcase */
 
 const supportedCompanyTypes = require('../setup/supportedCompanyTypes.json');
-const createWrappedReactorApi = require('../reactor-sdk-wrapper');
-const ReactorApi = createWrappedReactorApi({
-  companyType: supportedCompanyTypes.DEFAULT_COMPANY
-});
+const createWrappedReactorApi = require('../setup/reactor-sdk-wrapper');
 
 async function generateContainer() {
+  const ReactorApi = await createWrappedReactorApi({
+    companyType: supportedCompanyTypes.DEFAULT_COMPANY
+  });
+
   try {
     const {
       propertyId,

@@ -19,6 +19,10 @@ jobs:
           node-version: 'lts/jod'
 
       # Project Setup
+      - name: Clean Sensitive Files
+        if: always()
+        run: |
+          rm -rf ci-scripts/setup/.env
       - name: Install dependencies
         run: npm ci
       - name: Linting files
@@ -95,29 +99,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov.info
 
-      - name: Create .env file for integration tests
-        run: |
-          cat > ci-scripts/setup/.env << EOF
-          # GitHub Actions environment - integration tests will use mock/test values
-          RSDK_ADOBE_DEFAULT_COMPANY_CLIENT_ID=${{ secrets.RSDK_ADOBE_DEFAULT_COMPANY_CLIENT_ID  }}
-          RSDK_ADOBE_DEFAULT_COMPANY_CLIENT_SECRET=${{ secrets.RSDK_ADOBE_DEFAULT_COMPANY_CLIENT_SECRET }}
-          RSDK_ADOBE_DEFAULT_COMPANY_ORG_ID=${{ secrets.RSDK_ADOBE_DEFAULT_COMPANY_ORG_ID }}
-          RSDK_ADOBE_REACTOR_DEFAULT_COMPANY_ID=${{ secrets.RSDK_ADOBE_REACTOR_DEFAULT_COMPANY_ID }}
-          RSDK_ADOBE_PREMIUM_COMPANY_CLIENT_ID=${{ secrets.RSDK_ADOBE_PREMIUM_COMPANY_CLIENT_ID  }}
-          RSDK_ADOBE_PREMIUM_COMPANY_CLIENT_SECRET=${{ secrets.RSDK_ADOBE_PREMIUM_COMPANY_CLIENT_SECRET }}
-          RSDK_ADOBE_PREMIUM_COMPANY_ORG_ID=${{ secrets.RSDK_ADOBE_PREMIUM_COMPANY_ORG_ID }}
-          RSDK_ADOBE_REACTOR_PREMIUM_COMPANY_ID=${{ secrets.RSDK_ADOBE_REACTOR_PREMIUM_COMPANY_ID }}
-          RSDK_ADOBE_SCOPES=${{ secrets.RSDK_ADOBE_SCOPES }}
-          RSDK_ADOBE_REACTOR_URL=${{ secrets.RSDK_ADOBE_REACTOR_URL }}
-          RSDK_ADOBE_ENVIRONMENT=${{ secrets.RSDK_ADOBE_ENVIRONMENT }}
-          EOF
-
       # Integration Tests Step
       - name: Run integration tests
         run: npm run test:integration
-
-      - name: Clean Sensitive Files
-        if: always()
-        run: |
-          rm -rf ci-scripts/setup/.env
-          rm -rf ci-scripts/setup/.env.access-token*

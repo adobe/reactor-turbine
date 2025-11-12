@@ -30,8 +30,8 @@ const turbineLogicTestVariants = {
 const buildLibrary = async (testVariant) => {
   console.log(`Building ${testVariant}...`);
   // invoke the generateContainer function.
-  const { success, error, ...rest } =
-    await turbineLogicTestVariants[testVariant]();
+  const libraryGeneratorFunc = turbineLogicTestVariants[testVariant];
+  const { success, error, ...rest } = await libraryGeneratorFunc();
 
   if (success) {
     const { libraryLink, propertyLink, propertyName, premiumCdnLink } = rest;

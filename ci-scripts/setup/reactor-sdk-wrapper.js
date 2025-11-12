@@ -14,24 +14,47 @@
  * Shared utilities for library generation scripts. Wraps the Reactor SDK to make
  * creating resources easier.
  */
-const Reactor = require('@adobe/reactor-sdk').default;
 const path = require('path');
-const packageJson = require(path.resolve(__dirname, '..', 'package.json'));
+const { auth } = require('@adobe/auth-token');
+const reactorSdk = require('@adobe/reactor-sdk').default;
+const packageJson = require(
+  path.resolve(__dirname, '..', '..', 'package.json')
+);
 const thisTurbineVersion = packageJson.version;
-require('dotenv').config({ path: path.resolve(__dirname, 'setup', '.env') });
-const supportedCompanyTypes = require('./setup/supportedCompanyTypes.json');
+const supportedCompanyTypes = require('./supportedCompanyTypes.json');
 
-function createReactorSdk({ accessToken, reactorUrl, orgId }) {
-  return new Reactor(accessToken, {
-    reactorUrl: reactorUrl,
-    customHeaders: { 'x-gw-ims-org-id': orgId },
-    enableLogging: false
-  });
+if (!process.env.CI && !process.env.GITHUB_ACTIONS) {
+  require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+}
+
+/**
+ * Generates a fresh access token using the supplied config
+ * @param {object} config
+ * @param {string} config.clientId
+ * @param {string} config.clientSecret
+ * @param {string} config.scope
+ * @param {string} config.environment
+ * @returns {Promise<string>}
+ */
+async function generateAccessToken(config = {}) {
+  if (
+    !config.clientId?.length ||
+    !config.clientSecret?.length ||
+    !config.scope?.length ||
+    !config.environment?.length
+  ) {
+    throw new Error(
+      'clientId, clientSecret, scope, and environment are required to create an access token'
+    );
+  }
+
+  const { access_token: freshToken } = await auth(config);
+  return freshToken;
 }
 
 /* eslint-disable camelcase */
 
-module.exports = function createWrappedReactorApi({ companyType }) {
+module.exports = async function createWrappedReactorApi({ companyType }) {
   if (!supportedCompanyTypes.hasOwnProperty(companyType)) {
     throw new Error(
       `The company type "${companyType}" is not any of the container types
@@ -40,36 +63,36 @@ module.exports = function createWrappedReactorApi({ companyType }) {
   }
 
   let companyId;
-  let Reactor;
+  let orgId;
+  let generatedAccessToken;
+
+  const scope = process.env.RSDK_ADOBE_SCOPES;
+  const environment = process.env.RSDK_ADOBE_ENVIRONMENT;
   if (companyType === supportedCompanyTypes.DEFAULT_COMPANY) {
     companyId = process.env.RSDK_ADOBE_REACTOR_DEFAULT_COMPANY_ID;
-    require('dotenv').config({
-      path: path.resolve(
-        __dirname,
-        'setup',
-        '.env.access-token-default-company'
-      )
-    });
-    Reactor = createReactorSdk({
-      accessToken: process.env.RSDK_DEFAULT_COMPANY_ACCESS_TOKEN,
-      reactorUrl: process.env.RSDK_ADOBE_REACTOR_URL,
-      orgId: process.env.RSDK_ADOBE_DEFAULT_COMPANY_ORG_ID
+    orgId = process.env.RSDK_ADOBE_DEFAULT_COMPANY_ORG_ID;
+    generatedAccessToken = await generateAccessToken({
+      clientId: process.env.RSDK_ADOBE_DEFAULT_COMPANY_CLIENT_ID,
+      clientSecret: process.env.RSDK_ADOBE_DEFAULT_COMPANY_CLIENT_SECRET,
+      scope,
+      environment
     });
   } else {
     companyId = process.env.RSDK_ADOBE_REACTOR_PREMIUM_COMPANY_ID;
-    require('dotenv').config({
-      path: path.resolve(
-        __dirname,
-        'setup',
-        '.env.access-token-premium-company'
-      )
-    });
-    Reactor = createReactorSdk({
-      accessToken: process.env.RSDK_PREMIUM_COMPANY_ACCESS_TOKEN,
-      reactorUrl: process.env.RSDK_ADOBE_REACTOR_URL,
-      orgId: process.env.RSDK_ADOBE_PREMIUM_COMPANY_ORG_ID
+    orgId = process.env.RSDK_ADOBE_PREMIUM_COMPANY_ORG_ID;
+    generatedAccessToken = await generateAccessToken({
+      clientId: process.env.RSDK_ADOBE_PREMIUM_COMPANY_CLIENT_ID,
+      clientSecret: process.env.RSDK_ADOBE_PREMIUM_COMPANY_CLIENT_SECRET,
+      scope,
+      environment
     });
   }
+
+  const Reactor = new reactorSdk(generatedAccessToken, {
+    reactorUrl: process.env.RSDK_ADOBE_REACTOR_URL,
+    customHeaders: { 'x-gw-ims-org-id': orgId },
+    enableLogging: false
+  });
 
   /**
    * Generate a unique human-readable version string based on UTC timestamp

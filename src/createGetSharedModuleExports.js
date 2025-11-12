@@ -10,30 +10,56 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-/**
- * Creates a function that, when called with an extension name and module name, will return the
- * exports of the respective shared module.
- *
- * @param {Object} extensions
- * @param {Object} moduleProvider
- * @returns {Function}
- */
-module.exports = function (extensions, moduleProvider) {
-  return function (extensionName, moduleName) {
-    var extension = extensions[extensionName];
+var validateInjectedParams = require('./helpers/validate-injected-params');
 
-    if (extension) {
-      var modules = extension.modules;
-      if (modules) {
-        var referencePaths = Object.keys(modules);
-        for (var i = 0; i < referencePaths.length; i++) {
-          var referencePath = referencePaths[i];
-          var module = modules[referencePath];
-          if (module.shared && module.name === moduleName) {
-            return moduleProvider.getModuleExports(referencePath);
+function injectCreateGetSharedModuleExports({ logger }) {
+  /**
+   * Creates a function that, when called with an extension name and module name, will return the
+   * exports of the respective shared module.
+   *
+   * @param {Object} extensions
+   * @param {Object} moduleProvider
+   * @returns {Function}
+   */
+  return function createGetSharedModuleExports(extensions, moduleProvider) {
+    return function getSharedModuleExports(extensionName, moduleName) {
+      var extension = extensions[extensionName];
+
+      if (extension) {
+        var modules = extension.modules;
+        if (modules) {
+          var referencePaths = Object.keys(modules);
+          for (var i = 0; i < referencePaths.length; i++) {
+            var referencePath = referencePaths[i];
+            var module = modules[referencePath];
+            if (module.shared && module.name === moduleName) {
+              return moduleProvider.getModuleExports(referencePath);
+            }
           }
+          logger.error(
+            `The module "${moduleName}" does not exist in the shared modules of the "${extensionName}" extension`
+          );
         }
+      } else {
+        logger.error(
+          `The extension "${extensionName}" is not bundled with the library."`
+        );
       }
-    }
+    };
   };
-};
+}
+
+const validateInjection = validateInjectedParams(
+  injectCreateGetSharedModuleExports
+);
+
+module.exports = validateInjection({
+  logger: require('./logger')
+});
+
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  /* START.TESTS_ONLY */
+  module.exports.injectCreateGetSharedModuleExports =
+    injectCreateGetSharedModuleExports;
+  /* END.TESTS_ONLY */
+}

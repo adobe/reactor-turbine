@@ -13,8 +13,11 @@
 'use strict';
 
 describe('function returned by createGetSharedModuleExports', function () {
-  var createGetSharedModuleExports = require('../createGetSharedModuleExports');
+  var {
+    injectCreateGetSharedModuleExports
+  } = require('../createGetSharedModuleExports');
   var getSharedModuleExports;
+  var loggerMock;
 
   beforeEach(function () {
     var extensions = {
@@ -35,6 +38,16 @@ describe('function returned by createGetSharedModuleExports', function () {
       }
     };
 
+    loggerMock = jasmine.createSpyObj('logger', [
+      'log',
+      'info',
+      'debug',
+      'warn',
+      'error'
+    ]);
+    var createGetSharedModuleExports = injectCreateGetSharedModuleExports({
+      logger: loggerMock
+    });
     getSharedModuleExports = createGetSharedModuleExports(
       extensions,
       moduleProvider
@@ -44,15 +57,26 @@ describe('function returned by createGetSharedModuleExports', function () {
   it("returns a shared module's exports", function () {
     var exports = getSharedModuleExports('hello-world', 'foo');
     expect(exports).toBe('exports from hello-world/src/foo.js');
+    expect(loggerMock.log).not.toHaveBeenCalled();
+    expect(loggerMock.info).not.toHaveBeenCalled();
+    expect(loggerMock.debug).not.toHaveBeenCalled();
+    expect(loggerMock.warn).not.toHaveBeenCalled();
+    expect(loggerMock.error).not.toHaveBeenCalled();
   });
 
   it('returns undefined if no matching extension is found', function () {
-    var exports = getSharedModuleExports('goodbye-moon', 'foo');
+    var exports = getSharedModuleExports('unknown-extension', 'some-module');
     expect(exports).toBeUndefined();
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      'The extension "unknown-extension" is not bundled with the library."'
+    );
   });
 
   it('returns undefined if no matching shared module is found', function () {
     var exports = getSharedModuleExports('hello-world', 'baz');
     expect(exports).toBeUndefined();
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      'The module "baz" does not exist in the shared modules of the "hello-world" extension'
+    );
   });
 });

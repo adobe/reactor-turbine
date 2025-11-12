@@ -19,7 +19,7 @@ To get started:
 1. Install [node.js](https://nodejs.org/).
 1. Clone the repository.
 1. After navigating into the project directory, install project dependencies by running `npm install`.
-1. `cp .env.example .env` and modify the environment variables as needed.
+1. `cp .env-example .env` and modify the environment variables as needed.
 
 ### Scripts
 
@@ -43,6 +43,7 @@ For integration tests, you can run the following commands:
 * To check if the real integration libraries are ready for testing: `npm run ensure-integration-test-libraries`
 * To force a rebuild of all the real libraries for testing: `npm run ensure-integration-test-libraries -- --force`
 * `npm run test:integration`
+* **NOTE**: This project relies on the [launch-validation-extension-package](https://github.com/oneAdobe/reactor-launch-validation-extension) to be publicly available on npm to run the integration tests.
 
 
 ### Pull Request & Deployment Process

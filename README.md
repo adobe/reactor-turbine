@@ -12,7 +12,7 @@ This project is not intended to be used directly by consumers; it is used by the
 
 ## Contributing
 
-Contributions are welcomed! Read the [Contributing Guide](CONTRIBUTING.md) for more information.
+Contributions are welcomed! Read the [Contributing Guide](CONTRIBUTING.md) and the [Testing Guide](TESTING.md) for more information.
 
 To get started:
 
@@ -44,7 +44,6 @@ For integration tests, you can run the following commands:
 * To force a rebuild of all the real libraries for testing: `npm run ensure-integration-test-libraries -- --force`
 * `npm run test:integration`
 * **NOTE**: This project relies on the [launch-validation-extension-package](https://github.com/oneAdobe/reactor-launch-validation-extension) to be publicly available on npm to run the integration tests.
-
 
 ### Pull Request & Deployment Process
 

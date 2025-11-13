@@ -4,8 +4,7 @@
   "description": "Tags rule engine which processes rules on client websites and delegates logic to extensions.",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "npm run clean && rollup -c",
-    "build:production": "NODE_ENV=production npm run build && npm run minify && npm run verify-no-test-code",
+    "build:production": "NODE_ENV=production && npm run clean && rollup -c && npm run minify && npm run verify-no-test-code",
     "verify-no-test-code": "bash ./verify-no-test-code.sh",
     "clean": "rm -rf dist",
     "format": "pretty-quick",
@@ -17,9 +16,9 @@
     "test:unit": "karma start karma.unit.conf.js",
     "test:unit:ci:pull:request": "npm install karma-sauce-launcher@4.3.6 && karma start karma.unit.conf.js",
     "test:unit:ci:npm:publish": "karma start karma.unit.conf.js --browsers=ChromeHeadless --no-coverage",
-    "ensure-integration-test-libraries": "node ci-scripts/ensure-library-builds-for-integration.js --",
-    "test:integration": "npm run build && npm run ensure-integration-test-libraries && playwright test",
-    "test:integration:ci:npm:publish": "npm run build && npm run ensure-integration-test-libraries -- --force && playwright test"
+    "ensure-integration-test-libraries": "node ci-scripts/ensure-integration-test-libraries.js --",
+    "test:integration": "npm run build:production && npm run ensure-integration-test-libraries && playwright test",
+    "test:integration:ci:npm:publish": "npm run build:production && npm run ensure-integration-test-libraries -- --force && playwright test"
   },
   "author": {
     "name": "Adobe Systems",

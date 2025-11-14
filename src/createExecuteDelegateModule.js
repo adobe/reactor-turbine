@@ -23,6 +23,10 @@ module.exports = function (
       moduleDescriptor.modulePath
     );
 
+    moduleExports = moduleExports.__esModule
+      ? moduleExports.default
+      : moduleExports;
+
     if (typeof moduleExports !== 'function') {
       throw new Error(MODULE_NOT_FUNCTION_ERROR);
     }

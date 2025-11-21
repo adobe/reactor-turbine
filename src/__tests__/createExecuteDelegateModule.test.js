@@ -54,6 +54,61 @@ describe('createExecuteDelegateModule returns a function that when called', func
     expect(moduleExportsSpy).toHaveBeenCalledWith(undefined, 'a', 'b');
   });
 
+  it('handles ES6 modules transpiled with Babel (with __esModule flag)', function () {
+    var moduleExportsSpy = jasmine
+      .createSpy('moduleExports')
+      .and.returnValue('module result');
+    var babelTranspiledModule = {
+      __esModule: true,
+      default: moduleExportsSpy
+    };
+    var getModuleExportsSpy = jasmine
+      .createSpy('getModuleExports')
+      .and.returnValue(babelTranspiledModule);
+
+    var moduleProvider = {
+      getModuleExports: getModuleExportsSpy,
+      getModuleDefinition: jasmine.createSpy().and.returnValue({})
+    };
+    var replaceTokens = emptyFn;
+    var settingsFileTransformer = emptyFn;
+
+    expect(
+      createExecuteDelegateModule(
+        moduleProvider,
+        replaceTokens,
+        settingsFileTransformer
+      )(moduleDescriptor, event, moduleCallParameters)
+    ).toBe('module result');
+    expect(getModuleExportsSpy).toHaveBeenCalledWith('path');
+    expect(moduleExportsSpy).toHaveBeenCalledWith(undefined, 'a', 'b');
+  });
+
+  it('throws an error if ES6 module default export is not a function', function () {
+    var babelTranspiledModule = {
+      __esModule: true,
+      default: 'not a function'
+    };
+    var getModuleExportsSpy = jasmine
+      .createSpy('getModuleExports')
+      .and.returnValue(babelTranspiledModule);
+
+    var moduleProvider = {
+      getModuleExports: getModuleExportsSpy,
+      getModuleDefinition: jasmine.createSpy().and.returnValue({})
+    };
+    var replaceTokens = emptyFn;
+    var settingsFileTransformer = emptyFn;
+
+    expect(function () {
+      createExecuteDelegateModule(
+        moduleProvider,
+        replaceTokens,
+        settingsFileTransformer
+      )(moduleDescriptor, event, moduleCallParameters);
+    }).toThrow(new Error('Module did not export a function.'));
+  });
+
   it(
     'calls the module export function with an empty array when ' +
       ' module call parameters are not provided',

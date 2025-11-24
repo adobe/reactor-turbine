@@ -8,9 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
+  check-needs-deploy:
     runs-on: ubuntu-latest
-    environment: npm-publish
 
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +27,7 @@ jobs:
       - name: Linting files
         run: npm run lint
 
-      # If the commit included changing the turbine version, we need to publish to the 'next' tag
+      # Check if deployment is needed
       - name: Get local version
         id: local
         run: echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
@@ -51,31 +50,56 @@ jobs:
             echo "deploy=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Build package due to commit containing package.json version change
-        if: steps.compare.outputs.deploy == 'true'
+    outputs:
+      run-deploy-script: ${{ steps.compare.outputs.deploy }}
+      version: ${{ steps.local.outputs.version }}
+
+  deploy:
+    needs: check-needs-deploy
+    if: needs.check-needs-deploy.outputs.run-deploy-script == 'true'
+    runs-on: ubuntu-latest
+    environment: npm-publish
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/jod'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build package for npm deployment
         run: npm run build:production
 
-      - name: Deploy package due to commit containing package.json version change
-        if: steps.compare.outputs.deploy == 'true'
+      - name: Deploy package to npm
         uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
           tag: "next"
 
-      # 🔥 Force exit if deploy happened
-      # Exit code 78 tells GitHub Actions to stop the workflow without marking it as failed
-      - name: Stop workflow after deployment due to changing package.json version
-        if: steps.compare.outputs.deploy == 'true'
+      - name: Deployment summary
         run: |
-          echo "✅ Deployment completed — stopping workflow." >> $GITHUB_STEP_SUMMARY
+          echo "✅ Deployment completed." >> $GITHUB_STEP_SUMMARY
           echo "⚠️ Rebuild Forge now that we've placed the new version on npm." >> $GITHUB_STEP_SUMMARY
-          echo "✅ Then re-run this action to validate the new version." >> $GITHUB_STEP_SUMMARY
-          echo "exiting with code 78." >> $GITHUB_STEP_SUMMARY
-          exit 78
+          echo "✅ Then re-run the workflow to validate the new version." >> $GITHUB_STEP_SUMMARY
 
-      - name: Skip deploy
-        if: steps.compare.outputs.deploy == 'false'
-        run: echo "✅ Versions match. No deploy needed."
+  test:
+    needs: [check-needs-deploy, deploy]
+    if: |
+      always() && 
+      needs.check-needs-deploy.result == 'success' && 
+      (needs.deploy.result == 'success' || needs.deploy.result == 'skipped')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/jod'
+
+      - name: Install dependencies
+        run: npm ci
 
       # Start Sauce Connect tunnel for SauceLabs
       - name: Start Sauce Connect

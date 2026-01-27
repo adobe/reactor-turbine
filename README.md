@@ -66,6 +66,10 @@ an image. After the deployment is complete, re-run the failed workflow job. It w
 If you push a new commit to an open PR without bumping package.json, the versions should match and the tests should run
 uninterrupted.
 
+#### Syncing Next & Latest
+During PR review, new versions of Turbine are placed on the `next` tag on npm. When the PR is merged and verified, the
+developer can sync the `latest` tag on npm by using the `restore-dist-tag.yaml` GitHub workflow.
+
 ## Browser Support
 
 Turbine supports the following browsers:

@@ -1,0 +1,37 @@
+name: Restore NPM dist-tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The dist-tag to restore (latest or next)'
+        required: true
+        type: string
+        default: 'latest'
+      version:
+        description: 'The version on npm to assign to the tag (e.g. 1.2.0)'
+        required: true
+        type: string
+
+jobs:
+  restore-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate tag input
+        run: |
+          if [[ "${{ github.event.inputs.tag }}" != "latest" && "${{ github.event.inputs.tag }}" != "next" ]]; then
+            echo "Error: Tag must be 'latest' or 'next'. Got '${{ github.event.inputs.tag }}'"
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/jod'
+
+      - name: Restore dist-tag
+        run: npm dist-tag add @adobe/reactor-turbine@${{ github.event.inputs.version }} ${{ github.event.inputs.tag }} --//registry.npmjs.org/:_authToken=${{ secrets.ADOBE_BOT_NPM_TOKEN }}
+
+      - name: Show updated dist-tags
+        run: npm dist-tag ls @adobe/reactor-turbine --//registry.npmjs.org/:_authToken=${{ secrets.ADOBE_BOT_NPM_TOKEN }}

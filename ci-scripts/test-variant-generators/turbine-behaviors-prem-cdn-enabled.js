@@ -1,0 +1,202 @@
+#!/usr/bin/env node
+
+/***************************************************************************************
+ * (c) 2025 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ ****************************************************************************************/
+
+/* eslint-disable camelcase */
+
+const supportedCompanyTypes = require('../setup/supportedCompanyTypes.json');
+const createWrappedReactorApi = require('../setup/reactor-sdk-wrapper');
+
+async function generateContainer() {
+  const ReactorApi = await createWrappedReactorApi({
+    companyType: supportedCompanyTypes.PREMIUM_COMPANY
+  });
+
+  try {
+    const {
+      propertyId,
+      propertyName,
+      propertyLink /* /CO.../properties/PR... */,
+      libraryLink /* assets.adobedtm.com/.../.min.js */,
+      premiumCdnLink,
+      environmentId,
+      coreExtensionId,
+      launchValidationExtensionId
+    } = await ReactorApi.prepareNewPropertyForDelegates({
+      libraryVariantName: 'TURBINE_CHECKS_PREM_CDN_ENABLED',
+      attributes: {
+        rule_component_sequencing_enabled: true
+      }
+    });
+
+    const dataElementsUsed = [];
+    const dataElement1 = await ReactorApi.createCustomCodeDataElement({
+      propertyId,
+      coreExtensionId,
+      attributes: {
+        name: 'premium-cdn-enabled-file-transform-data-element',
+        settings: {
+          source:
+            // eslint-disable-next-line max-len
+            "markTurbineTestExecuted('PremiumCDNEnabled::turbine_cc_data_element-file-transform-pass', new Date().toISOString());"
+        },
+        storage_duration: 'pageview'
+      }
+    });
+    dataElementsUsed.push(dataElement1.data.id);
+
+    const rulesUsed = [];
+    try {
+      /**** rule 1, Custom Condition File Transform ****/
+      const rule1 = await ReactorApi.createRule({
+        propertyId,
+        ruleName: 'Premium CDN Custom Condition File Transform'
+      });
+      const rule1Id = rule1.data.id;
+      rulesUsed.push(rule1Id);
+      // event
+      await ReactorApi.createRuleComponent({
+        propertyId,
+        extensionId: coreExtensionId,
+        ruleId: rule1Id,
+        delegateDescriptorId: 'core::events::dom-ready',
+        ruleComponentName: 'dom ready'
+      });
+      // condition
+      await ReactorApi.createRuleComponent({
+        propertyId,
+        extensionId: launchValidationExtensionId,
+        ruleId: rule1Id,
+        delegateDescriptorId: 'launch-validation::conditions::file-transform',
+        settings: {
+          fileValue: 'var tmpConditionVal = "fileComparisonValue";',
+          staticValue: 'fileComparisonValue'
+        },
+        ruleComponentName: 'Custom Code File Transform Condition'
+      });
+      // action
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
+        propertyId,
+        extensionId: launchValidationExtensionId,
+        ruleId: rule1Id,
+        delegateDescriptorId:
+          'launch-validation::actions::action-direct-no-dom-element',
+        settings: {
+          testIdentifier:
+            'PremiumCDNEnabledCustomConditionFileTransform::sequence-action-js-3-pass'
+        },
+        ruleComponentName: '(1) Action Direct No DOM Element',
+        order: 1
+      });
+      /**** end rule 1, Custom Condition File Transform ****/
+    } catch (err) {
+      console.log('Error creating rule 1');
+      throw err;
+    }
+
+    try {
+      /**** rule 2, Custom Action File Transform ****/
+      const rule2 = await ReactorApi.createRule({
+        propertyId,
+        ruleName: 'Premium CDN Custom Action File Transform'
+      });
+      const rule2Id = rule2.data.id;
+      rulesUsed.push(rule2Id);
+      // event
+      await ReactorApi.createRuleComponent({
+        propertyId,
+        extensionId: coreExtensionId,
+        ruleId: rule2Id,
+        delegateDescriptorId: 'core::events::dom-ready',
+        ruleComponentName: 'dom ready'
+      });
+      // action
+      await ReactorApi.createActionThatRespectsPromiseChainResolves({
+        propertyId,
+        extensionId: launchValidationExtensionId,
+        ruleId: rule2Id,
+        delegateDescriptorId:
+          'launch-validation::actions::action-verify-file-transform-no-dom-element',
+        settings: {
+          rawFileValue: 'fileComparisonValue',
+          fileValue: 'var tmpConditionVal = "fileComparisonValue";',
+          staticValue: 'fileComparisonValue',
+          testIdentifier:
+            'PremiumCDNEnabledCustomActionFileTransform::sequence-action-js-2-pass'
+        },
+        ruleComponentName: '(1) Action Verify File Transform No DOM Element',
+        order: 1
+      });
+      /**** end rule 1, Custom Condition File Transform ****/
+    } catch (err) {
+      console.log('Error creating rule 2');
+      throw err;
+    }
+
+    console.log('✅ finished rules/conditions/actions creations');
+
+    /*** create Library ***/
+    const library = await ReactorApi.createLibrary({
+      name: 'API Build Library',
+      propertyId,
+      environmentId,
+      extensionIdsUsed: [coreExtensionId, launchValidationExtensionId],
+      dataElementIds: dataElementsUsed,
+      ruleIds: rulesUsed
+    });
+    const libraryId = library.data.id;
+    console.log('✅ made a library');
+
+    const completedBuild = await ReactorApi.buildLibrary({ libraryId });
+    console.log('✅ create build', completedBuild.data.id);
+    /*** create Library ***/
+
+    return {
+      success: true,
+      propertyLink,
+      libraryLink,
+      premiumCdnLink,
+      propertyName
+    };
+  } catch (error) {
+    return { success: false, error };
+  }
+}
+
+// If this script is run directly, execute the function
+if (require.main === module) {
+  generateContainer()
+    .then(({ success, propertyLink, libraryLink, propertyName, error }) => {
+      if (success) {
+        console.log(
+          'TURBINE_CHECKS_PREM_CDN_ENABLED library generated successfully!'
+        );
+        console.log(propertyName);
+        console.log('Property Link:', propertyLink);
+        console.log('Library Build:', libraryLink);
+        process.exit(0);
+      } else {
+        console.error(
+          'Failed to generate TURBINE_CHECKS_PREM_CDN_ENABLED library:',
+          error
+        );
+        process.exit(1);
+      }
+    })
+    .catch((err) => {
+      console.error('Unexpected error:', err);
+      process.exit(1);
+    });
+}
+
+module.exports = generateContainer;

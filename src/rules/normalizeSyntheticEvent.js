@@ -10,42 +10,45 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var logger = require('../logger');
-var objectAssign = require('@adobe/reactor-object-assign');
-var { isPlainObject } = require('is-plain-object');
+var validateInjectedParams = require('../helpers/validate-injected-params');
 
-/**
- * Normalizes a synthetic event so that it exists and has at least meta.
- * @param {Object} syntheticEventMeta
- * @param {Object} [syntheticEvent]
- * @returns {Object}
- */
-module.exports = function (syntheticEventMeta, syntheticEvent) {
-  syntheticEvent = syntheticEvent || {};
+function injectNormalizeSyntheticEvent({
+  objectAssign,
+  isPlainObject,
+  logger
+}) {
+  return function normalizeSyntheticEvent(syntheticEventMeta, syntheticEvent) {
+    syntheticEvent = syntheticEvent || {};
+    if (isPlainObject(syntheticEvent)) {
+      syntheticEvent = objectAssign({}, syntheticEvent, syntheticEventMeta);
+    } else {
+      objectAssign(syntheticEvent, syntheticEventMeta);
+    }
+    if (!syntheticEvent.hasOwnProperty('type')) {
+      Object.defineProperty(syntheticEvent, 'type', {
+        get: function () {
+          logger.deprecation(
+            'Accessing event.type in Adobe Launch has been deprecated and will be ' +
+              'removed soon. Please use event.$type instead.'
+          );
+          return syntheticEvent.$type;
+        }
+      });
+    }
+    return syntheticEvent;
+  };
+}
 
-  // This ensures that as the user hands us a synthetic event for multiple rules,
-  // we aren't overwriting a new meta into the same object reference.
-  if (isPlainObject(syntheticEvent)) {
-    syntheticEvent = objectAssign({}, syntheticEvent, syntheticEventMeta);
-  } else {
-    // When syntheticEvent is not an object, there's nothing we can guarantee
-    // about the ability to "copy". Leave it alone.
-    objectAssign(syntheticEvent, syntheticEventMeta);
-  }
+const validateInjection = validateInjectedParams(injectNormalizeSyntheticEvent);
 
-  // Remove after some arbitrary time period when we think users have had sufficient chance
-  // to move away from event.type
-  if (!syntheticEvent.hasOwnProperty('type')) {
-    Object.defineProperty(syntheticEvent, 'type', {
-      get: function () {
-        logger.deprecation(
-          'Accessing event.type in Adobe Launch has been deprecated and will be ' +
-            'removed soon. Please use event.$type instead.'
-        );
-        return syntheticEvent.$type;
-      }
-    });
-  }
+module.exports = validateInjection({
+  objectAssign: require('@adobe/reactor-object-assign'),
+  isPlainObject: require('is-plain-object').isPlainObject,
+  logger: require('../logger')
+});
 
-  return syntheticEvent;
-};
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  /* START.TESTS_ONLY */
+  module.exports.injectNormalizeSyntheticEvent = validateInjection;
+  /* END.TESTS_ONLY */
+}

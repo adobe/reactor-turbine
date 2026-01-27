@@ -1,3 +1,18 @@
 node_modules
 /coverage
 /dist
+ci-scripts/setup/.env
+**/.env*
+!**/.env-example
+**/.*access-token
+
+#playwright
+# Playwright browsers (installed locally by default)
+.playwright/
+
+# Test artifacts
+test-results/
+playwright-report/
+blob-report/
+trace.zip
+**/fake-blacksmith-container.js

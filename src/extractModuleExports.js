@@ -15,6 +15,7 @@ module.exports = function (script, require, turbine) {
     exports: {}
   };
 
+  // simulate CommonJS environment where a developer can define module.exports
   script.call(module.exports, module, module.exports, require, turbine);
 
   return module.exports;

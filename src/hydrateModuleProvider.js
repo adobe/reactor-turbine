@@ -10,104 +10,127 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var createGetSharedModuleExports = require('./createGetSharedModuleExports');
-var createGetExtensionSettings = require('./createGetExtensionSettings');
-var createGetHostedLibFileUrl = require('./createGetHostedLibFileUrl');
-var logger = require('./logger');
-var resolveRelativePath = require('./resolveRelativePath');
-var createPublicRequire = require('./createPublicRequire');
+var validateInjectedParams = require('./helpers/validate-injected-params');
 
-module.exports = function (
-  container,
-  moduleProvider,
-  debugController,
-  replaceTokens,
-  getDataElementValue,
-  settingsFileTransformer,
-  decorateWithDynamicHost
-) {
-  var extensions = container.extensions;
-  var buildInfo = container.buildInfo;
-  var environment = container.environment;
-  var propertySettings = container.property.settings;
+function injectHydrateModuleProvider({
+  createGetSharedModuleExports,
+  createGetExtensionSettings,
+  createGetHostedLibFileUrl,
+  resolveRelativePath,
+  createPublicRequire,
+  logger
+}) {
+  return function hydrateModuleProvider(
+    container,
+    moduleProvider,
+    debugController,
+    replaceTokens,
+    getDataElementValue,
+    settingsFileTransformer,
+    decorateWithDynamicHost
+  ) {
+    var extensions = container.extensions;
+    var buildInfo = container.buildInfo;
+    var environment = container.environment;
+    var propertySettings = container.property.settings;
 
-  if (extensions) {
-    var getSharedModuleExports = createGetSharedModuleExports(
-      extensions,
-      moduleProvider
-    );
-
-    Object.keys(extensions).forEach(function (extensionName) {
-      var extension = extensions[extensionName];
-      var extensionSettings = extension.settings;
-      if (Array.isArray(extension.filePaths)) {
-        extensionSettings = settingsFileTransformer(
-          extensionSettings,
-          extension.filePaths
-        );
-      }
-      var getExtensionSettings = createGetExtensionSettings(
-        replaceTokens,
-        extensionSettings
+    if (extensions) {
+      var getSharedModuleExports = createGetSharedModuleExports(
+        extensions,
+        moduleProvider
       );
 
-      if (extension.modules) {
-        var prefixedLogger = logger.createPrefixedLogger(extension.displayName);
-        var getHostedLibFileUrl = createGetHostedLibFileUrl(
-          decorateWithDynamicHost,
-          extension.hostedLibFilesBaseUrl,
-          buildInfo.minified
+      Object.keys(extensions).forEach(function (extensionName) {
+        var extension = extensions[extensionName];
+        var extensionSettings = extension.settings;
+        if (Array.isArray(extension.filePaths)) {
+          extensionSettings = settingsFileTransformer(
+            extensionSettings,
+            extension.filePaths
+          );
+        }
+        var getExtensionSettings = createGetExtensionSettings(
+          replaceTokens,
+          extensionSettings
         );
-        var turbine = {
-          buildInfo: buildInfo,
-          environment: environment,
-          property: {
-            name: container.property.name,
-            id: container.property.id
-          },
-          getDataElementValue: getDataElementValue,
-          getExtensionSettings: getExtensionSettings,
-          getHostedLibFileUrl: getHostedLibFileUrl,
-          getSharedModule: getSharedModuleExports,
-          logger: prefixedLogger,
-          propertySettings: propertySettings,
-          replaceTokens: replaceTokens,
-          onDebugChanged: debugController.onDebugChanged,
-          get debugEnabled() {
-            return debugController.getDebugEnabled();
-          }
-        };
 
-        Object.keys(extension.modules).forEach(function (referencePath) {
-          var module = extension.modules[referencePath];
-          var getModuleExportsByRelativePath = function (relativePath) {
-            var resolvedReferencePath = resolveRelativePath(
-              referencePath,
-              relativePath
-            );
-            return moduleProvider.getModuleExports(resolvedReferencePath);
+        if (extension.modules) {
+          var prefixedLogger = logger.createPrefixedLogger(
+            extension.displayName
+          );
+          var getHostedLibFileUrl = createGetHostedLibFileUrl(
+            decorateWithDynamicHost,
+            extension.hostedLibFilesBaseUrl,
+            buildInfo.minified
+          );
+          var turbine = {
+            buildInfo: buildInfo,
+            environment: environment,
+            property: {
+              name: container.property.name,
+              id: container.property.id
+            },
+            getDataElementValue: getDataElementValue,
+            getExtensionSettings: getExtensionSettings,
+            getHostedLibFileUrl: getHostedLibFileUrl,
+            getSharedModule: getSharedModuleExports,
+            logger: prefixedLogger,
+            propertySettings: propertySettings,
+            replaceTokens: replaceTokens,
+            onDebugChanged: debugController.onDebugChanged,
+            get debugEnabled() {
+              return debugController.getDebugEnabled();
+            }
           };
-          var publicRequire = createPublicRequire(
-            getModuleExportsByRelativePath
-          );
 
-          moduleProvider.registerModule(
-            referencePath,
-            module,
-            extensionName,
-            publicRequire,
-            turbine
-          );
-        });
-      }
-    });
+          Object.keys(extension.modules).forEach(function (referencePath) {
+            var module = extension.modules[referencePath];
+            var getModuleExportsByRelativePath = function (relativePath) {
+              var resolvedReferencePath = resolveRelativePath(
+                referencePath,
+                relativePath
+              );
+              return moduleProvider.getModuleExports(resolvedReferencePath);
+            };
+            var publicRequire = createPublicRequire(
+              getModuleExportsByRelativePath
+            );
 
-    // We want to extract the module exports immediately to allow the modules
-    // to run some logic immediately.
-    // We need to do the extraction here in order for the moduleProvider to
-    // have all the modules previously registered. (eg. when moduleA needs moduleB, both modules
-    // must exist inside moduleProvider).
-    moduleProvider.hydrateCache();
-  }
-  return moduleProvider;
-};
+            moduleProvider.registerModule(
+              referencePath,
+              module,
+              extensionName,
+              publicRequire,
+              turbine
+            );
+          });
+        }
+      });
+
+      // We want to extract the module exports immediately to allow the modules
+      // to run some logic immediately.
+      // We need to do the extraction here in order for the moduleProvider to
+      // have all the modules previously registered. (eg. when moduleA needs moduleB, both modules
+      // must exist inside moduleProvider).
+      moduleProvider.hydrateCache();
+    }
+    return moduleProvider;
+  };
+}
+
+const validateInjection = validateInjectedParams(injectHydrateModuleProvider);
+
+module.exports = validateInjection({
+  createGetSharedModuleExports: require('./createGetSharedModuleExports'),
+  createGetExtensionSettings: require('./createGetExtensionSettings'),
+  createGetHostedLibFileUrl: require('./createGetHostedLibFileUrl'),
+  resolveRelativePath: require('./resolveRelativePath'),
+  createPublicRequire: require('./createPublicRequire'),
+  logger: require('./logger')
+});
+
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  /* START.TESTS_ONLY */
+  module.exports.injectHydrateModuleProvider = validateInjection;
+  /* END.TESTS_ONLY */
+}

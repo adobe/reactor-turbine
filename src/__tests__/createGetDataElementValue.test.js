@@ -12,18 +12,18 @@
 
 'use strict';
 
-var injectCreateGetDataElementValue = require('inject-loader!../createGetDataElementValue');
+var {
+  injectCreateGetDataElementValue
+} = require('../createGetDataElementValue');
+var cleanText = require('../cleanText');
+var dataElementSafe = require('../dataElementSafe');
 var createSettingsFileTransformer = require('../createSettingsFileTransformer');
 
 describe('function returned by createGetDataElementValue', function () {
+  var createGetDataElementValue;
   var logger;
   var replaceTokens;
   var settingsFileTransformer;
-  var getInjectedCreateGetDataElementValue = function (mocks) {
-    mocks = mocks || {};
-    mocks['./logger'] = logger;
-    return injectCreateGetDataElementValue(mocks);
-  };
 
   beforeEach(function () {
     logger = jasmine.createSpyObj('logger', ['log', 'error']);
@@ -31,10 +31,14 @@ describe('function returned by createGetDataElementValue', function () {
       return settings;
     });
     settingsFileTransformer = jasmine.createSpy('settingsFileTransformer');
+    createGetDataElementValue = injectCreateGetDataElementValue({
+      logger,
+      cleanText,
+      dataElementSafe
+    });
   });
 
   it('returns a data element value using data from settings', function () {
-    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
       getModuleExports: function () {
         return function (settings) {
@@ -68,7 +72,6 @@ describe('function returned by createGetDataElementValue', function () {
   // DTM-12602 Allows data elements to reference event
   // data when retrieved within the context of a rule execution
   it('returns a data element value using data from event', function () {
-    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
       getModuleExports: function () {
         return function (settings, event) {
@@ -101,11 +104,13 @@ describe('function returned by createGetDataElementValue', function () {
   });
 
   it('stores the data element value if value exists and storageDuration provided', function () {
-    var dataElementSafe = {
+    var dataElementSafeMock = {
       setValue: jasmine.createSpy()
     };
-    var createGetDataElementValue = getInjectedCreateGetDataElementValue({
-      './dataElementSafe': dataElementSafe
+    createGetDataElementValue = injectCreateGetDataElementValue({
+      logger,
+      cleanText,
+      dataElementSafe: dataElementSafeMock
     });
     var moduleProvider = {
       getModuleExports: function () {
@@ -135,7 +140,7 @@ describe('function returned by createGetDataElementValue', function () {
     );
     getDataElementValue('testDataElement');
 
-    expect(dataElementSafe.setValue).toHaveBeenCalledWith(
+    expect(dataElementSafeMock.setValue).toHaveBeenCalledWith(
       'testDataElement',
       'visitor',
       'bar'
@@ -143,10 +148,12 @@ describe('function returned by createGetDataElementValue', function () {
   });
 
   it('cleans the value when cleanText = true', function () {
-    var createGetDataElementValue = getInjectedCreateGetDataElementValue({
-      './cleanText': function (value) {
+    createGetDataElementValue = injectCreateGetDataElementValue({
+      logger,
+      cleanText: function (value) {
         return 'cleaned:' + value;
-      }
+      },
+      dataElementSafe
     });
     var moduleProvider = {
       getModuleExports: function () {
@@ -178,10 +185,12 @@ describe('function returned by createGetDataElementValue', function () {
   });
 
   it('cleans the default value when cleanText = true', function () {
-    var createGetDataElementValue = getInjectedCreateGetDataElementValue({
-      './cleanText': function (value) {
+    createGetDataElementValue = injectCreateGetDataElementValue({
+      logger,
+      cleanText: function (value) {
         return 'cleaned:' + value;
-      }
+      },
+      dataElementSafe
     });
     var moduleProvider = {
       getModuleExports: function () {
@@ -215,7 +224,6 @@ describe('function returned by createGetDataElementValue', function () {
     'returns undefined when undefinedVarsReturnEmpty = false and data element ' +
       'does not exist',
     function () {
-      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {};
       var getDataElementDefinition = function () {};
       var undefinedVarsReturnEmpty = false;
@@ -233,8 +241,10 @@ describe('function returned by createGetDataElementValue', function () {
   );
 
   it('does not return default value if cached value is present', function () {
-    var createGetDataElementValue = getInjectedCreateGetDataElementValue({
-      './dataElementSafe': {
+    createGetDataElementValue = injectCreateGetDataElementValue({
+      logger,
+      cleanText,
+      dataElementSafe: {
         getValue: function () {
           return 'cachedValue';
         }
@@ -272,8 +282,10 @@ describe('function returned by createGetDataElementValue', function () {
     it(
       'returns a cached value if current value is ' + dataElementValue,
       function () {
-        var createGetDataElementValue = getInjectedCreateGetDataElementValue({
-          './dataElementSafe': {
+        createGetDataElementValue = injectCreateGetDataElementValue({
+          logger,
+          cleanText,
+          dataElementSafe: {
             getValue: function () {
               return 'cachedValue';
             }
@@ -310,7 +322,6 @@ describe('function returned by createGetDataElementValue', function () {
     );
 
     it('returns a default value if value is ' + dataElementValue, function () {
-      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
         getModuleExports: function () {
           return function () {
@@ -347,10 +358,12 @@ describe('function returned by createGetDataElementValue', function () {
         'is ' +
         dataElementValue,
       function () {
-        var createGetDataElementValue = getInjectedCreateGetDataElementValue({
-          './cleanText': function (value) {
+        createGetDataElementValue = injectCreateGetDataElementValue({
+          logger,
+          cleanText: function (value) {
             return 'cleaned:' + value;
-          }
+          },
+          dataElementSafe
         });
         var moduleProvider = {
           getModuleExports: function () {
@@ -388,7 +401,6 @@ describe('function returned by createGetDataElementValue', function () {
         dataElementValue +
         ' and default is undefined',
       function () {
-        var createGetDataElementValue = getInjectedCreateGetDataElementValue();
         var moduleProvider = {
           getModuleExports: function () {
             return function () {
@@ -423,7 +435,6 @@ describe('function returned by createGetDataElementValue', function () {
     it(
       'does not return a default value if value is ' + dataElementValue,
       function () {
-        var createGetDataElementValue = getInjectedCreateGetDataElementValue();
         var moduleProvider = {
           getModuleExports: function () {
             return function () {
@@ -456,7 +467,6 @@ describe('function returned by createGetDataElementValue', function () {
   });
 
   it('lowercases the value if forceLowerCase = true', function () {
-    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
       getModuleExports: function () {
         return function (settings) {
@@ -489,7 +499,6 @@ describe('function returned by createGetDataElementValue', function () {
   });
 
   it('lowercases the default value if forceLowerCase = true', function () {
-    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
       getModuleExports: function () {
         return function () {};
@@ -519,7 +528,6 @@ describe('function returned by createGetDataElementValue', function () {
   });
 
   it('replaces tokens in settings object', function () {
-    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
       getModuleExports: function () {
         return function (settings) {
@@ -571,7 +579,6 @@ describe('function returned by createGetDataElementValue', function () {
       .createSpy('settingsFileTransform')
       .and.callFake(settingsFileTransformer);
 
-    var createGetDataElementValue = getInjectedCreateGetDataElementValue();
     var moduleProvider = {
       getModuleExports: function () {
         return function (settings) {
@@ -655,7 +662,6 @@ describe('function returned by createGetDataElementValue', function () {
         .createSpy('settingsFileTransform')
         .and.callFake(settingsFileTransformer);
 
-      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
         getModuleExports: function () {
           return function (settings) {
@@ -698,7 +704,6 @@ describe('function returned by createGetDataElementValue', function () {
 
   describe('error handling', function () {
     it('logs an error when retrieving data element module exports fails', function () {
-      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
         getModuleExports: function () {
           throw new Error('noob tried to divide by zero');
@@ -733,7 +738,6 @@ describe('function returned by createGetDataElementValue', function () {
     });
 
     it('logs an error when executing data element module exports fails', function () {
-      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
         getModuleExports: function () {
           return function () {
@@ -770,7 +774,6 @@ describe('function returned by createGetDataElementValue', function () {
     });
 
     it('logs an error when the data element module does not export a function', function () {
-      var createGetDataElementValue = getInjectedCreateGetDataElementValue();
       var moduleProvider = {
         getModuleExports: function () {
           return {};

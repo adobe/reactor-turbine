@@ -6,9 +6,16 @@ export default [
   js.configs.recommended,
   eslintPluginPrettierRecommended,
   {
+    ignores: [
+      'src/__integration__/faked-libraries/fake-blacksmith-container.js'
+    ]
+  },
+  {
     languageOptions: {
       globals: {
         _satellite: true,
+        REACTOR_KARMA_CI_UNIT_TEST_MODE: true,
+        __satelliteLoaded: true,
         ...globals.browser,
         ...globals.jasmine,
         ...globals.node
@@ -32,16 +39,7 @@ export default [
       'space-before-blocks': [2, 'always'],
       'space-infix-ops': [2, { int32Hint: false }],
       quotes: [1, 'single', 'avoid-escape'],
-      'max-len': [
-        2,
-        100,
-        4,
-        {
-          ignoreUrls: true,
-          ignorePattern:
-            '^(\\s*(var|let|const)\\s.+=\\s*require\\s*\\()|(^\\s*import)'
-        }
-      ],
+      'max-len': [2, 120, 4, { ignoreUrls: true }],
       eqeqeq: [2, 'allow-null'],
       strict: [0, 'safe'],
       'no-nested-ternary': [2],

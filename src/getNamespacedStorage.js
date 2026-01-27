@@ -10,42 +10,56 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var window = require('@adobe/reactor-window');
-var NAMESPACE = 'com.adobe.reactor.';
+var validateInjectedParams = require('./helpers/validate-injected-params');
 
-module.exports = function (storageType, additionalNamespace) {
-  var finalNamespace = NAMESPACE + (additionalNamespace || '');
+function injectGetNamespacedStorage({ window }) {
+  var NAMESPACE = 'com.adobe.reactor.'; // Default namespace.
+  return function getNamespacedStorage(storageType, additionalNamespace) {
+    var finalNamespace = NAMESPACE + (additionalNamespace || '');
 
-  // When storage is disabled on Safari, the mere act of referencing window.localStorage
-  // or window.sessionStorage throws an error. For this reason, we wrap in a try-catch.
-  return {
-    /**
-     * Reads a value from storage.
-     * @param {string} name The name of the item to be read.
-     * @returns {string}
-     */
-    getItem: function (name) {
-      try {
-        return window[storageType].getItem(finalNamespace + name);
-        // eslint-disable-next-line no-unused-vars
-      } catch (e) {
-        return null;
+    // When storage is disabled on Safari, the mere act of referencing window.localStorage
+    // or window.sessionStorage throws an error. For this reason, we wrap in a try-catch.
+    return {
+      /**
+       * Reads a value from storage.
+       * @param {string} name The name of the item to be read.
+       * @returns {string}
+       */
+      getItem: function (name) {
+        try {
+          return window[storageType].getItem(finalNamespace + name);
+          // eslint-disable-next-line no-unused-vars
+        } catch (e) {
+          return null;
+        }
+      },
+      /**
+       * Saves a value to storage.
+       * @param {string} name The name of the item to be saved.
+       * @param {string} value The value of the item to be saved.
+       * @returns {boolean} Whether the item was successfully saved to storage.
+       */
+      setItem: function (name, value) {
+        try {
+          window[storageType].setItem(finalNamespace + name, value);
+          return true;
+          // eslint-disable-next-line no-unused-vars
+        } catch (e) {
+          return false;
+        }
       }
-    },
-    /**
-     * Saves a value to storage.
-     * @param {string} name The name of the item to be saved.
-     * @param {string} value The value of the item to be saved.
-     * @returns {boolean} Whether the item was successfully saved to storage.
-     */
-    setItem: function (name, value) {
-      try {
-        window[storageType].setItem(finalNamespace + name, value);
-        return true;
-        // eslint-disable-next-line no-unused-vars
-      } catch (e) {
-        return false;
-      }
-    }
+    };
   };
-};
+}
+
+const validateInjection = validateInjectedParams(injectGetNamespacedStorage);
+
+module.exports = validateInjection({
+  window: require('@adobe/reactor-window')
+});
+
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  /* START.TESTS_ONLY */
+  module.exports.injectGetNamespacedStorage = validateInjection;
+  /* END.TESTS_ONLY */
+}

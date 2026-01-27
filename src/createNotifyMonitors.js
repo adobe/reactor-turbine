@@ -9,28 +9,43 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  ****************************************************************************************/
-var logger = require('./logger');
 
-var warningLogged = false;
+var validateInjectedParams = require('./helpers/validate-injected-params');
 
-module.exports = function (_satellite) {
-  return function (type, event) {
-    var monitors = _satellite._monitors;
+function injectCreateNotifyMonitors({ logger }) {
+  return function createNotifyMonitors(satellite) {
+    var warningLogged = false;
 
-    if (monitors) {
-      if (!warningLogged) {
-        logger.warn(
-          'The _satellite._monitors API may change at any time and should only ' +
-            'be used for debugging.'
-        );
-        warningLogged = true;
-      }
+    return function notifyMonitors(type, event) {
+      var monitors = satellite._monitors;
 
-      monitors.forEach(function (monitor) {
-        if (monitor[type]) {
-          monitor[type](event);
+      if (monitors) {
+        if (!warningLogged) {
+          logger.warn(
+            'The _satellite._monitors API may change at any time and should only ' +
+              'be used for debugging.'
+          );
+          warningLogged = true;
         }
-      });
-    }
+
+        monitors.forEach(function (monitor) {
+          if (monitor[type]) {
+            monitor[type](event);
+          }
+        });
+      }
+    };
   };
-};
+}
+
+const validateInjection = validateInjectedParams(injectCreateNotifyMonitors);
+
+module.exports = validateInjection({
+  logger: require('./logger')
+});
+
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  /* START.TESTS_ONLY */
+  module.exports.injectCreateNotifyMonitors = validateInjection;
+  /* END.TESTS_ONLY */
+}

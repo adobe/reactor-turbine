@@ -10,103 +10,117 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var logger = require('./logger');
+var validateInjectedParams = require('./helpers/validate-injected-params');
 
-/**
- * Replacing any variable tokens (%myDataElement%, %this.foo%, etc.) with their associated values.
- * A new string, object, or array will be created; the thing being processed will never be
- * modified.
- * @param {*} thing Thing potentially containing variable tokens. Objects and arrays will be
- * deeply processed.
- * @param {HTMLElement} [element] Associated HTML element. Used for special tokens
- * (%this.something%).
- * @param {Object} [event] Associated event. Used for special tokens (%event.something%,
- * %target.something%)
- * @returns {*} A processed value.
- */
-module.exports = function (isVar, getVar, undefinedVarsReturnEmpty) {
-  var replaceTokensInString;
-  var replaceTokensInObject;
-  var replaceTokensInArray;
-  var replaceTokens;
-  var variablesBeingRetrieved = [];
-
-  var getVarValue = function (token, variableName, syntheticEvent) {
-    if (!isVar(variableName)) {
-      return token;
-    }
-
-    variablesBeingRetrieved.push(variableName);
-    var val = getVar(variableName, syntheticEvent);
-    variablesBeingRetrieved.pop();
-    return val == null && undefinedVarsReturnEmpty ? '' : val;
-  };
-
+function injectCreateReplaceTokens({ logger }) {
   /**
-   * Perform variable substitutions to a string where tokens are specified in the form %foo%.
-   * If the only content of the string is a single data element token, then the raw data element
-   * value will be returned instead.
-   *
-   * @param str {string} The string potentially containing data element tokens.
-   * @param element {HTMLElement} The element to use for tokens in the form of %this.property%.
-   * @param event {Object} The event object to use for tokens in the form of %target.property%.
-   * @returns {*}
+   * Replacing any variable tokens (%myDataElement%, %this.foo%, etc.) with their associated values.
+   * A new string, object, or array will be created; the thing being processed will never be
+   * modified.
+   * @param {*} thing Thing potentially containing variable tokens. Objects and arrays will be
+   * deeply processed.
+   * @param {HTMLElement} [element] Associated HTML element. Used for special tokens
+   * (%this.something%).
+   * @param {Object} [event] Associated event. Used for special tokens (%event.something%,
+   * %target.something%)
+   * @returns {*} A processed value.
    */
-  replaceTokensInString = function (str, syntheticEvent) {
-    // Is the string a single data element token and nothing else?
-    var result = /^%([^%]+)%$/.exec(str);
+  return function createReplaceTokens(isVar, getVar, undefinedVarsReturnEmpty) {
+    var replaceTokensInString;
+    var replaceTokensInObject;
+    var replaceTokensInArray;
+    var replaceTokens;
+    var variablesBeingRetrieved = [];
 
-    if (result) {
-      return getVarValue(str, result[1], syntheticEvent);
-    } else {
-      return str.replace(/%(.+?)%/g, function (token, variableName) {
-        return getVarValue(token, variableName, syntheticEvent);
-      });
-    }
-  };
+    var getVarValue = function (token, variableName, syntheticEvent) {
+      if (!isVar(variableName)) {
+        return token;
+      }
 
-  replaceTokensInObject = function (obj, syntheticEvent) {
-    var ret = {};
-    var keys = Object.keys(obj);
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i];
-      var value = obj[key];
-      ret[key] = replaceTokens(value, syntheticEvent);
-    }
-    return ret;
-  };
+      variablesBeingRetrieved.push(variableName);
+      var val = getVar(variableName, syntheticEvent);
+      variablesBeingRetrieved.pop();
+      return val == null && undefinedVarsReturnEmpty ? '' : val;
+    };
 
-  replaceTokensInArray = function (arr, syntheticEvent) {
-    var ret = [];
-    for (var i = 0, len = arr.length; i < len; i++) {
-      ret.push(replaceTokens(arr[i], syntheticEvent));
-    }
-    return ret;
-  };
+    /**
+     * Perform variable substitutions to a string where tokens are specified in the form %foo%.
+     * If the only content of the string is a single data element token, then the raw data element
+     * value will be returned instead.
+     *
+     * @param str {string} The string potentially containing data element tokens.
+     * @param element {HTMLElement} The element to use for tokens in the form of %this.property%.
+     * @param event {Object} The event object to use for tokens in the form of %target.property%.
+     * @returns {*}
+     */
+    replaceTokensInString = function (str, syntheticEvent) {
+      // Is the string a single data element token and nothing else?
+      var result = /^%([^%]+)%$/.exec(str);
 
-  replaceTokens = function (thing, syntheticEvent) {
-    if (typeof thing === 'string') {
-      return replaceTokensInString(thing, syntheticEvent);
-    } else if (Array.isArray(thing)) {
-      return replaceTokensInArray(thing, syntheticEvent);
-    } else if (typeof thing === 'object' && thing !== null) {
-      return replaceTokensInObject(thing, syntheticEvent);
-    }
+      if (result) {
+        return getVarValue(str, result[1], syntheticEvent);
+      } else {
+        return str.replace(/%(.+?)%/g, function (token, variableName) {
+          return getVarValue(token, variableName, syntheticEvent);
+        });
+      }
+    };
 
-    return thing;
-  };
+    replaceTokensInObject = function (obj, syntheticEvent) {
+      var ret = {};
+      var keys = Object.keys(obj);
+      for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        var value = obj[key];
+        ret[key] = replaceTokens(value, syntheticEvent);
+      }
+      return ret;
+    };
 
-  return function (thing, syntheticEvent) {
-    // It's possible for a data element to reference another data element. Because of this,
-    // we need to prevent circular dependencies from causing an infinite loop.
-    if (variablesBeingRetrieved.length > 10) {
-      logger.error(
-        'Data element circular reference detected: ' +
-          variablesBeingRetrieved.join(' -> ')
-      );
+    replaceTokensInArray = function (arr, syntheticEvent) {
+      var ret = [];
+      for (var i = 0, len = arr.length; i < len; i++) {
+        ret.push(replaceTokens(arr[i], syntheticEvent));
+      }
+      return ret;
+    };
+
+    replaceTokens = function (thing, syntheticEvent) {
+      if (typeof thing === 'string') {
+        return replaceTokensInString(thing, syntheticEvent);
+      } else if (Array.isArray(thing)) {
+        return replaceTokensInArray(thing, syntheticEvent);
+      } else if (typeof thing === 'object' && thing !== null) {
+        return replaceTokensInObject(thing, syntheticEvent);
+      }
+
       return thing;
-    }
+    };
 
-    return replaceTokens(thing, syntheticEvent);
+    return function (thing, syntheticEvent) {
+      // It's possible for a data element to reference another data element. Because of this,
+      // we need to prevent circular dependencies from causing an infinite loop.
+      if (variablesBeingRetrieved.length > 10) {
+        logger.error(
+          'Data element circular reference detected: ' +
+            variablesBeingRetrieved.join(' -> ')
+        );
+        return thing;
+      }
+
+      return replaceTokens(thing, syntheticEvent);
+    };
   };
-};
+}
+
+const validateInjection = validateInjectedParams(injectCreateReplaceTokens);
+
+module.exports = validateInjection({
+  logger: require('./logger')
+});
+
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  /* START.TESTS_ONLY */
+  module.exports.injectCreateReplaceTokens = validateInjection;
+  /* END.TESTS_ONLY */
+}

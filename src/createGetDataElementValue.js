@@ -10,9 +10,7 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var cleanText = require('./cleanText');
-var logger = require('./logger');
-var dataElementSafe = require('./dataElementSafe');
+var validateInjectedParams = require('./helpers/validate-injected-params');
 
 var getErrorMessage = function (
   dataDef,
@@ -31,83 +29,107 @@ var getErrorMessage = function (
   );
 };
 
-module.exports = function (
-  moduleProvider,
-  getDataElementDefinition,
-  replaceTokens,
-  undefinedVarsReturnEmpty,
-  settingsFileTransformer
-) {
-  return function (name, syntheticEvent) {
-    var dataDef = getDataElementDefinition(name);
+function injectCreateGetDataElementValue({
+  cleanText,
+  dataElementSafe,
+  logger
+}) {
+  return function createGetDataElementValue(
+    moduleProvider,
+    getDataElementDefinition,
+    replaceTokens,
+    undefinedVarsReturnEmpty,
+    settingsFileTransformer
+  ) {
+    return function (name, syntheticEvent) {
+      var dataDef = getDataElementDefinition(name);
 
-    if (!dataDef) {
-      return undefinedVarsReturnEmpty ? '' : undefined;
-    }
-
-    var storageDuration = dataDef.storageDuration;
-    var moduleExports;
-    var moduleDefinition;
-
-    try {
-      moduleExports = moduleProvider.getModuleExports(dataDef.modulePath);
-      moduleDefinition = moduleProvider.getModuleDefinition(dataDef.modulePath);
-    } catch (e) {
-      logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
-      return;
-    }
-
-    if (typeof moduleExports !== 'function') {
-      logger.error(
-        getErrorMessage(dataDef, name, 'Module did not export a function.')
-      );
-      return;
-    }
-
-    var value;
-
-    var dataElementSettings = dataDef.settings || {};
-    if (!dataDef.hasTransformedFilePaths && moduleDefinition.filePaths) {
-      settingsFileTransformer(
-        dataElementSettings,
-        moduleDefinition.filePaths,
-        dataDef.modulePath
-      );
-      dataDef.hasTransformedFilePaths = true;
-    }
-
-    try {
-      value = moduleExports(
-        replaceTokens(dataElementSettings, syntheticEvent),
-        syntheticEvent
-      );
-    } catch (e) {
-      logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
-      return;
-    }
-
-    if (storageDuration) {
-      if (value != null) {
-        dataElementSafe.setValue(name, storageDuration, value);
-      } else {
-        value = dataElementSafe.getValue(name, storageDuration);
-      }
-    }
-
-    if (value == null && dataDef.defaultValue != null) {
-      value = dataDef.defaultValue;
-    }
-
-    if (typeof value === 'string') {
-      if (dataDef.cleanText) {
-        value = cleanText(value);
+      if (!dataDef) {
+        return undefinedVarsReturnEmpty ? '' : undefined;
       }
 
-      if (dataDef.forceLowerCase) {
-        value = value.toLowerCase();
-      }
-    }
+      var storageDuration = dataDef.storageDuration;
+      var moduleExports;
+      var moduleDefinition;
 
-    return value;
+      try {
+        moduleExports = moduleProvider.getModuleExports(dataDef.modulePath);
+        moduleDefinition = moduleProvider.getModuleDefinition(
+          dataDef.modulePath
+        );
+      } catch (e) {
+        logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
+        return;
+      }
+
+      if (typeof moduleExports !== 'function') {
+        logger.error(
+          getErrorMessage(dataDef, name, 'Module did not export a function.')
+        );
+        return;
+      }
+
+      var value;
+
+      var dataElementSettings = dataDef.settings || {};
+      if (!dataDef.hasTransformedFilePaths && moduleDefinition.filePaths) {
+        settingsFileTransformer(
+          dataElementSettings,
+          moduleDefinition.filePaths,
+          dataDef.modulePath
+        );
+        dataDef.hasTransformedFilePaths = true;
+      }
+
+      try {
+        value = moduleExports(
+          replaceTokens(dataElementSettings, syntheticEvent),
+          syntheticEvent
+        );
+      } catch (e) {
+        logger.error(getErrorMessage(dataDef, name, e.message, e.stack));
+        return;
+      }
+
+      if (storageDuration) {
+        if (value != null) {
+          dataElementSafe.setValue(name, storageDuration, value);
+        } else {
+          value = dataElementSafe.getValue(name, storageDuration);
+        }
+      }
+
+      if (value == null && dataDef.defaultValue != null) {
+        value = dataDef.defaultValue;
+      }
+
+      if (typeof value === 'string') {
+        if (dataDef.cleanText) {
+          value = cleanText(value);
+        }
+
+        if (dataDef.forceLowerCase) {
+          value = value.toLowerCase();
+        }
+      }
+
+      return value;
+    };
   };
-};
+}
+
+const validateInjection = validateInjectedParams(
+  injectCreateGetDataElementValue
+);
+
+module.exports = validateInjection({
+  cleanText: require('./cleanText'),
+  logger: require('./logger'),
+  dataElementSafe: require('./dataElementSafe')
+});
+
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  /* START.TESTS_ONLY */
+  module.exports.injectCreateGetDataElementValue = validateInjection;
+  /* END.TESTS_ONLY */
+}

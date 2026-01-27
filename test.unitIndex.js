@@ -1,5 +1,5 @@
 /***************************************************************************************
- * (c) 2019 Adobe. All rights reserved.
+ * (c) 2025 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -12,20 +12,38 @@
 
 'use strict';
 
-// Engine tests
-var testsContext = require.context('./src', true, /__tests__\/.*\.test\.jsx?$/);
+// First, run integrity / sanity tests for production files that export an "injected" function
+require('./src/__tests__/production-exports.integrity.test.js');
+
+// Load unit tests from __tests__ directories, excluding integrity tests
+var testsContext = require.context(
+  './src',
+  true,
+  /__tests__\/(?!.*integrity\.test\.).*\.test\.jsx?$/
+);
+
 testsContext.keys().forEach(testsContext);
 
-// This is necessary for the coverage report to show all source files even when they're not
-// included by tests. https://github.com/webpack-contrib/istanbul-instrumenter-loader/issues/15
-var srcContext = require.context('./src', true, /^((?!__tests__).)*\.jsx?$/);
+// Coverage for all non-test code in src (exclude __tests__ and __integration__)
+var srcContext = require.context(
+  './src',
+  true,
+  /^((?!(__tests__|__integration__)).)*\.jsx?$/
+);
 srcContext.keys().forEach(srcContext);
 
-// Core module package tests
-testsContext = require.context('./coreModulePackages', true, /^.\/[^\/]*\/test\.js/);
+// Core module tests
+testsContext = require.context(
+  './coreModulePackages',
+  true,
+  /^.\/[^\/]*\/test\.js/
+);
 testsContext.keys().forEach(testsContext);
 
-// This is necessary for the coverage report to show all source files even when they're not
-// included by tests. https://github.com/webpack-contrib/istanbul-instrumenter-loader/issues/15
-srcContext = require.context('./coreModulePackages', true, /^.\/[^\/]*\/index\.js/);
+// Coverage for core module source
+srcContext = require.context(
+  './coreModulePackages',
+  true,
+  /^.\/[^\/]*\/index\.js/
+);
 srcContext.keys().forEach(srcContext);

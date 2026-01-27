@@ -10,7 +10,9 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var injectCreateDynamicHostResolver = require('inject-loader!../createDynamicHostResolver');
+var {
+  injectCreateDynamicHostResolver
+} = require('../createDynamicHostResolver');
 var createDebugController = require('../createDebugController');
 
 var loggerSpy = jasmine.createSpy('logger');
@@ -36,11 +38,13 @@ describe('createDynamicHostResolver returns a function that when called', functi
     delete window.dynamicHostResolver;
     mockWindow = createMockWindowProtocol('https');
     createDynamicHostResolver = injectCreateDynamicHostResolver({
-      '@adobe/reactor-window': mockWindow
+      window: mockWindow
     });
     consoleSpy = spyOn(console, 'warn');
     debugController = jasmine.createSpyObj('debugController', [
-      'onDebugChanged'
+      'onDebugChanged',
+      'getDebugEnabled',
+      'setDebugEnabled'
     ]);
     dynamicCdnEnabled = true;
   });
@@ -173,7 +177,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
         it('and the window protocol is http', function () {
           var mockWindow = createMockWindowProtocol('http');
           createDynamicHostResolver = injectCreateDynamicHostResolver({
-            '@adobe/reactor-window': mockWindow
+            window: mockWindow
           });
           turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
           dynamicHostResolver = createDynamicHostResolver(
@@ -209,7 +213,7 @@ describe('createDynamicHostResolver returns a function that when called', functi
         it('and the window protocol is http', function () {
           var mockWindow = createMockWindowProtocol('http');
           createDynamicHostResolver = injectCreateDynamicHostResolver({
-            '@adobe/reactor-window': mockWindow
+            window: mockWindow
           });
           turbineEmbedCode = '//assets.adobedtm.com/lib/dev.js';
 

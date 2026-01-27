@@ -12,9 +12,100 @@
 
 'use strict';
 
-var injectIndex = require('inject-loader!../index');
+var index = require('../index');
+var injectIndex = index.injectIndex;
+var cloneDeep = require('lodash.clonedeep');
+const logger = require('../logger');
+var document = require('@adobe/reactor-document');
+var objectAssign = require('@adobe/reactor-object-assign');
+var createDynamicHostResolver = require('../createDynamicHostResolver');
+var buildRuleExecutionOrder = require('../buildRuleExecutionOrder');
+var createDebugController = require('../createDebugController');
+var createExecuteDelegateModule = require('../createExecuteDelegateModule');
+var createGetDataElementValue = require('../createGetDataElementValue');
+var createGetVar = require('../createGetVar');
+var createIsVar = require('../createIsVar');
+var createModuleProvider = require('../createModuleProvider');
+var createNotifyMonitors = require('../createNotifyMonitors');
+var createReplaceTokens = require('../createReplaceTokens');
+var createSetCustomVar = require('../createSetCustomVar');
+var createAddActionToQueue = require('../rules/createAddActionToQueue');
+var createAddConditionToQueue = require('../rules/createAddConditionToQueue');
+var createAddRuleToQueue = require('../rules/createAddRuleToQueue');
+var createEvaluateConditions = require('../rules/createEvaluateConditions');
+var createExecuteRule = require('../rules/createExecuteRule');
+var createGetModuleDisplayNameByRuleComponent = require('../rules/createGetModuleDisplayNameByRuleComponent');
+var createGetSyntheticEventMeta = require('../rules/createGetSyntheticEventMeta');
+var createInitEventModule = require('../rules/createInitEventModule');
+var createLogActionError = require('../rules/createLogActionError');
+var createLogConditionError = require('../rules/createLogConditionError');
+var createLogConditionNotMet = require('../rules/createLogConditionNotMet');
+var createLogRuleCompleted = require('../rules/createLogRuleCompleted');
+var createRunActions = require('../rules/createRunActions');
+var createTriggerRule = require('../rules/createTriggerRule');
+var getRuleComponentErrorMessage = require('../rules/getRuleComponentErrorMessage');
+var isConditionMet = require('../rules/isConditionMet');
+var initRules = require('../rules/initRules');
+var normalizeRuleComponentError = require('../rules/normalizeRuleComponentError');
+var normalizeSyntheticEvent = require('../rules/normalizeSyntheticEvent');
+var getNamespacedStorage = require('../getNamespacedStorage');
+var hydrateModuleProvider = require('../hydrateModuleProvider');
+var hydrateSatelliteObject = require('../hydrateSatelliteObject');
+var createSettingsFileTransformer = require('../createSettingsFileTransformer');
+var loggerMock;
+var satelliteMock;
 
-var logger;
+function getRealDeps() {
+  return {
+    logger,
+    document,
+    objectAssign,
+    createDynamicHostResolver,
+    buildRuleExecutionOrder,
+    createDebugController,
+    createExecuteDelegateModule,
+    createGetDataElementValue,
+    createGetVar,
+    createIsVar,
+    createModuleProvider,
+    createNotifyMonitors,
+    createReplaceTokens,
+    createSetCustomVar,
+    createAddActionToQueue,
+    createAddConditionToQueue,
+    createAddRuleToQueue,
+    createEvaluateConditions,
+    createExecuteRule,
+    createGetModuleDisplayNameByRuleComponent,
+    createGetSyntheticEventMeta,
+    createInitEventModule,
+    createLogActionError,
+    createLogConditionError,
+    createLogConditionNotMet,
+    createLogRuleCompleted,
+    createRunActions,
+    createTriggerRule,
+    getRuleComponentErrorMessage,
+    isConditionMet,
+    initRules,
+    normalizeRuleComponentError,
+    normalizeSyntheticEvent,
+    getNamespacedStorage,
+    hydrateModuleProvider,
+    hydrateSatelliteObject,
+    createSettingsFileTransformer
+  };
+}
+function injectPartialMocks(mockEntries) {
+  if (mockEntries && Object.keys(mockEntries).length > 0) {
+    return {
+      ...getRealDeps(),
+      ...mockEntries
+    };
+  }
+
+  return getRealDeps();
+}
 
 describe('index', function () {
   var turbineScriptId = 'turbine-script-id';
@@ -23,7 +114,7 @@ describe('index', function () {
     'https://fake.adobeassets.com:443/launch-ENabc123-development.min.js';
 
   beforeEach(function () {
-    window._satellite = {
+    satelliteMock = {
       container: {
         property: {
           settings: {
@@ -34,11 +125,19 @@ describe('index', function () {
         company: {
           dynamicCdnEnabled: true,
           cdnAllowList: undefined
+        },
+        buildInfo: {
+          environment: 'development'
+        },
+        environment: {
+          id: 'environment-id',
+          stage: 'test'
         }
       }
     };
+    window._satellite = satelliteMock;
 
-    logger = jasmine.createSpyObj('logger', [
+    loggerMock = jasmine.createSpyObj('logger', [
       'log',
       'info',
       'debug',
@@ -81,34 +180,38 @@ describe('index', function () {
 
   it('starts up just fine when container.company.cdnAllowList is undefined', function () {
     expect(function () {
-      injectIndex({
-        './logger': logger
-      });
+      delete satelliteMock.container.company.cdnAllowList;
+      var decorateSatellite = injectIndex(
+        injectPartialMocks({
+          logger: loggerMock
+        })
+      );
+      decorateSatellite(satelliteMock);
     }).not.toThrow();
 
-    expect(logger.warn).not.toHaveBeenCalledWith(
+    expect(loggerMock.warn).not.toHaveBeenCalledWith(
       'Please review the following error:'
     );
   });
 
-  it('exports the window._satellite object', function () {
-    var index = injectIndex();
-    expect(index).toBe(window._satellite);
-  });
-
   it('prevents turbine from executing multiple times', function () {
-    var createModuleProvider = jasmine.createSpy();
+    var createModuleProviderMock = jasmine.createSpy();
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        createModuleProvider: createModuleProviderMock,
+        logger: loggerMock
+      })
+    );
 
-    injectIndex();
-    injectIndex({
-      './createModuleProvider': createModuleProvider
-    });
+    decorateSatellite(satelliteMock);
+    decorateSatellite(satelliteMock);
 
-    expect(createModuleProvider).not.toHaveBeenCalled();
+    expect(createModuleProviderMock).toHaveBeenCalledTimes(1);
   });
 
   it('deletes the container', function () {
-    injectIndex();
+    var decorateSatellite = injectIndex(getRealDeps());
+    decorateSatellite(satelliteMock);
     expect(window._satellite.container).toBe(undefined);
   });
 
@@ -116,21 +219,24 @@ describe('index', function () {
     'redefines container.buildInfo.environment to point to ' +
       'container.environment.container.stage ',
     function () {
-      var container = window._satellite.container;
-      container.buildInfo = {
+      satelliteMock.container.buildInfo = {
         environment: undefined
       };
-      container.environment = {
+      satelliteMock.container.environment = {
         id: 'the-environment-id',
         stage: 'the-environment-stage-in-environment'
       };
-      injectIndex({
-        './logger': logger
-      });
-      expect(container.buildInfo.environment).toBe(
+      var decorateSatellite = injectIndex(
+        injectPartialMocks({
+          logger: loggerMock
+        })
+      );
+      decorateSatellite(satelliteMock);
+
+      expect(window._satellite.buildInfo.environment).toBe(
         'the-environment-stage-in-environment'
       );
-      expect(logger.deprecation).toHaveBeenCalledWith(
+      expect(loggerMock.deprecation).toHaveBeenCalledWith(
         'container.buildInfo.environment is deprecated.' +
           'Please use `container.environment.stage` instead'
       );
@@ -138,123 +244,149 @@ describe('index', function () {
   );
 
   it('creates moduleProvider', function () {
-    var createModuleProvider = jasmine.createSpy();
-    injectIndex({
-      './createModuleProvider': createModuleProvider
-    });
+    var createModuleProviderMock = jasmine.createSpy();
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        createModuleProvider: createModuleProviderMock
+      })
+    );
+    decorateSatellite(satelliteMock);
 
-    expect(createModuleProvider).toHaveBeenCalled();
+    expect(createModuleProviderMock).toHaveBeenCalled();
   });
 
   it('creates getDataElementValue', function () {
-    var createGetDataElementValue = jasmine.createSpy();
-    var settingsFileTransformer = jasmine.createSpy('settingsFileTransformer');
+    var createGetDataElementValueMock = jasmine.createSpy();
+    var settingsFileTransformerMock = jasmine.createSpy(
+      'settingsFileTransformer'
+    );
     var createSettingsFileTransformer = function () {
-      return settingsFileTransformer;
+      return settingsFileTransformerMock;
     };
-    var moduleProvider = function () {};
-    injectIndex({
-      './createGetDataElementValue': createGetDataElementValue,
-      './createModuleProvider': function () {
-        return moduleProvider;
-      },
-      './createSettingsFileTransformer': createSettingsFileTransformer
-    });
+    var moduleProviderMock = function () {};
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        createGetDataElementValue: createGetDataElementValueMock,
+        createModuleProvider: function () {
+          return moduleProviderMock;
+        },
+        createSettingsFileTransformer: createSettingsFileTransformer
+      })
+    );
+    decorateSatellite(satelliteMock);
 
-    expect(createGetDataElementValue).toHaveBeenCalledWith(
-      moduleProvider,
+    expect(createGetDataElementValueMock).toHaveBeenCalledWith(
+      moduleProviderMock,
       jasmine.any(Function),
       jasmine.any(Function),
       true,
-      settingsFileTransformer
+      settingsFileTransformerMock
     );
   });
 
   it('creates setCustomVar', function () {
-    var createSetCustomVar = jasmine.createSpy();
-    injectIndex({
-      './createSetCustomVar': createSetCustomVar
-    });
+    var createSetCustomVarMock = jasmine.createSpy();
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        createSetCustomVar: createSetCustomVarMock,
+        logger: loggerMock
+      })
+    );
+    decorateSatellite(satelliteMock);
 
-    expect(createSetCustomVar).toHaveBeenCalledWith(jasmine.any(Object));
+    expect(createSetCustomVarMock).toHaveBeenCalledWith(jasmine.any(Object));
   });
 
   it('creates isVar', function () {
-    var createIsVar = jasmine.createSpy();
-    injectIndex({
-      './createIsVar': createIsVar
-    });
+    var createIsVarMock = jasmine.createSpy();
 
-    expect(createIsVar).toHaveBeenCalledWith(
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        createIsVar: createIsVarMock,
+        logger: loggerMock
+      })
+    );
+    decorateSatellite(satelliteMock);
+
+    expect(createIsVarMock).toHaveBeenCalledWith(
       jasmine.any(Object),
       jasmine.any(Function)
     );
   });
 
   it('creates getVar', function () {
-    var createGetVar = jasmine.createSpy();
-    var getDataElementValue = function () {};
-    injectIndex({
-      './createGetVar': createGetVar,
-      './createGetDataElementValue': function () {
-        return getDataElementValue;
-      }
-    });
+    var createGetVarMock = jasmine.createSpy();
+    var getDataElementValueMock = function () {};
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        createGetVar: createGetVarMock,
+        createGetDataElementValue: function () {
+          return getDataElementValueMock;
+        },
+        logger: loggerMock
+      })
+    );
 
-    expect(createGetVar).toHaveBeenCalledWith(
+    decorateSatellite(satelliteMock);
+
+    expect(createGetVarMock).toHaveBeenCalledWith(
       jasmine.any(Object),
       jasmine.any(Function),
-      getDataElementValue
+      getDataElementValueMock
     );
   });
 
   it('creates replaceTokens', function () {
-    var createReplaceTokens = jasmine.createSpy();
-    var isVar = function () {};
-    var getVar = function () {};
-    injectIndex({
-      './createReplaceTokens': createReplaceTokens,
-      './createIsVar': function () {
-        return isVar;
-      },
-      './createGetVar': function () {
-        return getVar;
-      }
-    });
+    var createReplaceTokensMock = jasmine.createSpy();
+    var isVarMock = function () {};
+    var getVarMock = function () {};
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        createReplaceTokens: createReplaceTokensMock,
+        createIsVar: function () {
+          return isVarMock;
+        },
+        createGetVar: function () {
+          return getVarMock;
+        },
+        logger: loggerMock
+      })
+    );
+    decorateSatellite(satelliteMock);
 
-    expect(createReplaceTokens).toHaveBeenCalledWith(isVar, getVar, true);
+    expect(createReplaceTokensMock).toHaveBeenCalledWith(
+      isVarMock,
+      getVarMock,
+      true
+    );
   });
 
   it('creates namespaced storage', function () {
-    var getNamespacedStorage = jasmine.createSpy().and.returnValue({
+    var getNamespacedStorageMock = jasmine.createSpy().and.returnValue({
       getItem: function () {}
     });
-    injectIndex({
-      './getNamespacedStorage': getNamespacedStorage
-    });
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        getNamespacedStorage: getNamespacedStorageMock,
+        logger: loggerMock
+      })
+    );
+    decorateSatellite(satelliteMock);
 
-    expect(getNamespacedStorage).toHaveBeenCalledWith('localStorage');
-  });
-
-  it('creates namespaced storage', function () {
-    var getNamespacedStorage = jasmine.createSpy().and.returnValue({
-      getItem: function () {}
-    });
-    injectIndex({
-      './getNamespacedStorage': getNamespacedStorage
-    });
-
-    expect(getNamespacedStorage).toHaveBeenCalledWith('localStorage');
+    expect(getNamespacedStorageMock).toHaveBeenCalledWith('localStorage');
   });
 
   it("sets logger output enabled when local storage item is 'true'", function () {
     window.localStorage.setItem('com.adobe.reactor.debug', true);
 
-    injectIndex({
-      './logger': logger
-    });
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        logger: loggerMock
+      })
+    );
+    decorateSatellite(satelliteMock);
 
-    expect(logger.outputEnabled).toBe(true);
+    expect(loggerMock.outputEnabled).toBe(true);
   });
 
   it(
@@ -263,140 +395,192 @@ describe('index', function () {
     function () {
       window.localStorage.setItem('com.adobe.reactor.debug', false);
 
-      injectIndex({
-        './logger': logger
-      });
+      var decorateSatellite = injectIndex(
+        injectPartialMocks({
+          logger: loggerMock
+        })
+      );
+      decorateSatellite(satelliteMock);
 
-      expect(logger.outputEnabled).toBe(false);
+      expect(loggerMock.outputEnabled).toBe(false);
     }
   );
 
   it('hydrates satellite object', function () {
-    var container = window._satellite.container;
-    var hydrateSatelliteObject = jasmine.createSpy();
-    var getVar = function () {};
-    var setCustomVar = function () {};
-    injectIndex({
-      './hydrateSatelliteObject': hydrateSatelliteObject,
-      './createGetVar': function () {
-        return getVar;
-      },
-      './createSetCustomVar': function () {
-        return setCustomVar;
-      }
-    });
+    var hydrateSatelliteObjectMock = jasmine.createSpy();
+    var getVarMock = function () {};
+    var setCustomVarMock = function () {};
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        hydrateSatelliteObject: hydrateSatelliteObjectMock,
+        createGetVar: function () {
+          return getVarMock;
+        },
+        createSetCustomVar: function () {
+          return setCustomVarMock;
+        },
+        logger: loggerMock
+      })
+    );
 
-    expect(hydrateSatelliteObject).toHaveBeenCalledWith(
-      window._satellite,
-      container,
+    const satelliteWithoutContainerMock = cloneDeep(satelliteMock);
+    const satelliteContainerMock = cloneDeep(satelliteMock.container);
+    delete satelliteWithoutContainerMock.container;
+    decorateSatellite(satelliteMock);
+
+    expect(hydrateSatelliteObjectMock).toHaveBeenCalledWith(
+      satelliteWithoutContainerMock,
+      jasmine.objectContaining({
+        property: satelliteContainerMock.property,
+        company: satelliteContainerMock.company,
+        buildInfo: {
+          environment: satelliteContainerMock.environment.stage
+        },
+        environment: satelliteContainerMock.environment
+      }),
       jasmine.any(Function),
-      getVar,
-      setCustomVar
+      getVarMock,
+      setCustomVarMock
     );
   });
 
   it('hydrates module provider', function () {
-    var container = window._satellite.container;
-    var hydrateModuleProvider = jasmine.createSpy();
+    var hydrateModuleProviderMock = jasmine.createSpy();
     var moduleProvider = { type: 'moduleProvider' };
     var debugController = { type: 'debugController' };
-    var replaceTokens = jasmine.createSpy('replaceTokens');
-    var getDataElementValue = jasmine.createSpy('getDataElementValue');
-    var settingsFileTransformer = jasmine.createSpy('settingsFileTransformer');
-    var decorateWithDynamicHost = jasmine.createSpy('decorateWithDynamicHost');
-    injectIndex({
-      './hydrateModuleProvider': hydrateModuleProvider,
-      './createModuleProvider': function () {
-        return moduleProvider;
-      },
-      './createDebugController': function () {
-        return debugController;
-      },
-      './createReplaceTokens': function () {
-        return replaceTokens;
-      },
-      './createGetDataElementValue': function () {
-        return getDataElementValue;
-      },
-      './createDynamicHostResolver': function () {
-        return {
-          decorateWithDynamicHost: decorateWithDynamicHost
-        };
-      },
-      './createSettingsFileTransformer': function () {
-        return settingsFileTransformer;
-      }
-    });
+    var replaceTokensMock = jasmine.createSpy('replaceTokens');
+    var getDataElementValueMock = jasmine.createSpy('getDataElementValue');
+    var settingsFileTransformerMock = jasmine.createSpy(
+      'settingsFileTransformer'
+    );
+    var decorateWithDynamicHostMock = jasmine.createSpy(
+      'decorateWithDynamicHost'
+    );
+    const satelliteContainerMock = cloneDeep(satelliteMock.container);
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        hydrateModuleProvider: hydrateModuleProviderMock,
+        createModuleProvider: function () {
+          return moduleProvider;
+        },
+        createDebugController: function () {
+          return debugController;
+        },
+        createReplaceTokens: function () {
+          return replaceTokensMock;
+        },
+        createGetDataElementValue: function () {
+          return getDataElementValueMock;
+        },
+        createDynamicHostResolver: function () {
+          return {
+            decorateWithDynamicHost: decorateWithDynamicHostMock
+          };
+        },
+        createSettingsFileTransformer: function () {
+          return settingsFileTransformerMock;
+        },
+        logger: loggerMock
+      })
+    );
+    decorateSatellite(satelliteMock);
 
-    expect(hydrateModuleProvider).toHaveBeenCalledWith(
-      container,
+    expect(hydrateModuleProviderMock).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        property: satelliteContainerMock.property,
+        company: satelliteContainerMock.company,
+        buildInfo: {
+          environment: satelliteContainerMock.environment.stage
+        },
+        environment: satelliteContainerMock.environment
+      }),
       moduleProvider,
       debugController,
-      replaceTokens,
-      getDataElementValue,
-      settingsFileTransformer,
-      decorateWithDynamicHost
+      replaceTokensMock,
+      getDataElementValueMock,
+      settingsFileTransformerMock,
+      decorateWithDynamicHostMock
     );
   });
 
   it('initializes rules', function () {
     var rules = [];
-    var initRules = jasmine.createSpy();
-    var buildRuleExecutionOrder = function () {};
-    var initEventModule = function () {};
-    injectIndex({
-      './rules/initRules': initRules,
-      './buildRuleExecutionOrder': buildRuleExecutionOrder,
-      './rules/createInitEventModule': function () {
-        return initEventModule;
-      }
-    });
+    var initRulesMock = jasmine.createSpy();
+    var buildRuleExecutionOrderMock = function () {};
+    var initEventModuleMock = function () {};
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        initRules: initRulesMock,
+        buildRuleExecutionOrder: buildRuleExecutionOrderMock,
+        createInitEventModule: function () {
+          return initEventModuleMock;
+        },
+        logger: loggerMock
+      })
+    );
+    decorateSatellite(satelliteMock);
 
-    expect(initRules).toHaveBeenCalledWith(
-      buildRuleExecutionOrder,
+    expect(initRulesMock).toHaveBeenCalledWith(
+      buildRuleExecutionOrderMock,
       rules,
-      initEventModule
+      initEventModuleMock
     );
   });
 
   it("provides an empty array for rules when container doesn't have rules", function () {
-    delete window._satellite.container.rules;
+    delete satelliteMock.container.rules;
     var rules;
-    injectIndex({
-      './rules/initRules': function (_satellite, _rules) {
-        rules = _rules;
-      }
-    });
+
+    var decorateSatellite = injectIndex(
+      injectPartialMocks({
+        initRules: function (_satellite, _rules) {
+          rules = _rules;
+        },
+        logger: loggerMock
+      })
+    );
+    decorateSatellite(satelliteMock);
 
     expect(rules).toEqual([]);
   });
 
   describe('getDataElementDefinition', function () {
     it('returns data elements from container', function () {
-      var dataElementDefinition = {};
-      window._satellite.container.dataElements = {
+      var dataElementDefinition = {
+        name: 'foo',
+        value: 'bar'
+      };
+      satelliteMock.container.dataElements = {
         foo: dataElementDefinition
       };
       var getDataElementDefinition;
-      injectIndex({
-        './createIsVar': function (customVars, _getDataElementDefinition) {
-          getDataElementDefinition = _getDataElementDefinition;
-          return function () {};
-        }
-      });
+      var decorateSatellite = injectIndex(
+        injectPartialMocks({
+          createIsVar: function (customVars, _getDataElementDefinition) {
+            getDataElementDefinition = _getDataElementDefinition;
+            return function () {};
+          },
+          logger: loggerMock
+        })
+      );
+      decorateSatellite(satelliteMock);
 
-      expect(getDataElementDefinition('foo')).toBe(dataElementDefinition);
+      expect(getDataElementDefinition('foo')).toEqual(dataElementDefinition);
     });
 
     it("doesn't throw an error when container doesn't have data elements", function () {
-      delete window._satellite.container.dataElements;
+      delete satelliteMock.container.dataElements;
       var getDataElementDefinition;
-      injectIndex({
-        './createIsVar': function (customVars, _getDataElementDefinition) {
-          getDataElementDefinition = _getDataElementDefinition;
-          return function () {};
-        }
-      });
+      var decorateSatellite = injectIndex(
+        injectPartialMocks({
+          createIsVar: function (customVars, _getDataElementDefinition) {
+            getDataElementDefinition = _getDataElementDefinition;
+            return function () {};
+          },
+          logger: loggerMock
+        })
+      );
+      decorateSatellite(satelliteMock);
 
       expect(getDataElementDefinition('foo')).toBe(undefined);
     });
@@ -405,15 +589,23 @@ describe('index', function () {
   describe('setDebugOutputEnabled', function () {
     it('sets localStorage item', function () {
       var setOutputDebugEnabled;
-      injectIndex({
-        './hydrateSatelliteObject': function (
-          _satellite,
-          container,
-          _setOutputDebugEnabled
-        ) {
-          setOutputDebugEnabled = _setOutputDebugEnabled;
-        }
-      });
+      var decorateSatellite = injectIndex(
+        injectPartialMocks({
+          hydrateSatelliteObject: function (
+            _satellite,
+            container,
+            _setOutputDebugEnabled
+          ) {
+            setOutputDebugEnabled = _setOutputDebugEnabled;
+          },
+          logger: loggerMock
+        })
+      );
+      decorateSatellite(satelliteMock);
+
+      expect(
+        window.localStorage.getItem('com.adobe.reactor.debug')
+      ).toBeFalsy();
 
       setOutputDebugEnabled(true);
 
@@ -445,21 +637,24 @@ describe('index', function () {
 
         describe('isDynamicEnforced=true', function () {
           beforeEach(function () {
-            window._satellite.container.company.isDynamicEnforced = true;
+            satelliteMock.container.company.isDynamicEnforced = true;
           });
 
           it('and the approved hosts list is empty', function () {
-            window._satellite.container.company.cdnAllowList = [];
+            satelliteMock.container.company.cdnAllowList = [];
 
             expect(function () {
-              injectIndex({
-                './logger': logger
-              });
+              var decorateSatellite = injectIndex(
+                injectPartialMocks({
+                  logger: loggerMock
+                })
+              );
+              decorateSatellite(satelliteMock);
             }).toThrowError(
               'Unable to find the Library Embed Code for Dynamic Host Resolution.'
             );
 
-            expect(logger.warn).toHaveBeenCalledOnceWith(
+            expect(loggerMock.warn).toHaveBeenCalledOnceWith(
               'Please review the following error:'
             );
           });
@@ -469,42 +664,48 @@ describe('index', function () {
       describe('there is a proper turbineEmbedCode', function () {
         describe('isDynamicEnforced=true', function () {
           beforeEach(function () {
-            window._satellite.container.company.isDynamicEnforced = true;
+            satelliteMock.container.company.isDynamicEnforced = true;
           });
 
           it('and the approved hosts list is empty', function () {
-            window._satellite.container.company.cdnAllowList = [];
+            satelliteMock.container.company.cdnAllowList = [];
 
             expect(function () {
-              injectIndex({
-                './logger': logger
-              });
+              var decorateSatellite = injectIndex(
+                injectPartialMocks({
+                  logger: loggerMock
+                })
+              );
+              decorateSatellite(satelliteMock);
             }).toThrowError(
               'This library is not authorized for this domain. ' +
                 'Please contact your CSM for more information.'
             );
 
-            expect(logger.warn).toHaveBeenCalledOnceWith(
+            expect(loggerMock.warn).toHaveBeenCalledOnceWith(
               'Please review the following error:'
             );
           });
 
           it('and the turbine embed code is not in the list of approved hosts', function () {
-            window._satellite.container.company.cdnAllowList = [
+            satelliteMock.container.company.cdnAllowList = [
               'first.domain.com',
               'second.domain.com'
             ];
 
             expect(function () {
-              injectIndex({
-                './logger': logger
-              });
+              var decorateSatellite = injectIndex(
+                injectPartialMocks({
+                  logger: loggerMock
+                })
+              );
+              decorateSatellite(satelliteMock);
             }).toThrowError(
               'This library is not authorized for this domain. ' +
                 'Please contact your CSM for more information.'
             );
 
-            expect(logger.warn).toHaveBeenCalledOnceWith(
+            expect(loggerMock.warn).toHaveBeenCalledOnceWith(
               'Please review the following error:'
             );
           });

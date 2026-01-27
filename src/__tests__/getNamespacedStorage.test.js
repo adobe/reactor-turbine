@@ -12,7 +12,8 @@
 
 'use strict';
 
-var injectGetNamespacedStorage = require('inject-loader!../getNamespacedStorage');
+var window = require('@adobe/reactor-window');
+var { injectGetNamespacedStorage } = require('../getNamespacedStorage');
 
 describe('getNamespacedStorage', function () {
   var createMockWindowUnavailableStorage = function () {
@@ -33,7 +34,7 @@ describe('getNamespacedStorage', function () {
   ['sessionStorage', 'localStorage'].forEach(function (storageType) {
     describe('getItem', function () {
       it('returns item', function () {
-        var getNamespacedStorage = injectGetNamespacedStorage();
+        var getNamespacedStorage = injectGetNamespacedStorage({ window });
         var storage = getNamespacedStorage(storageType);
 
         window[storageType].setItem('com.adobe.reactor.foo', 'something');
@@ -42,9 +43,8 @@ describe('getNamespacedStorage', function () {
 
       it('proper error handling if storage is disabled', function () {
         var mockWindow = createMockWindowUnavailableStorage();
-
         var getNamespacedStorage = injectGetNamespacedStorage({
-          '@adobe/reactor-window': mockWindow
+          window: mockWindow
         });
 
         var storage = getNamespacedStorage(storageType);
@@ -55,7 +55,7 @@ describe('getNamespacedStorage', function () {
 
     describe('setItem', function () {
       it('sets item', function () {
-        var getNamespacedStorage = injectGetNamespacedStorage();
+        var getNamespacedStorage = injectGetNamespacedStorage({ window });
         var storage = getNamespacedStorage(storageType);
 
         storage.setItem('foo', 'something');
@@ -66,9 +66,8 @@ describe('getNamespacedStorage', function () {
 
       it('proper error handling if storage is disabled', function () {
         var mockWindow = createMockWindowUnavailableStorage();
-
         var getNamespacedStorage = injectGetNamespacedStorage({
-          '@adobe/reactor-window': mockWindow
+          window: mockWindow
         });
 
         var storage = getNamespacedStorage(storageType);

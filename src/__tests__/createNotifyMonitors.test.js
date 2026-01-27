@@ -10,23 +10,26 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var injectCreateNotifyMonitors = require('inject-loader!../createNotifyMonitors');
+var { injectCreateNotifyMonitors } = require('../createNotifyMonitors');
 
 describe('function returned by createNotifyMonitors', function () {
-  var logger;
+  var loggerMock;
   var createNotifyMonitors;
 
   beforeEach(function () {
-    logger = {
+    loggerMock = {
       warn: jasmine.createSpy()
     };
 
     createNotifyMonitors = injectCreateNotifyMonitors({
-      './logger': logger
+      logger: loggerMock
     });
   });
 
   it("doesn't throw errors if monitors aren't defined", function () {
+    var createNotifyMonitors = injectCreateNotifyMonitors({
+      logger: loggerMock
+    });
     var notifyMonitors = createNotifyMonitors({});
 
     expect(function () {
@@ -48,14 +51,14 @@ describe('function returned by createNotifyMonitors', function () {
     notifyMonitors('ruleTriggered', event);
 
     expect(monitor.ruleTriggered).toHaveBeenCalledWith(event);
-    expect(logger.warn).toHaveBeenCalledWith(
+    expect(loggerMock.warn).toHaveBeenCalledWith(
       'The _satellite._monitors API may change at ' +
         'any time and should only be used for debugging.'
     );
 
     // It shouldn't warn again.
     notifyMonitors('ruleTriggered', event);
-    expect(logger.warn.calls.count()).toBe(1);
+    expect(loggerMock.warn.calls.count()).toBe(1);
   });
 
   it("doesn't throw an error if method on monitor doesn't exist", function () {

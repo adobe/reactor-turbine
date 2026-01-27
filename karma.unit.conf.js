@@ -1,7 +1,20 @@
+/***************************************************************************************
+ * (c) 2025 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ ****************************************************************************************/
+
 'use strict';
 
 const path = require('path');
 const yargs = require('yargs');
+const webpack = require('webpack');
 
 const argv = yargs
   .array('browsers')
@@ -16,7 +29,6 @@ let buildId;
 if (process.env.CI) {
   buildId = `CI #${process.env.GITHUB_RUN_NUMBER} (${process.env.GITHUB_RUN_ID})`;
   argv.browsers = ['SL_EDGE', 'SL_CHROME', 'SL_SAFARI'];
-  reporters.push('saucelabs');
 } else {
   startConnect = true;
 }
@@ -124,7 +136,7 @@ module.exports = function (config) {
     // list of files / patterns to load in the browser
     files: [
       {
-        pattern: 'testIndex.js',
+        pattern: 'test.unitIndex.js',
         watched: false,
         included: true,
         served: true
@@ -147,7 +159,7 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'testIndex.js': ['webpack']
+      'test.unitIndex.js': ['webpack']
     },
     // web server port
     port: 9876,
@@ -182,7 +194,12 @@ module.exports = function (config) {
       },
       module: {
         rules: rules
-      }
+      },
+      plugins: [
+        new webpack.DefinePlugin({
+          REACTOR_KARMA_CI_UNIT_TEST_MODE: JSON.stringify(true)
+        })
+      ]
     },
     webpackServer: {
       debug: false,

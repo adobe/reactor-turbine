@@ -12,11 +12,19 @@
 
 'use strict';
 
-var injectHydrateModuleProvider = require('inject-loader!../hydrateModuleProvider');
+var { injectHydrateModuleProvider } = require('../hydrateModuleProvider');
+var createGetSharedModuleExports = require('../createGetSharedModuleExports');
+var createGetExtensionSettings = require('../createGetExtensionSettings');
+var createGetHostedLibFileUrl = require('../createGetHostedLibFileUrl');
+var resolveRelativePath = require('../resolveRelativePath');
+var createPublicRequire = require('../createPublicRequire');
 var createDynamicHostResolver = require('../createDynamicHostResolver');
 var createSettingsFileTransformer = require('../createSettingsFileTransformer');
 
 describe('hydrateModuleProvider', function () {
+  var loggerMock;
+  var prefixedLoggerMock;
+  var hydrateModuleProvider;
   var container;
   var moduleProvider;
   var replaceTokens;
@@ -26,6 +34,20 @@ describe('hydrateModuleProvider', function () {
   var decorateWithDynamicHost;
 
   beforeEach(function () {
+    prefixedLoggerMock = {};
+    loggerMock = {
+      createPrefixedLogger: jasmine.createSpy().and.callFake(function () {
+        return prefixedLoggerMock;
+      })
+    };
+    hydrateModuleProvider = injectHydrateModuleProvider({
+      createGetSharedModuleExports,
+      createGetExtensionSettings,
+      createGetHostedLibFileUrl,
+      resolveRelativePath,
+      createPublicRequire,
+      logger: loggerMock
+    });
     container = {
       extensions: {
         'ext-a': {
@@ -58,7 +80,8 @@ describe('hydrateModuleProvider', function () {
     getDataElementValue = function () {};
     debugControllerSpy = jasmine.createSpyObj('debugController', {
       onDebugChanged: jasmine.createSpy('onDebugChanged'),
-      getDebugEnabled: true
+      getDebugEnabled: true,
+      setDebugEnabled: jasmine.createSpy('setDebugEnabled')
     });
 
     decorateWithDynamicHost = createDynamicHostResolver(
@@ -74,7 +97,6 @@ describe('hydrateModuleProvider', function () {
   });
 
   it('registers all modules', function () {
-    var hydrateModuleProvider = injectHydrateModuleProvider();
     var a1Module = function () {};
     var a2Module = function () {};
     var b1Module = function () {};
@@ -139,8 +161,6 @@ describe('hydrateModuleProvider', function () {
   });
 
   it('hydrates module cache', function () {
-    var hydrateModuleProvider = injectHydrateModuleProvider();
-
     hydrateModuleProvider(
       container,
       moduleProvider,
@@ -155,21 +175,26 @@ describe('hydrateModuleProvider', function () {
   });
 
   describe('public require provided to modules', function () {
-    var publicRequire;
-    var createPublicRequire;
+    var publicRequireMock;
+    var createPublicRequireMock;
     var getModuleExportsByRelativePath;
 
     beforeEach(function () {
-      publicRequire = function () {};
-      createPublicRequire = jasmine
+      publicRequireMock = function () {};
+      createPublicRequireMock = jasmine
         .createSpy()
         .and.callFake(function (_getModuleExportsByRelativePath) {
           getModuleExportsByRelativePath = _getModuleExportsByRelativePath;
-          return publicRequire;
+          return publicRequireMock;
         });
 
       var hydrateModuleProvider = injectHydrateModuleProvider({
-        './createPublicRequire': createPublicRequire
+        createGetSharedModuleExports,
+        createGetExtensionSettings,
+        createGetHostedLibFileUrl,
+        resolveRelativePath,
+        createPublicRequire: createPublicRequireMock,
+        logger: loggerMock
       });
 
       hydrateModuleProvider(
@@ -185,7 +210,7 @@ describe('hydrateModuleProvider', function () {
 
     it('is the publicRequire returned from createPublicRequire', function () {
       expect(moduleProvider.registerModule.calls.mostRecent().args[3]).toEqual(
-        publicRequire
+        publicRequireMock
       );
     });
 
@@ -201,44 +226,40 @@ describe('hydrateModuleProvider', function () {
 
   describe('turbine object provided to modules', function () {
     var turbine;
-    var createGetExtensionSettings;
-    var getExtensionSettings;
-    var createGetHostedLibFileUrl;
-    var getHostedLibFileUrl;
-    var getSharedModuleExports;
-    var createGetSharedModuleExports;
-    var prefixedLogger;
-    var logger;
+    var createGetSharedModuleExportsMock;
+    var getSharedModuleExportsMock;
+    var createGetExtensionSettingsMock;
+    var getExtensionSettingsMock;
+    var createGetHostedLibFileUrlMock;
+    var getHostedLibFileUrlMock;
 
     beforeEach(function () {
-      getExtensionSettings = function () {};
-      createGetExtensionSettings = jasmine
+      getExtensionSettingsMock = function () {};
+      createGetExtensionSettingsMock = jasmine
         .createSpy()
         .and.callFake(function () {
-          return getExtensionSettings;
+          return getExtensionSettingsMock;
         });
-      getHostedLibFileUrl = function () {};
-      createGetHostedLibFileUrl = jasmine.createSpy().and.callFake(function () {
-        return getHostedLibFileUrl;
-      });
-      getSharedModuleExports = function () {};
-      createGetSharedModuleExports = jasmine
+      getHostedLibFileUrlMock = function () {};
+      createGetHostedLibFileUrlMock = jasmine
         .createSpy()
         .and.callFake(function () {
-          return getSharedModuleExports;
+          return getHostedLibFileUrlMock;
         });
-      prefixedLogger = {};
-      logger = {
-        createPrefixedLogger: jasmine.createSpy().and.callFake(function () {
-          return prefixedLogger;
-        })
-      };
+      getSharedModuleExportsMock = function () {};
+      createGetSharedModuleExportsMock = jasmine
+        .createSpy()
+        .and.callFake(function () {
+          return getSharedModuleExportsMock;
+        });
 
-      var hydrateModuleProvider = injectHydrateModuleProvider({
-        './createGetExtensionSettings': createGetExtensionSettings,
-        './createGetHostedLibFileUrl': createGetHostedLibFileUrl,
-        './createGetSharedModuleExports': createGetSharedModuleExports,
-        './logger': logger
+      hydrateModuleProvider = injectHydrateModuleProvider({
+        createGetSharedModuleExports: createGetSharedModuleExportsMock,
+        createGetExtensionSettings: createGetExtensionSettingsMock,
+        createGetHostedLibFileUrl: createGetHostedLibFileUrlMock,
+        resolveRelativePath,
+        createPublicRequire,
+        logger: loggerMock
       });
 
       hydrateModuleProvider(
@@ -262,33 +283,35 @@ describe('hydrateModuleProvider', function () {
     });
 
     it('contains getExtensionSettings', function () {
-      expect(createGetExtensionSettings).toHaveBeenCalledWith(
+      expect(createGetExtensionSettingsMock).toHaveBeenCalledWith(
         replaceTokens,
         container.extensions['ext-a'].settings
       );
-      expect(turbine.getExtensionSettings).toEqual(getExtensionSettings);
+      expect(turbine.getExtensionSettings).toEqual(getExtensionSettingsMock);
     });
 
     it('contains getHostedLibFileUrl', function () {
-      expect(createGetHostedLibFileUrl).toHaveBeenCalledWith(
+      expect(createGetHostedLibFileUrlMock).toHaveBeenCalledWith(
         decorateWithDynamicHost,
         'somebaseurl',
         true
       );
-      expect(turbine.getHostedLibFileUrl).toEqual(getHostedLibFileUrl);
+      expect(turbine.getHostedLibFileUrl).toEqual(getHostedLibFileUrlMock);
     });
 
     it('contains getSharedModule', function () {
-      expect(createGetSharedModuleExports).toHaveBeenCalledWith(
+      expect(createGetSharedModuleExportsMock).toHaveBeenCalledWith(
         container.extensions,
         moduleProvider
       );
-      expect(turbine.getSharedModule).toBe(getSharedModuleExports);
+      expect(turbine.getSharedModule).toBe(getSharedModuleExportsMock);
     });
 
     it('contains logger', function () {
-      expect(logger.createPrefixedLogger).toHaveBeenCalledWith('Extension A');
-      expect(turbine.logger).toBe(prefixedLogger);
+      expect(loggerMock.createPrefixedLogger).toHaveBeenCalledWith(
+        'Extension A'
+      );
+      expect(turbine.logger).toBe(prefixedLoggerMock);
     });
 
     it('contains property information similar to _satellite.property', function () {
@@ -324,7 +347,6 @@ describe('hydrateModuleProvider', function () {
     });
 
     it('when extension.filePaths is missing', function () {
-      var hydrateModuleProvider = injectHydrateModuleProvider();
       var a1Module = function () {};
       var extensionA = {
         modules: {
@@ -353,7 +375,6 @@ describe('hydrateModuleProvider', function () {
     });
 
     it('when extension.filePaths is not an array', function () {
-      var hydrateModuleProvider = injectHydrateModuleProvider();
       var a1Module = function () {};
       var extensionA = {
         modules: {
@@ -383,7 +404,6 @@ describe('hydrateModuleProvider', function () {
     });
 
     it('transforms file paths when extension.filePaths is present', function () {
-      var hydrateModuleProvider = injectHydrateModuleProvider();
       var a1Module = function () {};
       var extensionA = {
         modules: {

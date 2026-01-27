@@ -10,39 +10,49 @@
  * governing permissions and limitations under the License.
  ****************************************************************************************/
 
-var CORE_MODULE_PREFIX = '@adobe/reactor-';
+var validateInjectedParams = require('./helpers/validate-injected-params');
 
-var modules = {
-  cookie: require('@adobe/reactor-cookie'),
-  document: require('@adobe/reactor-document'),
-  'load-script': require('@adobe/reactor-load-script'),
-  'object-assign': require('@adobe/reactor-object-assign'),
-  promise: require('@adobe/reactor-promise'),
-  'query-string': require('@adobe/reactor-query-string'),
-  window: require('@adobe/reactor-window')
-};
-
-/**
- * Creates a function which can be passed as a "require" function to extension modules.
- *
- * @param {Function} getModuleExportsByRelativePath
- * @returns {Function}
- */
-module.exports = function (getModuleExportsByRelativePath) {
-  return function (key) {
-    if (key.indexOf(CORE_MODULE_PREFIX) === 0) {
-      var keyWithoutScope = key.substr(CORE_MODULE_PREFIX.length);
-      var module = modules[keyWithoutScope];
-
-      if (module) {
-        return module;
+function injectCreatePublicRequire({ moduleMap }) {
+  moduleMap = moduleMap || {};
+  return function createPublicRequire(getModuleExportsByRelativePath) {
+    // I thought about allowing this prefix to be overridden for testing but
+    // I think it's safer if we don't allow it to be tampered with.
+    var CORE_MODULE_PREFIX = '@adobe/reactor-';
+    return function publicRequire(key) {
+      if (key.indexOf(CORE_MODULE_PREFIX) === 0) {
+        var keyWithoutScope = key.substr(CORE_MODULE_PREFIX.length);
+        if (moduleMap.hasOwnProperty(keyWithoutScope)) {
+          return moduleMap[keyWithoutScope];
+        }
       }
-    }
 
-    if (key.indexOf('./') === 0 || key.indexOf('../') === 0) {
-      return getModuleExportsByRelativePath(key);
-    }
+      if (key.indexOf('./') === 0 || key.indexOf('../') === 0) {
+        return getModuleExportsByRelativePath(key);
+      }
 
-    throw new Error('Cannot resolve module "' + key + '".');
+      throw new Error('Cannot resolve module "' + key + '".');
+    };
   };
-};
+}
+
+const validateInjection = validateInjectedParams(injectCreatePublicRequire);
+
+// 'promise' in this context should be lowercase because imports are of the shape:
+// @adobe/reactor-promise, etc.
+module.exports = validateInjection({
+  moduleMap: {
+    cookie: require('@adobe/reactor-cookie'),
+    document: require('@adobe/reactor-document'),
+    'load-script': require('@adobe/reactor-load-script'),
+    'object-assign': require('@adobe/reactor-object-assign'),
+    promise: require('@adobe/reactor-promise'),
+    'query-string': require('@adobe/reactor-query-string'),
+    window: require('@adobe/reactor-window')
+  }
+});
+
+if (REACTOR_KARMA_CI_UNIT_TEST_MODE) {
+  /* START.TESTS_ONLY */
+  module.exports.injectCreatePublicRequire = validateInjection;
+  /* END.TESTS_ONLY */
+}

@@ -17,8 +17,25 @@ var cookie = require('js-cookie');
 // we have a little more flexibility to change the underlying implementation later. If clear
 // use cases come up for needing the other methods js-cookie exposes, we can re-evaluate whether
 // we want to expose them here.
+
+// js-cookie 3.x removed auto-stringification of objects/arrays from set(). This logic is
+// preserved from the 2.x source to maintain backward compatibility for extensions that pass
+// objects or arrays to cookie.set() without manually stringifying.
+// https://github.com/js-cookie/js-cookie/blob/v2.2.1/src/js.cookie.js
+function set(name, value, attributes) {
+  try {
+    var result = JSON.stringify(value);
+    if (/^[{[]/.test(result)) {
+      value = result;
+    }
+  } catch (e) {
+    console.error('error when testing string for setting cookie', e);
+  }
+  return cookie.set(name, value, attributes);
+}
+
 module.exports = {
   get: cookie.get,
-  set: cookie.set,
+  set: set,
   remove: cookie.remove
 };

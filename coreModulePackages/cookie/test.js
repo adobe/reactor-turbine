@@ -23,4 +23,28 @@ describe('cookie', function () {
   it('does not expose other methods supported by the underlying implementation', function () {
     expect(Object.keys(cookie).length).toBe(3);
   });
+
+  it('sets and gets a string value', function () {
+    cookie.set('testKey', 'hello');
+    expect(cookie.get('testKey')).toBe('hello');
+    cookie.remove('testKey');
+  });
+
+  it('auto-stringifies objects on set', function () {
+    cookie.set('testKey', { foo: 'bar' });
+    expect(cookie.get('testKey')).toBe('{"foo":"bar"}');
+    cookie.remove('testKey');
+  });
+
+  it('auto-stringifies arrays on set', function () {
+    cookie.set('testKey', ['a', 'b']);
+    expect(cookie.get('testKey')).toBe('["a","b"]');
+    cookie.remove('testKey');
+  });
+
+  it('does not double-stringify a value already passed as a JSON string', function () {
+    cookie.set('testKey', '{"foo":"bar"}');
+    expect(cookie.get('testKey')).toBe('{"foo":"bar"}');
+    cookie.remove('testKey');
+  });
 });

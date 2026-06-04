@@ -47,4 +47,16 @@ describe('cookie', function () {
     expect(cookie.get('testKey')).toBe('{"foo":"bar"}');
     cookie.remove('testKey');
   });
+
+  it('handles an undefined value', function () {
+    cookie.set('testKey', undefined);
+    expect(cookie.get('testKey')).toBe('undefined');
+    cookie.remove('testKey');
+  });
+
+  it('handles a null value', function () {
+    cookie.set('testKey', null);
+    expect(cookie.get('testKey')).toBe('null');
+    cookie.remove('testKey');
+  });
 });

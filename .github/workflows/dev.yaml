@@ -101,30 +101,57 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # SauceLabs and Adobe SDK secrets are NOT shared with workflow runs that are
+      # triggered by Dependabot or that originate from a forked repository. When
+      # they are missing, the Sauce Connect tunnel can never authenticate and the
+      # job hangs and retries until it times out (~10 min) instead of failing fast.
+      # Detect their presence so we can run the appropriate test suite.
+      - name: Detect available secrets
+        id: secrets
+        env:
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+        run: |
+          if [ -n "$SAUCE_USERNAME" ]; then
+            echo "sauce=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "sauce=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::SauceLabs secrets unavailable (likely a Dependabot or forked-PR run); running headless unit tests only."
+          fi
+
       # Start Sauce Connect tunnel for SauceLabs
       - name: Start Sauce Connect
+        if: steps.secrets.outputs.sauce == 'true'
         uses: saucelabs/sauce-connect-action@v2
         with:
           username: ${{ secrets.SAUCE_USERNAME }}
           accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
           tunnelIdentifier: github-action-tunnel
 
-      # Unit Tests Step
+      # Unit Tests Step (cross-browser via SauceLabs)
       - name: Run unit tests
+        if: steps.secrets.outputs.sauce == 'true'
         run: npm run test:unit:ci:pull:request
         env:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
 
+      # Fallback for runs without secrets (Dependabot / forked PRs): keep the unit
+      # suite green by running it in headless Chrome, which needs no credentials.
+      - name: Run unit tests (headless Chrome)
+        if: steps.secrets.outputs.sauce == 'false'
+        run: npm run test:unit:ci:npm:publish
+
       ## Coveralls
       - name: Coveralls
+        if: steps.secrets.outputs.sauce == 'true'
         uses: coverallsapp/github-action@v2.3.6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov.info
 
-      # Integration Tests Step
+      # Integration Tests Step (requires Adobe SDK secrets)
       - name: Run integration tests
+        if: steps.secrets.outputs.sauce == 'true'
         run: npm run test:integration
         env:
           RSDK_ADOBE_DEFAULT_COMPANY_CLIENT_ID: ${{ secrets.RSDK_ADOBE_DEFAULT_COMPANY_CLIENT_ID }}

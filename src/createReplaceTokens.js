@@ -53,15 +53,39 @@ function injectCreateReplaceTokens({ logger }) {
      * @param event {Object} The event object to use for tokens in the form of %target.property%.
      * @returns {*}
      */
+    // POC for adobe/reactor-turbine#125.
+    // A token may opt out of eager (module-run-time) evaluation by prefixing its
+    // name with "~", e.g. "%~myDataElement%". Turbine strips one "~" and leaves
+    // the remaining "%myDataElement%" token in place, unresolved, so the delegate
+    // module can resolve it itself at the exact moment its action runs (via
+    // turbine.replaceTokens). This addresses the case where a dynamic data
+    // element used in extension/component configuration was frozen to the value
+    // it had when that module was first executed instead of when the beacon
+    // actually fires.
+    var DEFERRED_TOKEN_PREFIX = '~';
+
+    var isDeferredToken = function (variableName) {
+      return variableName.charAt(0) === DEFERRED_TOKEN_PREFIX;
+    };
+
+    // Strip one level of "~" so the emitted token can be resolved on a later pass.
+    var deferToken = function (variableName) {
+      return '%' + variableName.slice(1) + '%';
+    };
+
     replaceTokensInString = function (str, syntheticEvent) {
       // Is the string a single data element token and nothing else?
       var result = /^%([^%]+)%$/.exec(str);
 
       if (result) {
-        return getVarValue(str, result[1], syntheticEvent);
+        return isDeferredToken(result[1])
+          ? deferToken(result[1])
+          : getVarValue(str, result[1], syntheticEvent);
       } else {
         return str.replace(/%(.+?)%/g, function (token, variableName) {
-          return getVarValue(token, variableName, syntheticEvent);
+          return isDeferredToken(variableName)
+            ? deferToken(variableName)
+            : getVarValue(token, variableName, syntheticEvent);
         });
       }
     };

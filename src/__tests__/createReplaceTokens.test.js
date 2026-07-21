@@ -140,6 +140,43 @@ describe('function returned by replaceTokens', function () {
     }
   );
 
+  // POC for adobe/reactor-turbine#125: deferred (lazy) token evaluation.
+  it('leaves a deferred token (%~foo%) unresolved so it can be evaluated later', function () {
+    getVar = function () {
+      return 'shouldNotBeUsed';
+    };
+    var replaceTokens = createReplaceTokens(
+      isVar,
+      getVar,
+      undefinedVarsReturnEmpty
+    );
+
+    // A single deferred token is emitted as the plain, still-unresolved token.
+    expect(replaceTokens('%~foo%')).toBe('%foo%');
+
+    // Inline: the deferred token is emitted unresolved while a normal token in
+    // the same string is still replaced.
+    expect(replaceTokens('%~foo% and %bar%')).toBe('%foo% and shouldNotBeUsed');
+  });
+
+  it('resolves a previously deferred token on a subsequent pass', function () {
+    getVar = function (variableName) {
+      return 'value-of-' + variableName;
+    };
+    var replaceTokens = createReplaceTokens(
+      isVar,
+      getVar,
+      undefinedVarsReturnEmpty
+    );
+
+    // First pass (e.g. at module-run time) defers evaluation...
+    var deferred = replaceTokens('%~random number%');
+    expect(deferred).toBe('%random number%');
+
+    // ...and a later pass (e.g. when the action actually fires) resolves it.
+    expect(replaceTokens(deferred)).toBe('value-of-random number');
+  });
+
   it('returns the argument unmodified if it is an unsupported type', function () {
     var replaceTokens = createReplaceTokens(
       isVar,

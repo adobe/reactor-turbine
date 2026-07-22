@@ -52,7 +52,7 @@ describe('logger', function () {
         var arg2 = {};
         logger[loggerMethodName](arg1, arg2);
         expect(calls.count()).toBe(1);
-        expect(calls.argsFor(0)[0]).toBe(launchPrefix, arg1, arg2);
+        expect(calls.argsFor(0)).toEqual([launchPrefix, arg1, arg2]);
       }
     );
 
